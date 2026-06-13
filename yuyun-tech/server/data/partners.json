@@ -1,0 +1,18 @@
+{
+  "title": "我们与以下企业携手共进",
+  "subtitle": "Global Partners & Trusted By",
+  "partners": [
+    { "name": "阿里云", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=alibaba%20cloud%20logo%20simple%20modern%20white%20background&image_size=square" },
+    { "name": "腾讯云", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=tencent%20cloud%20logo%20simple%20modern%20white%20background&image_size=square" },
+    { "name": "华为云", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=huawei%20cloud%20logo%20simple%20modern%20white%20background&image_size=square" },
+    { "name": "百度云", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=baidu%20cloud%20logo%20simple%20modern%20white%20background&image_size=square" },
+    { "name": "AWS", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=amazon%20aws%20cloud%20logo%20simple%20modern&image_size=square" },
+    { "name": "Cloudflare", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cloudflare%20logo%20simple%20modern%20orange%20blue&image_size=square" },
+    { "name": "Microsoft Azure", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=microsoft%20azure%20cloud%20logo%20simple%20modern&image_size=square" },
+    { "name": "Google Cloud", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=google%20cloud%20platform%20logo%20simple%20modern&image_size=square" },
+    { "name": "DigitalOcean", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=digitalocean%20cloud%20logo%20simple%20modern&image_size=square" },
+    { "name": "Vultr", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=vultr%20cloud%20hosting%20logo%20simple%20modern&image_size=square" },
+    { "name": "Oracle", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=oracle%20cloud%20infrastructure%20logo%20simple%20modern&image_size=square" },
+    { "name": "IBM Cloud", "logo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ibm%20cloud%20logo%20simple%20modern%20blue&image_size=square" }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "heroTitle": "全球智能云服务领导者",
+  "heroSubtitle": "覆盖全球 30+ 节点 · 7×24 小时专业服务",
+  "certificates": [
+    {
+      "title": "营业执照",
+      "subtitle": "Business License",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20business%20license%20certificate%20official%20document&image_size=square",
+      "desc": "正规工商注册企业，合法合规经营。"
+    },
+    {
+      "title": "电子增值服务产业证",
+      "subtitle": "Value-added Telecom License",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20value%20added%20telecom%20service%20license%20certificate&image_size=square",
+      "desc": "工信部颁发的增值电信业务经营许可证。"
+    },
+    {
+      "title": "ISO 27001认证",
+      "subtitle": "Information Security",
+      "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ISO%2027001%20certification%20information%20security%20badge&image_size=square",
+      "desc": "国际信息安全管理体系认证。"
+    }
+  ],
+  "businessIntro": {
+    "title": "关于语云科技",
+    "subtitle": "ABOUT US",
+    "content": "语云科技（美国）有限公司是一家在全球范围内提供云计算、CDN加速、人工智能解决方案的创新科技企业。我们在中国区设有运营中心，并在中东、欧洲、北美、亚太等多个地区部署核心节点，为全球客户提供高质量、本地化的云服务。"
+  }
+}

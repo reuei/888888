@@ -1,0 +1,18 @@
+{
+  "title": "联系我们",
+  "subtitle": "CONTACT US",
+  "banner": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20customer%20service%20center%20corporate%20contact%20blue&image_size=landscape_16_9",
+  "company": "语云科技（美国）有限公司",
+  "cnCompany": "语云科技（北京）运营中心",
+  "address": "北京市海淀区中关村科技园",
+  "phone": "400-800-8541",
+  "email": "sales@loveym.cloud",
+  "supportEmail": "support@loveym.cloud",
+  "workTime": "工作日 9:00 - 21:00",
+  "supportTime": "7×24 小时技术支持",
+  "lat": 39.9789,
+  "lng": 116.3086,
+  "wechatQr": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=simple%20QR%20code%20wechat%20official%20account&image_size=square",
+  "qqGroup": "88888888",
+  "qqQr": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=simple%20QR%20code%20QQ%20group%20black%20white&image_size=square"
+}

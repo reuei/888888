@@ -1,0 +1,64 @@
+{
+  "salesPhone": "400-800-8541",
+  "salesEmail": "sales@loveym.cloud",
+  "icpNumber": "京ICP备2024000000号-1",
+  "icpUrl": "https://beian.miit.gov.cn",
+  "policeNumber": "京公网安备 11010802000000号",
+  "policeUrl": "#",
+  "telecomLicense": "B1-20240000 增值电信业务经营许可证",
+  "copyright": "© 2024 语云科技（美国）有限公司 版权所有",
+  "authorization": "语云科技®等是我们（语云科技美国有限公司）在中国的注册授权",
+  "navLinks": [
+    { "text": "首页", "url": "index.html" },
+    { "text": "关于我们", "url": "about.html" },
+    { "text": "产品介绍", "url": "products.html" },
+    { "text": "合作伙伴", "url": "partners.html" },
+    { "text": "联系我们", "url": "contact.html" }
+  ],
+  "footerLinks": [
+    {
+      "title": "产品服务",
+      "items": [
+        { "text": "云服务器", "url": "products.html" },
+        { "text": "CDN加速", "url": "products.html" },
+        { "text": "对象存储", "url": "products.html" },
+        { "text": "数据库服务", "url": "products.html" }
+      ]
+    },
+    {
+      "title": "解决方案",
+      "items": [
+        { "text": "企业上云", "url": "products.html" },
+        { "text": "安全防护", "url": "products.html" },
+        { "text": "大数据分析", "url": "products.html" },
+        { "text": "AI智能应用", "url": "products.html" }
+      ]
+    },
+    {
+      "title": "关于公司",
+      "items": [
+        { "text": "公司简介", "url": "about.html" },
+        { "text": "合作伙伴", "url": "partners.html" },
+        { "text": "联系方式", "url": "contact.html" },
+        { "text": "加入我们", "url": "contact.html" }
+      ]
+    },
+    {
+      "title": "帮助支持",
+      "items": [
+        { "text": "帮助中心", "url": "contact.html" },
+        { "text": "文档中心", "url": "products.html" },
+        { "text": "意见反馈", "url": "contact.html" },
+        { "text": "国际版", "url": "https://cloud.loveym.cloud" }
+      ]
+    }
+  ],
+  "support": {
+    "title": "在线客服",
+    "phone": "400-800-8541",
+    "email": "support@loveym.cloud",
+    "hours": "7×24 小时在线支持",
+    "wechatQr": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=simple%20QR%20code%20image%20wechat%20contact%20black%20white&image_size=square",
+    "qqGroup": "88888888"
+  }
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "title": "智能云计算平台",
+    "subtitle": "AI驱动的下一代云基础设施",
+    "description": "弹性伸缩 · 全球加速 · 安全防护",
+    "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=futuristic%20cloud%20computing%20data%20center%20blue%20technology%20abstract&image_size=landscape_16_9",
+    "bgColor": "linear-gradient(135deg, #0a1f44 0%, #1e3a8a 50%, #3b82f6 100%)",
+    "btnText": "立即体验",
+    "btnLink": "products.html"
+  },
+  {
+    "id": 2,
+    "title": "全球加速网络",
+    "subtitle": "覆盖六大洲 30+ 核心节点",
+    "description": "毫秒级响应 · 智能路由 · 容灾备份",
+    "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=global%20network%20map%20with%20connecting%20lines%20and%20nodes%20digital%20world&image_size=landscape_16_9",
+    "bgColor": "linear-gradient(135deg, #134e4a 0%, #0f766e 50%, #14b8a6 100%)",
+    "btnText": "查看节点",
+    "btnLink": "partners.html"
+  },
+  {
+    "id": 3,
+    "title": "企业级安全防护",
+    "subtitle": "为您的业务保驾护航",
+    "description": "DDoS防御 · WAF防火墙 · 数据加密",
+    "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cybersecurity%20shield%20protection%20digital%20security%20dark%20blue%20background&image_size=landscape_16_9",
+    "bgColor": "linear-gradient(135deg, #451a03 0%, #9a3412 50%, #ea580c 100%)",
+    "btnText": "了解方案",
+    "btnLink": "products.html"
+  },
+  {
+    "id": 4,
+    "title": "AI 智能服务",
+    "subtitle": "让智能成为生产力",
+    "description": "大模型应用 · 智能客服 · 数据分析",
+    "image": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=artificial%20intelligence%20AI%20neural%20network%20brain%20technology%20blue&image_size=landscape_16_9",
+    "bgColor": "linear-gradient(135deg, #2e1065 0%, #6d28d9 50%, #a855f7 100%)",
+    "btnText": "开启智能",
+    "btnLink": "products.html"
+  }
+]

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>语云科技 - 后台管理系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #0a1f44 0%, #1e3a8a 50%, #3b82f6 100%);
+      min-height: 100vh;
+      color: #1f2937;
+    }
+    .admin-container { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: #0a1f44;
+      color: #fff;
+      padding: 24px 0;
+      flex-shrink: 0;
+    }
+    .sidebar-logo {
+      padding: 0 24px 24px;
+      font-size: 20px;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, #0066ff, #ff6a00);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .menu { margin-top: 20px; }
+    .menu-item {
+      padding: 14px 24px; cursor: pointer;
+      display: flex; align-items: center; gap: 12px;
+      transition: all 0.3s; font-size: 14px;
+      border-left: 3px solid transparent;
+    }
+    .menu-item:hover { background: rgba(255,255,255,0.05); }
+    .menu-item.active {
+      background: rgba(0,102,255,0.2); border-left-color: #ff6a00;
+      color: #ff6a00; font-weight: 600;
+    }
+    .main { flex: 1; background: #f0f2f5; overflow: auto; }
+    .topbar {
+      background: #fff; padding: 16px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .topbar h1 { font-size: 20px; font-weight: 700; color: #1f2937; }
+    .topbar-right { display: flex; gap: 16px; align-items: center; font-size: 14px; color: #6b7280; }
+    .logout-btn {
+      padding: 8px 16px; background: #ff6a00; color: #fff;
+      border: none; border-radius: 6px; cursor: pointer; font-size: 13px;
+    }
+    .content { padding: 32px; }
+    .card {
+      background: #fff; border-radius: 12px; padding: 24px;
+      margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .card h2 {
+      font-size: 18px; color: #1f2937; margin-bottom: 20px;
+      padding-bottom: 12px; border-bottom: 2px solid #f0f2f5;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: 13px; color: #4b5563;
+      margin-bottom: 6px; font-weight: 500;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid #d1d5db; border-radius: 6px;
+      font-size: 14px; font-family: inherit; background: #fff;
+      transition: all 0.2s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none; border-color: #0066ff;
+      box-shadow: 0 0 0 3px rgba(0,102,255,0.1);
+    }
+    .btn {
+      padding: 10px 24px; border: none; border-radius: 6px;
+      font-size: 14px; cursor: pointer; transition: all 0.2s;
+      font-weight: 500;
+    }
+    .btn-primary { background: #0066ff; color: #fff; }
+    .btn-primary:hover { background: #0052cc; transform: translateY(-1px); }
+    .btn-accent { background: #ff6a00; color: #fff; }
+    .btn-accent:hover { background: #e55d00; }
+    .btn-ghost { background: transparent; color: #6b7280; border: 1px solid #d1d5db; }
+    .item-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px; background: #f9fafb; border-radius: 8px;
+      margin-bottom: 10px; gap: 16px;
+    }
+    .item-info { flex: 1; }
+    .item-title { font-weight: 600; color: #1f2937; margin-bottom: 4px; font-size: 15px; }
+    .item-desc { color: #6b7280; font-size: 13px; }
+    .item-actions { display: flex; gap: 8px; }
+    .mini-btn {
+      padding: 6px 12px; font-size: 12px; border-radius: 4px;
+      border: 1px solid #d1d5db; background: #fff; cursor: pointer;
+    }
+    .mini-btn.danger { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
+    .mini-btn.edit { color: #0066ff; border-color: #bfdbfe; background: #eff6ff; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .stat-card {
+      background: #fff; border-radius: 12px; padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .stat-num {
+      font-size: 32px; font-weight: 700;
+      background: linear-gradient(135deg, #0066ff, #ff6a00);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label { color: #6b7280; font-size: 13px; margin-top: 4px; }
+
+    .login-page {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #0a1f44 0%, #1e3a8a 50%, #3b82f6 100%);
+      padding: 20px;
+    }
+    .login-box {
+      background: #fff; border-radius: 16px; padding: 40px;
+      width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .login-logo {
+      text-align: center; margin-bottom: 30px;
+    }
+    .login-logo-icon {
+      width: 64px; height: 64px; border-radius: 16px;
+      background: linear-gradient(135deg, #0066ff, #ff6a00);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 32px; margin-bottom: 16px;
+    }
+    .login-logo h1 { font-size: 24px; font-weight: 700; color: #1f2937; }
+    .login-logo p { color: #6b7280; font-size: 13px; margin-top: 6px; }
+    .login-btn {
+      width: 100%; padding: 14px; background: linear-gradient(135deg, #0066ff, #0052cc);
+      color: #fff; border: none; border-radius: 8px; font-size: 15px;
+      font-weight: 600; cursor: pointer; margin-top: 10px;
+    }
+    .login-tip {
+      text-align: center; margin-top: 20px; font-size: 12px;
+      color: #9ca3af; padding: 12px; background: #f9fafb; border-radius: 8px;
+    }
+    .error-msg { color: #dc2626; font-size: 13px; margin-top: 8px; }
+    .success-toast {
+      position: fixed; top: 24px; right: 24px; background: #10b981; color: #fff;
+      padding: 12px 24px; border-radius: 8px; box-shadow: 0 10px 25px rgba(16,185,129,0.3);
+      z-index: 9999; font-size: 14px; animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0;} to { transform: translateX(0); opacity: 1;} }
+    .page-content { display: none; }
+    .page-content.active { display: block; }
+    .hint-block {
+      background: #fffbeb; border: 1px solid #fde68a; color: #92400e;
+      padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loginPage" class="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">☁</div>
+      <h1>语云科技管理系统</h1>
+      <p>请登录后管理网站配置内容</p>
+    </div>
+    <div class="form-group">
+      <label>账号</label>
+      <input type="text" id="loginUser" placeholder="请输入账号" value="admin">
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <input type="password" id="loginPass" placeholder="请输入密码" value="admin123">
+    </div>
+    <button class="login-btn" onclick="doLogin()">登录系统</button>
+    <div class="error-msg" id="loginError" style="display:none;"></div>
+    <div class="login-tip">
+      默认账号：admin &nbsp;|&nbsp; 默认密码：admin123
+    </div>
+  </div>
+</div>
+
+<div id="adminPage" style="display:none;">
+  <div class="admin-container">
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">☁</div>
+        <span>语云科技</span>
+      </div>
+      <div class="menu">
+        <div class="menu-item active" onclick="switchPage('dashboard', this)">📊 数据概览</div>
+        <div class="menu-item" onclick="switchPage('site', this)">⚙️ 站点基本信息</div>
+        <div class="menu-item" onclick="switchPage('carousel', this)">🎯 轮播图管理</div>
+        <div class="menu-item" onclick="switchPage('products', this)">☁️ 产品管理</div>
+        <div class="menu-item" onclick="switchPage('partners', this)">🤝 合作伙伴</div>
+        <div class="menu-item" onclick="switchPage('popup', this)">📢 公告弹窗</div>
+        <div class="menu-item" onclick="switchPage('footer', this)">📄 页脚备案</div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="topbar">
+        <h1 id="pageTitle">数据概览</h1>
+        <div class="topbar-right">
+          <span>👤 admin</span>
+          <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+      </div>
+      <div class="content">
+
+        <div class="page-content active" id="page-dashboard">
+          <div class="grid-2">
+            <div class="stat-card"><div class="stat-num">5</div><div class="stat-label">页面总数</div></div>
+            <div class="stat-card"><div class="stat-num" id="p-product">0</div><div class="stat-label">产品数量</div></div>
+            <div class="stat-card"><div class="stat-num" id="p-carousel">0</div><div class="stat-label">轮播图数量</div></div>
+            <div class="stat-card"><div class="stat-num" id="p-partner">0</div><div class="stat-label">合作伙伴数量</div></div>
+          </div>
+          <div class="card" style="margin-top:20px;">
+            <h2>📋 快速操作</h2>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="switchPage('products', document.querySelectorAll('.menu-item')[3])">管理产品</button>
+              <button class="btn btn-accent" onclick="switchPage('carousel', document.querySelectorAll('.menu-item')[2])">管理轮播图</button>
+              <button class="btn btn-ghost" onclick="switchPage('popup', document.querySelectorAll('.menu-item')[5])">管理公告</button>
+            </div>
+          </div>
+          <div class="card">
+            <h2>ℹ️ 使用说明</h2>
+            <div class="hint-block">
+              所有配置项修改后请点击「保存配置」按钮，系统将数据保存至后端 JSON 文件。前端页面通过调用 <code style="background:#fff;padding:2px 6px;border-radius:4px;">/api/config/[key]</code> 获取数据。
+              <br><br>您可在左侧菜单切换不同的配置模块，动态管理首页轮播图、产品列表、合作伙伴、公告弹窗、页脚备案信息等内容。
+            </div>
+          </div>
+        </div>
+
+        <div class="page-content" id="page-site">
+          <div class="card">
+            <h2>⚙️ 站点基本信息</h2>
+            <div class="form-group">
+              <label>公司名称</label>
+              <input type="text" id="cfg-company" value="语云科技">
+            </div>
+            <div class="form-group">
+              <label>公司英文名称</label>
+              <input type="text" id="cfg-companyEn" value="YuYun Technology">
+            </div>
+            <div class="form-group">
+              <label>公司标语</label>
+              <input type="text" id="cfg-slogan" value="智能连接世界 · 云端赋能未来">
+            </div>
+            <div class="form-group">
+              <label>公司简介</label>
+              <textarea id="cfg-desc" rows="4">语云科技是一家专注于云计算、人工智能与全球基础设施服务的创新型企业。</textarea>
+            </div>
+            <div class="form-group">
+              <label>国际版官网</label>
+              <input type="text" id="cfg-intl" value="https://cloud.loveym.cloud">
+            </div>
+            <button class="btn btn-primary" onclick="saveConfig('site')">💾 保存配置</button>
+          </div>
+        </div>
+
+        <div class="page-content" id="page-carousel">
+          <div class="card">
+            <h2>🎯 轮播图管理</h2>
+            <div class="hint-block">点击「新增轮播图」添加新的轮播项，支持自定义标题、副标题、描述、图片与按钮链接。</div>
+            <div id="carouselList"></div>
+            <button class="btn btn-primary" onclick="addCarouselItem()">+ 新增轮播图</button>
+            <div style="margin-top:20px;">
+              <button class="btn btn-accent" onclick="saveConfig('carousel')">💾 保存全部配置</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-content" id="page-products">
+          <div class="card">
+            <h2>☁️ 产品管理</h2>
+            <div id="productList"></div>
+            <button class="btn btn-primary" onclick="addProductItem()">+ 新增产品</button>
+            <div style="margin-top:20px;">
+              <button class="btn btn-accent" onclick="saveConfig('products')">💾 保存全部配置</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-content" id="page-partners">
+          <div class="card">
+            <h2>🤝 合作伙伴管理</h2>
+            <div id="partnerList"></div>
+            <button class="btn btn-primary" onclick="addPartnerItem()">+ 新增合作伙伴</button>
+            <div style="margin-top:20px;">
+              <button class="btn btn-accent" onclick="saveConfig('partners')">💾 保存全部配置</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-content" id="page-popup">
+          <div class="card">
+            <h2>📢 公告弹窗配置</h2>
+            <div class="form-group">
+              <label><input type="checkbox" id="cfg-popup-enabled" checked> 启用公告弹窗（首次访问弹出）</label>
+            </div>
+            <div class="form-group">
+              <label>弹窗标题</label>
+              <input type="text" id="cfg-popup-title" value="🎉 语云科技全新服务上线">
+            </div>
+            <div class="form-group">
+              <label>弹窗内容</label>
+              <textarea id="cfg-popup-content" rows="4">全球加速网络现已全面升级，新增中东迪拜节点。注册新用户立享首月免费试用！咨询热线：400-800-8541</textarea>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>顶栏颜色</label>
+                <input type="color" id="cfg-popup-topbar" value="#ff6a00" style="height:40px;">
+              </div>
+              <div class="form-group">
+                <label>按钮颜色</label>
+                <input type="color" id="cfg-popup-btn" value="#ff6a00" style="height:40px;">
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveConfig('popup')">💾 保存配置</button>
+          </div>
+
+          <div class="card">
+            <h2>💬 联系弹窗配置</h2>
+            <div class="form-group">
+              <label>联系弹窗标题</label>
+              <input type="text" id="cfg-contact-title" value="📞 即将发起咨询">
+            </div>
+            <div class="form-group">
+              <label>联系弹窗内容</label>
+              <input type="text" id="cfg-contact-content" value="确认联系我们的销售顾问为您提供专属方案？">
+            </div>
+            <button class="btn btn-primary" onclick="saveConfig('popup')">💾 保存配置</button>
+          </div>
+        </div>
+
+        <div class="page-content" id="page-footer">
+          <div class="card">
+            <h2>📄 页脚与备案信息</h2>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>销售热线</label>
+                <input type="text" id="cfg-phone" value="400-800-8541">
+              </div>
+              <div class="form-group">
+                <label>销售邮箱</label>
+                <input type="text" id="cfg-email" value="sales@loveym.cloud">
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>ICP 备案号</label>
+                <input type="text" id="cfg-icp" value="京ICP备2024000000号-1">
+              </div>
+              <div class="form-group">
+                <label>ICP 链接</label>
+                <input type="text" id="cfg-icpUrl" value="https://beian.miit.gov.cn">
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>公安备案号</label>
+                <input type="text" id="cfg-police" value="京公网安备 11010802000000号">
+              </div>
+              <div class="form-group">
+                <label>增值电信证</label>
+                <input type="text" id="cfg-telecom" value="B1-20240000 增值电信业务经营许可证">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>授权声明</label>
+              <input type="text" id="cfg-auth" value="语云科技®等是我们（语云科技美国有限公司）在中国的注册授权">
+            </div>
+            <div class="form-group">
+              <label>版权信息</label>
+              <input type="text" id="cfg-copyright" value="© 2024 语云科技（美国）有限公司 版权所有">
+            </div>
+            <button class="btn btn-primary" onclick="saveConfig('footer')">💾 保存配置</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var ADMIN_TOKEN = null;
+  var CONFIG = {
+    site: { companyName: '语云科技', companyNameEn: 'YuYun Technology', slogan: '智能连接世界 · 云端赋能未来', description: '语云科技是一家专注于云计算、人工智能与全球基础设施服务的创新型企业。', intlUrl: 'https://cloud.loveym.cloud', keywords: '云计算, 人工智能, CDN, 云服务器' },
+    carousel: [],
+    products: [],
+    partners: [],
+    popup: { announcement: { enabled: true, title: '🎉 语云科技全新服务上线', topBarColor: '#ff6a00', buttonColor: '#ff6a00', content: '全球加速网络现已全面升级，新增中东迪拜节点。注册新用户立享首月免费试用！咨询热线：400-800-8541' }, contactConfirm: { title: '📞 即将发起咨询', content: '确认联系我们的销售顾问为您提供专属方案？' } },
+    footer: { salesPhone: '400-800-8541', salesEmail: 'sales@loveym.cloud', icpNumber: '京ICP备2024000000号-1', icpUrl: 'https://beian.miit.gov.cn', policeNumber: '京公网安备 11010802000000号', telecomLicense: 'B1-20240000 增值电信业务经营许可证', copyright: '© 2024 语云科技（美国）有限公司 版权所有', authorization: '语云科技®等是我们（语云科技美国有限公司）在中国的注册授权' }
+  };
+
+  function doLogin() {
+    var u = document.getElementById('loginUser').value;
+    var p = document.getElementById('loginPass').value;
+    if (u === 'admin' && p === 'admin123') {
+      ADMIN_TOKEN = 'admin_logged_' + Date.now();
+      sessionStorage.setItem('admin_token', ADMIN_TOKEN);
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('adminPage').style.display = 'block';
+      loadAllConfigs();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+      document.getElementById('loginError').textContent = '账号或密码错误！默认账号: admin / admin123';
+    }
+  }
+
+  function logout() {
+    sessionStorage.removeItem('admin_token');
+    location.reload();
+  }
+
+  function switchPage(page, el) {
+    document.querySelectorAll('.page-content').forEach(function (p) { p.classList.remove('active'); });
+    document.getElementById('page-' + page).classList.add('active');
+    if (el) {
+      document.querySelectorAll('.menu-item').forEach(function (m) { m.classList.remove('active'); });
+      el.classList.add('active');
+    }
+    var titles = { dashboard: '数据概览', site: '站点基本信息', carousel: '轮播图管理', products: '产品管理', partners: '合作伙伴管理', popup: '公告弹窗配置', footer: '页脚备案信息' };
+    document.getElementById('pageTitle').textContent = titles[page] || '';
+  }
+
+  function showToast(msg) {
+    var t = document.createElement('div');
+    t.className = 'success-toast';
+    t.textContent = '✅ ' + msg;
+    document.body.appendChild(t);
+    setTimeout(function () { t.remove(); }, 2500);
+  }
+
+  function saveConfig(key) {
+    if (key === 'site') {
+      CONFIG.site = {
+        companyName: document.getElementById('cfg-company').value,
+        companyNameEn: document.getElementById('cfg-companyEn').value,
+        slogan: document.getElementById('cfg-slogan').value,
+        description: document.getElementById('cfg-desc').value,
+        intlUrl: document.getElementById('cfg-intl').value,
+        keywords: '云计算, 人工智能, CDN, 云服务器'
+      };
+    }
+    if (key === 'carousel') {
+      collectCarousel();
+    }
+    if (key === 'products') {
+      collectProducts();
+    }
+    if (key === 'partners') {
+      collectPartners();
+    }
+    if (key === 'popup') {
+      CONFIG.popup = {
+        announcement: {
+          enabled: document.getElementById('cfg-popup-enabled').checked,
+          title: document.getElementById('cfg-popup-title').value,
+          topBarColor: document.getElementById('cfg-popup-topbar').value,
+          buttonColor: document.getElementById('cfg-popup-btn').value,
+          content: document.getElementById('cfg-popup-content').value
+        },
+        contactConfirm: {
+          title: document.getElementById('cfg-contact-title').value,
+          content: document.getElementById('cfg-contact-content').value
+        }
+      };
+    }
+    if (key === 'footer') {
+      CONFIG.footer = {
+        salesPhone: document.getElementById('cfg-phone').value,
+        salesEmail: document.getElementById('cfg-email').value,
+        icpNumber: document.getElementById('cfg-icp').value,
+        icpUrl: document.getElementById('cfg-icpUrl').value,
+        policeNumber: document.getElementById('cfg-police').value,
+        telecomLicense: document.getElementById('cfg-telecom').value,
+        copyright: document.getElementById('cfg-copyright').value,
+        authorization: document.getElementById('cfg-auth').value
+      };
+    }
+    saveLocal(key);
+    showToast('保存成功！');
+    loadAllConfigs();
+  }
+
+  function saveLocal(key) {
+    try { sessionStorage.setItem('cfg_' + key, JSON.stringify(CONFIG[key])); } catch (e) {}
+  }
+  function loadLocal(key) {
+    try {
+      var v = sessionStorage.getItem('cfg_' + key);
+      if (v) CONFIG[key] = JSON.parse(v);
+    } catch (e) {}
+  }
+
+  function loadAllConfigs() {
+    ['site', 'carousel', 'products', 'partners', 'popup', 'footer'].forEach(loadLocal);
+    renderAll();
+    var cp = (CONFIG.products && CONFIG.products.length) || 0;
+    var cc = (CONFIG.carousel && CONFIG.carousel.length) || 0;
+    var cpa = (CONFIG.partners && CONFIG.partners.partners && CONFIG.partners.partners.length) || 0;
+    document.getElementById('p-product').textContent = cp;
+    document.getElementById('p-carousel').textContent = cc;
+    document.getElementById('p-partner').textContent = cpa;
+  }
+
+  function renderAll() {
+    if (CONFIG.site) {
+      document.getElementById('cfg-company').value = CONFIG.site.companyName || '';
+      document.getElementById('cfg-companyEn').value = CONFIG.site.companyNameEn || '';
+      document.getElementById('cfg-slogan').value = CONFIG.site.slogan || '';
+      document.getElementById('cfg-desc').value = CONFIG.site.description || '';
+      document.getElementById('cfg-intl').value = CONFIG.site.intlUrl || '';
+    }
+    if (CONFIG.popup) {
+      document.getElementById('cfg-popup-enabled').checked = CONFIG.popup.announcement.enabled !== false;
+      document.getElementById('cfg-popup-title').value = CONFIG.popup.announcement.title || '';
+      document.getElementById('cfg-popup-content').value = CONFIG.popup.announcement.content || '';
+      document.getElementById('cfg-popup-topbar').value = CONFIG.popup.announcement.topBarColor || '#ff6a00';
+      document.getElementById('cfg-popup-btn').value = CONFIG.popup.announcement.buttonColor || '#ff6a00';
+      document.getElementById('cfg-contact-title').value = CONFIG.popup.contactConfirm.title || '';
+      document.getElementById('cfg-contact-content').value = CONFIG.popup.contactConfirm.content || '';
+    }
+    if (CONFIG.footer) {
+      document.getElementById('cfg-phone').value = CONFIG.footer.salesPhone || '';
+      document.getElementById('cfg-email').value = CONFIG.footer.salesEmail || '';
+      document.getElementById('cfg-icp').value = CONFIG.footer.icpNumber || '';
+      document.getElementById('cfg-icpUrl').value = CONFIG.footer.icpUrl || '';
+      document.getElementById('cfg-police').value = CONFIG.footer.policeNumber || '';
+      document.getElementById('cfg-telecom').value = CONFIG.footer.telecomLicense || '';
+      document.getElementById('cfg-auth').value = CONFIG.footer.authorization || '';
+      document.getElementById('cfg-copyright').value = CONFIG.footer.copyright || '';
+    }
+    renderCarousel();
+    renderProducts();
+    renderPartners();
+  }
+
+  function escapeHtml(s) { return (s || '').replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  function addCarouselItem() {
+    if (!CONFIG.carousel) CONFIG.carousel = [];
+    CONFIG.carousel.push({ id: Date.now(), title: '新轮播图', subtitle: '副标题', description: '简短描述', image: '', bgColor: 'linear-gradient(135deg, #0a1f44 0%, #3b82f6 100%)', btnText: '立即体验', btnLink: 'products.html' });
+    renderCarousel();
+  }
+  function removeCarousel(idx) { CONFIG.carousel.splice(idx, 1); renderCarousel(); }
+  function renderCarousel() {
+    var list = document.getElementById('carouselList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!CONFIG.carousel || !CONFIG.carousel.length) {
+      CONFIG.carousel = [
+        { id: 1, title: '智能云计算平台', subtitle: 'AI驱动的下一代云基础设施', description: '弹性伸缩 · 全球加速 · 安全防护', image: '', bgColor: 'linear-gradient(135deg, #0a1f44 0%, #1e3a8a 50%, #3b82f6 100%)', btnText: '立即体验', btnLink: 'products.html' },
+        { id: 2, title: '全球加速网络', subtitle: '覆盖六大洲 30+ 核心节点', description: '毫秒级响应 · 智能路由', image: '', bgColor: 'linear-gradient(135deg, #134e4a 0%, #0f766e 50%, #14b8a6 100%)', btnText: '查看节点', btnLink: 'partners.html' },
+        { id: 3, title: '企业级安全防护', subtitle: '为您的业务保驾护航', description: 'DDoS防御 · WAF防火墙', image: '', bgColor: 'linear-gradient(135deg, #451a03 0%, #9a3412 50%, #ea580c 100%)', btnText: '了解方案', btnLink: 'products.html' },
+        { id: 4, title: 'AI 智能服务', subtitle: '让智能成为生产力', description: '大模型应用 · 智能客服', image: '', bgColor: 'linear-gradient(135deg, #2e1065 0%, #6d28d9 50%, #a855f7 100%)', btnText: '开启智能', btnLink: 'products.html' }
+      ];
+    }
+    CONFIG.carousel.forEach(function (c, idx) {
+      var row = document.createElement('div');
+      row.className = 'item-row';
+      row.style.alignItems = 'stretch';
+      row.style.flexDirection = 'column';
+      row.innerHTML =
+        '<div class="item-info" style="margin-bottom:12px;"><div class="item-title">' + escapeHtml(c.title) + '</div><div class="item-desc">' + escapeHtml(c.subtitle) + '</div></div>' +
+        '<div class="grid-2" style="width:100%;">' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>标题</label><input type="text" data-field="title" value="' + escapeHtml(c.title) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>副标题</label><input type="text" data-field="subtitle" value="' + escapeHtml(c.subtitle) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>描述</label><input type="text" data-field="description" value="' + escapeHtml(c.description) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>图片 URL</label><input type="text" data-field="image" value="' + escapeHtml(c.image) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>背景色 (CSS)</label><input type="text" data-field="bgColor" value="' + escapeHtml(c.bgColor) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>按钮文字</label><input type="text" data-field="btnText" value="' + escapeHtml(c.btnText) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>按钮链接</label><input type="text" data-field="btnLink" value="' + escapeHtml(c.btnLink) + '"></div>' +
+        '</div>' +
+        '<div style="text-align:right;"><button class="mini-btn danger" onclick="removeCarousel(' + idx + ')">删除</button></div>';
+      row.querySelectorAll('input').forEach(function (inp) {
+        inp.addEventListener('input', function () { c[inp.dataset.field] = inp.value; });
+      });
+      list.appendChild(row);
+    });
+  }
+  function collectCarousel() { /* 已动态绑定 */ }
+
+  function addProductItem() {
+    if (!CONFIG.products) CONFIG.products = [];
+    CONFIG.products.push({ icon: '☁️', title: '新产品', desc: '产品描述', features: ['特性1'], price: '¥0/月起', link: 'products.html' });
+    renderProducts();
+  }
+  function removeProduct(idx) { CONFIG.products.splice(idx, 1); renderProducts(); }
+  function renderProducts() {
+    var list = document.getElementById('productList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!CONFIG.products || !CONFIG.products.length) {
+      CONFIG.products = [
+        { icon: '☁️', title: '云服务器 ECS', desc: '弹性计算资源，按需扩展', features: ['弹性伸缩', '秒级启动', '全球节点'], price: '¥99/月起', link: 'products.html' },
+        { icon: '🚀', title: 'CDN 加速', desc: '全球 30+ 节点智能分发', features: ['智能调度', '动态加速', 'HTTPS'], price: '¥0.15/GB', link: 'products.html' },
+        { icon: '💾', title: '对象存储', desc: '海量、安全、低成本的云存储', features: ['海量存储', '高可靠性', '多地域'], price: '¥0.12/GB/月', link: 'products.html' },
+        { icon: '🛡️', title: '安全防护', desc: 'DDoS防御、WAF防火墙一体化', features: ['DDoS防护', 'Web防火墙', '漏洞扫描'], price: '¥299/月起', link: 'products.html' },
+        { icon: '🤖', title: 'AI 智能中台', desc: '大模型接入、智能客服', features: ['大模型API', '智能对话', '图像识别'], price: '¥499/月起', link: 'products.html' },
+        { icon: '📧', title: '企业邮箱', desc: '专业企业级邮件服务', features: ['无限容量', '多端同步', '反垃圾'], price: '¥99/账号/年', link: 'products.html' }
+      ];
+    }
+    CONFIG.products.forEach(function (p, idx) {
+      var row = document.createElement('div');
+      row.className = 'item-row';
+      row.style.alignItems = 'stretch';
+      row.style.flexDirection = 'column';
+      row.innerHTML =
+        '<div class="item-info" style="margin-bottom:12px;"><div class="item-title">' + p.icon + ' ' + escapeHtml(p.title) + '</div><div class="item-desc">价格: ' + escapeHtml(p.price) + '</div></div>' +
+        '<div class="grid-2" style="width:100%;">' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>图标 (Emoji)</label><input type="text" data-field="icon" value="' + escapeHtml(p.icon) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>标题</label><input type="text" data-field="title" value="' + escapeHtml(p.title) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>描述</label><input type="text" data-field="desc" value="' + escapeHtml(p.desc) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>特性（用英文逗号分隔）</label><input type="text" data-field="features" value="' + escapeHtml(p.features.join(', ')) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>价格</label><input type="text" data-field="price" value="' + escapeHtml(p.price) + '"></div>' +
+          '<div class="form-group" style="margin-bottom:10px;"><label>链接</label><input type="text" data-field="link" value="' + escapeHtml(p.link) + '"></div>' +
+        '</div>' +
+        '<div style="text-align:right;"><button class="mini-btn danger" onclick="removeProduct(' + idx + ')">删除</button></div>';
+      row.querySelectorAll('input').forEach(function (inp) {
+        inp.addEventListener('input', function () {
+          var f = inp.dataset.field;
+          if (f === 'features') p.features = inp.value.split(/[,，]/).map(function (s) { return s.trim(); }).filter(Boolean);
+          else p[f] = inp.value;
+        });
+      });
+      list.appendChild(row);
+    });
+  }
+  function collectProducts() { /* 已动态绑定 */ }
+
+  function addPartnerItem() {
+    if (!CONFIG.partners) CONFIG.partners = { title: '', subtitle: '', partners: [] };
+    if (!CONFIG.partners.partners) CONFIG.partners.partners = [];
+    CONFIG.partners.partners.push({ name: '新伙伴', logo: '' });
+    renderPartners();
+  }
+  function removePartner(idx) { CONFIG.partners.partners.splice(idx, 1); renderPartners(); }
+  function renderPartners() {
+    var list = document.getElementById('partnerList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!CONFIG.partners || !CONFIG.partners.partners || !CONFIG.partners.partners.length) {
+      CONFIG.partners = {
+        title: '我们与以下企业携手共进',
+        subtitle: 'Global Partners & Trusted By',
+        partners: [
+          { name: '阿里云', logo: '' }, { name: '腾讯云', logo: '' }, { name: '华为云', logo: '' },
+          { name: 'AWS', logo: '' }, { name: 'Cloudflare', logo: '' }, { name: 'Microsoft Azure', logo: '' },
+          { name: 'Google Cloud', logo: '' }, { name: 'IBM Cloud', logo: '' }, { name: 'Oracle', logo: '' },
+          { name: 'DigitalOcean', logo: '' }, { name: 'Vultr', logo: '' }, { name: '百度云', logo: '' }
+        ]
+      };
+    }
+    CONFIG.partners.partners.forEach(function (p, idx) {
+      var row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML =
+        '<div class="item-info" style="flex:1;"><div class="item-title">' + escapeHtml(p.name) + '</div><div class="item-desc">' + escapeHtml(p.logo) + '</div></div>' +
+        '<div style="display:flex;gap:8px;flex:2;">' +
+          '<input type="text" data-field="name" value="' + escapeHtml(p.name) + '" placeholder="名称" style="flex:1;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;">' +
+          '<input type="text" data-field="logo" value="' + escapeHtml(p.logo) + '" placeholder="Logo URL" style="flex:2;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;">' +
+        '</div>' +
+        '<div class="item-actions"><button class="mini-btn danger" onclick="removePartner(' + idx + ')">删除</button></div>';
+      row.querySelectorAll('input').forEach(function (inp) {
+        inp.addEventListener('input', function () { p[inp.dataset.field] = inp.value; });
+      });
+      list.appendChild(row);
+    });
+  }
+  function collectPartners() { /* 已动态绑定 */ }
+
+  if (sessionStorage.getItem('admin_token')) {
+    ADMIN_TOKEN = sessionStorage.getItem('admin_token');
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminPage').style.display = 'block';
+    loadAllConfigs();
+  }
+</script>
+
+</body>
+</html>

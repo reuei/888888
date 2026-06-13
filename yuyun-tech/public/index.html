@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="云计算,人工智能,CDN,云服务器,企业数字化,语云科技">
+  <meta name="description" content="语云科技 - 全球智能云服务领导者，提供云计算、CDN加速、人工智能解决方案。">
+  <title>语云科技 - 智能连接世界 · 云端赋能未来</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☁️</text></svg>">
+</head>
+<body>
+
+<header class="header" id="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <span class="logo-icon">☁</span>
+      <div class="logo-text">
+        语云科技
+        <small>YUYUN TECH</small>
+      </div>
+    </a>
+
+    <nav class="nav" id="nav">
+      <a href="index.html" class="nav-item active">首页</a>
+      <a href="about.html" class="nav-item">关于我们</a>
+      <a href="products.html" class="nav-item">产品服务</a>
+      <a href="partners.html" class="nav-item">合作伙伴</a>
+      <a href="contact.html" class="nav-item">联系我们</a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="header-phone">
+        <span class="header-phone-icon">📞</span>
+        <span>400-800-8541</span>
+      </div>
+      <a href="https://cloud.loveym.cloud" class="intl-btn" target="_blank">
+        🌐 国际版
+      </a>
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="carousel" id="carousel">
+    <div class="carousel-slides" id="carouselSlides"></div>
+    <div class="carousel-controls">
+      <button class="carousel-btn" id="prevBtn" aria-label="上一张">‹</button>
+      <button class="carousel-btn" id="nextBtn" aria-label="下一张">›</button>
+    </div>
+    <div class="carousel-dots" id="carouselDots"></div>
+  </div>
+</section>
+
+<section class="section certificates">
+  <div class="container">
+    <div class="section-title">
+      <span class="subtitle">CERTIFICATIONS</span>
+      <h2>资质与认证</h2>
+      <div class="line"></div>
+      <p style="margin-top:20px;color:var(--text-secondary);max-width:600px;margin-left:auto;margin-right:auto;">
+        我们持正规营业执照与增值电信业务许可证，通过国际信息安全体系认证，为您提供值得信赖的云服务。
+      </p>
+    </div>
+    <div class="cert-grid" id="certGrid"></div>
+  </div>
+</section>
+
+<section class="section about-preview">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-image">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20corporate%20team%20meeting%20cloud%20tech%20company%20office&image_size=square_hd" alt="语云科技">
+      </div>
+      <div class="about-content">
+        <span class="subtitle">ABOUT US</span>
+        <h2>关于语云科技</h2>
+        <p>语云科技（美国）有限公司是一家专注于云计算、CDN加速与人工智能解决方案的创新科技企业。我们在中国区设有运营中心，并在全球多个核心节点部署服务网络。</p>
+        <p>秉承「智能连接世界 · 云端赋能未来」的企业愿景，为全球客户提供安全、稳定、高效的企业级云服务。</p>
+        <div class="stats">
+          <div class="stat-item">
+            <div class="num">30+</div>
+            <div class="label">全球节点</div>
+          </div>
+          <div class="stat-item">
+            <div class="num">10000+</div>
+            <div class="label">企业客户</div>
+          </div>
+          <div class="stat-item">
+            <div class="num">7×24</div>
+            <div class="label">专业服务</div>
+          </div>
+        </div>
+        <a href="about.html" class="btn btn-primary">了解更多 →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section products">
+  <div class="container">
+    <div class="section-title">
+      <span class="subtitle">PRODUCTS & SERVICES</span>
+      <h2>核心产品与服务</h2>
+      <div class="line"></div>
+    </div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+</section>
+
+<section class="partners-section">
+  <div class="container">
+    <div class="section-title">
+      <span class="subtitle">OUR PARTNERS</span>
+      <h2>与行业领先者携手共进</h2>
+      <div class="line"></div>
+    </div>
+    <div class="partners-scroll">
+      <div class="partners-track" id="partnersTrack"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section global-map">
+  <div class="container">
+    <div class="section-title">
+      <span class="subtitle">GLOBAL NETWORK</span>
+      <h2>全球服务网络</h2>
+      <div class="line"></div>
+    </div>
+    <div class="map-container">
+      <div class="world-map">
+        <svg class="map-svg" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <radialGradient id="mapGrad">
+              <stop offset="0%" stop-color="#ff6a00" stop-opacity="0.1"/>
+              <stop offset="100%" stop-color="#ff6a00" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="1000" height="500" fill="url(#mapGrad)"/>
+          <g fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1">
+            <ellipse cx="500" cy="250" rx="450" ry="180"/>
+            <ellipse cx="500" cy="250" rx="350" ry="140"/>
+            <ellipse cx="500" cy="250" rx="250" ry="100"/>
+            <line x1="50" y1="250" x2="950" y2="250"/>
+            <line x1="500" y1="70" x2="500" y2="430"/>
+            <line x1="250" y1="120" x2="750" y2="380"/>
+            <line x1="750" y1="120" x2="250" y2="380"/>
+          </g>
+          <g id="mapLines"></g>
+          <g id="mapDots"></g>
+        </svg>
+      </div>
+      <div class="location-list" id="locationList"></div>
+    </div>
+  </div>
+</section>
+
+<aside class="sidebar">
+  <div class="sidebar-item">
+    <span class="icon">💬</span>
+    <span class="label">咨询</span>
+    <div class="sidebar-tooltip">
+      在线咨询
+      <strong>400-800-8541</strong>
+    </div>
+  </div>
+  <div class="sidebar-item">
+    <span class="icon">📱</span>
+    <span class="label">微信</span>
+    <div class="sidebar-tooltip">
+      官方微信
+      <strong>扫码添加</strong>
+    </div>
+  </div>
+  <div class="sidebar-item">
+    <span class="icon">📧</span>
+    <span class="label">邮件</span>
+    <div class="sidebar-tooltip">
+      商务合作
+      <strong>sales@loveym.cloud</strong>
+    </div>
+  </div>
+  <a href="#top" class="sidebar-item sidebar-top">
+    <span class="icon">↑</span>
+    <span class="label">顶部</span>
+  </a>
+</aside>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <span class="logo-icon">☁</span>
+          <div class="logo-text">
+            语云科技
+            <small>YUYUN TECH</small>
+          </div>
+        </div>
+        <p>语云科技致力于为全球企业客户提供安全、稳定、高效的云计算与数字化解决方案。</p>
+        <div class="footer-sales">
+          <div class="label">销售咨询热线</div>
+          <div class="phone">400-800-8541</div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>产品服务</h4>
+        <ul>
+          <li><a href="products.html">云服务器</a></li>
+          <li><a href="products.html">CDN加速</a></li>
+          <li><a href="products.html">对象存储</a></li>
+          <li><a href="products.html">数据库服务</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>解决方案</h4>
+        <ul>
+          <li><a href="products.html">企业上云</a></li>
+          <li><a href="products.html">安全防护</a></li>
+          <li><a href="products.html">大数据分析</a></li>
+          <li><a href="products.html">AI智能应用</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>关于公司</h4>
+        <ul>
+          <li><a href="about.html">公司简介</a></li>
+          <li><a href="partners.html">合作伙伴</a></li>
+          <li><a href="contact.html">联系方式</a></li>
+          <li><a href="contact.html">加入我们</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>帮助支持</h4>
+        <ul>
+          <li><a href="contact.html">帮助中心</a></li>
+          <li><a href="products.html">文档中心</a></li>
+          <li><a href="contact.html">意见反馈</a></li>
+          <li><a href="https://cloud.loveym.cloud" target="_blank">国际版入口</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>
+        © 2024 语云科技（美国）有限公司 版权所有 &nbsp;|&nbsp;
+        <a href="https://beian.miit.gov.cn" target="_blank">京ICP备2024000000号-1</a>
+      </div>
+      <div>
+        <a href="#">B1-20240000 增值电信业务经营许可证</a>
+        &nbsp;|&nbsp;
+        <a href="#">京公网安备 11010802000000号</a>
+      </div>
+      <div class="footer-auth">
+        语云科技® 等是我们（语云科技美国有限公司）在中国的注册授权
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="popup-mask" id="popupAnnouncement">
+  <div class="popup-box">
+    <div class="popup-top" id="popupTop">
+      <span id="popupTitle">🎉 语云科技全新服务上线</span>
+      <button class="close-btn" data-close="popupAnnouncement">✕</button>
+    </div>
+    <div class="popup-body" id="popupBody">
+      <p>全球加速网络现已全面升级，新增中东迪拜节点，更多区域支持IPv6网络。注册新用户立享首月免费试用！咨询热线：400-800-8541</p>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-primary" data-close="popupAnnouncement" id="popupConfirm">我知道了</button>
+    </div>
+  </div>
+</div>
+
+<div class="popup-mask" id="popupContact">
+  <div class="popup-box">
+    <div class="popup-top" style="background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);">
+      <span>📞 即将发起咨询</span>
+      <button class="close-btn" data-close="popupContact">✕</button>
+    </div>
+    <div class="popup-body">
+      <h3>联系我们的销售顾问</h3>
+      <p>我们的专业顾问将为您提供专属云服务方案<br/>工作日 9:00-21:00，节假日值班服务</p>
+      <div style="padding:20px;background:var(--bg-light);border-radius:var(--radius);margin-bottom:20px;">
+        <div style="color:var(--text-secondary);font-size:13px;margin-bottom:6px;">销售咨询热线</div>
+        <div style="color:var(--accent);font-size:28px;font-weight:700;letter-spacing:2px;">400-800-8541</div>
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-ghost" data-close="popupContact" style="border-color:var(--gray-300);color:var(--gray-700);">取消</button>
+      <a href="contact.html" class="btn btn-accent">立即联系</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/main.js"></script>
+<script src="assets/js/home.js"></script>
+
+</body>
+</html>

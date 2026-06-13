@@ -1,0 +1,22 @@
+{
+  "name": "yuyun-tech-website",
+  "version": "1.0.0",
+  "description": "语云科技企业官网 - 融合魔方财务、腾讯云、Cloudflare 风格的企业官网",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js",
+    "serve": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "YuYun Technology",
+  "license": "MIT",
+  "keywords": ["企业官网", "云计算", "CDN", "语云科技", "YuYun"]
+}

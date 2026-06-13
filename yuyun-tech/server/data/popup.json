@@ -1,0 +1,16 @@
+{
+  "announcement": {
+    "enabled": true,
+    "title": "🎉 语云科技全新服务上线",
+    "topBarColor": "#ff6a00",
+    "buttonColor": "#ff6a00",
+    "content": "全球加速网络现已全面升级，新增中东迪拜节点，更多区域支持IPv6网络。注册新用户立享首月免费试用！咨询热线：400-800-8541",
+    "showOnce": true
+  },
+  "contactConfirm": {
+    "title": "📞 即将发起咨询",
+    "content": "确认联系我们的销售顾问为您提供专属方案？<br/>工作日 9:00-21:00，节假日值班服务。",
+    "okText": "确认联系",
+    "cancelText": "再看看"
+  }
+}

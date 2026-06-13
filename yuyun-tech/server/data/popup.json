@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "title": "欢迎来到语云科技",
+  "headerColor": "#00a1d6",
+  "buttonColor": "#ff6b35",
+  "content": "🎉 感谢您访问语云科技官网！我们为您提供高性能云服务器、全球CDN加速、安全防护等一站式云服务。<br/><br/>📞 销售热线：400-800-8541<br/>💼 新用户专享：首购低至3折，立即咨询获取专属优惠！",
+  "confirmText": "立即咨询",
+  "closeText": "稍后再看",
+  "oncePerDay": true,
+  "sideBar": {
+    "enabled": true,
+    "title": "在线客服",
+    "phone": "400-800-8541",
+    "workHours": "周一至周日 9:00-22:00",
+    "qq": "123456789",
+    "wechat": "yuyun-tech-support",
+    "email": "contact@loveym.cloud"
+  }
+}

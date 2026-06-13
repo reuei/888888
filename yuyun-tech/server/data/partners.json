@@ -1,0 +1,18 @@
+{
+  "partners": [
+    { "name": "Tencent", "icon": "🐧", "category": "战略合作伙伴" },
+    { "name": "Alibaba", "icon": "☁️", "category": "云计算伙伴" },
+    { "name": "Huawei", "icon": "🌸", "category": "技术合作伙伴" },
+    { "name": "AWS", "icon": "🌐", "category": "全球合作" },
+    { "name": "Microsoft", "icon": "🪟", "category": "战略合作伙伴" },
+    { "name": "Google", "icon": "🔍", "category": "技术合作伙伴" },
+    { "name": "Cloudflare", "icon": "🛡️", "category": "CDN合作" },
+    { "name": "Intel", "icon": "💎", "category": "硬件合作伙伴" },
+    { "name": "NVIDIA", "icon": "🎮", "category": "GPU合作" },
+    { "name": "中国联通", "icon": "📡", "category": "运营商合作" },
+    { "name": "中国移动", "icon": "📱", "category": "运营商合作" },
+    { "name": "中国电信", "icon": "☎️", "category": "运营商合作" }
+  ],
+  "title": "合作伙伴",
+  "subtitle": "携手全球领先企业，共同构建卓越云服务生态"
+}

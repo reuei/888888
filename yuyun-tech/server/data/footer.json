@@ -1,0 +1,43 @@
+{
+  "logoText": "语云科技",
+  "salesPhone": "400-800-8451",
+  "companyAddress": "中国·北京市朝阳区语云大厦",
+  "companyEmail": "contact@loveym.cloud",
+  "icpNumber": "京ICP备2024000001号-1",
+  "icpUrl": "https://beian.miit.gov.cn/",
+  "policeNumber": "京公网安备 11010502000001号",
+  "policeUrl": "http://www.beian.gov.cn/",
+  "valueAddedCert": "B1-20240001（增值电信业务经营许可证）",
+  "copyright": "© 2015-2026 语云科技美国有限公司 China All Rights Reserved.",
+  "authorization": "语云科技®等是我们（语云科技美国有限公司）在中国的注册授权",
+  "internationalUrl": "https://cloud.loveym.cloud",
+  "links": [
+    {
+      "title": "产品服务",
+      "items": [
+        { "text": "云服务器", "url": "products.html#cloud-server" },
+        { "text": "云数据库", "url": "products.html#cloud-db" },
+        { "text": "CDN加速", "url": "products.html#cdn" },
+        { "text": "安全防护", "url": "products.html#security" }
+      ]
+    },
+    {
+      "title": "关于我们",
+      "items": [
+        { "text": "公司简介", "url": "about.html" },
+        { "text": "发展历程", "url": "about.html#timeline" },
+        { "text": "合作伙伴", "url": "partners.html" },
+        { "text": "联系我们", "url": "contact.html" }
+      ]
+    },
+    {
+      "title": "帮助支持",
+      "items": [
+        { "text": "帮助文档", "url": "#" },
+        { "text": "常见问题", "url": "#" },
+        { "text": "服务等级", "url": "#" },
+        { "text": "工单系统", "url": "#" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "banners": [
+    {
+      "title": "智能云服务 驱动未来",
+      "subtitle": "高性能云服务器 · 全球节点覆盖 · 7×24小时专业支持",
+      "description": "语云科技为您提供稳定可靠的云计算基础设施服务",
+      "buttonText": "立即咨询",
+      "buttonUrl": "contact.html",
+      "bgGradient": "linear-gradient(135deg, #0a2463 0%, #1e5fb0 50%, #00a1d6 100%)"
+    },
+    {
+      "title": "全球加速 触达每一位用户",
+      "subtitle": "CDN智能调度 · 2800+边缘节点 · 毫秒级响应",
+      "description": "让您的业务在全球范围内高速稳定运行",
+      "buttonText": "了解产品",
+      "buttonUrl": "products.html",
+      "bgGradient": "linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%)"
+    },
+    {
+      "title": "安全防护 守护业务安全",
+      "subtitle": "DDoS防护 · Web应用防火墙 · 智能风控",
+      "description": "多层次安全架构，为您的数字资产保驾护航",
+      "buttonText": "查看方案",
+      "buttonUrl": "products.html#security",
+      "bgGradient": "linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%)"
+    }
+  ],
+  "features": [
+    {
+      "icon": "🚀",
+      "title": "高性能计算",
+      "desc": "采用最新一代Intel/AMD处理器，NVMe SSD存储，为您的业务提供极速体验"
+    },
+    {
+      "icon": "🌐",
+      "title": "全球节点",
+      "desc": "覆盖中东、欧洲、北美、亚太等多个地区，为您的全球业务提供支持"
+    },
+    {
+      "icon": "🔒",
+      "title": "安全可靠",
+      "desc": "企业级安全防护体系，数据加密存储，多重备份机制确保数据安全"
+    },
+    {
+      "icon": "💰",
+      "title": "灵活计费",
+      "desc": "包年包月、按量计费多种模式，按需选择，成本可控"
+    },
+    {
+      "icon": "🎯",
+      "title": "专业支持",
+      "desc": "7×24小时技术支持团队，资深工程师一对一服务"
+    },
+    {
+      "icon": "📊",
+      "title": "智能监控",
+      "desc": "实时监控面板，智能告警系统，让运维更简单"
+    }
+  ],
+  "products": [
+    {
+      "icon": "💻",
+      "title": "云服务器 CVM",
+      "desc": "弹性可扩展的计算服务，支持多种实例规格，快速部署，按需付费",
+      "link": "products.html#cloud-server",
+      "tag": "热门"
+    },
+    {
+      "icon": "🗄️",
+      "title": "云数据库 MySQL",
+      "desc": "高可用、可扩展的关系型数据库服务，支持一主多从架构",
+      "link": "products.html#cloud-db",
+      "tag": "推荐"
+    },
+    {
+      "icon": "⚡",
+      "title": "CDN加速",
+      "desc": "全球2800+边缘节点，智能调度，静态资源加速，提升用户访问体验",
+      "link": "products.html#cdn",
+      "tag": "新品"
+    },
+    {
+      "icon": "🛡️",
+      "title": "Web应用防火墙",
+      "desc": "防御SQL注入、XSS跨站、CC攻击等常见Web威胁",
+      "link": "products.html#security",
+      "tag": ""
+    },
+    {
+      "icon": "📦",
+      "title": "对象存储 COS",
+      "desc": "海量、安全、低成本、高可靠的云存储服务",
+      "link": "products.html#cos",
+      "tag": ""
+    },
+    {
+      "icon": "🌍",
+      "title": "全球负载均衡",
+      "desc": "多地域智能流量调度，实现业务高可用与容灾",
+      "link": "products.html#lb",
+      "tag": ""
+    }
+  ],
+  "certifications": [
+    {
+      "title": "营业执照",
+      "image": "",
+      "desc": "语云科技美国有限公司（中国授权运营）",
+      "certNo": "91110000MA00000000"
+    },
+    {
+      "title": "增值电信业务经营许可证",
+      "image": "",
+      "desc": "电子增值服务产业认证",
+      "certNo": "B1-20240001"
+    }
+  ],
+  "partnerTitle": "我们与以下企业/组织携手共进",
+  "mapTitle": "全球分布",
+  "mapDesc": "我们在全球多个核心城市设有分支机构，为您提供本地化服务",
+  "mapMarkers": [
+    { "name": "北京总部", "lat": 39.9042, "lng": 116.4074, "desc": "中国·北京 朝阳区XX大厦" },
+    { "name": "青岛分公司", "lat": 36.0671, "lng": 120.3826, "desc": "中国·山东·青岛" },
+    { "name": "莫斯科", "lat": 55.7558, "lng": 37.6173, "desc": "俄罗斯·莫斯科 数据中心" },
+    { "name": "圣彼得堡", "lat": 59.9311, "lng": 30.3609, "desc": "俄罗斯·圣彼得堡 节点" },
+    { "name": "首尔", "lat": 37.5665, "lng": 126.9780, "desc": "韩国·首尔 亚太节点" },
+    { "name": "新加坡", "lat": 1.3521, "lng": 103.8198, "desc": "新加坡 东南亚总部" },
+    { "name": "悉尼", "lat": -33.8688, "lng": 151.2093, "desc": "澳大利亚·悉尼 大洋洲节点" },
+    { "name": "迪拜", "lat": 25.2048, "lng": 55.2708, "desc": "阿联酋·迪拜 中东总部" },
+    { "name": "法兰克福", "lat": 50.1109, "lng": 8.6821, "desc": "德国·法兰克福 欧洲节点" },
+    { "name": "伦敦", "lat": 51.5074, "lng": -0.1278, "desc": "英国·伦敦 欧洲节点" },
+    { "name": "纽约", "lat": 40.7128, "lng": -74.0060, "desc": "美国·纽约 美东节点" },
+    { "name": "华盛顿", "lat": 38.9072, "lng": -77.0369, "desc": "美国·华盛顿 美东节点" },
+    { "name": "旧金山", "lat": 37.7749, "lng": -122.4194, "desc": "美国·旧金山 美西节点" }
+  ]
+}

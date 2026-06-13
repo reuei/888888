@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "title": "重要通知",
+  "content": "尊敬的用户，语云科技官网已全新升级，为您提供更优质的服务体验。如有任何疑问，请联系我们的客服团队。",
+  "headerColor": "#0052D9",
+  "buttonColor": "#0052D9",
+  "oncePerDay": true
+}

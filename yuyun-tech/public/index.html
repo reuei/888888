@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>语云科技 - 全球领先的云计算服务商</title>
+  <meta name="description" content="语云科技为企业提供安全、稳定、高效的云计算解决方案，助力数字化转型。">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://api.map.baidu.com/api?v=3.0&ak=YOUR_BAIDU_MAP_AK"></script>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">语</div>
+        <span>语云科技</span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="active">首页</a>
+        <a href="/about.html">关于我们</a>
+        <div class="nav-dropdown">
+          <a href="/products.html">产品服务 ▾</a>
+          <div class="nav-dropdown-menu">
+            <a href="/products.html">云服务器</a>
+            <a href="/products.html">云安全</a>
+            <a href="/products.html">云数据库</a>
+            <a href="/products.html">CDN加速</a>
+          </div>
+        </div>
+        <a href="/partners.html">合作伙伴</a>
+        <a href="/contact.html">联系我们</a>
+        <a href="https://cloud.loveym.cloud" target="_blank">国际版 ↗</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="/contact.html" class="btn btn-primary btn-sm">立即咨询</a>
+      </div>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 移动端菜单 -->
+  <div class="mobile-menu">
+    <a href="/">首页</a>
+    <a href="/about.html">关于我们</a>
+    <a href="/products.html">产品服务</a>
+    <a href="/partners.html">合作伙伴</a>
+    <a href="/contact.html">联系我们</a>
+    <a href="https://cloud.loveym.cloud" target="_blank">国际版 ↗</a>
+  </div>
+
+  <!-- 轮播图 -->
+  <section class="carousel">
+    <div id="bannersContainer">
+      <!-- 由JS动态加载 -->
+      <div class="carousel-slide active">
+        <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=520&fit=crop" alt="语云科技">
+        <div class="carousel-overlay">
+          <div class="carousel-content">
+            <h2>语云科技 - 全球领先的云计算服务商</h2>
+            <p>为企业提供安全、稳定、高效的云计算解决方案，助力数字化转型</p>
+            <a href="/products.html" class="btn btn-primary">了解更多</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-btn prev">‹</button>
+    <button class="carousel-btn next">›</button>
+    <div class="carousel-dots" id="carouselDots">
+      <button class="carousel-dot active"></button>
+    </div>
+  </section>
+
+  <!-- 资质展示 -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>企业资质</h2>
+        <p>合规经营，值得信赖</p>
+      </div>
+      <div class="certificates-grid" id="certsContainer">
+        <div class="certificate-card">
+          <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=300&fit=crop" alt="营业执照">
+          <div class="certificate-info">
+            <h3>营业执照</h3>
+            <p>语云科技（北京）有限公司，注册资本5000万元人民币，依法合规经营。</p>
+          </div>
+        </div>
+        <div class="certificate-card">
+          <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop" alt="电子增值服务产业证">
+          <div class="certificate-info">
+            <h3>电子增值服务产业证</h3>
+            <p>获得工信部颁发的电子增值服务许可证，具备全国范围经营资质。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 产品业务 -->
+  <section class="section" style="background: var(--bg-gray);">
+    <div class="container">
+      <div class="section-title">
+        <h2>产品与服务</h2>
+        <p>全面的云计算解决方案，满足企业多样化需求</p>
+      </div>
+      <div class="products-grid" id="productsContainer">
+        <div class="product-card">
+          <div class="product-icon">☁</div>
+          <h3>云服务器</h3>
+          <p>弹性可扩展的云计算资源，支持多种实例规格，满足不同业务场景需求。</p>
+          <a href="/products.html" class="link">了解更多 →</a>
+        </div>
+        <div class="product-card">
+          <div class="product-icon">🛡</div>
+          <h3>云安全</h3>
+          <p>DDoS防护、Web应用防火墙、主机安全等多层次安全防护体系。</p>
+          <a href="/products.html" class="link">了解更多 →</a>
+        </div>
+        <div class="product-card">
+          <div class="product-icon">🗄</div>
+          <h3>云数据库</h3>
+          <p>高可用、高性能的数据库服务，支持MySQL、PostgreSQL、Redis等。</p>
+          <a href="/products.html" class="link">了解更多 →</a>
+        </div>
+        <div class="product-card">
+          <div class="product-icon">🌐</div>
+          <h3>CDN加速</h3>
+          <p>全球节点覆盖，智能调度，为您的网站和应用提供极速访问体验。</p>
+          <a href="/products.html" class="link">了解更多 →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 全球分布地图 -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>全球布局</h2>
+        <p>覆盖全球多个数据中心，为您提供低延迟、高可用的云服务</p>
+      </div>
+      <div class="map-container" id="globalMap"></div>
+    </div>
+  </section>
+
+  <!-- 合作伙伴横滚 -->
+  <section class="partners-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>合作伙伴</h2>
+        <p>我们与以下企业/组织携手共进</p>
+      </div>
+      <div class="partners-scroll" id="partnersScroll">
+        <img src="https://via.placeholder.com/150x60/0052D9/FFFFFF?text=腾讯云" alt="腾讯云" class="partner-logo">
+        <img src="https://via.placeholder.com/150x60/FF6A00/FFFFFF?text=阿里云" alt="阿里云" class="partner-logo">
+        <img src="https://via.placeholder.com/150x60/C7000B/FFFFFF?text=华为云" alt="华为云" class="partner-logo">
+        <img src="https://via.placeholder.com/150x60/2932E1/FFFFFF?text=百度智能云" alt="百度智能云" class="partner-logo">
+        <img src="https://via.placeholder.com/150x60/E4393C/FFFFFF?text=京东云" alt="京东云" class="partner-logo">
+        <img src="https://via.placeholder.com/150x60/0098E8/FFFFFF?text=UCloud" alt="UCloud" class="partner-logo">
+        <img src="https://via.placeholder.com/150x60/FF6A00/FFFFFF?text=金山云" alt="金山云" class="partner-logo">
+        <img src="https://via.placeholder.com/150x60/0066B3/FFFFFF?text=天翼云" alt="天翼云" class="partner-logo">
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="/" class="logo">
+            <div class="logo-icon">语</div>
+            <span>语云科技</span>
+          </a>
+          <p>语云科技致力于为企业提供安全、稳定、高效的云计算解决方案，助力全球企业数字化转型。</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-links-col">
+            <h4>产品服务</h4>
+            <a href="/products.html">云服务器</a>
+            <a href="/products.html">云安全</a>
+            <a href="/products.html">云数据库</a>
+            <a href="/products.html">CDN加速</a>
+          </div>
+          <div class="footer-links-col">
+            <h4>关于我们</h4>
+            <a href="/about.html">公司简介</a>
+            <a href="/about.html">联系我们</a>
+            <a href="/partners.html">合作伙伴</a>
+          </div>
+          <div class="footer-links-col">
+            <h4>联系方式</h4>
+            <div class="footer-phone" id="footerPhone">销售电话:400-800-8451</div>
+            <div class="footer-phone-label">7x24小时服务热线</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p id="footerStatement">语云科技®等是我们（语云科技美国有限公司）在中国的注册授权</p>
+        <div>
+          <a href="https://beian.miit.gov.cn/" target="_blank" id="footerIcp">京ICP备2024001234号-1</a>
+          <span style="margin: 0 8px; color: #86909C;">|</span>
+          <span id="footerCert">电子增值服务许可证：B1-20240001</span>
+          <span style="margin: 0 8px; color: #86909C;">|</span>
+          <a href="https://www.beian.gov.cn/" target="_blank" id="footerPolice">京公网安备 11010502040001号</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 弹窗 -->
+  <div class="modal-overlay" id="popupModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">重要通知</h3>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        尊敬的用户，语云科技官网已全新升级，为您提供更优质的服务体验。如有任何疑问，请联系我们的客服团队。
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary modal-confirm">我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 客服侧边栏 -->
+  <div class="sidebar">
+    <button class="sidebar-toggle">💬</button>
+    <div class="sidebar-panel">
+      <h4>在线咨询</h4>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">📞</div>
+        <div class="sidebar-item-info">
+          <p>销售热线</p>
+          <a href="tel:400-800-8451">400-800-8451</a>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">⏰</div>
+        <div class="sidebar-item-info">
+          <p>工作时间</p>
+          <a>周一至周日 9:00-21:00</a>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">✉</div>
+        <div class="sidebar-item-info">
+          <p>商务邮箱</p>
+          <a href="mailto:sales@yuyun.tech">sales@yuyun.tech</a>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">💬</div>
+        <div class="sidebar-item-info">
+          <p>在线咨询</p>
+          <a href="/contact.html">点击咨询客服</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

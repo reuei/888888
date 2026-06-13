@@ -1,0 +1,84 @@
+{
+  "banners": [
+    {
+      "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=520&fit=crop",
+      "title": "语云科技 - 全球领先的云计算服务商",
+      "description": "为企业提供安全、稳定、高效的云计算解决方案，助力数字化转型",
+      "link": "#/products"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=520&fit=crop",
+      "title": "智能云基础设施",
+      "description": "覆盖全球多个数据中心，为您提供低延迟、高可用的云服务",
+      "link": "#/products"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=520&fit=crop",
+      "title": "企业级安全防护",
+      "description": "多层次安全架构，保障您的数据安全与业务连续性",
+      "link": "#/products"
+    }
+  ],
+  "certificates": [
+    {
+      "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=300&fit=crop",
+      "title": "营业执照",
+      "description": "语云科技（北京）有限公司，注册资本5000万元人民币，依法合规经营。"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop",
+      "title": "电子增值服务产业证",
+      "description": "获得工信部颁发的电子增值服务许可证，具备全国范围经营资质。"
+    }
+  ],
+  "products": [
+    {
+      "icon": "cloud",
+      "title": "云服务器",
+      "description": "弹性可扩展的云计算资源，支持多种实例规格，满足不同业务场景需求。",
+      "link": "#/products"
+    },
+    {
+      "icon": "shield",
+      "title": "云安全",
+      "description": "DDoS防护、Web应用防火墙、主机安全等多层次安全防护体系。",
+      "link": "#/products"
+    },
+    {
+      "icon": "database",
+      "title": "云数据库",
+      "description": "高可用、高性能的数据库服务，支持MySQL、PostgreSQL、Redis等。",
+      "link": "#/products"
+    },
+    {
+      "icon": "globe",
+      "title": "CDN加速",
+      "description": "全球节点覆盖，智能调度，为您的网站和应用提供极速访问体验。",
+      "link": "#/products"
+    },
+    {
+      "icon": "server",
+      "title": "裸金属服务器",
+      "description": "物理机级别的性能与隔离，兼具云的弹性与物理机的性能优势。",
+      "link": "#/products"
+    },
+    {
+      "icon": "network",
+      "title": "私有网络VPC",
+      "description": "逻辑隔离的私有网络环境，自定义网段、路由策略，构建安全网络架构。",
+      "link": "#/products"
+    },
+    {
+      "icon": "monitor",
+      "title": "云监控",
+      "description": "全方位资源监控与告警，实时掌握业务运行状态，保障服务稳定。",
+      "link": "#/products"
+    },
+    {
+      "icon": "lock",
+      "title": "SSL证书",
+      "description": "一站式SSL证书服务，保障网站数据传输安全，提升用户信任度。",
+      "link": "#/products"
+    }
+  ]
+}

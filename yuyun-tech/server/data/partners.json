@@ -1,0 +1,12 @@
+{
+  "partners": [
+    { "name": "腾讯云", "logo": "https://via.placeholder.com/150x60/0052D9/FFFFFF?text=腾讯云", "link": "https://cloud.tencent.com" },
+    { "name": "阿里云", "logo": "https://via.placeholder.com/150x60/FF6A00/FFFFFF?text=阿里云", "link": "https://www.aliyun.com" },
+    { "name": "华为云", "logo": "https://via.placeholder.com/150x60/C7000B/FFFFFF?text=华为云", "link": "https://www.huaweicloud.com" },
+    { "name": "百度智能云", "logo": "https://via.placeholder.com/150x60/2932E1/FFFFFF?text=百度智能云", "link": "https://cloud.baidu.com" },
+    { "name": "京东云", "logo": "https://via.placeholder.com/150x60/E4393C/FFFFFF?text=京东云", "link": "https://www.jdcloud.com" },
+    { "name": "UCloud", "logo": "https://via.placeholder.com/150x60/0098E8/FFFFFF?text=UCloud", "link": "https://www.ucloud.cn" },
+    { "name": "金山云", "logo": "https://via.placeholder.com/150x60/FF6A00/FFFFFF?text=金山云", "link": "https://www.ksyun.com" },
+    { "name": "天翼云", "logo": "https://via.placeholder.com/150x60/0066B3/FFFFFF?text=天翼云", "link": "https://www.ctyun.cn" }
+  ]
+}

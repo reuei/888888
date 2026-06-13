@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于我们 - 语云科技</title>
+  <meta name="description" content="了解语云科技公司信息、发展历程与联系方式。">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://api.map.baidu.com/api?v=3.0&ak=YOUR_BAIDU_MAP_AK"></script>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">语</div>
+        <span>语云科技</span>
+      </a>
+      <nav class="nav">
+        <a href="/">首页</a>
+        <a href="/about.html" class="active">关于我们</a>
+        <div class="nav-dropdown">
+          <a href="/products.html">产品服务 ▾</a>
+          <div class="nav-dropdown-menu">
+            <a href="/products.html">云服务器</a>
+            <a href="/products.html">云安全</a>
+            <a href="/products.html">云数据库</a>
+            <a href="/products.html">CDN加速</a>
+          </div>
+        </div>
+        <a href="/partners.html">合作伙伴</a>
+        <a href="/contact.html">联系我们</a>
+        <a href="https://cloud.loveym.cloud" target="_blank">国际版 ↗</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="/contact.html" class="btn btn-primary btn-sm">立即咨询</a>
+      </div>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 移动端菜单 -->
+  <div class="mobile-menu">
+    <a href="/">首页</a>
+    <a href="/about.html">关于我们</a>
+    <a href="/products.html">产品服务</a>
+    <a href="/partners.html">合作伙伴</a>
+    <a href="/contact.html">联系我们</a>
+    <a href="https://cloud.loveym.cloud" target="_blank">国际版 ↗</a>
+  </div>
+
+  <!-- 页面标题 -->
+  <section class="section" style="padding-top: 120px; background: var(--primary-bg);">
+    <div class="container">
+      <div class="section-title">
+        <h2>关于我们</h2>
+        <p>了解语云科技，携手共创未来</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 公司介绍 -->
+  <section class="section">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-text">
+          <h3>语云科技（北京）有限公司</h3>
+          <p>语云科技成立于2018年，是一家专注于云计算、大数据与人工智能技术的创新型科技企业。公司总部位于北京，在青岛、莫斯科、圣彼得堡、首尔、新加坡、悉尼、纽约、华盛顿、旧金山等地设有分支机构与数据中心。</p>
+          <p>我们致力于为全球企业提供安全、稳定、高效的云计算基础设施与解决方案，涵盖云服务器、云安全、云数据库、CDN加速、裸金属服务器、私有网络VPC、云监控、SSL证书等全方位产品服务。</p>
+          <p>凭借领先的技术实力与优质的客户服务，语云科技已成为众多知名企业的信赖之选，助力客户实现数字化转型与业务创新。</p>
+
+          <div class="about-info-item">
+            <div class="icon">📍</div>
+            <div>
+              <h4>公司地址</h4>
+              <p>北京市海淀区中关村科技园语云大厦18层</p>
+            </div>
+          </div>
+          <div class="about-info-item">
+            <div class="icon">📞</div>
+            <div>
+              <h4>营销电话</h4>
+              <p class="phone">400-800-8541</p>
+            </div>
+          </div>
+          <div class="about-info-item">
+            <div class="icon">✉</div>
+            <div>
+              <h4>电子邮箱</h4>
+              <p>contact@yuyun.tech</p>
+            </div>
+          </div>
+          <div class="about-info-item">
+            <div class="icon">💬</div>
+            <div>
+              <h4>官方群聊</h4>
+              <p>扫描右侧二维码加入官方群</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="map-container" id="aboutMap" style="height: 360px; margin-bottom: 24px;"></div>
+          <div style="background: var(--bg-white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center;">
+            <h4 style="font-size: 16px; margin-bottom: 12px;">官方群聊二维码</h4>
+            <div class="qr-code" style="margin: 0 auto;">官方微信群<br>扫码加入</div>
+            <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 12px;">加入群聊获取最新产品资讯与优惠活动</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="/" class="logo">
+            <div class="logo-icon">语</div>
+            <span>语云科技</span>
+          </a>
+          <p>语云科技致力于为企业提供安全、稳定、高效的云计算解决方案，助力全球企业数字化转型。</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-links-col">
+            <h4>产品服务</h4>
+            <a href="/products.html">云服务器</a>
+            <a href="/products.html">云安全</a>
+            <a href="/products.html">云数据库</a>
+            <a href="/products.html">CDN加速</a>
+          </div>
+          <div class="footer-links-col">
+            <h4>关于我们</h4>
+            <a href="/about.html">公司简介</a>
+            <a href="/about.html">联系我们</a>
+            <a href="/partners.html">合作伙伴</a>
+          </div>
+          <div class="footer-links-col">
+            <h4>联系方式</h4>
+            <div class="footer-phone" id="footerPhone">销售电话:400-800-8451</div>
+            <div class="footer-phone-label">7x24小时服务热线</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p id="footerStatement">语云科技®等是我们（语云科技美国有限公司）在中国的注册授权</p>
+        <div>
+          <a href="https://beian.miit.gov.cn/" target="_blank" id="footerIcp">京ICP备2024001234号-1</a>
+          <span style="margin: 0 8px; color: #86909C;">|</span>
+          <span id="footerCert">电子增值服务许可证：B1-20240001</span>
+          <span style="margin: 0 8px; color: #86909C;">|</span>
+          <a href="https://www.beian.gov.cn/" target="_blank" id="footerPolice">京公网安备 11010502040001号</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 客服侧边栏 -->
+  <div class="sidebar">
+    <button class="sidebar-toggle">💬</button>
+    <div class="sidebar-panel">
+      <h4>在线咨询</h4>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">📞</div>
+        <div class="sidebar-item-info">
+          <p>销售热线</p>
+          <a href="tel:400-800-8451">400-800-8451</a>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">⏰</div>
+        <div class="sidebar-item-info">
+          <p>工作时间</p>
+          <a>周一至周日 9:00-21:00</a>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">✉</div>
+        <div class="sidebar-item-info">
+          <p>商务邮箱</p>
+          <a href="mailto:sales@yuyun.tech">sales@yuyun.tech</a>
+        </div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">💬</div>
+        <div class="sidebar-item-info">
+          <p>在线咨询</p>
+          <a href="/contact.html">点击咨询客服</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    // 关于我们页面专用：初始化地图定位到北京总部
+    function initAboutMap() {
+      const mapContainer = document.getElementById('aboutMap');
+      if (!mapContainer || typeof BMap === 'undefined') return;
+      const map = new BMap.Map('aboutMap');
+      const point = new BMap.Point(116.4074, 39.9042);
+      map.centerAndZoom(point, 15);
+      map.enableScrollWheelZoom(true);
+      const marker = new BMap.Marker(point);
+      map.addOverlay(marker);
+      const info = new BMap.InfoWindow(
+        '<div style="padding:8px;"><h4 style="margin:0 0 6px;font-size:15px;color:#0052D9;">语云科技北京总部</h4><p style="margin:0;font-size:13px;color:#4E5969;">北京市海淀区中关村科技园语云大厦18层</p></div>',
+        { width: 260 }
+      );
+      marker.addEventListener('click', () => {
+        map.openInfoWindow(info, point);
+      });
+    }
+    document.addEventListener('DOMContentLoaded', initAboutMap);
+  </script>
+</body>
+</html>

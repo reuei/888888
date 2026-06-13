@@ -1,0 +1,16 @@
+{
+  "name": "yuyun-tech",
+  "version": "1.0.0",
+  "description": "语云科技企业官网 - 无MySQL轻量级架构",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node server/app.js",
+    "dev": "node server/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "cors": "^2.8.5"
+  }
+}

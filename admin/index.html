@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>语云科技 - 后台管理</title>
+  <link rel="stylesheet" href="/admin/assets/css/admin.css">
+</head>
+<body>
+
+  <!-- ========== 登录页 ========== -->
+  <div id="loginPage" class="admin-login-page" style="display:none;">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="/assets/images/logo.svg" alt="语云科技">
+        <h2>语云科技管理后台</h2>
+        <p>Yuyun Technology Admin Panel</p>
+      </div>
+
+      <div id="loginError" class="login-error"></div>
+
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="loginUsername">管理员账号</label>
+          <input type="text" id="loginUsername" placeholder="请输入管理员账号" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">密码</label>
+          <input type="password" id="loginPassword" placeholder="请输入密码" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="login-btn">登 录</button>
+      </form>
+
+      <p style="text-align:center;margin-top:20px;font-size:0.75rem;color:#999;">
+        默认账号: admin / 密码: yuyun2024admin
+      </p>
+    </div>
+  </div>
+
+  <!-- ========== 后台主页（仪表盘） ========== -->
+  <div id="dashboardPage" class="admin-layout" style="display:none;">
+
+    <!-- 侧边栏 -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <img src="/assets/images/logo.svg" alt="">
+        <span>语云科技</span>
+      </div>
+
+      <nav class="admin-sidebar-nav">
+        <button class="sidebar-nav-item active" onclick="switchSection('sectionDashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          仪表盘
+        </button>
+
+        <div class="sidebar-nav-section">
+          <div class="sidebar-nav-section-title">内容管理</div>
+        </div>
+
+        <button class="sidebar-nav-item" onclick="switchSection('sectionCarousel')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 13a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/></svg>
+          轮播图管理
+        </button>
+
+        <button class="sidebar-nav-item" onclick="switchSection('sectionProducts')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          产品管理
+        </button>
+
+        <button class="sidebar-nav-item" onclick="switchSection('sectionPartners')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          合作伙伴
+        </button>
+
+        <div class="sidebar-nav-section">
+          <div class="sidebar-nav-section-title">系统设置</div>
+        </div>
+
+        <button class="sidebar-nav-item" onclick="switchSection('sectionSettings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          全局设置
+        </button>
+      </nav>
+
+      <div class="admin-sidebar-footer">
+        <button class="admin-logout-btn" id="logoutBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          退出登录
+        </button>
+      </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="admin-main">
+      <!-- 顶栏 -->
+      <header class="admin-header">
+        <div class="admin-header-left">
+          <h2>仪表盘</h2>
+          <span class="admin-breadcrumb">首页 / 控制台</span>
+        </div>
+        <div class="admin-header-right">
+          <div class="admin-user-info">
+            <div class="admin-avatar">A</div>
+            <span>管理员</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="admin-content">
+
+        <!-- ====== 仪表盘 ====== -->
+        <div id="sectionDashboard" class="admin-section">
+
+          <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 13a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/></svg>
+              </div>
+              <div class="admin-stat-info">
+                <div class="stat-value" id="carouselCount">-</div>
+                <div class="stat-label">轮播图数量</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              </div>
+              <div class="admin-stat-info">
+                <div class="stat-value" id="productsCount">-</div>
+                <div class="stat-label">产品服务数</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+              <div class="admin-stat-info">
+                <div class="stat-value" id="partnersCount">-</div>
+                <div class="stat-label">合作伙伴数</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="admin-stat-info">
+                <div class="stat-value">12+</div>
+                <div class="stat-label">全球节点</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:linear-gradient(135deg,#f0f4ff,#fff);border-radius:12px;padding:28px;border:1px solid rgba(0,82,217,0.06);">
+            <h3 style="margin-bottom:12px;">快速操作</h3>
+            <p style="font-size:0.875rem;color:#888;margin-bottom:20px;">通过左侧菜单进入各管理模块，或使用以下快捷入口：</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="btn-admin btn-admin-primary" onclick="switchSection('sectionCarousel')">管理轮播图</button>
+              <button class="btn-admin btn-admin-primary" onclick="switchSection('sectionProducts')">管理产品</button>
+              <button class="btn-admin btn-admin-primary" onclick="switchSection('sectionPartners')">管理合作伙伴</button>
+              <button class="btn-admin btn-admin-success" onclick="switchSection('sectionSettings')">全局设置</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== 轮播图管理 ====== -->
+        <div id="sectionCarousel" class="admin-section" style="display:none;">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <h3>轮播图列表</h3>
+              <button class="btn-admin btn-admin-primary">+ 添加轮播项</button>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>#</th><th>标题</th><th>状态</th><th>排序</th><th>图片</th><th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="carouselTableBody">
+                  <tr><td colspan="6" style="text-align:center;padding:32px;color:#999;">加载中...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== 产品管理 ====== -->
+        <div id="sectionProducts" class="admin-section" style="display:none;">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <h3>产品列表</h3>
+              <button class="btn-admin btn-admin-primary">+ 添加产品</button>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>#</th><th>名称</th><th>分类</th><th>描述</th><th>状态</th><th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                  <tr><td colspan="6" style="text-align:center;padding:32px;color:#999;">加载中...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== 合作伙伴管理 ====== -->
+        <div id="sectionPartners" class="admin-section" style="display:none;">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <h3>合作伙伴列表</h3>
+              <button class="btn-admin btn-admin-primary">+ 添加合作伙伴</button>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>#</th><th>名称</th><th>描述</th><th>排序</th><th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="partnersTableBody">
+                  <tr><td colspan="5" style="text-align:center;padding:32px;color:#999;">加载中...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== 全局设置 ====== -->
+        <div id="sectionSettings" class="admin-section" style="display:none;">
+          <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchTab('tabAnnouncement')">公告设置</button>
+            <button class="admin-tab" onclick="switchTab('tabFooter')">页脚设置</button>
+            <button class="admin-tab" onclick="switchTab('tabInternational')">国际版</button>
+          </div>
+
+          <!-- 公告设置 -->
+          <div id="tabAnnouncement" class="admin-tab-content active">
+            <div class="admin-panel">
+              <div class="admin-panel-body">
+                <div class="admin-form-group">
+                  <label>公告标题</label>
+                  <input type="text" id="announcementTitle" class="admin-input" placeholder="公告标题">
+                </div>
+                <div class="admin-form-group">
+                  <label>公告内容</label>
+                  <textarea id="announcementContent" class="admin-textarea" rows="4" placeholder="公告详细内容..."></textarea>
+                </div>
+                <div class="admin-form-row">
+                  <div class="admin-form-group">
+                    <label>启用公告</label>
+                    <select id="announcementEnabled" class="admin-select">
+                      <option value="true">是</option>
+                      <option value="false">否</option>
+                    </select>
+                  </div>
+                  <div class="admin-form-group">
+                    <label>每日仅显一次</label>
+                    <select id="showOnceDaily" class="admin-select">
+                      <option value="true">是</option>
+                      <option value="false">否</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="admin-form-row">
+                  <div class="admin-form-group">
+                    <label>顶部颜色</label>
+                    <input type="color" id="headerColor" value="#0052D9" class="admin-input" style="height:42px;padding:4px;">
+                  </div>
+                  <div class="admin-form-group">
+                    <label>按钮颜色</label>
+                    <input type="color" id="buttonColor" value="#FF6B00" class="admin-input" style="height:42px;padding:4px;">
+                  </div>
+                </div>
+              </div>
+              <div class="admin-panel-footer">
+                <span style="font-size:0.8125rem;color:#999;">配置首页首次访问时弹出的公告内容与样式</span>
+                <button class="btn-admin btn-admin-primary" onclick="saveSettings('announcement')">保存公告设置</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 页脚设置 -->
+          <div id="tabFooter" class="admin-tab-content">
+            <div class="admin-panel">
+              <div class="admin-panel-body">
+                <div class="admin-form-row">
+                  <div class="admin-form-group">
+                    <label>销售电话</label>
+                    <input type="text" id="footerPhone" class="admin-input" placeholder="400-800-8541">
+                  </div>
+                  <div class="admin-form-group">
+                    <label>ICP备案号</label>
+                    <input type="text" id="footerIcp" class="admin-input" placeholder="备案号">
+                  </div>
+                </div>
+                <div class="admin-form-row">
+                  <div class="admin-form-group">
+                    <label>ICP备案链接</label>
+                    <input type="url" id="footerIcpUrl" class="admin-input" placeholder="https://beian.miit.gov.cn/">
+                  </div>
+                  <div class="admin-form-group">
+                    <label>公安备案号</label>
+                    <input type="text" id="footerPolice" class="admin-input" placeholder="公安备案号">
+                  </div>
+                </div>
+                <div class="admin-form-group">
+                  <label>公安备案链接</label>
+                  <input type="url" id="footerPoliceUrl" class="admin-input" placeholder="http://www.beian.gov.cn/">
+                </div>
+                <div class="admin-form-group">
+                  <label>增值电信许可证</label>
+                  <input type="text" id="footerLicense" class="admin-input" placeholder="增值电信业务经营许可证号">
+                </div>
+                <div class="admin-form-group">
+                  <label>授权声明</label>
+                  <textarea id="footerDeclaration" class="admin-textarea" rows="2" placeholder="语云科技®等是我们（语云科技美国有限公司）在中国的注册授权"></textarea>
+                </div>
+              </div>
+              <div class="admin-panel-footer">
+                <span style="font-size:0.8125rem;color:#999;">配置网站页脚显示的联系方式与备案信息</span>
+                <button class="btn-admin btn-admin-primary" onclick="saveSettings('footer')">保存页脚设置</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 国际版设置 -->
+          <div id="tabInternational" class="admin-tab-content">
+            <div class="admin-panel">
+              <div class="admin-panel-body">
+                <div class="admin-form-group">
+                  <label>国际版官网地址</label>
+                  <input type="url" id="internationalUrl" class="admin-input" placeholder="https://cloud.loveym.cloud">
+                </div>
+                <p style="font-size:0.8125rem;color:#888;margin-top:8px;">此地址将用于导航栏"国际版"链接和页脚的国际版入口。</p>
+              </div>
+              <div class="admin-panel-footer">
+                <span style="font-size:0.8125rem;color:#999;"></span>
+                <button class="btn-admin btn-admin-primary" onclick="saveSettings('international')">保存设置</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /admin-content -->
+    </main><!-- /admin-main -->
+  </div><!-- /dashboardPage -->
+
+  <script src="/admin/assets/js/admin.js"></script>
+</body>
+</html>

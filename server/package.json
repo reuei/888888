@@ -1,0 +1,1 @@
+{"name": "yuyun-tech-server", "version": "1.0.0", "description": "语云科技企业官网后端服务", "main": "app.js", "scripts": {"start": "node app.js", "dev": "node --watch app.js"}, "dependencies": {"express": "^4.18.2", "cors": "^2.8.5", "multer": "^1.4.5-lts.1"}}

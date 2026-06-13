@@ -1,0 +1,18 @@
+{
+  "companyName": "语云科技",
+  "address": "北京市朝阳区语云大厦",
+  "salesPhone": "400-800-8541",
+  "supportPhone": "400-800-8541",
+  "email": "contact@loveym.cloud",
+  "workHours": "周一至周日 9:00 - 22:00",
+  "qqGroup": "123456789",
+  "wechatGroup": "yuyun-tech-support",
+  "lat": 39.9042,
+  "lng": 116.4074,
+  "salesRegions": [
+    { "region": "华北地区", "manager": "李经理", "phone": "138-0000-0001" },
+    { "region": "华东地区", "manager": "王经理", "phone": "138-0000-0002" },
+    { "region": "华南地区", "manager": "陈经理", "phone": "138-0000-0003" },
+    { "region": "海外地区", "manager": "Mike", "phone": "138-0000-0004" }
+  ]
+}

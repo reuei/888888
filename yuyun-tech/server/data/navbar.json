@@ -1,0 +1,18 @@
+{
+  "navItems": [
+    { "text": "首页", "url": "index.html" },
+    { "text": "关于我们", "url": "about.html" },
+    { "text": "公司简介", "url": "about.html#intro" },
+    { "text": "产品介绍", "url": "products.html",
+      "children": [
+        { "text": "云服务器", "url": "products.html#cloud-server" },
+        { "text": "云数据库", "url": "products.html#cloud-db" },
+        { "text": "CDN加速", "url": "products.html#cdn" },
+        { "text": "安全防护", "url": "products.html#security" }
+      ]
+    },
+    { "text": "合作伙伴", "url": "partners.html" },
+    { "text": "联系我们", "url": "contact.html" },
+    { "text": "国际版", "url": "https://cloud.loveym.cloud", "external": true }
+  ]
+}

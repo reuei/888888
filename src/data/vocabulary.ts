@@ -1,0 +1,40 @@
+import type { Word } from '@/types';
+
+export const vocabularyData: Record<string, Word[]> = {
+  english: [
+    { id: 'en-w1', word: 'Serendipity', phonetic: '/ˌserənˈdɪpəti/', translation: '意外发现珍奇事物的运气', example: 'Finding this restaurant was pure serendipity.', exampleTranslation: '发现这家餐厅纯粹是意外之喜。', language: 'english', difficulty: 3 },
+    { id: 'en-w2', word: 'Ephemeral', phonetic: '/ɪˈfemərəl/', translation: '短暂的，瞬息的', example: 'Fashion trends are often ephemeral.', exampleTranslation: '时尚潮流往往是短暂的。', language: 'english', difficulty: 3 },
+    { id: 'en-w3', word: 'Resilience', phonetic: '/rɪˈzɪliəns/', translation: '韧性，恢复力', example: 'Her resilience in the face of adversity is inspiring.', exampleTranslation: '她在逆境中的韧性令人鼓舞。', language: 'english', difficulty: 2 },
+    { id: 'en-w4', word: 'Eloquent', phonetic: '/ˈeləkwənt/', translation: '雄辩的，有说服力的', example: 'He gave an eloquent speech at the ceremony.', exampleTranslation: '他在典礼上发表了雄辩的演讲。', language: 'english', difficulty: 2 },
+    { id: 'en-w5', word: 'Meticulous', phonetic: '/məˈtɪkjələs/', translation: '一丝不苟的，严谨的', example: 'She is meticulous about her work.', exampleTranslation: '她对工作一丝不苟。', language: 'english', difficulty: 2 },
+    { id: 'en-w6', word: 'Ambiguous', phonetic: '/æmˈbɪɡjuəs/', translation: '模棱两可的', example: 'His answer was ambiguous and confusing.', exampleTranslation: '他的回答模棱两可，令人困惑。', language: 'english', difficulty: 2 },
+    { id: 'en-w7', word: 'Pragmatic', phonetic: '/præɡˈmætɪk/', translation: '务实的，实用的', example: 'We need a pragmatic solution to this problem.', exampleTranslation: '我们需要一个务实的解决方案。', language: 'english', difficulty: 2 },
+    { id: 'en-w8', word: 'Ubiquitous', phonetic: '/juːˈbɪkwɪtəs/', translation: '无处不在的', example: 'Smartphones have become ubiquitous in modern life.', exampleTranslation: '智能手机在现代生活中已无处不在。', language: 'english', difficulty: 3 },
+    { id: 'en-w9', word: 'Nostalgia', phonetic: '/nɒˈstældʒə/', translation: '怀旧之情', example: 'Looking at old photos filled her with nostalgia.', exampleTranslation: '看着旧照片，她充满了怀旧之情。', language: 'english', difficulty: 2 },
+    { id: 'en-w10', word: 'Paradigm', phonetic: '/ˈpærədaɪm/', translation: '范例，模式', example: 'This discovery represents a paradigm shift.', exampleTranslation: '这一发现代表了范式转变。', language: 'english', difficulty: 3 },
+  ],
+  japanese: [
+    { id: 'jp-w1', word: '桜', phonetic: 'さくら', translation: '樱花', example: '春になると桜が咲きます。', exampleTranslation: '到了春天樱花就会开放。', language: 'japanese', difficulty: 1 },
+    { id: 'jp-w2', word: '努力', phonetic: 'どりょく', translation: '努力', example: '努力は必ず報われる。', exampleTranslation: '努力一定会有回报。', language: 'japanese', difficulty: 2 },
+    { id: 'jp-w3', word: '絆', phonetic: 'きずな', translation: '羁绊，纽带', example: '家族との絆を大切にする。', exampleTranslation: '珍惜与家人的羁绊。', language: 'japanese', difficulty: 2 },
+    { id: 'jp-w4', word: '一期一会', phonetic: 'いちごいちえ', translation: '一生只有一次的相遇', example: '一期一会の心で接客する。', exampleTranslation: '以一期一会的心态服务客人。', language: 'japanese', difficulty: 3 },
+    { id: 'jp-w5', word: '曖昧', phonetic: 'あいまい', translation: '暧昧，模糊', example: '曖昧な答えは避けてください。', exampleTranslation: '请避免暧昧的回答。', language: 'japanese', difficulty: 2 },
+    { id: 'jp-w6', word: '勤勉', phonetic: 'きんべん', translation: '勤勉，勤奋', example: '勤勉な人は成功する。', exampleTranslation: '勤奋的人会成功。', language: 'japanese', difficulty: 2 },
+    { id: 'jp-w7', word: '和', phonetic: 'わ', translation: '和谐，和平', example: '和を以て貴しとなす。', exampleTranslation: '以和为贵。', language: 'japanese', difficulty: 2 },
+    { id: 'jp-w8', word: 'おもてなし', phonetic: 'おもてなし', translation: '款待，招待', example: '日本のおもてなしは世界に有名だ。', exampleTranslation: '日本的款待之道世界闻名。', language: 'japanese', difficulty: 2 },
+    { id: 'jp-w9', word: '残念', phonetic: 'ざんねん', translation: '遗憾，可惜', example: '残念ながら、明日は行けません。', exampleTranslation: '很遗憾，明天我去不了。', language: 'japanese', difficulty: 1 },
+    { id: 'jp-w10', word: '元気', phonetic: 'げんき', translation: '精神，健康', example: 'お元気ですか。', exampleTranslation: '您好吗？', language: 'japanese', difficulty: 1 },
+  ],
+  korean: [
+    { id: 'kr-w1', word: '화이팅', phonetic: 'hwaiting', translation: '加油', example: '시험 화이팅!', exampleTranslation: '考试加油！', language: 'korean', difficulty: 1 },
+    { id: 'kr-w2', word: '정', phonetic: 'jeong', translation: '情，情谊', example: '한국 문화에서 정은 매우 중요하다.', exampleTranslation: '在韩国文化中，情是非常重要的。', language: 'korean', difficulty: 2 },
+    { id: 'kr-w3', word: '눈치', phonetic: 'nunchi', translation: '眼力见，察言观色', example: '눈치가 빠른 사람이에요.', exampleTranslation: '他是个有眼力见的人。', language: 'korean', difficulty: 2 },
+    { id: 'kr-w4', word: '희망', phonetic: 'huimang', translation: '希望', example: '희망을 잃지 마세요.', exampleTranslation: '请不要失去希望。', language: 'korean', difficulty: 1 },
+    { id: 'kr-w5', word: '열정', phonetic: 'yeoljeong', translation: '热情', example: '열정적으로 일하다.', exampleTranslation: '热情地工作。', language: 'korean', difficulty: 2 },
+    { id: 'kr-w6', word: '한류', phonetic: 'hallyu', translation: '韩流', example: '한류가 전 세계에서 인기가 많다.', exampleTranslation: '韩流在全世界都很受欢迎。', language: 'korean', difficulty: 1 },
+    { id: 'kr-w7', word: '꿈', phonetic: 'kkum', translation: '梦想', example: '꿈을 위해 노력하다.', exampleTranslation: '为梦想而努力。', language: 'korean', difficulty: 1 },
+    { id: 'kr-w8', word: '행복', phonetic: 'haengbok', translation: '幸福', example: '행복한 하루 되세요.', exampleTranslation: '祝你度过幸福的一天。', language: 'korean', difficulty: 1 },
+    { id: 'kr-w9', word: '인내', phonetic: 'innnae', translation: '忍耐', example: '인내는 쓰지만 그 열매는 달다.', exampleTranslation: '忍耐是苦的，但果实是甜的。', language: 'korean', difficulty: 2 },
+    { id: 'kr-w10', word: '소통', phonetic: 'sotong', translation: '沟通', example: '소통이 중요하다.', exampleTranslation: '沟通很重要。', language: 'korean', difficulty: 2 },
+  ],
+};

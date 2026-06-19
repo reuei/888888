@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}合作伙伴 - {{ s.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1>合作伙伴</h1>
+    <p style="color:rgba(255,255,255,.85);margin-top:10px">与全球领先企业携手，共建云生态</p>
+    <div style="font-size:14px;opacity:.85;margin-top:10px"><a href="/" style="color:#fff;text-decoration:none;opacity:.8">首页</a> <span style="margin:0 8px;opacity:.6">/</span> 合作伙伴</div>
+  </div>
+</section>
+
+<section style="padding:70px 0">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:50px">
+      <h2 style="font-size:30px;color:#0f1e36;margin-bottom:10px">战略合作伙伴</h2>
+      <p style="color:#6b7280">与以下企业长期深度合作，构建完整云生态</p>
+      <div style="width:60px;height:4px;background:linear-gradient(90deg,#ff8a00,#ff6a00);margin:16px auto 0;border-radius:2px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+      {% for p in partners %}
+      <a href="{{ p.url }}" target="_blank" style="text-decoration:none;background:#fff;padding:36px 24px;border-radius:12px;border:1px solid #e5e7eb;text-align:center;transition:all .3s;color:inherit;display:block"
+         onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 15px 35px rgba(0,0,0,.1)';this.style.borderColor='#ff6a00'"
+         onmouseout="this.style.transform='none';this.style.boxShadow='none';this.style.borderColor='#e5e7eb'">
+        <div style="height:100px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+          <img src="{{ p.logo }}" alt="{{ p.name }}" style="max-height:100px;max-width:100%">
+        </div>
+        <h4 style="font-size:17px;color:#0f1e36;margin-bottom:4px">{{ p.name }}</h4>
+        <p style="color:#ff6a00;font-size:13px">官方网站 →</p>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div style="margin-top:70px;text-align:center;background:linear-gradient(135deg,#0f1e36,#1a3a6a);color:#fff;padding:60px 30px;border-radius:16px">
+      <h2 style="font-size:30px;margin-bottom:16px">加入 {{ s.site_name }} 合作伙伴计划</h2>
+      <p style="color:rgba(255,255,255,.85);font-size:15px;margin-bottom:30px">与我们携手，共创云计算时代的无限可能</p>
+      <a href="/contact" class="btn" style="padding:14px 40px;background:linear-gradient(90deg,#ff8a00,#ff6a00);color:#fff;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600">申请合作 <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <div style="margin-top:60px">
+      <h2 style="font-size:24px;color:#0f1e36;margin-bottom:24px;text-align:center">友情链接</h2>
+      <div style="background:#fff;padding:30px;border:1px solid #e5e7eb;border-radius:12px;display:flex;flex-wrap:wrap;gap:10px 20px;justify-content:center">
+        {% for fl in friendlinks %}
+        <a href="{{ fl.url }}" target="_blank" style="color:#4b5563;font-size:14px;text-decoration:none;padding:8px 16px;border-radius:6px;transition:all .2s"
+           onmouseover="this.style.color='#ff6a00';this.style.background='#fff7f0'"
+           onmouseout="this.style.color='#4b5563';this.style.background='transparent'">
+          {{ fl.name }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

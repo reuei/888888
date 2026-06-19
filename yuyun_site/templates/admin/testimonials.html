@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用户评价管理</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% include 'admin/_base_style.html' %}
+</head>
+<body>
+<div class="admin-layout">
+  {% include 'admin/_sidebar.html' %}
+  <main class="admin-main">
+    {% include 'admin/_header.html' %}
+    <div class="admin-content">
+      <div class="tip"><i class="fa-solid fa-circle-info" style="color:#3b82f6"></i> 管理客户评价展示。</div>
+      <div class="card">
+        <h3>添加 / 编辑</h3>
+        <form method="post" enctype="multipart/form-data">
+          <input type="hidden" name="id" id="f-id" value="">
+          <div class="admin-grid">
+            <div><div class="form-row"><label>姓名 *</label><input type="text" name="name" id="f-name" required></div></div>
+            <div><div class="form-row"><label>职位 / 公司</label><input type="text" name="title" id="f-title"></div></div>
+          </div>
+          <div class="form-row"><label>评价内容</label><textarea name="content" id="f-content"></textarea></div>
+          <div class="admin-grid">
+            <div><div class="form-row"><label>头像（上传）</label><input type="file" name="avatar" accept="image/*"><div class="small-text" id="f-avatar-current"></div></div></div>
+            <div><div class="form-row"><label>排序</label><input type="number" name="sort" id="f-sort" value="0"></div></div>
+          </div>
+          <div class="form-actions"><button type="submit" class="admin-btn">保存</button><button type="button" onclick="resetForm()" class="admin-btn secondary">清空</button></div>
+        </form>
+      </div>
+      <div class="card">
+        <h3>列表（共 {{ items|length }} 条）</h3>
+        <table class="admin-table">
+          <thead><tr><th>ID</th><th>头像</th><th>姓名</th><th>职位</th><th>评价</th><th>排序</th><th>操作</th></tr></thead>
+          <tbody>
+            {% for r in items %}
+            <tr>
+              <td>{{ r.id }}</td><td>{% if r.avatar %}<img src="{{ r.avatar }}" alt="">{% endif %}</td>
+              <td>{{ r.name }}</td><td>{{ r.title }}</td><td style="max-width:300px">{{ r.content[:80] }}...</td><td>{{ r.sort }}</td>
+              <td class="row-actions">
+                <button type="button" onclick="edit('{{ r.id }}','{{ r.name|replace("'", "\\'") }}','{{ r.title|replace("'", "\\'") }}','{{ r.content|replace("'", "\\'")|replace("\n"," ") }}','{{ r.sort }}','{{ r.avatar or '' }}')"><i class="fa-solid fa-edit"></i> 编辑</button>
+                <form method="post" style="display:inline" onsubmit="return confirm('确定删除?')"><input type="hidden" name="id" value="{{ r.id }}"><button type="submit" name="action" value="delete" class="del"><i class="fa-solid fa-trash"></i> 删除</button></form>
+              </td>
+            </tr>
+            {% else %}<tr><td colspan="7" style="text-align:center;padding:40px;color:#9ca3af">暂无数据</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+function edit(id,name,title,content,sort,avatar){
+  document.getElementById('f-id').value=id;
+  document.getElementById('f-name').value=name;
+  document.getElementById('f-title').value=title;
+  document.getElementById('f-content').value=content;
+  document.getElementById('f-sort').value=sort;
+  document.getElementById('f-avatar-current').innerHTML=avatar?'当前：<img src="'+avatar+'" class="thumb-preview" alt=""> '+avatar:'';
+  window.scrollTo(0,0);
+}
+function resetForm(){
+  document.querySelector('form').reset();
+  document.getElementById('f-id').value='';
+  document.getElementById('f-avatar-current').innerHTML='';
+}
+</script>
+{% include 'admin/_toasts.html' %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} - {{ s.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1>{{ item.title }}</h1>
+    <p style="color:rgba(255,255,255,.85);margin-top:10px">发布时间：{{ item.created_at }}</p>
+  </div>
+</section>
+
+<section style="padding:70px 0">
+  <div class="container" style="max-width:800px">
+    <div style="background:#fff;padding:50px;border-radius:12px;border:1px solid #e5e7eb;box-shadow:0 10px 30px rgba(0,0,0,.06)">
+      <div style="color:#6b7280;font-size:14px;margin-bottom:20px"><i class="fa-regular fa-calendar" style="color:#ff6a00"></i> {{ item.created_at }}</div>
+      <div style="background:#fff7f0;padding:20px;border-radius:8px;border-left:4px solid #ff6a00;margin-bottom:30px">
+        <p style="color:#4b5563;font-size:15px;line-height:1.8;margin:0">{{ item.summary }}</p>
+      </div>
+      <div style="color:#374151;font-size:15px;line-height:2">
+        {{ item.content or item.summary }}
+      </div>
+      <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center">
+        <a href="/news" class="btn" style="padding:10px 24px;background:#fff;color:#ff6a00;border:1.5px solid #ff6a00;border-radius:6px;text-decoration:none;font-size:14px"><i class="fa-solid fa-arrow-left"></i> 返回列表</a>
+        <a href="/contact" class="btn" style="padding:10px 24px;background:linear-gradient(90deg,#ff8a00,#ff6a00);color:#fff;border-radius:6px;text-decoration:none;font-size:14px">咨询详情</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

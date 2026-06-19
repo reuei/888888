@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}联系我们 - {{ s.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1>联系我们</h1>
+    <p style="color:rgba(255,255,255,.85);margin-top:10px">我们期待与您建立联系，为您的业务提供专业云服务</p>
+    <div style="font-size:14px;opacity:.85;margin-top:10px"><a href="/" style="color:#fff;text-decoration:none;opacity:.8">首页</a> <span style="margin:0 8px;opacity:.6">/</span> 联系我们</div>
+  </div>
+</section>
+
+<section style="padding:70px 0">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:40px">
+      <div>
+        <div style="background:#fff;padding:28px;border-radius:12px;border:1px solid #e5e7eb;margin-bottom:20px">
+          <h3 style="font-size:20px;color:#0f1e36;margin-bottom:16px;display:flex;align-items:center;gap:10px"><i class="fa-solid fa-phone" style="color:#ff6a00"></i> 销售热线</h3>
+          <p style="color:#ff6a00;font-size:28px;font-weight:700;margin-bottom:6px;letter-spacing:1px">{{ s.sales_phone }}</p>
+          <p style="color:#6b7280;font-size:13px">7 × 24 小时 专业销售顾问为您服务</p>
+        </div>
+        <div style="background:#fff;padding:28px;border-radius:12px;border:1px solid #e5e7eb;margin-bottom:20px">
+          <h3 style="font-size:20px;color:#0f1e36;margin-bottom:16px;display:flex;align-items:center;gap:10px"><i class="fa-solid fa-headset" style="color:#ff6a00"></i> 技术支持</h3>
+          <p style="color:#4b5563;font-size:15px;margin-bottom:4px"><i class="fa-solid fa-phone-volume" style="color:#ff6a00"></i> {{ s.service_phone }}</p>
+          <p style="color:#4b5563;font-size:15px;margin-bottom:4px"><i class="fa-solid fa-envelope" style="color:#ff6a00"></i> {{ s.service_email }}</p>
+          <p style="color:#6b7280;font-size:13px;margin-top:10px">工作日 9:00 - 21:00 响应</p>
+        </div>
+        <div style="background:#fff;padding:28px;border-radius:12px;border:1px solid #e5e7eb;margin-bottom:20px">
+          <h3 style="font-size:20px;color:#0f1e36;margin-bottom:16px;display:flex;align-items:center;gap:10px"><i class="fa-solid fa-location-dot" style="color:#ff6a00"></i> 公司地址</h3>
+          <p style="color:#4b5563;font-size:15px;line-height:1.8">{{ s.company_address }}</p>
+          <p style="color:#6b7280;font-size:13px;margin-top:10px">{{ s.company_address_en }}</p>
+        </div>
+        <div style="background:linear-gradient(135deg,#ff8a00,#ff6a00);padding:28px;border-radius:12px;color:#fff">
+          <h3 style="font-size:20px;margin-bottom:16px;display:flex;align-items:center;gap:10px"><i class="fa-brands fa-qq"></i> 官方交流群</h3>
+          <p style="font-size:24px;font-weight:700;margin-bottom:6px">QQ 群：{{ s.qq_group }}</p>
+          <p style="font-size:13px;opacity:.9">技术交流 · 资源共享 · 福利发放</p>
+        </div>
+      </div>
+
+      <form method="post" action="/contact" style="background:#fff;padding:40px;border-radius:12px;border:1px solid #e5e7eb;box-shadow:0 10px 40px rgba(0,0,0,.06)">
+        <h3 style="font-size:24px;color:#0f1e36;margin-bottom:10px">在线留言</h3>
+        <p style="color:#6b7280;font-size:14px;margin-bottom:26px">填写以下信息，我们的顾问将尽快与您联系</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
+          <div><label style="display:block;font-size:14px;color:#374151;margin-bottom:8px;font-weight:500">您的姓名 *</label><input type="text" name="name" required style="width:100%;padding:12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit"></div>
+          <div><label style="display:block;font-size:14px;color:#374151;margin-bottom:8px;font-weight:500">联系电话 *</label><input type="tel" name="phone" required style="width:100%;padding:12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
+          <div><label style="display:block;font-size:14px;color:#374151;margin-bottom:8px;font-weight:500">邮箱地址</label><input type="email" name="email" style="width:100%;padding:12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit"></div>
+          <div><label style="display:block;font-size:14px;color:#374151;margin-bottom:8px;font-weight:500">公司名称</label><input type="text" name="company" style="width:100%;padding:12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit"></div>
+        </div>
+        <div style="margin-bottom:14px"><label style="display:block;font-size:14px;color:#374151;margin-bottom:8px;font-weight:500">咨询产品</label>
+          <select name="product" style="width:100%;padding:12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit">
+            <option>云服务器 ECS</option><option>云数据库 RDS</option><option>对象存储 OSS</option>
+            <option>CDN 加速</option><option>DDoS 高防</option><option>AI 大模型平台</option><option>其他咨询</option>
+          </select>
+        </div>
+        <div style="margin-bottom:20px"><label style="display:block;font-size:14px;color:#374151;margin-bottom:8px;font-weight:500">留言内容</label>
+          <textarea name="content" rows="5" style="width:100%;padding:12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;resize:vertical"></textarea>
+        </div>
+        <button type="submit" class="btn" style="padding:14px 40px;background:linear-gradient(90deg,#ff8a00,#ff6a00);color:#fff;border-radius:8px;border:none;font-size:15px;font-weight:600;cursor:pointer;width:100%">提交留言 <i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
+
+    <div style="height:450px;margin-top:60px;border-radius:16px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,.1);border:2px solid #ff6a00">
+      <iframe src="https://maps.google.com/maps?q={{ s.company_address }}&output=embed" style="width:100%;height:100%;border:0" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+{% endblock %}

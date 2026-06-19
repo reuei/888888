@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block admin_title %}仪表盘{% endblock %}
+{% block admin_content %}
+<div class="tip"><i class="fa-solid fa-circle-info" style="color:#3b82f6"></i> 欢迎使用 {{ s.site_name }} 网站管理后台，您可以通过左侧菜单管理网站的全部内容与配置。</div>
+<div class="stat-grid">
+  <div class="stat-card"><div class="label">轮播图</div><div class="num">{{ counts.sliders }}</div></div>
+  <div class="stat-card"><div class="label">产品数</div><div class="num">{{ counts.products }}</div></div>
+  <div class="stat-card"><div class="label">合作伙伴</div><div class="num">{{ counts.partners }}</div></div>
+  <div class="stat-card"><div class="label">分支机构</div><div class="num">{{ counts.offices }}</div></div>
+  <div class="stat-card"><div class="label">资质认证</div><div class="num">{{ counts.certs }}</div></div>
+  <div class="stat-card"><div class="label">用户评价</div><div class="num">{{ counts.testimonials }}</div></div>
+  <div class="stat-card"><div class="label">友情链接</div><div class="num">{{ counts.friendlinks }}</div></div>
+  <div class="stat-card"><div class="label">建站状态</div><div class="num" style="font-size:18px;color:#10b981;margin-top:20px">运行中</div></div>
+</div>
+
+<div class="card">
+  <h3>快速操作</h3>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:6px">
+    <a href="/admin/settings" class="admin-btn">网站设置</a>
+    <a href="/admin/products" class="admin-btn secondary">产品管理</a>
+    <a href="/admin/partners" class="admin-btn secondary">合作伙伴</a>
+    <a href="/admin/certifications" class="admin-btn secondary">资质认证</a>
+    <a href="/admin/news" class="admin-btn secondary">新闻资讯</a>
+    <a href="/" class="admin-btn danger" target="_blank"><i class="fa-solid fa-eye"></i> 预览网站</a>
+  </div>
+</div>
+
+<div class="card">
+  <h3>系统信息</h3>
+  <div style="font-size:14px;color:#4b5563;line-height:2">
+    <div><span style="color:#6b7280;display:inline-block;width:120px">网站名称：</span>{{ s.site_name }}</div>
+    <div><span style="color:#6b7280;display:inline-block;width:120px">公司名称：</span>{{ s.company_name }}</div>
+    <div><span style="color:#6b7280;display:inline-block;width:120px">销售热线：</span>{{ s.sales_phone }}</div>
+    <div><span style="color:#6b7280;display:inline-block;width:120px">ICP备案：</span>{{ s.icp }}</div>
+    <div><span style="color:#6b7280;display:inline-block;width:120px">国际版链接：</span><a href="{{ s.international_url }}" target="_blank" style="color:#ff6a00">{{ s.international_url }}</a></div>
+  </div>
+</div>
+{% endblock %}

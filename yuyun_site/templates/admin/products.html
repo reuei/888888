@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>产品管理</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% include 'admin/_base_style.html' %}
+</head>
+<body>
+<div class="admin-layout">
+  {% include 'admin/_sidebar.html' %}
+  <main class="admin-main">
+    {% include 'admin/_header.html' %}
+    <div class="admin-content">
+      <div class="tip"><i class="fa-solid fa-circle-info" style="color:#3b82f6"></i> 管理产品与服务。图标字段可填 Font Awesome class（例如 fa-solid fa-server）。</div>
+      <div class="card">
+        <h3>添加 / 编辑</h3>
+        <form method="post" enctype="multipart/form-data">
+          <input type="hidden" name="id" id="f-id" value="">
+          <div class="admin-grid">
+            <div><div class="form-row"><label>标题 *</label><input type="text" name="title" id="f-title" required></div></div>
+            <div><div class="form-row"><label>图标（Font Awesome class）</label><input type="text" name="icon" id="f-icon" placeholder="fa-solid fa-server"></div></div>
+          </div>
+          <div class="form-row"><label>简介</label><textarea name="summary" id="f-summary"></textarea></div>
+          <div class="form-row"><label>详情内容</label><textarea name="content" id="f-content"></textarea></div>
+          <div class="admin-grid">
+            <div><div class="form-row"><label>图片（上传）</label><input type="file" name="image" accept="image/*"><div class="small-text" id="f-image-current"></div></div></div>
+            <div><div class="form-row"><label>排序</label><input type="number" name="sort" id="f-sort" value="0"></div></div>
+          </div>
+          <div class="form-actions"><button type="submit" class="admin-btn">保存</button><button type="button" onclick="resetForm()" class="admin-btn secondary">清空</button></div>
+        </form>
+      </div>
+      <div class="card">
+        <h3>列表（共 {{ items|length }} 条）</h3>
+        <table class="admin-table">
+          <thead><tr><th>ID</th><th>图片</th><th>标题</th><th>图标</th><th>排序</th><th>操作</th></tr></thead>
+          <tbody>
+            {% for r in items %}
+            <tr>
+              <td>{{ r.id }}</td><td>{% if r.image %}<img src="{{ r.image }}" alt="">{% endif %}</td>
+              <td>{{ r.title }}</td><td><i class="{{ r.icon }}" style="color:#ff6a00"></i> {{ r.icon }}</td><td>{{ r.sort }}</td>
+              <td class="row-actions">
+                <button type="button" onclick="edit('{{ r.id }}','{{ r.title|replace("'", "\\'") }}','{{ r.icon|replace("'", "\\'") }}','{{ r.summary|replace("'", "\\'")|replace("\n","\\n") }}','{{ (r.content or '')|replace("'", "\\'")|replace("\n","\\n") }}','{{ r.sort }}','{{ r.image or '' }}')"><i class="fa-solid fa-edit"></i> 编辑</button>
+                <form method="post" style="display:inline" onsubmit="return confirm('确定删除?')"><input type="hidden" name="id" value="{{ r.id }}"><button type="submit" name="action" value="delete" class="del"><i class="fa-solid fa-trash"></i> 删除</button></form>
+              </td>
+            </tr>
+            {% else %}<tr><td colspan="6" style="text-align:center;padding:40px;color:#9ca3af">暂无数据</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+function edit(id,title,icon,summary,content,sort,image){
+  document.getElementById('f-id').value=id;
+  document.getElementById('f-title').value=title;
+  document.getElementById('f-icon').value=icon;
+  document.getElementById('f-summary').value=summary;
+  document.getElementById('f-content').value=content;
+  document.getElementById('f-sort').value=sort;
+  document.getElementById('f-image-current').innerHTML=image?'当前：<img src="'+image+'" class="thumb-preview" alt=""> '+image:'';
+  window.scrollTo(0,0);
+}
+function resetForm(){
+  document.querySelector('form').reset();
+  document.getElementById('f-id').value='';
+  document.getElementById('f-image-current').innerHTML='';
+}
+</script>
+{% include 'admin/_toasts.html' %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

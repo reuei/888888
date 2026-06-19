@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>合作伙伴管理</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% include 'admin/_base_style.html' %}
+</head>
+<body>
+<div class="admin-layout">
+  {% include 'admin/_sidebar.html' %}
+  <main class="admin-main">
+    {% include 'admin/_header.html' %}
+    <div class="admin-content">
+      <div class="tip"><i class="fa-solid fa-circle-info" style="color:#3b82f6"></i> 管理合作伙伴与 LOGO 展示。</div>
+      <div class="card">
+        <h3>添加 / 编辑</h3>
+        <form method="post" enctype="multipart/form-data">
+          <input type="hidden" name="id" id="f-id" value="">
+          <div class="admin-grid">
+            <div><div class="form-row"><label>名称 *</label><input type="text" name="name" id="f-name" required></div></div>
+            <div><div class="form-row"><label>官网链接</label><input type="text" name="url" id="f-url" placeholder="https://"></div></div>
+            <div><div class="form-row"><label>排序</label><input type="number" name="sort" id="f-sort" value="0"></div></div>
+            <div><div class="form-row"><label>LOGO 图片</label><input type="file" name="logo" accept="image/*"><div class="small-text" id="f-logo-current"></div></div></div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="admin-btn"><i class="fa-solid fa-save"></i> 保存</button>
+            <button type="button" onclick="resetForm()" class="admin-btn secondary">清空</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <h3>列表（共 {{ items|length }} 条）</h3>
+        <table class="admin-table">
+          <thead><tr><th>ID</th><th>LOGO</th><th>名称</th><th>链接</th><th>排序</th><th>操作</th></tr></thead>
+          <tbody>
+            {% for r in items %}
+            <tr>
+              <td>{{ r.id }}</td><td>{% if r.logo %}<img src="{{ r.logo }}" alt="">{% endif %}</td>
+              <td>{{ r.name }}</td><td>{{ r.url }}</td><td>{{ r.sort }}</td>
+              <td class="row-actions">
+                <button type="button" onclick="edit({{ r.id }}, '{{ r.name|replace("'", "\\'") }}', '{{ r.url|replace("'", "\\'") }}', {{ r.sort }}, '{{ r.logo or '' }}')"><i class="fa-solid fa-edit"></i> 编辑</button>
+                <form method="post" style="display:inline" onsubmit="return confirm('确定删除?')"><input type="hidden" name="id" value="{{ r.id }}"><button type="submit" name="action" value="delete" class="del"><i class="fa-solid fa-trash"></i> 删除</button></form>
+              </td>
+            </tr>
+            {% else %}<tr><td colspan="6" style="text-align:center;padding:40px;color:#9ca3af">暂无数据</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+function edit(id,n,url,sort,logo){
+  document.getElementById('f-id').value=id;
+  document.getElementById('f-name').value=n;
+  document.getElementById('f-url').value=url;
+  document.getElementById('f-sort').value=sort;
+  document.getElementById('f-logo-current').innerHTML=logo?'当前：<img src="'+logo+'" class="thumb-preview" alt=""> '+logo:'';
+  window.scrollTo(0,0);
+}
+function resetForm(){for(const id of ['f-id','f-name','f-url','f-sort'])document.getElementById(id).value='';document.getElementById('f-logo-current').innerHTML='';}
+</script>
+{% include 'admin/_toasts.html' %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

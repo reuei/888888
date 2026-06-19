@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% block title %}首页 - {{ s.site_name }}{% endblock %}
+
+{% block content %}
+
+<!-- Carousel -->
+<section class="carousel">
+  <div class="carousel-track">
+    {% for slide in sliders %}
+    <div class="carousel-slide">
+      <div class="slide-bg" style="background-image:url('{{ slide.image }}')"></div>
+      <div class="slide-content">
+        <h1>{{ slide.title }}</h1>
+        <p>{{ slide.subtitle }}</p>
+        <div style="display:flex;gap:14px;margin-top:24px;flex-wrap:wrap">
+          <a href="{{ slide.link or '/products' }}" class="btn" style="padding:14px 34px;background:linear-gradient(90deg,#ff8a00,#ff6a00);color:#fff;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600;box-shadow:0 10px 30px rgba(255,106,0,.4)">立即选购 <i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/contact" class="btn" style="padding:14px 34px;background:transparent;color:#fff;border:1.5px solid #fff;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600">免费试用</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <button class="carousel-nav carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
+  <button class="carousel-nav carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
+  <div class="carousel-dots"></div>
+</section>
+
+<!-- Feature strip -->
+<section class="feature-strip">
+  <div class="container" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:40px 20px">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#ff8a00,#ff6a00);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px"><i class="fa-solid fa-bolt"></i></div>
+      <div><h3 style="font-size:18px;color:#fff;margin-bottom:4px">极速部署</h3><p style="font-size:13px;color:rgba(255,255,255,.7)">秒级开通，即开即用</p></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#ff8a00,#ff6a00);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px"><i class="fa-solid fa-shield-halved"></i></div>
+      <div><h3 style="font-size:18px;color:#fff;margin-bottom:4px">安全防护</h3><p style="font-size:13px;color:rgba(255,255,255,.7)">DDoS 防护与企业级安全</p></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#ff8a00,#ff6a00);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px"><i class="fa-solid fa-globe"></i></div>
+      <div><h3 style="font-size:18px;color:#fff;margin-bottom:4px">全球节点</h3><p style="font-size:13px;color:rgba(255,255,255,.7)">覆盖 50+ 国家和地区</p></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#ff8a00,#ff6a00);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px"><i class="fa-solid fa-headset"></i></div>
+      <div><h3 style="font-size:18px;color:#fff;margin-bottom:4px">7×24 服务</h3><p style="font-size:13px;color:rgba(255,255,255,.7)">专业顾问全天候支持</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Partners marquee -->
+<section class="partners-marquee">
+  <div class="container" style="padding:60px 20px">
+    <div style="text-align:center;margin-bottom:36px">
+      <h2 style="font-size:32px;color:#0f1e36;margin-bottom:10px">我们与以下企业/组织携手共进</h2>
+      <p style="color:#6b7280">全球领先的合作伙伴，为您提供可靠的云服务体验</p>
+      <div style="width:60px;height:4px;background:linear-gradient(90deg,#ff8a00,#ff6a00);margin:16px auto 0;border-radius:2px"></div>
+    </div>
+    <div style="overflow:hidden">
+      <div style="display:flex;gap:24px;animation:marquee-scroll 40s linear infinite;width:max-content"
+           onmouseover="this.style.animationPlayState='paused'"
+           onmouseout="this.style.animationPlayState='running'">
+        {% for p in partners %}{% for _ in range(1,3) %}
+        <div style="flex-shrink:0;width:220px;height:110px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:all .2s"
+             onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 25px rgba(0,0,0,.15)'"
+             onmouseout="this.style.transform='none';this.style.boxShadow='0 2px 10px rgba(0,0,0,.06)'">
+          <img src="{{ p.logo }}" alt="{{ p.name }}" style="max-height:80px;max-width:200px">
+        </div>
+        {% endfor %}{% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Products -->
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:50px">
+      <h2 style="font-size:32px;color:#0f1e36;margin-bottom:10px">企业核心云产品</h2>
+      <p style="color:#6b7280">一站式云服务解决方案，助力企业数字化转型</p>
+      <div style="width:60px;height:4px;background:linear-gradient(90deg,#ff8a00,#ff6a00);margin:16px auto 0;border-radius:2px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      {% for prod in products %}
+      <a href="{{ url_for('product_detail', pid=prod.id) }}" style="text-decoration:none;color:inherit;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:30px;transition:all .3s;display:block;position:relative;overflow:hidden"
+         onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,.12)';this.style.borderColor='transparent'"
+         onmouseout="this.style.transform='none';this.style.boxShadow='none';this.style.borderColor='#e5e7eb'">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff8a00,#ff6a00);transform-origin:left;transition:transform .4s"></div>
+        <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#fff7f0,#ffe6d1);display:flex;align-items:center;justify-content:center;color:#ff6a00;font-size:26px;margin-bottom:18px">
+          <i class="{{ prod.icon or 'fa-solid fa-cloud' }}"></i>
+        </div>
+        <h3 style="font-size:20px;margin-bottom:10px;color:#0f1e36">{{ prod.title }}</h3>
+        <p style="color:#6b7280;font-size:14px;min-height:40px">{{ prod.summary }}</p>
+        <div style="color:#ff6a00;font-size:14px;font-weight:500;margin-top:14px">了解详情 →</div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Offices map -->
+<section class="section" style="background:linear-gradient(135deg,#0f1e36 0%,#1a2a4a 100%);color:#fff">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:50px">
+      <h2 style="font-size:32px;color:#fff;margin-bottom:10px">全球布局 · 触达世界</h2>
+      <p style="color:rgba(255,255,255,.7)">在全球 50+ 个城市建立数据中心与分支机构，服务遍布世界各地</p>
+      <div style="width:60px;height:4px;background:linear-gradient(90deg,#ff8a00,#ff6a00);margin:16px auto 0;border-radius:2px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:40px;align-items:center">
+      <div class="offices-map" style="position:relative;height:420px;background:radial-gradient(circle at 50% 50%,rgba(255,106,0,.12),transparent 70%);border-radius:16px;padding:20px;overflow:hidden">
+        <img src="{{ url_for('static', filename='images/world-map.svg') }}" style="width:100%;height:100%;object-fit:cover;border-radius:16px" alt="世界地图">
+        {% for off in offices %}
+        <div style="position:absolute;width:14px;height:14px;background:#ff6a00;border:2px solid #fff;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;animation:pulse-marker 2s infinite;left:{{ ((off.lng + 180)/360)*100 }}%;top:{{ ((90 - off.lat)/180)*100 }}%"
+             title="{{ off.name }} ({{ off.region }})">
+          <div style="position:absolute;left:18px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.85);color:#fff;padding:4px 10px;border-radius:4px;font-size:12px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s" class="marker-tooltip">{{ off.name }} ({{ off.region }})</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:28px">
+        <h3 style="color:#ff6a00;font-size:20px;margin-bottom:18px"><i class="fa-solid fa-map-location-dot"></i> 全球分支机构</h3>
+        <div style="margin-bottom:18px">
+          <h4 style="color:#fff;font-size:15px;margin-bottom:10px;font-weight:600">🇨🇳 中国地区</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            {% for o in offices if o.region in ['中国','青岛'] %}<span style="background:rgba(255,106,0,.15);border:1px solid rgba(255,106,0,.3);padding:6px 14px;border-radius:4px;font-size:13px;color:#fff">{{ o.name }}</span>{% endfor %}
+          </div>
+        </div>
+        <div style="margin-bottom:18px">
+          <h4 style="color:#fff;font-size:15px;margin-bottom:10px;font-weight:600">🌏 亚太地区</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            {% for o in offices if o.region in ['韩国','东南亚','澳大利亚'] %}<span style="background:rgba(255,106,0,.15);border:1px solid rgba(255,106,0,.3);padding:6px 14px;border-radius:4px;font-size:13px;color:#fff">{{ o.name }}</span>{% endfor %}
+          </div>
+        </div>
+        <div style="margin-bottom:18px">
+          <h4 style="color:#fff;font-size:15px;margin-bottom:10px;font-weight:600">🌍 欧洲/中东</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            {% for o in offices if o.region in ['俄罗斯','欧洲','中东'] %}<span style="background:rgba(255,106,0,.15);border:1px solid rgba(255,106,0,.3);padding:6px 14px;border-radius:4px;font-size:13px;color:#fff">{{ o.name }}</span>{% endfor %}
+          </div>
+        </div>
+        <div>
+          <h4 style="color:#fff;font-size:15px;margin-bottom:10px;font-weight:600">🌎 北美地区</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            {% for o in offices if '美国' in o.region %}<span style="background:rgba(255,106,0,.15);border:1px solid rgba(255,106,0,.3);padding:6px 14px;border-radius:4px;font-size:13px;color:#fff">{{ o.name }}</span>{% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Certifications -->
+<section class="section" style="background:#f8fafc">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:50px">
+      <h2 style="font-size:32px;color:#0f1e36;margin-bottom:10px">权威资质认证</h2>
+      <p style="color:#6b7280">多项国家级与国际权威认证，为您提供可信赖的云服务</p>
+      <div style="width:60px;height:4px;background:linear-gradient(90deg,#ff8a00,#ff6a00);margin:16px auto 0;border-radius:2px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+      {% for cert in certs %}
+      <div style="background:#fff;border-radius:12px;padding:28px;text-align:center;transition:all .3s;border:1px solid #e5e7eb"
+           onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 15px 35px rgba(0,0,0,.1)'"
+           onmouseout="this.style.transform='none';this.style.boxShadow='none'">
+        <div style="height:240px;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+          <img src="{{ cert.image }}" alt="{{ cert.title }}" style="max-height:240px;max-width:100%">
+        </div>
+        <h4 style="font-size:17px;color:#0f1e36;margin-bottom:6px">{{ cert.title }}</h4>
+        <p style="font-size:13px;color:#6b7280">{{ cert.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:50px">
+      <h2 style="font-size:32px;color:#0f1e36;margin-bottom:10px">客户评价</h2>
+      <p style="color:#6b7280">来自全球客户的真实反馈</p>
+      <div style="width:60px;height:4px;background:linear-gradient(90deg,#ff8a00,#ff6a00);margin:16px auto 0;border-radius:2px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      {% for t in testimonials %}
+      <div style="background:linear-gradient(135deg,#fff 0%,#fff7f0 100%);border-radius:12px;padding:30px;border:1px solid #ffe6d1;position:relative">
+        <div style="position:absolute;top:10px;right:20px;font-size:80px;color:#ffe6d1;font-family:Georgia,serif;line-height:1">"</div>
+        <p style="color:#4b5563;font-size:14px;margin-bottom:20px;position:relative;z-index:1;line-height:1.8">{{ t.content }}</p>
+        <div style="display:flex;align-items:center;gap:12px;position:relative;z-index:1">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ff8a00,#ff6a00);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">{{ t.name[:1] }}</div>
+          <div><div style="font-weight:600;color:#0f1e36">{{ t.name }}</div><div style="font-size:13px;color:#6b7280">{{ t.title }}</div></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Stats / Why us -->
+<section style="background:linear-gradient(135deg,#ff8a00,#ff6a00);color:#fff;padding:70px 0">
+  <div class="container" style="display:grid;grid-template-columns:repeat(4,1fr);gap:30px;text-align:center">
+    <div><div style="font-size:52px;font-weight:700;margin-bottom:6px">100,000+</div><p style="font-size:15px;opacity:.95">企业客户信赖</p></div>
+    <div><div style="font-size:52px;font-weight:700;margin-bottom:6px">50+</div><p style="font-size:15px;opacity:.95">全球数据中心</p></div>
+    <div><div style="font-size:52px;font-weight:700;margin-bottom:6px">99.99%</div><p style="font-size:15px;opacity:.95">服务可用性承诺</p></div>
+    <div><div style="font-size:52px;font-weight:700;margin-bottom:6px">7×24</div><p style="font-size:15px;opacity:.95">全天候专业支持</p></div>
+  </div>
+</section>
+
+<style>
+@keyframes marquee-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes pulse-marker { 0%,100% { box-shadow: 0 0 0 0 rgba(255,106,0,.7); } 50% { box-shadow: 0 0 0 10px rgba(255,106,0,0); } }
+.office-marker:hover .marker-tooltip { opacity: 1 !important; }
+@media (max-width:992px) {
+  .feature-strip .container { grid-template-columns:repeat(2,1fr); }
+  .products-grid { grid-template-columns:repeat(2,1fr); }
+  .offices-map + div + div, .offices-map-wrap > div { grid-template-columns:1fr; }
+  .section > .container > div:last-child { grid-template-columns:1fr; }
+  .why-grid { grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width:600px) {
+  .carousel-slide h1 { font-size:28px; }
+  .section-title h2 { font-size:24px; }
+}
+</style>
+{% endblock %}

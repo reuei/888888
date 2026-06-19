@@ -1,0 +1,18 @@
+<aside class="admin-sidebar">
+  <div class="brand"><i class="fa-solid fa-cube"></i> {{ s.site_name }} 后台</div>
+  <nav>
+    <a href="/admin" class="{% if request.path=='/admin' %}active{% endif %}"><i class="fa-solid fa-gauge-high"></i> 仪表盘</a>
+    <a href="/admin/settings" class="{% if '/admin/settings' in request.path %}active{% endif %}"><i class="fa-solid fa-gear"></i> 网站设置</a>
+    <a href="/admin/sliders" class="{% if '/admin/sliders' in request.path %}active{% endif %}"><i class="fa-solid fa-images"></i> 轮播图管理</a>
+    <a href="/admin/products" class="{% if '/admin/products' in request.path %}active{% endif %}"><i class="fa-solid fa-box"></i> 产品管理</a>
+    <a href="/admin/offices" class="{% if '/admin/offices' in request.path %}active{% endif %}"><i class="fa-solid fa-map-location-dot"></i> 分支机构</a>
+    <a href="/admin/partners" class="{% if '/admin/partners' in request.path %}active{% endif %}"><i class="fa-solid fa-handshake"></i> 合作伙伴</a>
+    <a href="/admin/certifications" class="{% if '/admin/certifications' in request.path %}active{% endif %}"><i class="fa-solid fa-award"></i> 资质认证</a>
+    <a href="/admin/testimonials" class="{% if '/admin/testimonials' in request.path %}active{% endif %}"><i class="fa-solid fa-star"></i> 用户评价</a>
+    <a href="/admin/friendlinks" class="{% if '/admin/friendlinks' in request.path %}active{% endif %}"><i class="fa-solid fa-link"></i> 友情链接</a>
+    <a href="/admin/news" class="{% if '/admin/news' in request.path %}active{% endif %}"><i class="fa-solid fa-newspaper"></i> 新闻资讯</a>
+    <a href="/admin/password" class="{% if '/admin/password' in request.path %}active{% endif %}"><i class="fa-solid fa-key"></i> 修改密码</a>
+    <a href="/"><i class="fa-solid fa-home"></i> 访问网站</a>
+    <a href="/admin/logout"><i class="fa-solid fa-right-from-bracket"></i> 退出登录</a>
+  </nav>
+</aside>

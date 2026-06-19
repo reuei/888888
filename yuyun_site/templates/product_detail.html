@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ product.title }} - {{ s.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1>{{ product.title }}</h1>
+    <p style="color:rgba(255,255,255,.85);margin-top:10px">{{ product.summary }}</p>
+    <div style="font-size:14px;opacity:.85;margin-top:10px"><a href="/" style="color:#fff;text-decoration:none;opacity:.8">首页</a> <span style="margin:0 8px;opacity:.6">/</span> <a href="/products" style="color:#fff;text-decoration:none;opacity:.8">产品中心</a> <span style="margin:0 8px;opacity:.6">/</span> {{ product.title }}</div>
+  </div>
+</section>
+
+<section style="padding:70px 0">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;margin-bottom:60px">
+      <div style="background:linear-gradient(135deg,#0f1e36,#1a3a6a);height:400px;border-radius:16px;display:flex;align-items:center;justify-content:center">
+        <i class="{{ product.icon or 'fa-solid fa-cloud' }}" style="font-size:120px;color:#ff6a00"></i>
+      </div>
+      <div>
+        <div style="width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,#ff8a00,#ff6a00);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:24px">
+          <i class="{{ product.icon or 'fa-solid fa-cloud' }}"></i>
+        </div>
+        <h2 style="font-size:34px;color:#0f1e36;margin-bottom:16px">{{ product.title }}</h2>
+        <p style="color:#4b5563;font-size:16px;margin-bottom:20px;line-height:1.8">{{ product.summary }}</p>
+        <p style="color:#4b5563;font-size:15px;margin-bottom:28px;line-height:1.8">{{ product.content }}</p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap">
+          <a href="/contact" class="btn" style="padding:14px 34px;background:linear-gradient(90deg,#ff8a00,#ff6a00);color:#fff;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600">立即选购</a>
+          <a href="#" data-modal="modal-phone" class="btn" style="padding:14px 34px;background:#fff;color:#ff6a00;border:1.5px solid #ff6a00;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600">咨询详情</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;border-radius:12px">
+        <h3 style="font-size:20px;color:#0f1e36;margin-bottom:14px"><i class="fa-solid fa-check-circle" style="color:#ff6a00"></i> 核心特性</h3>
+        <ul style="list-style:none;padding:0;color:#4b5563;font-size:14px;line-height:2">
+          <li>✓ 高性能实例，秒级响应</li>
+          <li>✓ 弹性伸缩，按需付费</li>
+          <li>✓ 全球部署，多区域可用</li>
+          <li>✓ 企业级安全防护</li>
+          <li>✓ 7×24 小时技术支持</li>
+        </ul>
+      </div>
+      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;border-radius:12px">
+        <h3 style="font-size:20px;color:#0f1e36;margin-bottom:14px"><i class="fa-solid fa-star" style="color:#ff6a00"></i> 适用场景</h3>
+        <ul style="list-style:none;padding:0;color:#4b5563;font-size:14px;line-height:2">
+          <li>✓ 企业官方网站与门户</li>
+          <li>✓ 电商与在线商城</li>
+          <li>✓ SaaS 应用承载</li>
+          <li>✓ 大数据与 AI 训练</li>
+          <li>✓ 开发测试环境</li>
+        </ul>
+      </div>
+      <div style="padding:30px;background:linear-gradient(135deg,#fff7f0,#ffe6d1);border-radius:12px;border:1px solid #ff6a00">
+        <h3 style="font-size:20px;color:#ff6a00;margin-bottom:14px"><i class="fa-solid fa-headset"></i> 专属支持</h3>
+        <p style="color:#4b5563;font-size:14px;line-height:1.8;margin-bottom:14px">提供一对一技术顾问服务，帮助您快速选型与上云部署。</p>
+        <p style="color:#ff6a00;font-size:24px;font-weight:700;margin-bottom:10px">{{ s.sales_phone }}</p>
+        <a href="/contact" class="btn" style="padding:10px 24px;background:linear-gradient(90deg,#ff8a00,#ff6a00);color:#fff;border-radius:6px;text-decoration:none;font-size:14px">立即咨询</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

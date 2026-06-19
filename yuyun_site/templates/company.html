@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}公司简介 - {{ s.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1>公司简介</h1>
+    <div style="font-size:14px;opacity:.85"><a href="/" style="color:#fff;text-decoration:none;opacity:.8">首页</a> <span style="margin:0 8px;opacity:.6">/</span> 公司简介</div>
+  </div>
+</section>
+
+<section style="padding:70px 0">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;margin-bottom:60px">
+      <div>
+        <h2 style="font-size:30px;color:#0f1e36;margin-bottom:20px">公司概览</h2>
+        <p style="color:#4b5563;margin-bottom:14px;font-size:15px;line-height:1.8">{{ s.company_intro }}</p>
+        <p style="color:#4b5563;margin-bottom:14px;font-size:15px;line-height:1.8">{{ s.company_intro_long }}</p>
+        <p style="color:#4b5563;font-size:15px;line-height:1.8">自成立以来，{{ s.site_name }}（{{ s.company_name }}）始终坚持自主研发与开放合作并行发展，构建覆盖全球的云基础设施网络，为政企客户提供从计算、存储、网络到 AI 的一体化解决方案。</p>
+      </div>
+      <div style="background:linear-gradient(135deg,#0f1e36,#1a3a6a);height:360px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#fff">
+        <div style="text-align:center;padding:40px">
+          <div style="font-size:64px;margin-bottom:20px"><i class="fa-solid fa-building-columns"></i></div>
+          <div style="font-size:24px;font-weight:700;margin-bottom:8px">{{ s.site_name }}</div>
+          <div style="color:rgba(255,255,255,.7);font-size:14px">{{ s.company_name }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#ff8a00,#ff6a00);color:#fff;padding:60px 40px;border-radius:16px;margin-bottom:60px">
+      <h2 style="font-size:30px;margin-bottom:30px;text-align:center">发展历程</h2>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:30px">
+        <div style="text-align:center">
+          <div style="font-size:36px;font-weight:700;margin-bottom:8px">2018</div>
+          <div style="font-size:14px;opacity:.95">公司成立，开启云服务事业</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:36px;font-weight:700;margin-bottom:8px">2020</div>
+          <div style="font-size:14px;opacity:.95">完成多轮融资，业务快速扩展</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:36px;font-weight:700;margin-bottom:8px">2023</div>
+          <div style="font-size:14px;opacity:.95">海外数据中心落成，服务全球化</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:36px;font-weight:700;margin-bottom:8px">2026</div>
+          <div style="font-size:14px;opacity:.95">服务全球 100,000+ 企业客户</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:60px">
+      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;border-radius:12px">
+        <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#fff7f0,#ffe6d1);display:flex;align-items:center;justify-content:center;color:#ff6a00;font-size:24px;margin-bottom:16px"><i class="fa-solid fa-users"></i></div>
+        <h3 style="font-size:20px;color:#0f1e36;margin-bottom:10px">专业团队</h3>
+        <p style="color:#6b7280;font-size:14px;line-height:1.8">拥有来自全球顶尖高校与企业的技术专家，员工总数超过 2,000 人。</p>
+      </div>
+      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;border-radius:12px">
+        <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#fff7f0,#ffe6d1);display:flex;align-items:center;justify-content:center;color:#ff6a00;font-size:24px;margin-bottom:16px"><i class="fa-solid fa-lightbulb"></i></div>
+        <h3 style="font-size:20px;color:#0f1e36;margin-bottom:10px">技术创新</h3>
+        <p style="color:#6b7280;font-size:14px;line-height:1.8">累计申请专利超过 500 项，主导与参与多项国家与行业技术标准。</p>
+      </div>
+      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;border-radius:12px">
+        <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#fff7f0,#ffe6d1);display:flex;align-items:center;justify-content:center;color:#ff6a00;font-size:24px;margin-bottom:16px"><i class="fa-solid fa-award"></i></div>
+        <h3 style="font-size:20px;color:#0f1e36;margin-bottom:10px">行业认可</h3>
+        <p style="color:#6b7280;font-size:14px;line-height:1.8">多次获得行业权威机构的年度奖项与认证，服务质量广受好评。</p>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-bottom:30px">
+      <h2 style="font-size:30px;color:#0f1e36;margin-bottom:10px">公司位置</h2>
+      <p style="color:#6b7280">{{ s.company_address }}</p>
+    </div>
+    <div style="height:450px;border-radius:16px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,.1);border:2px solid #ff6a00">
+      <iframe src="https://map.qq.com/?q={{ s.company_address }}" style="width:100%;height:100%;border:0" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+{% endblock %}

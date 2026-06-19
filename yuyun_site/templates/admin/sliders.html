@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>轮播图管理 - {{ s.site_name }}</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% include 'admin/_base_style.html' %}
+</head>
+<body>
+<div class="admin-layout">
+  {% include 'admin/_sidebar.html' %}
+  <main class="admin-main">
+    {% include 'admin/_header.html' %}
+    <div class="admin-content">
+      <div class="tip"><i class="fa-solid fa-circle-info" style="color:#3b82f6"></i> 管理首页轮播图，支持标题、副标题、图片和链接。</div>
+      <div class="card">
+        <h3>添加 / 编辑</h3>
+        <form method="post" enctype="multipart/form-data" id="edit-form">
+          <input type="hidden" name="id" id="f-id" value="">
+          <div class="admin-grid">
+            <div><div class="form-row"><label>标题</label><input type="text" name="title" id="f-title" required></div></div>
+            <div><div class="form-row"><label>副标题</label><input type="text" name="subtitle" id="f-subtitle"></div></div>
+            <div><div class="form-row"><label>跳转链接</label><input type="text" name="link" id="f-link" placeholder="/products"></div></div>
+            <div><div class="form-row"><label>排序（小的在前）</label><input type="number" name="sort" id="f-sort" value="0"></div></div>
+          </div>
+          <div class="form-row"><label>图片（推荐 1600x900）</label>
+            <input type="file" name="image" accept="image/*" id="f-image">
+            <div class="small-text" id="f-image-current"></div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="admin-btn"><i class="fa-solid fa-save"></i> 保存</button>
+            <button type="button" onclick="resetForm()" class="admin-btn secondary">清空</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <h3>现有列表（共 {{ items|length }} 条）</h3>
+        <table class="admin-table">
+          <thead><tr><th>ID</th><th>图片</th><th>标题</th><th>副标题</th><th>链接</th><th>排序</th><th>操作</th></tr></thead>
+          <tbody>
+            {% for r in items %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{% if r.image %}<img src="{{ r.image }}" alt="">{% endif %}</td>
+              <td>{{ r.title }}</td>
+              <td>{{ r.subtitle }}</td>
+              <td>{{ r.link }}</td>
+              <td>{{ r.sort }}</td>
+              <td class="row-actions">
+                <button type="button" onclick="edit({{ r.id }}, '{{ r.title|replace("'", "\\'") }}', '{{ r.subtitle|replace("'", "\\'") }}', '{{ r.link|replace("'", "\\'") }}', {{ r.sort }}, '{{ r.image }}')"><i class="fa-solid fa-edit"></i> 编辑</button>
+                <form method="post" style="display:inline" onsubmit="return confirm('确定删除?')">
+                  <input type="hidden" name="id" value="{{ r.id }}">
+                  <button type="submit" name="action" value="delete" class="del"><i class="fa-solid fa-trash"></i> 删除</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:#9ca3af">暂无数据</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+function edit(id, t, s, l, sort, img){
+  document.getElementById('f-id').value = id;
+  document.getElementById('f-title').value = t;
+  document.getElementById('f-subtitle').value = s;
+  document.getElementById('f-link').value = l;
+  document.getElementById('f-sort').value = sort;
+  document.getElementById('f-image-current').innerHTML = img ? '当前：<img src="'+img+'" class="thumb-preview" alt=""> '+img : '';
+  window.scrollTo(0,0);
+}
+function resetForm(){
+  document.getElementById('edit-form').reset();
+  document.getElementById('f-id').value='';
+  document.getElementById('f-image-current').innerHTML='';
+}
+</script>
+{% include 'admin/_toasts.html' %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

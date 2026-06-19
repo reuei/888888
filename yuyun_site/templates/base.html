@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ s.site_name }} - 全球云计算服务提供商{% endblock %}</title>
+<meta name="description" content="{{ s.company_intro }}">
+<meta name="keywords" content="云服务器,云计算,CDN,AI,语云科技">
+<link rel="icon" href="{{ s.site_favicon }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center;">
+    <span><i class="fa-solid fa-phone" style="color:#ff6a00"></i> 销售热线：<strong>{{ s.sales_phone }}</strong></span>
+    <span>
+      <a href="{{ s.international_url }}" target="_blank"><i class="fa-solid fa-globe"></i> 国际版</a>
+      <a href="/admin"><i class="fa-solid fa-user-shield"></i> 管理后台</a>
+    </span>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+    <a href="/" class="logo" style="text-decoration:none">
+      <img src="{{ s.site_logo }}" alt="{{ s.site_name }}" style="height:44px">
+    </a>
+    <nav class="nav">
+      <a href="/" class="{% if page=='home' %}active{% endif %}">首页</a>
+      <a href="/products" class="{% if page=='products' %}active{% endif %}">产品</a>
+      <a href="/partners" class="{% if page=='partners' %}active{% endif %}">合作伙伴</a>
+      <a href="/about" class="{% if page=='about' %}active{% endif %}">关于我们</a>
+      <a href="/company" class="{% if page=='company' %}active{% endif %}">公司简介</a>
+      <a href="/news" class="{% if page=='news' %}active{% endif %}">新闻资讯</a>
+      <a href="/contact" class="{% if page=='contact' %}active{% endif %}">联系我们</a>
+      <div class="dropdown" style="position:relative">
+        <a href="#" onclick="return false">更多 ▾</a>
+        <div class="dropdown-menu">
+          <a href="/international">国际版官网</a>
+          <a href="/contact">技术支持</a>
+          <a href="/about">加入我们</a>
+        </div>
+      </div>
+    </nav>
+    <div class="header-actions" style="display:flex;gap:10px;align-items:center">
+      <a href="/contact" class="btn" style="padding:8px 20px;font-size:14px;background:linear-gradient(90deg,#ff8a00,#ff6a00);color:#fff;border-radius:6px;cursor:pointer;text-decoration:none">立即咨询</a>
+      <button class="hamburger" aria-label="menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-nav">
+    <a href="/">首页</a>
+    <a href="/products">产品</a>
+    <a href="/partners">合作伙伴</a>
+    <a href="/about">关于我们</a>
+    <a href="/company">公司简介</a>
+    <a href="/news">新闻资讯</a>
+    <a href="/contact">联系我们</a>
+    <a href="/international">国际版官网</a>
+  </nav>
+</header>
+
+{% block content %}{% endblock %}
+
+<!-- Right floating panel -->
+<div class="float-panel">
+  <div class="float-btn phone" data-modal="modal-phone" title="销售电话">
+    <i class="fa-solid fa-phone"></i>
+    <b>{{ s.sales_phone[:3] }}</b>
+  </div>
+  <div class="float-btn" data-modal="modal-wechat" title="微信咨询">
+    <i class="fa-brands fa-weixin"></i>
+  </div>
+  <div class="float-btn" data-modal="modal-qq" title="QQ群">
+    <i class="fa-brands fa-qq"></i>
+  </div>
+  <div class="float-btn" data-modal="modal-service" title="在线客服">
+    <i class="fa-solid fa-headset"></i>
+  </div>
+  <a href="/contact" class="float-btn" title="留言咨询">
+    <i class="fa-solid fa-envelope"></i>
+  </a>
+</div>
+
+<!-- Modals -->
+<div class="modal-backdrop" id="modal-phone">
+  <div class="modal">
+    <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-icon"><i class="fa-solid fa-phone"></i></div>
+    <h3>销售服务热线</h3>
+    <p>7 × 24 小时 全天候为您服务</p>
+    <div class="phone-big">{{ s.sales_phone }}</div>
+    <p style="color:#6b7280;font-size:13px;margin-top:18px">其他联系方式：技术咨询 {{ s.service_phone }}</p>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-wechat">
+  <div class="modal">
+    <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-icon"><i class="fa-brands fa-weixin"></i></div>
+    <h3>扫码添加官方微信</h3>
+    <p>长按识别二维码，添加专属顾问</p>
+    <div class="qr"><img src="{{ s.wechat_qr }}" alt="微信二维码"></div>
+    <p style="color:#6b7280;font-size:13px">添加时请备注「咨询」</p>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-qq">
+  <div class="modal">
+    <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-icon"><i class="fa-brands fa-qq"></i></div>
+    <h3>官方 QQ 交流群</h3>
+    <p>加入我们的云服务技术讨论群</p>
+    <div class="phone-big" style="font-size:32px">{{ s.qq_group }}</div>
+    <p style="color:#6b7280;font-size:13px;margin-top:20px">官方认证 · 技术交流 · 定期福利</p>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-service">
+  <div class="modal">
+    <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-icon"><i class="fa-solid fa-headset"></i></div>
+    <h3>7×24 小时在线客服</h3>
+    <p>专属技术顾问一对一服务</p>
+    <div class="phone-big">{{ s.service_phone }}</div>
+    <p style="color:#6b7280;font-size:13px;margin-top:18px">邮箱：{{ s.service_email }}</p>
+    <p style="margin-top:24px"><a href="/contact" class="btn" style="padding:10px 28px;background:linear-gradient(90deg,#ff8a00,#ff6a00);color:#fff;border-radius:6px;text-decoration:none">立即留言咨询</a></p>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding:60px 20px 30px">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <img src="{{ s.site_logo_dark }}" style="height:48px" alt="{{ s.site_name }}">
+      </div>
+      <p style="color:#9ca3af;font-size:14px;line-height:1.8;max-width:380px;margin-bottom:20px">{{ s.company_intro }}</p>
+      <div style="background:rgba(255,106,0,.08);border:1px solid rgba(255,106,0,.2);border-radius:8px;padding:16px;display:inline-block">
+        <div style="font-size:12px;color:#9ca3af;margin-bottom:4px">销售热线 / SALES HOTLINE</div>
+        <div style="font-size:26px;color:#ff6a00;font-weight:700;letter-spacing:1px">{{ s.sales_phone }}</div>
+      </div>
+    </div>
+    <div>
+      <h5 style="color:#fff;font-size:16px;margin-bottom:18px">产品与服务</h5>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:10px"><a href="/products" style="color:#9ca3af;font-size:14px;text-decoration:none">云服务器 ECS</a></li>
+        <li style="margin-bottom:10px"><a href="/products" style="color:#9ca3af;font-size:14px;text-decoration:none">云数据库 RDS</a></li>
+        <li style="margin-bottom:10px"><a href="/products" style="color:#9ca3af;font-size:14px;text-decoration:none">对象存储 OSS</a></li>
+        <li style="margin-bottom:10px"><a href="/products" style="color:#9ca3af;font-size:14px;text-decoration:none">CDN 加速</a></li>
+        <li style="margin-bottom:10px"><a href="/products" style="color:#9ca3af;font-size:14px;text-decoration:none">DDoS 高防</a></li>
+        <li style="margin-bottom:10px"><a href="/products" style="color:#9ca3af;font-size:14px;text-decoration:none">AI 大模型平台</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5 style="color:#fff;font-size:16px;margin-bottom:18px">关于 {{ s.site_name }}</h5>
+      <ul style="list-style:none;padding:0">
+        <li style="margin-bottom:10px"><a href="/about" style="color:#9ca3af;font-size:14px;text-decoration:none">关于我们</a></li>
+        <li style="margin-bottom:10px"><a href="/company" style="color:#9ca3af;font-size:14px;text-decoration:none">公司简介</a></li>
+        <li style="margin-bottom:10px"><a href="/partners" style="color:#9ca3af;font-size:14px;text-decoration:none">合作伙伴</a></li>
+        <li style="margin-bottom:10px"><a href="/news" style="color:#9ca3af;font-size:14px;text-decoration:none">新闻资讯</a></li>
+        <li style="margin-bottom:10px"><a href="/international" style="color:#9ca3af;font-size:14px;text-decoration:none">国际版官网</a></li>
+        <li style="margin-bottom:10px"><a href="/contact" style="color:#9ca3af;font-size:14px;text-decoration:none">联系我们</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5 style="color:#fff;font-size:16px;margin-bottom:18px">联系方式</h5>
+      <ul style="list-style:none;padding:0;color:#9ca3af;font-size:14px;line-height:2">
+        <li><i class="fa-solid fa-phone" style="color:#ff6a00;width:18px"></i> {{ s.sales_phone }}</li>
+        <li><i class="fa-solid fa-headset" style="color:#ff6a00;width:18px"></i> {{ s.service_phone }}</li>
+        <li><i class="fa-solid fa-envelope" style="color:#ff6a00;width:18px"></i> {{ s.service_email }}</li>
+        <li><i class="fa-solid fa-location-dot" style="color:#ff6a00;width:18px"></i> {{ s.company_address }}</li>
+      </ul>
+    </div>
+  </div>
+  <div style="border-top:1px solid rgba(255,255,255,.08);padding:20px 20px 30px;text-align:center">
+    <div style="color:#9ca3af;font-size:14px;margin-bottom:12px">
+      <a href="{{ s.icp_url }}" target="_blank" style="color:#9ca3af;text-decoration:none;margin:0 10px">{{ s.icp }}</a>
+      <span style="margin:0 6px">·</span>
+      <a href="{{ s.police_url }}" target="_blank" style="color:#9ca3af;text-decoration:none;margin:0 10px"><span style="display:inline-block;width:18px;height:18px;border-radius:3px;background:#ef4444;color:#fff;font-size:10px;line-height:18px;text-align:center;vertical-align:middle;margin-right:4px">公</span>{{ s.police }}</a>
+      <span style="margin:0 6px">·</span>
+      <span style="margin:0 10px">{{ s.zengxin_text }}：{{ s.zengxin }}</span>
+    </div>
+    <div style="color:#6b7280;font-size:12px;margin-bottom:8px">{{ s.copyright }}</div>
+    <div style="color:#6b7280;font-size:12px;max-width:800px;margin:0 auto;line-height:1.6">{{ s.footer_note }}</div>
+  </div>
+</footer>
+
+{% for cat, msg in get_flashed_messages(with_categories=true) %}
+  <div class="toast-wait" data-type="{{ 'success' if cat=='success' else 'error' }}" data-message="{{ msg }}"></div>
+{% endfor %}
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

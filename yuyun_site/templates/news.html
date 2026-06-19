@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}新闻资讯 - {{ s.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1>新闻资讯</h1>
+    <p style="color:rgba(255,255,255,.85);margin-top:10px">了解 {{ s.site_name }} 最新动态与行业资讯</p>
+  </div>
+</section>
+
+<section style="padding:70px 0">
+  <div class="container">
+    {% if news %}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      {% for item in news %}
+      <a href="{{ url_for('news_detail', nid=item.id) }}" style="text-decoration:none;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;display:block;transition:all .3s;color:inherit"
+         onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,.12)'"
+         onmouseout="this.style.transform='none';this.style.boxShadow='none'">
+        <div style="height:200px;background:linear-gradient(135deg,#0f1e36,#1a3a6a);display:flex;align-items:center;justify-content:center;color:#ff6a00;font-size:60px">
+          <i class="fa-solid fa-newspaper"></i>
+        </div>
+        <div style="padding:24px">
+          <div style="color:#6b7280;font-size:13px;margin-bottom:10px"><i class="fa-regular fa-calendar" style="color:#ff6a00"></i> {{ item.created_at[:10] }}</div>
+          <h3 style="font-size:18px;color:#0f1e36;margin-bottom:10px;line-height:1.5">{{ item.title }}</h3>
+          <p style="color:#6b7280;font-size:14px;line-height:1.7">{{ item.summary }}</p>
+          <div style="color:#ff6a00;font-size:14px;font-weight:500;margin-top:14px">阅读全文 →</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:80px;background:#fff;border-radius:12px;border:1px solid #e5e7eb">
+      <i class="fa-solid fa-inbox" style="font-size:60px;color:#e5e7eb;margin-bottom:20px"></i>
+      <h3 style="color:#6b7280">暂无新闻资讯</h3>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

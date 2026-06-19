@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}关于我们 - {{ s.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1>关于 {{ s.site_name }}</h1>
+    <div style="font-size:14px;opacity:.85"><a href="/" style="color:#fff;text-decoration:none;opacity:.8">首页</a> <span style="margin:0 8px;opacity:.6">/</span> 关于我们</div>
+  </div>
+</section>
+
+<section style="padding:70px 0">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center">
+      <div>
+        <h2 style="font-size:30px;color:#0f1e36;margin-bottom:20px">{{ s.company_name }}</h2>
+        <p style="color:#4b5563;margin-bottom:14px;font-size:15px;line-height:1.8">{{ s.company_intro }}</p>
+        <p style="color:#4b5563;margin-bottom:14px;font-size:15px;line-height:1.8">{{ s.company_intro_long }}</p>
+        <div style="margin-top:30px;display:flex;gap:14px;flex-wrap:wrap">
+          <a href="/contact" class="btn" style="padding:12px 28px;background:linear-gradient(90deg,#ff8a00,#ff6a00);color:#fff;border-radius:8px;text-decoration:none">联系我们</a>
+          <a href="/company" class="btn" style="padding:12px 28px;background:#fff;color:#ff6a00;border:1px solid #ff6a00;border-radius:8px;text-decoration:none">公司简介</a>
+        </div>
+      </div>
+      <div style="height:360px;border-radius:16px;background:linear-gradient(135deg,#0f1e36,#1a3a6a);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,106,0,.4),transparent 60%)"></div>
+        <i class="fa-solid fa-globe" style="font-size:120px;color:rgba(255,255,255,.9);position:relative;z-index:1"></i>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:50px">
+      <div style="background:#fff7f0;padding:24px;border-radius:12px;border-left:4px solid #ff6a00">
+        <div style="font-size:13px;color:#6b7280;margin-bottom:4px"><i class="fa-solid fa-building" style="color:#ff6a00"></i> 企业名称</div>
+        <div style="font-size:18px;color:#0f1e36;font-weight:600">{{ s.company_cn or s.company_name }}</div>
+      </div>
+      <div style="background:#fff7f0;padding:24px;border-radius:12px;border-left:4px solid #ff6a00">
+        <div style="font-size:13px;color:#6b7280;margin-bottom:4px"><i class="fa-solid fa-location-dot" style="color:#ff6a00"></i> 公司地址</div>
+        <div style="font-size:18px;color:#0f1e36;font-weight:600">{{ s.company_address }}</div>
+      </div>
+      <div style="background:#fff7f0;padding:24px;border-radius:12px;border-left:4px solid #ff6a00">
+        <div style="font-size:13px;color:#6b7280;margin-bottom:4px"><i class="fa-solid fa-phone" style="color:#ff6a00"></i> 销售热线</div>
+        <div style="font-size:18px;color:#ff6a00;font-weight:600">{{ s.sales_phone }}</div>
+      </div>
+      <div style="background:#fff7f0;padding:24px;border-radius:12px;border-left:4px solid #ff6a00">
+        <div style="font-size:13px;color:#6b7280;margin-bottom:4px"><i class="fa-brands fa-qq" style="color:#ff6a00"></i> 官方群聊</div>
+        <div style="font-size:18px;color:#0f1e36;font-weight:600">QQ：{{ s.qq_group }}</div>
+      </div>
+    </div>
+
+    <div style="height:450px;margin-top:50px;border-radius:16px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,.1);border:2px solid #ff6a00">
+      <iframe src="https://map.baidu.com/search/{{ s.company_address }}" style="width:100%;height:100%;border:0" allowfullscreen></iframe>
+    </div>
+    <div style="text-align:center;color:#6b7280;font-size:13px;margin-top:10px">公司位置地图示意（使用百度/高德/腾讯地图）</div>
+  </div>
+</section>
+
+<section style="background:#f8fafc;padding:70px 0">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:40px">
+      <h2 style="font-size:30px;color:#0f1e36;margin-bottom:10px">企业文化</h2>
+      <div style="width:60px;height:4px;background:linear-gradient(90deg,#ff8a00,#ff6a00);margin:16px auto 0;border-radius:2px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      <div style="background:#fff;padding:40px;border-radius:12px;text-align:center;border:1px solid #e5e7eb">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#ff8a00,#ff6a00);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px"><i class="fa-solid fa-bullseye"></i></div>
+        <h3 style="font-size:20px;color:#0f1e36;margin-bottom:12px">我们的使命</h3>
+        <p style="color:#6b7280;font-size:14px;line-height:1.8">为全球企业提供安全、可靠、高性能的云服务与数字化解决方案。</p>
+      </div>
+      <div style="background:#fff;padding:40px;border-radius:12px;text-align:center;border:1px solid #e5e7eb">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#ff8a00,#ff6a00);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px"><i class="fa-solid fa-eye"></i></div>
+        <h3 style="font-size:20px;color:#0f1e36;margin-bottom:12px">我们的愿景</h3>
+        <p style="color:#6b7280;font-size:14px;line-height:1.8">成为全球领先的云与人工智能服务提供商，让云计算普惠每一家企业。</p>
+      </div>
+      <div style="background:#fff;padding:40px;border-radius:12px;text-align:center;border:1px solid #e5e7eb">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#ff8a00,#ff6a00);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px"><i class="fa-solid fa-handshake"></i></div>
+        <h3 style="font-size:20px;color:#0f1e36;margin-bottom:12px">我们的价值观</h3>
+        <p style="color:#6b7280;font-size:14px;line-height:1.8">以客户为中心、以创新为驱动、以诚信为根基、以卓越为目标。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>@media (max-width:992px){ .page-hero h1{font-size:28px} }</style>
+{% endblock %}

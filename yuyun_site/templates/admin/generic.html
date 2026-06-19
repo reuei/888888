@@ -1,0 +1,47 @@
+{% extends "admin/base.html" %}
+{% block admin_title %}通用管理{% endblock %}
+{% block admin_content %}
+<div class="tip"><i class="fa-solid fa-circle-info" style="color:#3b82f6"></i> 添加、编辑、删除条目。图片上传可选，为空时将保留原图片。</div>
+
+<div class="card">
+  <h3>添加 / 编辑</h3>
+  <form method="post" enctype="multipart/form-data" id="edit-form">
+    <input type="hidden" name="id" id="f-id" value="">
+    {% block form_fields %}{% endblock %}
+    <div class="form-actions">
+      <button type="submit" class="admin-btn"><i class="fa-solid fa-save"></i> 保存</button>
+      <button type="button" onclick="document.getElementById('edit-form').reset();document.getElementById('f-id').value=''" class="admin-btn secondary">清空</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h3>现有列表（共 {{ items|length }} 条）</h3>
+  <div style="overflow-x:auto">
+    <table class="admin-table">
+      <thead>
+        <tr>{% block table_header %}<th>ID</th><th>名称</th><th>排序</th><th>操作</th>{% endblock %}</tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          {% block table_row scoped %}{% endblock %}
+          <td class="row-actions">
+            <button type="button" onclick="{% block edit_onclick %}{% endblock %}"><i class="fa-solid fa-edit"></i> 编辑</button>
+            <form method="post" style="display:inline" onsubmit="return confirm('确定删除?')">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" name="action" value="delete" class="del"><i class="fa-solid fa-trash"></i> 删除</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+        {% if not items %}
+        <tr><td colspan="10" style="text-align:center;padding:40px;color:#9ca3af">暂无数据，上方表单可添加</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% block edit_scripts %}{% endblock %}
+{% endblock %}

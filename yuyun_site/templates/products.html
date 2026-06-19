@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}产品中心 - {{ s.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1>企业云产品中心</h1>
+    <p style="color:rgba(255,255,255,.85);margin-top:10px">一站式云服务解决方案，满足各行业企业需求</p>
+    <div style="font-size:14px;opacity:.85;margin-top:10px"><a href="/" style="color:#fff;text-decoration:none;opacity:.8">首页</a> <span style="margin:0 8px;opacity:.6">/</span> 产品中心</div>
+  </div>
+</section>
+
+<section style="padding:70px 0">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      {% for prod in products %}
+      <a href="{{ url_for('product_detail', pid=prod.id) }}" style="text-decoration:none;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:30px;transition:all .3s;color:inherit;display:block;position:relative;overflow:hidden"
+         onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,.12)';this.style.borderColor='transparent'"
+         onmouseout="this.style.transform='none';this.style.boxShadow='none';this.style.borderColor='#e5e7eb'">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff8a00,#ff6a00)"></div>
+        <div style="width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,#fff7f0,#ffe6d1);display:flex;align-items:center;justify-content:center;color:#ff6a00;font-size:28px;margin-bottom:20px">
+          <i class="{{ prod.icon or 'fa-solid fa-cloud' }}"></i>
+        </div>
+        <h3 style="font-size:22px;margin-bottom:10px;color:#0f1e36">{{ prod.title }}</h3>
+        <p style="color:#6b7280;font-size:14px;min-height:40px;margin-bottom:20px">{{ prod.summary }}</p>
+        <div style="color:#ff6a00;font-size:14px;font-weight:500">查看详情 →</div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section style="background:#f8fafc;padding:70px 0">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:40px">
+      <h2 style="font-size:30px;color:#0f1e36;margin-bottom:10px">行业解决方案</h2>
+      <p style="color:#6b7280">针对各行业量身定制，满足差异化业务需求</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
+      {% set solutions = [
+        ('fa-solid fa-landmark', '金融行业', '高可用容灾，合规安全'),
+        ('fa-solid fa-graduation-cap', '教育行业', '在线教学，资源管理'),
+        ('fa-solid fa-cart-shopping', '电商零售', '弹性扩容，秒杀支持'),
+        ('fa-solid fa-hospital', '医疗健康', '数据加密，稳定运行'),
+        ('fa-solid fa-gamepad', '游戏行业', '低延迟，高并发架构'),
+        ('fa-solid fa-video', '视频娱乐', 'CDN 加速，流畅体验'),
+        ('fa-solid fa-industry', '工业制造', '智能制造，物联网'),
+        ('fa-solid fa-city', '政务服务', '安全合规，稳定可靠')
+      ] %}
+      {% for icon, name, desc in solutions %}
+      <div style="background:#fff;padding:24px;border-radius:12px;text-align:center;border:1px solid #e5e7eb;transition:all .3s"
+           onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 15px 30px rgba(0,0,0,.1)'"
+           onmouseout="this.style.transform='none';this.style.boxShadow='none'">
+        <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#fff7f0,#ffe6d1);display:inline-flex;align-items:center;justify-content:center;color:#ff6a00;font-size:24px;margin-bottom:14px">
+          <i class="{{ icon }}"></i>
+        </div>
+        <h4 style="font-size:17px;color:#0f1e36;margin-bottom:6px">{{ name }}</h4>
+        <p style="font-size:13px;color:#6b7280">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %}
+{% block admin_title %}网站设置{% endblock %}
+{% block admin_content %}
+<div class="tip"><i class="fa-solid fa-circle-info" style="color:#3b82f6"></i> 此处可配置网站的基础信息、联系方式、备案信息、版权等全部展示内容。</div>
+
+<form method="post" enctype="multipart/form-data" style="margin-bottom:20px">
+  <div class="card">
+    <h3>基础信息</h3>
+    <div class="form-row"><label>网站名称</label><input type="text" name="site_name" value="{{ s.site_name }}"></div>
+    <div class="form-row"><label>英文名称</label><input type="text" name="site_name_en" value="{{ s.site_name_en }}"></div>
+    <div class="form-row"><label>公司名称（英文）</label><input type="text" name="company_name" value="{{ s.company_name }}"></div>
+    <div class="form-row"><label>公司名称（中文）</label><input type="text" name="company_cn" value="{{ s.company_cn }}"></div>
+    <div class="form-row"><label>公司地址（中文）</label><input type="text" name="company_address" value="{{ s.company_address }}"></div>
+    <div class="form-row"><label>公司地址（英文）</label><input type="text" name="company_address_en" value="{{ s.company_address_en }}"></div>
+    <div class="form-row"><label>公司简介（简短）</label><textarea name="company_intro">{{ s.company_intro }}</textarea></div>
+    <div class="form-row"><label>公司简介（详细）</label><textarea name="company_intro_long">{{ s.company_intro_long }}</textarea></div>
+    <div class="form-row"><label>网站 Logo（上传）</label>
+      <input type="file" name="site_logo" accept="image/*">
+      {% if s.site_logo %}<div class="small-text"><img src="{{ s.site_logo }}" style="max-height:50px;margin-top:8px" class="thumb-preview" alt="logo"> 当前：{{ s.site_logo }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>联系方式</h3>
+    <div class="admin-grid">
+      <div class="form-row"><label>销售热线（400电话）</label><input type="text" name="sales_phone" value="{{ s.sales_phone }}"></div>
+      <div class="form-row"><label>第二销售热线</label><input type="text" name="sales_phone2" value="{{ s.sales_phone2 }}"></div>
+      <div class="form-row"><label>服务电话</label><input type="text" name="service_phone" value="{{ s.service_phone }}"></div>
+      <div class="form-row"><label>客服邮箱</label><input type="text" name="service_email" value="{{ s.service_email }}"></div>
+      <div class="form-row"><label>官方 QQ 群</label><input type="text" name="qq_group" value="{{ s.qq_group }}"></div>
+      <div class="form-row"><label>微信二维码图片（上传）</label>
+        <input type="file" name="wechat_qr" accept="image/*">
+        {% if s.wechat_qr %}<div class="small-text"><img src="{{ s.wechat_qr }}" style="max-height:80px;margin-top:8px" alt="qr"> 当前：{{ s.wechat_qr }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>备案信息与版权</h3>
+    <div class="admin-grid">
+      <div class="form-row"><label>ICP备案号</label><input type="text" name="icp" value="{{ s.icp }}"></div>
+      <div class="form-row"><label>ICP链接</label><input type="text" name="icp_url" value="{{ s.icp_url }}"></div>
+      <div class="form-row"><label>公安备案号</label><input type="text" name="police" value="{{ s.police }}"></div>
+      <div class="form-row"><label>公安备案链接</label><input type="text" name="police_url" value="{{ s.police_url }}"></div>
+      <div class="form-row"><label>增值电信业务许可证号</label><input type="text" name="zengxin" value="{{ s.zengxin }}"></div>
+      <div class="form-row"><label>许可证名称</label><input type="text" name="zengxin_text" value="{{ s.zengxin_text }}"></div>
+    </div>
+    <div class="form-row"><label>版权信息</label><input type="text" name="copyright" value="{{ s.copyright }}"></div>
+    <div class="form-row"><label>页脚授权说明</label><textarea name="footer_note">{{ s.footer_note }}</textarea></div>
+  </div>
+
+  <div class="card">
+    <h3>其他链接</h3>
+    <div class="form-row"><label>国际版官网链接</label><input type="text" name="international_url" value="{{ s.international_url }}"></div>
+    <div class="form-row"><label>首页 Banner 副标题</label><input type="text" name="banner_subtitle" value="{{ s.banner_subtitle }}"></div>
+  </div>
+
+  <button type="submit" class="admin-btn"><i class="fa-solid fa-save"></i> 保存全部设置</button>
+  <a href="/" class="admin-btn secondary" target="_blank"><i class="fa-solid fa-eye"></i> 预览网站</a>
+</form>
+{% endblock %}

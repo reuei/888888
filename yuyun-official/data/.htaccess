@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule \.(db|json|sql|log)$ - [F,L]
+</IfModule>
+
+<FilesMatch "\.(php|php5|phtml|pl|py|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+Options -Indexes

@@ -1,0 +1,45 @@
+@import url('../../default/css/style.css');
+
+:root {
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --accent-orange: #FF6A00;
+    --accent-orange-light: #ff8533;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --bg: #0b1120;
+    --bg-gray: #0f172a;
+    --bg-dark: #020617;
+    --border: #1e293b;
+    --shadow: 0 4px 20px rgba(0,0,0,0.35);
+    --shadow-hover: 0 12px 32px rgba(0,0,0,0.45);
+}
+
+body { background: var(--bg); color: var(--text); }
+.header { background: rgba(11,17,32,0.95); border-bottom-color: var(--border); }
+.logo { color: #fff; }
+.nav a { color: var(--text); }
+.nav a:hover { color: var(--primary); }
+.mobile-nav { background: rgba(11,17,32,0.98); }
+.mobile-nav a { color: var(--text); border-bottom-color: var(--border); }
+
+.card { background: #1e293b; border-color: var(--border); }
+.card h3 { color: #fff; }
+.content-block { background: #1e293b; }
+.partner-item { background: #1e293b; border-color: var(--border); }
+.cert-item { background: #1e293b; }
+.cert-item .cert-img { background: #0f172a; }
+
+.form-control { background: #1e293b; border-color: var(--border); color: var(--text); }
+.contact-card { background: #1e293a; }
+
+.section-gray { background: #0f172a; }
+
+.footer { background: var(--bg-dark); }
+.footer-brand p, .footer-col a, .footer-bottom a, .footer-bottom p { color: rgba(255,255,255,0.55); }
+.footer-col a:hover, .footer-bottom a:hover { color: #fff; }
+
+.toast { box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+
+.qr-box { background: #1e293b; }
+.qr-placeholder { background: #0f172a; }

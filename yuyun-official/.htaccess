@@ -1,0 +1,17 @@
+# 默认首页
+DirectoryIndex index.php index.html
+
+# 重写规则：将 page 参数美化
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?page=$1 [L,QSA]
+</IfModule>
+
+# 禁用目录浏览
+Options -Indexes
+
+# 设置默认字符集
+AddDefaultCharset UTF-8

@@ -1,0 +1,19 @@
+# Apache / LiteSpeed 虚拟主机部署配置示例
+# 如果使用 cPanel + Passenger，请确保已通过 "Setup Python App" 绑定到 passenger_wsgi.py
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # 已有文件/目录直接访问
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    # 其余请求交给 WSGI 应用处理
+    RewriteRule ^(.*)$ /passenger_wsgi.py/$1 [QSA,L]
+</IfModule>
+
+# 静态资源缓存（可选）
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>

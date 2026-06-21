@@ -1,0 +1,78 @@
+@import url('../../default/css/style.css');
+
+:root {
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --accent-orange: #f97316;
+    --accent-orange-light: #fb923c;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --bg: #f0fdf4;
+    --bg-gray: #ecfdf5;
+    --bg-dark: #064e3b;
+    --border: #d1fae5;
+    --shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
+    --shadow-hover: 0 12px 32px rgba(16, 185, 129, 0.18);
+    --radius: 16px;
+    --radius-lg: 24px;
+}
+
+body { background: var(--bg); }
+
+.header {
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid var(--border);
+}
+.logo { color: var(--primary-dark); }
+.nav a { color: var(--text); }
+.nav a:hover { color: var(--primary); }
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #34d399 100%);
+    border: none;
+}
+.btn-primary:hover { background: var(--primary-dark); }
+
+.hero {
+    background: linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #ffffff 100%);
+    position: relative;
+}
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120'%3E%3Cpath fill='%23f0fdf4' fill-opacity='1' d='M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: cover;
+    z-index: -1;
+}
+
+.card, .content-block, .partner-item, .cert-item {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+.card-icon {
+    background: #d1fae5;
+    color: var(--primary-dark);
+}
+
+.section-gray { background: #fff; }
+
+.map-container { background: #fff; border: 1px solid var(--border); }
+
+.form-control { background: #fff; border-color: var(--border); }
+.form-control:focus { border-color: var(--primary); }
+.contact-card { background: #fff; border: 1px solid var(--border); }
+
+.footer { background: var(--bg-dark); }
+.footer-sales { color: var(--accent-orange); }
+
+.float-btn { background: var(--primary); }
+.float-phone { background: var(--accent-orange) !important; }
+.float-wechat { background: #22c55e !important; }
+.float-top { background: rgba(6,78,59,0.7) !important; }
+
+.modal-header { background: var(--primary); }

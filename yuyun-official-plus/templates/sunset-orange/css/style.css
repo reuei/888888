@@ -1,0 +1,81 @@
+@import url('../../default/css/style.css');
+
+:root {
+    --primary: #f97316;
+    --primary-dark: #ea580c;
+    --accent-orange: #fb923c;
+    --accent-orange-light: #fdba74;
+    --text: #fff7ed;
+    --text-muted: #fdba74;
+    --bg: #431407;
+    --bg-gray: #7c2d12;
+    --bg-dark: #280f06;
+    --border: rgba(251, 146, 60, 0.2);
+    --shadow: 0 8px 30px rgba(249, 115, 22, 0.2);
+    --shadow-hover: 0 16px 45px rgba(249, 115, 22, 0.3);
+    --radius: 16px;
+    --radius-lg: 28px;
+}
+
+body { background: var(--bg); color: var(--text); }
+
+.header {
+    background: rgba(40, 15, 6, 0.95);
+    border-bottom: 1px solid var(--border);
+}
+.logo { color: #fff; }
+.nav a { color: var(--text); }
+.nav a:hover { color: var(--accent-orange); }
+
+.btn-primary {
+    background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+    border: none;
+    box-shadow: 0 4px 16px rgba(249, 115, 22, 0.35);
+}
+.btn-primary:hover { box-shadow: 0 6px 24px rgba(249, 115, 22, 0.5); }
+
+.hero {
+    background: linear-gradient(135deg, #431407 0%, #9a3412 60%, #c2410c 100%);
+    position: relative;
+}
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(251,146,60,0.25) 0%, transparent 40%);
+    z-index: -1;
+}
+
+.card, .content-block, .partner-item, .cert-item {
+    background: rgba(124, 45, 18, 0.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+.card h3 { color: #fff; }
+.card p { color: var(--text-muted); }
+.card-icon {
+    background: rgba(251, 146, 60, 0.15);
+    color: var(--accent-orange);
+}
+
+.section-gray { background: rgba(124, 45, 18, 0.25); }
+
+.map-container { background: rgba(124, 45, 18, 0.3); border: 1px solid var(--border); }
+
+.form-control {
+    background: rgba(124, 45, 18, 0.4);
+    border-color: var(--border);
+    color: #fff;
+}
+.form-control:focus { border-color: var(--accent-orange); }
+.contact-card { background: rgba(124, 45, 18, 0.3); border: 1px solid var(--border); }
+
+.footer { background: var(--bg-dark); }
+.footer-sales { color: #fff; text-shadow: 0 0 20px rgba(251,146,60,0.4); }
+
+.float-btn { background: var(--primary); }
+.float-phone { background: #fff !important; color: var(--primary) !important; }
+.float-wechat { background: #22c55e !important; }
+.float-top { background: rgba(249,115,22,0.7) !important; }
+
+.modal-content { background: var(--bg-dark); border: 1px solid var(--border); }

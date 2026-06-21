@@ -1,0 +1,87 @@
+@import url('../../default/css/style.css');
+
+:root {
+    --primary: #0052d9;
+    --primary-dark: #003bb3;
+    --accent-orange: #c9a227;
+    --accent-orange-light: #e0b83d;
+    --text: #1d2129;
+    --text-muted: #4e5969;
+    --bg: #f7f8fa;
+    --bg-gray: #f2f3f5;
+    --bg-dark: #0a0c10;
+    --border: #e5e6eb;
+    --shadow: 0 4px 20px rgba(0, 82, 217, 0.08);
+    --shadow-hover: 0 12px 32px rgba(0, 82, 217, 0.14);
+    --radius: 10px;
+    --radius-lg: 18px;
+}
+
+body { background: var(--bg); }
+
+.header {
+    background: rgba(255, 255, 255, 0.97);
+    border-bottom: 1px solid var(--border);
+}
+.logo { color: var(--primary); font-weight: 700; }
+.nav a { color: var(--text); font-weight: 500; }
+.nav a:hover { color: var(--primary); }
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border: none;
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-accent {
+    background: linear-gradient(90deg, var(--accent-orange) 0%, #a68a1f 100%);
+    color: #fff;
+}
+.btn-accent:hover { background: #a68a1f; }
+
+.hero {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 60%, #fff8e6 100%);
+    border-bottom: 1px solid var(--border);
+}
+.hero-badge {
+    background: rgba(201, 162, 39, 0.12);
+    color: #8a6d0b;
+    border: 1px solid rgba(201, 162, 39, 0.25);
+}
+.hero h1 { color: #0a0c10; }
+.hero p { color: var(--text-muted); }
+
+.card, .content-block, .partner-item, .cert-item {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+.card:hover { border-color: var(--primary); }
+.card-icon {
+    background: linear-gradient(135deg, #eef3ff 0%, #fff8e6 100%);
+    color: var(--primary);
+}
+
+.section-header h2 { color: #0a0c10; }
+.section-gray { background: #fff; }
+
+.partner-marquee { background: linear-gradient(90deg, var(--bg) 0%, #fff 20%, #fff 80%, var(--bg) 100%); }
+
+.map-container { background: #fff; border: 1px solid var(--border); }
+.map-marker { color: var(--primary); }
+
+.form-control { background: #fff; border-color: var(--border); }
+.form-control:focus { border-color: var(--primary); }
+.contact-card { background: #fff; border: 1px solid var(--border); }
+
+.footer {
+    background: var(--bg-dark);
+    background-image: radial-gradient(circle at 10% 20%, rgba(201,162,39,0.08) 0%, transparent 30%);
+}
+.footer-sales { color: var(--accent-orange); text-shadow: 0 0 20px rgba(201,162,39,0.3); }
+
+.float-btn { background: var(--primary); }
+.float-phone { background: var(--accent-orange) !important; }
+.float-wechat { background: #07c160 !important; }
+.float-top { background: rgba(10,12,16,0.7) !important; }
+
+.modal-header { background: var(--primary); }

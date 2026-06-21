@@ -1,0 +1,33 @@
+# 禁止直接访问数据文件
+<FilesMatch "\.(json|log)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# 禁止列出目录
+Options -Indexes
+
+# 默认首页
+DirectoryIndex index.php index.html
+
+# PHP 处理
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+# 启用 gzip 压缩
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml
+</IfModule>
+
+# 缓存静态资源
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/jpg "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+    ExpiresByType image/x-icon "access plus 365 days"
+</IfModule>

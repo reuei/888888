@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1200);
     }
 
-    // Toast helper
+    // Toast helper (admin fallback)
     window.showToast = function (message, type) {
         type = type || 'info';
         const container = document.getElementById('toastContainer');
@@ -171,11 +171,42 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => toast.remove(), 4000);
     };
 
-    // Convert flash messages to toasts
-    const flashEl = document.querySelector('.flash-message');
-    if (flashEl) {
-        const type = flashEl.classList.contains('flash-error') ? 'error' : 'success';
-        showToast(flashEl.textContent.trim(), type);
-        flashEl.style.display = 'none';
+    // Top sliding notice
+    window.showTopNotice = function (message, type) {
+        type = type || 'info';
+        const container = document.getElementById('topNoticeContainer');
+        if (!container) return;
+        const iconMap = { success: 'certificate', error: 'close', info: 'bell' };
+        const notice = document.createElement('div');
+        notice.className = 'top-notice ' + type;
+        notice.innerHTML = '<i class="iconfont icon-' + iconMap[type] + '"></i><span>' + message + '</span>';
+        container.appendChild(notice);
+        setTimeout(() => notice.remove(), 4000);
+    };
+
+    // Convert flash messages to top notices
+    document.querySelectorAll('.flash-message').forEach(function (el) {
+        const type = el.getAttribute('data-type') || 'info';
+        showTopNotice(el.textContent.trim(), type);
+        el.style.display = 'none';
+    });
+
+    // Form validation top notice
+    document.addEventListener('invalid', function (e) {
+        e.preventDefault();
+        const target = e.target;
+        const label = target.closest('.form-group')?.querySelector('label')?.textContent?.trim() || target.placeholder || target.name || '必填项';
+        showTopNotice('请填写：' + label, 'error');
+        target.focus();
+    }, true);
+
+    // Theme toggle icon sync
+    const themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) {
+        const updateThemeIcon = function () {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            themeBtn.innerHTML = '<i class="iconfont icon-' + (isDark ? 'sun' : 'moon') + '"></i>';
+        };
+        updateThemeIcon();
     }
 });

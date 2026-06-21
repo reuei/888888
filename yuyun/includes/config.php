@@ -29,3 +29,4 @@ if (session_status() === PHP_SESSION_NONE) {
 if (isset($_GET['lang'])) {
     current_lang();
 }
+init_patch2_tables();

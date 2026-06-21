@@ -413,3 +413,55 @@ body.has-banner{--banner-height:38px}
 
 /* Admin icon preview in product list */
 .admin-icon-preview{width:32px;height:32px;border-radius:8px;background:rgba(255,106,0,.1);display:inline-flex;align-items:center;justify-content:center;color:var(--brand);font-size:16px}
+
+/* Flash messages (admin fallback) */
+.flash-message{display:none}
+.admin-body .flash-message{display:block;background:#fff2f0;border:1px solid #ffccc7;color:#c00;padding:12px 14px;border-radius:6px;margin-bottom:16px}
+.admin-body .flash-message.flash-success{background:#f6ffed;border-color:#b7eb8f;color:#389e0d}
+.admin-body .flash-message.flash-info{background:#e6f7ff;border-color:#91d5ff;color:#096dd9}
+
+/* Top sliding notice */
+.top-notice-container{position:fixed;top:calc(var(--banner-height) + 68px);left:0;right:0;z-index:1100;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;padding:0 16px}
+.top-notice{pointer-events:auto;background:#fff;border-left:4px solid var(--brand);color:var(--text);padding:12px 18px;border-radius:10px;box-shadow:var(--shadow-lg);display:inline-flex;align-items:center;gap:10px;font-size:14px;max-width:520px;width:100%;animation:noticeSlide .45s ease,noticeFade .45s 3.55s forwards}
+.top-notice.success{border-left-color:#52c41a}
+.top-notice.error{border-left-color:#ff4d4f}
+.top-notice.info{border-left-color:#1890ff}
+.top-notice i{font-size:18px;color:var(--brand);flex-shrink:0}
+.top-notice.success i{color:#52c41a}
+.top-notice.error i{color:#ff4d4f}
+.top-notice.info i{color:#1890ff}
+@keyframes noticeSlide{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes noticeFade{to{opacity:0;transform:translateY(-20px)}}
+@media(max-width:992px){.top-notice-container{top:calc(var(--banner-height) + 60px)}}
+
+/* User notification badge */
+.badge-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:#ff4d4f;color:#fff;border-radius:9px;font-size:11px;font-weight:700;margin-left:4px}
+
+/* Message list in user center */
+.message-list{display:flex;flex-direction:column;gap:14px}
+.message-item{background:#fff;border:1px solid #f0f0f0;border-radius:12px;padding:18px;transition:.2s}
+.message-item.read{background:#fafafa;border-color:#eee}
+.message-item:hover{box-shadow:var(--shadow)}
+.message-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.message-title{font-weight:700;color:var(--dark);font-size:15px}
+.message-time{font-size:12px;color:#999}
+.message-body{color:var(--text-2);font-size:14px;line-height:1.6}
+
+/* 3D animation optimization */
+.hero-mascot .mascot-wrap{will-change:transform}
+.illustration-3d,.cube{will-change:transform}
+.product-card,.cert-card,.staff-card{transition:transform .35s cubic-bezier(.25,.46,.45,.94),box-shadow .35s}
+
+/* Page intro with IconPark */
+.page-intro{text-align:center;max-width:720px;margin:0 auto 40px}
+.page-intro h2{font-size:32px;font-weight:800;color:var(--dark);margin:0 0 12px}
+.page-intro p{color:var(--text-2);font-size:16px;margin:0;line-height:1.7}
+
+/* Subtle section polish */
+.section.bg-white{background:linear-gradient(180deg,#fff 0%,#fafafa 100%)}
+
+/* Dark mode overrides */
+[data-theme="dark"] .top-notice{background:var(--white);color:var(--text)}
+[data-theme="dark"] .message-item{background:var(--white);border-color:rgba(255,255,255,.08)}
+[data-theme="dark"] .message-item.read{background:#0f0f0f}
+[data-theme="dark"] .flash-message{color:#c00}

@@ -15,10 +15,11 @@ $feedbackCount->execute([':uid'=>$user['id']]);
         <div class="admin-body" style="min-height:auto;display:block">
             <div style="display:grid;grid-template-columns:240px 1fr;gap:24px">
                 <div style="background:var(--dark-2);border-radius:12px;padding:14px 0">
-                    <a href="<?php echo YUYUN_URL ?>/user/index.php" class="active"><i class="iconfont icon-gauge"></i> 概览</a>
-                    <a href="<?php echo YUYUN_URL ?>/user/tickets.php"><i class="iconfont icon-ticket"></i> 我的工单</a>
-                    <a href="<?php echo YUYUN_URL ?>/user/feedback.php"><i class="iconfont icon-edit"></i> 建议/举报</a>
-                    <a href="<?php echo YUYUN_URL ?>/user/profile.php"><i class="iconfont icon-user"></i> 个人资料</a>
+                    <a href="<?php echo YUYUN_URL ?>/user/index.php" class="active"><i class="iconfont icon-gauge"></i> <?php echo L('user.overview', '概览') ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/tickets.php"><i class="iconfont icon-ticket"></i> <?php echo L('user.tickets', '我的工单') ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/feedback.php"><i class="iconfont icon-edit"></i> <?php echo L('user.feedback', '建议/举报') ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/messages.php"><i class="iconfont icon-bell"></i> <?php echo L('user.messages', '消息通知') ?> <?php $mc = get_notification_count($user['id']); if ($mc): ?><span class="badge-count"><?php echo $mc ?></span><?php endif; ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/profile.php"><i class="iconfont icon-user"></i> <?php echo L('user.profile', '个人资料') ?></a>
                 </div>
                 <div>
                     <h2 style="margin-bottom:20px">欢迎，<?php echo e($user['nickname'] ?: $user['email']) ?></h2>

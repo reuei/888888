@@ -92,12 +92,16 @@ return [
     'auth.no_account' => '还没有账号？',
     'auth.register_now' => '立即注册',
     'auth.login_now' => '立即登录',
+    'auth.verify_first' => '请先验证邮箱',
 
     'user.overview' => '概览',
     'user.tickets' => '我的工单',
     'user.feedback' => '建议/举报',
     'user.profile' => '个人资料',
+    'user.messages' => '消息通知',
 
     'mail.code_subject' => '您的登录验证码',
     'mail.code_body' => "您好，\n\n您的验证码是：{code}，5 分钟内有效。\n\n如非本人操作，请忽略此邮件。",
+    'mail.verify_subject' => '邮箱验证',
+    'mail.verify_body' => "您好，\n\n您的邮箱验证码是：{code}，5 分钟内有效。\n\n如非本人操作，请忽略此邮件。",
 ];

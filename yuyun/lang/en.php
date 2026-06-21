@@ -92,12 +92,16 @@ return [
     'auth.no_account' => "Don't have an account?",
     'auth.register_now' => 'Register now',
     'auth.login_now' => 'Login now',
+    'auth.verify_first' => 'Please verify your email first',
 
     'user.overview' => 'Overview',
     'user.tickets' => 'My Tickets',
     'user.feedback' => 'Feedback',
     'user.profile' => 'Profile',
+    'user.messages' => 'Notifications',
 
     'mail.code_subject' => 'Your login verification code',
     'mail.code_body' => "Hello,\n\nYour verification code is: {code}. It is valid for 5 minutes.\n\nIf this was not you, please ignore this email.",
+    'mail.verify_subject' => 'Email Verification',
+    'mail.verify_body' => "Hello,\n\nYour email verification code is: {code}. It is valid for 5 minutes.\n\nIf this was not you, please ignore this email.",
 ];

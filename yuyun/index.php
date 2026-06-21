@@ -10,7 +10,7 @@ $products = $db->query('SELECT * FROM products WHERE is_active=1 ORDER BY sort_o
 $partners = $db->query('SELECT * FROM partners WHERE is_active=1 ORDER BY sort_order,id')->fetchAll(PDO::FETCH_ASSOC);
 $staff = $db->query('SELECT * FROM staff ORDER BY sort_order,id')->fetchAll(PDO::FETCH_ASSOC);
 $gradients = ['linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient(135deg,#1a2980,#26d0ce)','linear-gradient(135deg,#ff512f,#dd2476)'];
-$iconMap = ['fa-cube'=>'icon-cubes','fa-server'=>'icon-store','fa-shield-halved'=>'icon-shield','fa-network-wired'=>'icon-cloud','fa-globe'=>'icon-map','fa-database'=>'icon-store','fa-lock'=>'icon-lock'];
+
 $staffBg = setting('site_staff_bg_image');
 ?>
 
@@ -61,8 +61,7 @@ $staffBg = setting('site_staff_bg_image');
         </div>
         <div class="card-grid">
             <?php foreach ($products as $prod):
-                $icon = $prod['icon'] ?: 'fa-cube';
-                $iconClass = $iconMap[$icon] ?? 'icon-cubes';
+                $iconClass = map_fa_to_iconfont($prod['icon'] ?: 'fa-cube');
             ?>
             <div class="product-card" onclick="openProductModal('<?php echo e($prod['name']) ?>','<?php echo e($prod['detail'] ?: $prod['summary']) ?>')">
                 <div class="icon"><i class="iconfont <?php echo e($iconClass) ?> icon-2xl"></i></div>
@@ -104,36 +103,36 @@ $staffBg = setting('site_staff_bg_image');
         </div>
         <div class="map-wrap">
             <svg class="map-svg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="mapGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="rgba(255,106,0,.35)"/>
+                        <stop offset="100%" stop-color="rgba(255,106,0,0)"/>
+                    </radialGradient>
+                </defs>
                 <g class="map-grid">
-                    <line x1="100" y1="0" x2="100" y2="500"/>
-                    <line x1="300" y1="0" x2="300" y2="500"/>
-                    <line x1="500" y1="0" x2="500" y2="500"/>
-                    <line x1="700" y1="0" x2="700" y2="500"/>
-                    <line x1="900" y1="0" x2="900" y2="500"/>
-                    <line x1="0" y1="125" x2="1000" y2="125"/>
-                    <line x1="0" y1="250" x2="1000" y2="250"/>
-                    <line x1="0" y1="375" x2="1000" y2="375"/>
+                    <line x1="100" y1="0" x2="100" y2="500"/><line x1="300" y1="0" x2="300" y2="500"/><line x1="500" y1="0" x2="500" y2="500"/><line x1="700" y1="0" x2="700" y2="500"/><line x1="900" y1="0" x2="900" y2="500"/>
+                    <line x1="0" y1="125" x2="1000" y2="125"/><line x1="0" y1="250" x2="1000" y2="250"/><line x1="0" y1="375" x2="1000" y2="375"/>
                 </g>
-                <path class="map-continent" d="M40,70 L100,40 L180,35 L250,60 L300,120 L280,180 L230,230 L160,240 L100,210 L60,150 Z"/>
-                <path class="map-continent" d="M250,250 L300,240 L330,280 L340,360 L310,440 L260,450 L240,360 Z"/>
-                <path class="map-continent" d="M460,90 L500,50 L600,40 L750,60 L880,110 L930,180 L900,260 L800,280 L700,260 L600,230 L520,180 L470,140 Z"/>
-                <path class="map-continent" d="M450,100 L520,90 L580,130 L600,220 L560,340 L480,360 L440,240 Z"/>
-                <path class="map-continent" d="M760,290 L830,280 L890,320 L870,380 L790,390 L750,340 Z"/>
+                <path class="map-continent" d="M120,70 Q180,30 260,50 T380,120 Q400,170 350,220 T220,250 Q150,240 110,180 T80,100 Z"/>
+                <path class="map-continent" d="M260,280 Q310,270 340,320 T350,420 Q330,470 290,460 T240,380 Q230,320 260,280 Z"/>
+                <path class="map-continent" d="M450,80 Q520,40 620,50 T780,90 Q850,120 880,180 T860,270 Q800,300 720,280 T580,230 Q500,190 460,140 T450,80 Z"/>
+                <path class="map-continent" d="M470,150 Q520,140 560,180 T590,300 Q570,380 510,390 T450,300 Q440,210 470,150 Z"/>
+                <path class="map-continent" d="M780,320 Q840,300 900,340 T920,420 Q880,460 820,450 T760,390 Q750,350 780,320 Z"/>
 
-                <g class="map-node-wrap"><circle class="map-city" cx="823" cy="139" r="5"/><text class="map-label" x="823" y="158">北京</text><title>中国 · 北京</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="835" cy="150" r="5"/><text class="map-label" x="835" y="169">青岛</text><title>中国 · 青岛</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="604" cy="106" r="5"/><text class="map-label" x="604" y="125">莫斯科</text><title>俄罗斯 · 莫斯科</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="584" cy="94" r="5"/><text class="map-label" x="584" y="85">圣彼得堡</text><title>俄罗斯 · 圣彼得堡</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="841" cy="145" r="5"/><text class="map-label" x="841" y="164">首尔</text><title>韩国 · 首尔</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="888" cy="151" r="5"/><text class="map-label" x="888" y="170">东京</text><title>日本 · 东京</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="777" cy="247" r="5"/><text class="map-label" x="777" y="266">新加坡</text><title>新加坡</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="920" cy="369" r="5"/><text class="map-label" x="920" y="388">悉尼</text><title>澳大利亚 · 悉尼</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="294" cy="138" r="5"/><text class="map-label" x="294" y="157">纽约</text><title>美国 · 纽约</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="286" cy="142" r="5"/><text class="map-label" x="286" y="161">华盛顿</text><title>美国 · 华盛顿</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="161" cy="145" r="5"/><text class="map-label" x="161" y="164">旧金山</text><title>美国 · 旧金山</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="500" cy="112" r="5"/><text class="map-label" x="500" y="131">伦敦</text><title>英国 · 伦敦</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="524" cy="114" r="5"/><text class="map-label" x="524" y="105">法兰克福</text><title>德国 · 法兰克福</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="654" cy="181" r="5"/><text class="map-label" x="654" y="200">迪拜</text><title>阿联酋 · 迪拜</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="780" cy="165" r="5"/><text class="map-label" x="780" y="185">北京</text><title>中国 · 北京</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="795" cy="178" r="4"/><text class="map-label" x="795" y="195">青岛</text><title>中国 · 青岛</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="650" cy="140" r="5"/><text class="map-label" x="650" y="125">莫斯科</text><title>俄罗斯 · 莫斯科</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="630" cy="125" r="4"/><text class="map-label" x="630" y="110">圣彼得堡</text><title>俄罗斯 · 圣彼得堡</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="810" cy="175" r="4"/><text class="map-label" x="810" y="193">首尔</text><title>韩国 · 首尔</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="870" cy="185" r="5"/><text class="map-label" x="870" y="205">东京</text><title>日本 · 东京</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="785" cy="265" r="5"/><text class="map-label" x="785" y="285">新加坡</text><title>新加坡</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="900" cy="380" r="5"/><text class="map-label" x="900" y="400">悉尼</text><title>澳大利亚 · 悉尼</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="250" cy="170" r="5"/><text class="map-label" x="250" y="190">纽约</text><title>美国 · 纽约</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="245" cy="185" r="4"/><text class="map-label" x="245" y="203">华盛顿</text><title>美国 · 华盛顿</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="150" cy="175" r="5"/><text class="map-label" x="150" y="195">旧金山</text><title>美国 · 旧金山</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="475" cy="150" r="5"/><text class="map-label" x="475" y="170">伦敦</text><title>英国 · 伦敦</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="500" cy="155" r="4"/><text class="map-label" x="500" y="140">法兰克福</text><title>德国 · 法兰克福</title></g>
+                <g class="map-node-wrap"><circle class="map-city" cx="660" cy="225" r="5"/><text class="map-label" x="660" y="245">迪拜</text><title>阿联酋 · 迪拜</title></g>
             </svg>
         </div>
     </div>

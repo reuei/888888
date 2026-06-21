@@ -32,4 +32,5 @@ $theme = setting('site_default_theme', 'light');
 </div>
 <?php endif; ?>
 <?php require __DIR__ . '/nav.php'; ?>
+<div class="top-notice-container" id="topNoticeContainer"></div>
 <div class="main-wrap">

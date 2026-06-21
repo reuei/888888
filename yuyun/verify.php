@@ -2,6 +2,7 @@
 require __DIR__ . '/includes/config.php';
 if (template_include('verify.php')) exit;
 $pageTitle = '邮箱验证码登录';
+ensure_user_columns();
 $step = empty($_GET['code']) ? 'send' : 'verify';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -48,9 +49,7 @@ require __DIR__ . '/includes/header.php';
 <section class="auth-page">
     <div class="auth-box">
         <div class="text-center">
-            <div class="illustration-3d" style="width:90px;height:90px;margin-bottom:12px">
-                <div class="cube" style="width:40px;height:40px;left:25px;top:25px"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
-            </div>
+            <div class="ip-illustration" style="width:90px;height:90px;margin-bottom:12px"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="10" width="36" height="26" rx="2"/><path d="M6 14l18 14 18-14"/><circle cx="38" cy="16" r="2" fill="currentColor" stroke="none"/></svg></div>
         </div>
         <h2>邮箱验证码登录</h2>
         <p>无需密码，验证码 5 分钟内有效</p>

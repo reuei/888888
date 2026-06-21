@@ -229,7 +229,16 @@ textarea.form-control{min-height:120px;resize:vertical}
 .hero-mascot .m-arm{width:28px;height:12px;background:#1f8fff;border-radius:10px;position:absolute;top:88px;transform:translateZ(15px)}
 .hero-mascot .m-arm.left{left:22px;transform:rotate(-25deg) translateZ(15px)}
 .hero-mascot .m-arm.right{right:22px;transform:rotate(25deg) translateZ(15px)}
-.hero-mascot .m-shadow{width:90px;height:14px;background:rgba(0,0,0,.15);border-radius:50%;position:absolute;left:35px;bottom:0;filter:blur(4px);transform:translateZ(-10px)}
+.hero-mascot .m-shadow{width:90px;height:14px;background:rgba(0,0,0,.15);border-radius:50%;position:absolute;left:35px;bottom:0;filter:blur(4px);transform:translateZ(-10px);animation:mShadowScale 2.5s ease-in-out infinite}
+.hero-mascot .m-head{animation:mHeadSway 3s ease-in-out infinite}
+.hero-mascot .m-arm.left{animation:mArmSwingLeft 2.2s ease-in-out infinite}
+.hero-mascot .m-arm.right{animation:mArmSwingRight 2.2s ease-in-out infinite}
+.hero-mascot .m-body{animation:mBodyFloat 2.8s ease-in-out infinite}
+@keyframes mHeadSway{0%,100%{transform:translateZ(20px) rotateZ(-6deg)}50%{transform:translateZ(20px) rotateZ(6deg)}}
+@keyframes mArmSwingLeft{0%,100%{transform:translateZ(15px) rotate(-25deg)}50%{transform:translateZ(15px) rotate(-50deg)}}
+@keyframes mArmSwingRight{0%,100%{transform:translateZ(15px) rotate(25deg)}50%{transform:translateZ(15px) rotate(50deg)}}
+@keyframes mBodyFloat{0%,100%{transform:translateZ(10px) translateY(0)}50%{transform:translateZ(10px) translateY(-4px)}}
+@keyframes mShadowScale{0%,100%{transform:translateZ(-10px) scale(1);opacity:.15}50%{transform:translateZ(-10px) scale(.85);opacity:.1}}
 @media(max-width:992px){.hero-mascot{display:none}}
 
 /* 3D cards & illustrations */
@@ -317,10 +326,132 @@ textarea.form-control{min-height:120px;resize:vertical}
 /* Float tools polish */
 .float-btn{border-radius:14px;width:52px;height:52px;background:rgba(255,255,255,.95);backdrop-filter:blur(4px)}
 
+/* Header actions & theme/lang toggles */
+.header-actions{display:flex;align-items:center;gap:10px}
+.header-icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;color:var(--text-2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.header-icon-btn:hover{background:rgba(255,106,0,.1);color:var(--brand)}
+.theme-icon-dark{display:none}
+html.dark .theme-icon-light{display:none}
+html.dark .theme-icon-dark{display:inline-flex}
+
+/* Hamburger with icon */
+.hamburger{width:40px;height:40px;border-radius:10px;background:#f5f5f7;border:none;display:none;align-items:center;justify-content:center;color:var(--dark);font-size:22px;cursor:pointer;transition:.2s}
+.hamburger:hover{background:var(--brand);color:#fff}
+.hamburger span{display:none}
+.admin-hamburger{display:none}
+.main-nav a i{width:20px;margin-right:6px;color:var(--brand)}
+
+/* Top banner announcement */
+.site-banner{position:relative;z-index:1001;color:#fff;font-size:14px;overflow:hidden}
+.banner-inner{display:flex;align-items:center;height:42px;gap:12px;position:relative}
+.banner-marquee{display:flex;gap:48px;white-space:nowrap;animation:bannerScroll 22s linear infinite}
+.banner-text{display:flex;align-items:center;gap:8px}
+.banner-close{margin-left:auto;background:none;border:none;color:#fff;opacity:.7;cursor:pointer;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;transition:.2s}
+.banner-close:hover{opacity:1;background:rgba(255,255,255,.15)}
+@keyframes bannerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@media(min-width:993px){.banner-marquee{animation:none}.banner-inner{justify-content:center}}
+
+/* Global slide-down notifier */
+.global-notifier{position:fixed;top:0;left:0;right:0;z-index:3000;display:flex;flex-direction:column;align-items:center;pointer-events:none;padding-top:14px;gap:12px}
+.global-notify{pointer-events:auto;min-width:300px;max-width:92%;background:#fff;border-radius:12px;box-shadow:var(--shadow-lg);padding:14px 18px;display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text);transform:translateY(-140%);opacity:0;animation:notifySlide .45s cubic-bezier(.22,1,.36,1) forwards,notifyFade .35s ease 3.65s forwards}
+.global-notify.success{border-bottom:3px solid #52c41a}
+.global-notify.error{border-bottom:3px solid #ff4d4f}
+.global-notify.info{border-bottom:3px solid #1890ff}
+.global-notify .icon{font-size:22px;flex-shrink:0}
+.global-notify.success .icon{color:#52c41a}
+.global-notify.error .icon{color:#ff4d4f}
+.global-notify.info .icon{color:#1890ff}
+@keyframes notifySlide{to{transform:translateY(0);opacity:1}}
+@keyframes notifyFade{to{opacity:0;transform:translateY(-20px)}}
+
+/* Staff horizontal scroll */
+.staff-section{position:relative;background-size:cover;background-position:center;background-repeat:no-repeat}
+.staff-section::before{content:"";position:absolute;inset:0;background:rgba(245,247,250,.92);pointer-events:none}
+html.dark .staff-section::before{background:rgba(11,13,18,.88)}
+.staff-section .container{position:relative;z-index:1}
+.staff-scroll{display:flex;gap:20px;overflow-x:auto;padding:10px 4px 28px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.staff-scroll .staff-card{flex:0 0 220px;scroll-snap-align:start}
+.staff-scroll::-webkit-scrollbar{height:6px}
+.staff-scroll::-webkit-scrollbar-track{background:transparent}
+.staff-scroll::-webkit-scrollbar-thumb{background:var(--brand);border-radius:3px}
+
+/* Map with real coordinates */
+.map-wrap{background:none}
+.map-svg{width:100%;height:100%;filter:drop-shadow(0 10px 30px rgba(0,0,0,.4))}
+.map-continent{fill:#1f2937;stroke:#374151;stroke-width:1;opacity:.9}
+.map-node-s{fill:var(--brand);stroke:#fff;stroke-width:2;cursor:pointer;animation:pulseDot 2s infinite}
+.map-node-s:hover{fill:#fff;stroke:var(--brand)}
+.map-label{font-size:12px;fill:#fff;font-weight:600;text-anchor:middle;pointer-events:none;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.map-line{stroke:var(--brand);stroke-width:1;opacity:.35;stroke-dasharray:5 5;animation:dashMove 18s linear infinite}
+@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(255,106,0,.6)}70%{box-shadow:0 0 0 12px rgba(255,106,0,0)}100%{box-shadow:0 0 0 0 rgba(255,106,0,0)}}
+@keyframes dashMove{to{stroke-dashoffset:-100}}
+
+/* ByteDance IconPark style illustrations */
+.ip-illustration{width:96px;height:96px;margin:0 auto 16px;color:var(--brand)}
+.ip-illustration svg{width:100%;height:100%;stroke-width:1.4}
+.section-title .ip-illustration{width:64px;height:64px;margin-bottom:12px}
+
+/* 3D animation polish */
+.hero-mascot{transition:transform .15s ease-out;will-change:transform}
+.hero-mascot .m-head{animation:headBob 3s ease-in-out infinite}
+.hero-mascot .m-arm.left{animation:waveLeft 2.5s ease-in-out infinite}
+.hero-mascot .m-arm.right{animation:waveRight 2.5s ease-in-out infinite}
+@keyframes headBob{0%,100%{transform:translateZ(20px) translateY(0)}50%{transform:translateZ(20px) translateY(-4px)}}
+@keyframes waveLeft{0%,100%{transform:rotate(-25deg) translateZ(15deg)}50%{transform:rotate(-35deg) translateZ(15deg)}}
+@keyframes waveRight{0%,100%{transform:rotate(25deg) translateZ(15deg)}50%{transform:rotate(35deg) translateZ(15deg)}}
+.product-card{transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s}
+.illustration-3d{will-change:transform}
+
+/* User & admin sidebar shared */
+.admin-body{min-height:100vh}
+.admin-body > div > div:first-child a{display:block;padding:12px 22px;color:#b8c0cc;transition:.2s}
+.admin-body > div > div:first-child a:hover,.admin-body > div > div:first-child a.active{color:#fff;background:rgba(255,106,0,.12)}
+.admin-body > div > div:first-child a i{width:22px;display:inline-flex;vertical-align:middle}
+
+/* Admin icon display fix */
+.admin-sidebar a i{display:inline-flex;vertical-align:middle}
+.admin-sidebar a .iconfont{font-size:1.15em}
+
+/* Dark mode */
+html.dark{--bg:#0b0d12;--text:#e8e8e8;--text-2:#9ca3af;--white:#14161b;--dark:#f3f4f6;--dark-2:#111318;--shadow:0 4px 20px rgba(0,0,0,.35);--shadow-lg:0 12px 40px rgba(0,0,0,.5)}
+html.dark,html.dark body{background:var(--bg);color:var(--text)}
+html.dark .site-header{background:rgba(20,22,27,.95);border-bottom-color:rgba(255,255,255,.06)}
+html.dark .main-nav{background:#14161b}
+html.dark .main-nav a{color:var(--text-2);border-bottom-color:#252836}
+html.dark .hamburger{background:#252836;color:var(--text)}
+html.dark .bg-white,html.dark .product-card,html.dark .cert-card,html.dark .staff-card,html.dark .partner-item,html.dark .auth-box{background:#181a20;border-color:#252836}
+html.dark .product-card:hover,html.dark .cert-card:hover,html.dark .staff-card:hover{border-color:transparent}
+html.dark .section-title h2,html.dark .product-card h3,html.dark .cert-card h4,html.dark .staff-card h4,html.dark .auth-box h2{color:var(--dark)}
+html.dark .site-footer{background:#0a0c10}
+html.dark .site-footer .link-group a{color:#9ca3af}
+html.dark .float-btn{background:#181a20}
+html.dark .admin-body{background:#0d0f14}
+html.dark .admin-sidebar{background:linear-gradient(180deg,#0b0d12,#07080c)}
+html.dark .admin-topbar,html.dark .admin-card{background:#14161b;border-color:#252836}
+html.dark .admin-table th{background:#1a1c23;color:#9ca3af}
+html.dark .admin-table tr:hover{background:#1a1c23}
+html.dark .form-control{background:#0f1116;border-color:#2a2d38;color:var(--text)}
+html.dark .global-notify{background:#181a20;color:var(--text)}
+html.dark .modal{background:linear-gradient(180deg,#181a20,#111318);color:var(--text)}
+html.dark .modal-header{background:#181a20;border-bottom-color:#252836}
+
 /* Responsive admin */
 @media(max-width:992px){
+    .hamburger{display:inline-flex}
+    .header-actions .header-icon-btn{display:none}
+    .main-nav{position:absolute;top:100%;left:12px;right:12px;background:#fff;flex-direction:column;align-items:flex-start;padding:12px 18px;gap:0;border-radius:12px;border:1px solid #f0f0f0;box-shadow:var(--shadow-lg);transform:translateY(-20px);opacity:0;pointer-events:none;transition:.35s}
+    .main-nav.open{transform:translateY(6px);opacity:1;pointer-events:auto}
+    .main-nav a{width:100%;padding:12px 0;border-bottom:1px solid #f2f2f2;display:flex;align-items:center}
+    .main-nav a:last-child{border-bottom:none}
+    .main-nav a::after{display:none}
+    .admin-hamburger{display:inline-flex}
     .admin-sidebar{left:-260px;width:260px;border-radius:0 16px 16px 0}
     .admin-sidebar.open{left:0;box-shadow:10px 0 40px rgba(0,0,0,.3)}
     .admin-topbar{flex-wrap:wrap}
     .admin-actions{width:100%;justify-content:flex-end}
 }
+@media(max-width:768px){
+    .banner-inner{height:38px;font-size:13px}
+    .staff-scroll .staff-card{flex:0 0 180px}
+}
+

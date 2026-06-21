@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('adminSidebar');
     const overlay = document.getElementById('adminOverlay');
     if (toggle && sidebar) {
-        toggle.style.display = 'flex';
         toggle.addEventListener('click', function () {
             sidebar.classList.toggle('open');
             if (overlay) overlay.classList.toggle('active', sidebar.classList.contains('open'));
@@ -18,6 +17,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 overlay.classList.remove('active');
             });
         }
+    }
+
+    // Flash to toast
+    document.querySelectorAll('.flash-data').forEach(function(el) {
+        const type = el.dataset.type || 'info';
+        const msg = el.dataset.message || '';
+        if (typeof showToast === 'function') showToast(msg, type);
+        el.remove();
+    });
+
+    // Admin theme toggle
+    const adminThemeToggle = document.getElementById('adminThemeToggle');
+    if (adminThemeToggle) {
+        adminThemeToggle.addEventListener('click', function () {
+            document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem('yy_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            } catch(e){}
+        });
     }
 });
 </script>

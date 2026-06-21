@@ -15,9 +15,7 @@ $partners = $db->query('SELECT * FROM partners WHERE is_active=1 ORDER BY sort_o
 <section class="section bg-white">
     <div class="container">
         <div class="text-center">
-            <div class="illustration-3d" style="margin-bottom:24px">
-                <div class="cube"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
-            </div>
+            <div class="ip-illustration" style="width:120px;height:120px;margin-bottom:24px"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="14" r="7"/><circle cx="32" cy="14" r="7"/><path d="M4 44c0-10 6-16 12-16s12 6 12 16"/><path d="M20 44c0-10 6-16 12-16s12 6 12 16"/><path d="M24 28l-4-4 4-4"/><path d="M24 28l4-4-4-4"/></svg></div>
         </div>
         <div class="card-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
             <?php foreach ($partners as $p): ?>

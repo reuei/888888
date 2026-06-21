@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/../includes/config.php';
 require_login();
-$pageTitle = '用户中心';
+$pageTitle = __('user_center');
 require __DIR__ . '/../includes/header.php';
 $db = getDb();
 $user = current_user();
@@ -9,33 +9,41 @@ $ticketCount = $db->prepare('SELECT COUNT(*) FROM tickets WHERE user_id=:uid');
 $ticketCount->execute([':uid'=>$user['id']]);
 $feedbackCount = $db->prepare('SELECT COUNT(*) FROM feedback WHERE user_id=:uid');
 $feedbackCount->execute([':uid'=>$user['id']]);
+$unread = unread_notification_count($user['id']);
 ?>
 <section class="section bg-white">
     <div class="container">
         <div class="admin-body" style="min-height:auto;display:block">
             <div style="display:grid;grid-template-columns:240px 1fr;gap:24px">
-                <div style="background:var(--dark-2);border-radius:12px;padding:14px 0">
-                    <a href="<?php echo YUYUN_URL ?>/user/index.php" class="active"><i class="iconfont icon-gauge"></i> 概览</a>
-                    <a href="<?php echo YUYUN_URL ?>/user/tickets.php"><i class="iconfont icon-ticket"></i> 我的工单</a>
-                    <a href="<?php echo YUYUN_URL ?>/user/feedback.php"><i class="iconfont icon-edit"></i> 建议/举报</a>
-                    <a href="<?php echo YUYUN_URL ?>/user/profile.php"><i class="iconfont icon-user"></i> 个人资料</a>
+                <div style="background:var(--dark-2);border-radius:12px;padding:14px 0;height:fit-content">
+                    <a href="<?php echo YUYUN_URL ?>/user/index.php" class="active"><i class="iconfont icon-gauge"></i> <?php echo __('welcome') ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/notifications.php"><i class="iconfont icon-bell"></i> <?php echo __('notifications') ?><?php if ($unread > 0): ?><span style="background:var(--brand);color:#fff;border-radius:10px;padding:1px 7px;font-size:12px;margin-left:6px"><?php echo $unread ?></span><?php endif; ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/tickets.php"><i class="iconfont icon-ticket"></i> <?php echo __('my_tickets') ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/feedback.php"><i class="iconfont icon-edit"></i> <?php echo __('feedback') ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/profile.php"><i class="iconfont icon-user"></i> <?php echo __('profile') ?></a>
                 </div>
                 <div>
-                    <h2 style="margin-bottom:20px">欢迎，<?php echo e($user['nickname'] ?: $user['email']) ?></h2>
+                    <h2 style="margin-bottom:20px"><?php echo __('welcome') ?>，<?php echo e($user['nickname'] ?: $user['email']) ?></h2>
                     <div class="card-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
                         <div class="admin-card" style="text-align:center">
                             <div style="font-size:32px;font-weight:800;color:var(--brand)"><?php echo $ticketCount->fetchColumn() ?></div>
-                            <div style="color:var(--text-2)">我的工单</div>
+                            <div style="color:var(--text-2)"><?php echo __('my_tickets') ?></div>
                         </div>
                         <div class="admin-card" style="text-align:center">
                             <div style="font-size:32px;font-weight:800;color:var(--brand)"><?php echo $feedbackCount->fetchColumn() ?></div>
-                            <div style="color:var(--text-2)">建议/举报</div>
+                            <div style="color:var(--text-2)"><?php echo __('feedback') ?></div>
+                        </div>
+                        <div class="admin-card" style="text-align:center;position:relative">
+                            <div style="font-size:32px;font-weight:800;color:var(--brand)"><?php echo $unread ?></div>
+                            <div style="color:var(--text-2)"><?php echo __('notifications') ?></div>
+                            <?php if ($unread > 0): ?><a href="<?php echo YUYUN_URL ?>/user/notifications.php" style="position:absolute;inset:0"></a><?php endif; ?>
                         </div>
                     </div>
                     <div class="admin-card" style="margin-top:24px">
                         <h3 style="margin-bottom:12px">快捷入口</h3>
-                        <a href="<?php echo YUYUN_URL ?>/user/tickets.php" class="btn btn-primary" style="margin-right:10px">提交工单</a>
-                        <a href="<?php echo YUYUN_URL ?>/user/feedback.php" class="btn btn-outline">提交建议/举报</a>
+                        <a href="<?php echo YUYUN_URL ?>/user/tickets.php" class="btn btn-primary" style="margin-right:10px"><?php echo __('my_tickets') ?></a>
+                        <a href="<?php echo YUYUN_URL ?>/user/feedback.php" class="btn btn-outline"><?php echo __('feedback') ?></a>
+                        <a href="<?php echo YUYUN_URL ?>/user/notifications.php" class="btn btn-outline" style="margin-left:10px"><?php echo __('notifications') ?></a>
                     </div>
                 </div>
             </div>

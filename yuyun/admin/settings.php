@@ -2,12 +2,17 @@
 $pageTitle = '站点配置';
 require __DIR__ . '/../includes/admin_header.php';
 $db = getDb();
-$keys = ['site_name','site_slogan','site_short','sales_phone','company_name','company_short','company_address','company_phone','company_group','company_intro','company_map_url','site_email','international_url','site_icp','site_police','site_license','site_ev_license','footer_statement'];
-$imageKeys = ['site_logo','site_favicon','site_license_image','site_ev_license_image','site_security_image','site_trust_image'];
+$keys = ['site_name','site_slogan','site_short','sales_phone','company_name','company_short','company_address','company_phone','company_group','company_intro','company_map_url','site_email','site_email_from','international_url','site_icp','site_police','site_license','site_ev_license','footer_statement','banner_enabled','banner_text','banner_bg_color','banner_icon','staff_bg_color','email_verify_enabled'];
+$imageKeys = ['site_logo','site_favicon','site_license_image','site_ev_license_image','site_security_image','site_trust_image','staff_bg_image'];
+$bannerIcons = ['bell'=>'铃铛','megaphone'=>'喇叭','info'=>'信息','cloud'=>'云朵','certificate'=>'证书','shield'=>'盾牌','globe'=>'地球'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     foreach ($keys as $k) {
-        setSetting($k, trim($_POST[$k] ?? ''));
+        $val = trim($_POST[$k] ?? '');
+        if ($k === 'banner_enabled' || $k === 'email_verify_enabled') {
+            $val = isset($_POST[$k]) && $_POST[$k] === '1' ? '1' : '0';
+        }
+        setSetting($k, $val);
     }
     foreach ($imageKeys as $f) {
         if (!empty($_FILES[$f]['tmp_name'])) {
@@ -37,6 +42,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group"><label>LOGO 图片</label><input type="file" name="site_logo" class="form-control" accept="image/*"> <?php if (setting('site_logo')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_logo')) ?>" style="max-height:40px;margin-top:6px;border-radius:4px"></p><?php endif; ?></div>
             <div class="form-group"><label>浏览器图标</label><input type="file" name="site_favicon" class="form-control" accept="image/*,.ico"> <?php if (setting('site_favicon')): ?><p style="font-size:12px">当前：<?php echo e(setting('site_favicon')) ?></p><?php endif; ?></div>
         </div>
+
+        <h4 style="margin:24px 0 14px;color:var(--dark);font-size:16px">顶部公告横幅</h4>
+        <div class="form-row">
+            <div class="form-group"><label><input type="checkbox" name="banner_enabled" value="1" <?php echo setting('banner_enabled','1')==='1'?'checked':'' ?>> 启用顶部公告</label></div>
+            <div class="form-group"><label>公告背景颜色</label><input type="color" name="banner_bg_color" class="form-control" value="<?php echo e(setting('banner_bg_color','#0a0a0a')) ?>" style="height:40px"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>公告文字内容</label><input type="text" name="banner_text" class="form-control" value="<?php echo e(setting('banner_text')) ?>"></div>
+            <div class="form-group"><label>公告图标（图标库：iconfont）</label>
+                <select name="banner_icon" class="form-control">
+                    <?php foreach ($bannerIcons as $k=>$v): ?>
+                    <option value="<?php echo e($k) ?>" <?php echo setting('banner_icon','megaphone')===$k?'selected':'' ?>><?php echo e($v) ?>（icon-<?php echo e($k) ?>）</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
         <h4 style="margin:24px 0 14px;color:var(--dark);font-size:16px">资质证照图片（首页点击放大预览）</h4>
         <div class="form-row">
             <div class="form-group"><label>营业执照图片</label><input type="file" name="site_license_image" class="form-control" accept="image/*"> <?php if (setting('site_license_image')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_license_image')) ?>" style="max-height:60px;margin-top:6px;border-radius:4px;border:1px solid #eee"></p><?php endif; ?></div>
@@ -46,6 +68,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group"><label>等保认证图片</label><input type="file" name="site_security_image" class="form-control" accept="image/*"> <?php if (setting('site_security_image')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_security_image')) ?>" style="max-height:60px;margin-top:6px;border-radius:4px;border:1px solid #eee"></p><?php endif; ?></div>
             <div class="form-group"><label>可信云认证图片</label><input type="file" name="site_trust_image" class="form-control" accept="image/*"> <?php if (setting('site_trust_image')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_trust_image')) ?>" style="max-height:60px;margin-top:6px;border-radius:4px;border:1px solid #eee"></p><?php endif; ?></div>
         </div>
+
+        <h4 style="margin:24px 0 14px;color:var(--dark);font-size:16px">首页员工模块</h4>
+        <div class="form-row">
+            <div class="form-group"><label>背景图片</label><input type="file" name="staff_bg_image" class="form-control" accept="image/*"> <?php if (setting('staff_bg_image')): ?><p style="font-size:12px"><img src="<?php echo e(setting('staff_bg_image')) ?>" style="max-height:60px;margin-top:6px;border-radius:4px;border:1px solid #eee"></p><?php endif; ?></div>
+            <div class="form-group"><label>背景底色</label><input type="color" name="staff_bg_color" class="form-control" value="<?php echo e(setting('staff_bg_color','#f5f7fa')) ?>" style="height:40px"></div>
+        </div>
+
+        <h4 style="margin:24px 0 14px;color:var(--dark);font-size:16px">邮箱验证配置</h4>
+        <div class="form-row">
+            <div class="form-group"><label><input type="checkbox" name="email_verify_enabled" value="1" <?php echo setting('email_verify_enabled','0')==='1'?'checked':'' ?>> 启用注册邮箱验证</label>
+                <p style="font-size:12px;color:var(--text-2)">开启后，密码登录将要求邮箱已验证，未验证用户可使用验证码登录完成验证。</p>
+            </div>
+            <div class="form-group"><label>发件人名称 / 邮箱</label><input type="text" name="site_email_from" class="form-control" value="<?php echo e(setting('site_email_from')) ?>"></div>
+        </div>
+
         <div class="form-row">
             <div class="form-group"><label>销售电话</label><input type="text" name="sales_phone" class="form-control" value="<?php echo e(setting('sales_phone')) ?>"></div>
             <div class="form-group"><label>联系邮箱</label><input type="text" name="site_email" class="form-control" value="<?php echo e(setting('site_email')) ?>"></div>

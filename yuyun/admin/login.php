@@ -32,9 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <section class="auth-page" style="background:linear-gradient(135deg,#0f172a,#1e293b);min-height:100vh">
     <div class="auth-box" style="background:rgba(255,255,255,.98);backdrop-filter:blur(10px)">
         <div class="text-center">
-            <div class="illustration-3d" style="width:90px;height:90px;margin-bottom:12px">
-                <div class="cube" style="width:40px;height:40px;left:25px;top:25px"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
-            </div>
+            <div class="ip-illustration" style="width:90px;height:90px;margin-bottom:12px"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="22" r="8"/><path d="M8 44c0-10 7-16 16-16s16 6 16 16"/><path d="M24 6v8"/><path d="M20 10l4-4 4 4"/></svg></div>
         </div>
         <h2 style="text-align:center"><i class="iconfont icon-cloud" style="color:var(--brand)"></i> 语云后台</h2>
         <p style="text-align:center">管理员登录</p>

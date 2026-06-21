@@ -2,6 +2,7 @@
 require __DIR__ . '/includes/config.php';
 if (template_include('login.php')) exit;
 $pageTitle = '用户登录';
+ensure_user_columns();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     $email = trim($_POST['email'] ?? '');
@@ -11,6 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([':e' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user && $user['password'] && password_verify($password, $user['password'])) {
+        if (setting('email_verify_enabled','0') === '1' && empty($user['email_verified'])) {
+            flash('error', '邮箱尚未验证，请使用邮箱验证码登录完成验证');
+            redirect(YUYUN_URL . '/verify.php');
+        }
         $_SESSION['user_id'] = $user['id'];
         flash('success', '登录成功');
         redirect($user['is_admin'] ? YUYUN_URL . '/admin/index.php' : YUYUN_URL . '/user/index.php');
@@ -24,9 +29,7 @@ require __DIR__ . '/includes/header.php';
 <section class="auth-page">
     <div class="auth-box" style="position:relative;overflow:hidden">
         <div class="text-center">
-            <div class="illustration-3d" style="width:90px;height:90px;margin-bottom:12px">
-                <div class="cube" style="width:40px;height:40px;left:25px;top:25px"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
-            </div>
+            <div class="ip-illustration" style="width:90px;height:90px;margin-bottom:12px"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="16" r="9"/><path d="M6 44c0-12 9-18 18-18s18 6 18 18"/></svg></div>
         </div>
         <h2>欢迎回来</h2>
         <p>登录语云科技用户中心</p>

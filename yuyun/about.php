@@ -14,9 +14,7 @@ require __DIR__ . '/includes/header.php';
     <div class="container">
         <div class="card-grid" style="grid-template-columns:1fr 1.3fr;align-items:center">
             <div class="text-center">
-                <div class="illustration-3d">
-                    <div class="cube"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
-                </div>
+                <div class="ip-illustration"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="14" r="8"/><path d="M6 44c0-12 8-18 18-18s18 6 18 18"/><circle cx="40" cy="20" r="5"/><path d="M32 44c0-7 4-11 9-11s9 4 9 11"/></svg></div>
                 <h2 style="font-size:26px;margin-bottom:14px"><?php echo e(setting('company_name','语云科技（美国）有限公司')) ?></h2>
                 <p style="color:var(--text-2);line-height:1.8"><?php echo nl2br(e(setting('company_intro','语云科技专注于为全球企业与开发者提供安全、稳定、高效的云计算、网络加速与数字化解决方案。'))) ?></p>
             </div>

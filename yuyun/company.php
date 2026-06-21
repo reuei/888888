@@ -14,9 +14,7 @@ require __DIR__ . '/includes/header.php';
     <div class="container">
         <div style="max-width:900px;margin:0 auto">
             <div class="text-center">
-                <div class="illustration-3d" style="margin-bottom:24px">
-                    <div class="cube"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
-                </div>
+                <div class="ip-illustration" style="width:120px;height:120px;margin-bottom:24px"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="10" width="32" height="32" rx="2"/><path d="M8 18h32"/><path d="M18 18v24"/><path d="M30 18v24"/><path d="M14 10V6h20v4"/><circle cx="22" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="26" cy="12" r="1" fill="currentColor" stroke="none"/></svg></div>
             </div>
             <h2 style="font-size:26px;margin-bottom:16px">公司介绍</h2>
             <p style="color:var(--text-2);line-height:1.9;margin-bottom:28px">

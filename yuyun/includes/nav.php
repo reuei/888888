@@ -9,24 +9,33 @@
             <?php endif; ?>
         </a>
         <nav class="main-nav" id="mainNav">
-            <a href="<?php echo YUYUN_URL ?>/index.php" class="<?php echo $current==='index.php'?'active':'' ?>">首页</a>
-            <a href="<?php echo YUYUN_URL ?>/about.php" class="<?php echo $current==='about.php'?'active':'' ?>">关于我们</a>
-            <a href="<?php echo YUYUN_URL ?>/company.php" class="<?php echo $current==='company.php'?'active':'' ?>">公司简介</a>
-            <a href="<?php echo YUYUN_URL ?>/products.php" class="<?php echo $current==='products.php'?'active':'' ?>">产品介绍</a>
-            <a href="<?php echo YUYUN_URL ?>/partners.php" class="<?php echo $current==='partners.php'?'active':'' ?>">合作伙伴</a>
-            <a href="<?php echo YUYUN_URL ?>/contact.php" class="<?php echo $current==='contact.php'?'active':'' ?>">联系我们</a>
-            <a href="<?php echo e(setting('international_url','https://cloud.loveym.cloud')) ?>" target="_blank">国际版官网</a>
+            <a href="<?php echo YUYUN_URL ?>/index.php" class="<?php echo $current==='index.php'?'active':'' ?>"><i class="iconfont icon-home"></i> <?php echo __('home') ?></a>
+            <a href="<?php echo YUYUN_URL ?>/about.php" class="<?php echo $current==='about.php'?'active':'' ?>"><i class="iconfont icon-shield"></i> <?php echo __('about') ?></a>
+            <a href="<?php echo YUYUN_URL ?>/company.php" class="<?php echo $current==='company.php'?'active':'' ?>"><i class="iconfont icon-building"></i> <?php echo __('company') ?></a>
+            <a href="<?php echo YUYUN_URL ?>/products.php" class="<?php echo $current==='products.php'?'active':'' ?>"><i class="iconfont icon-cubes"></i> <?php echo __('products') ?></a>
+            <a href="<?php echo YUYUN_URL ?>/partners.php" class="<?php echo $current==='partners.php'?'active':'' ?>"><i class="iconfont icon-handshake"></i> <?php echo __('partners') ?></a>
+            <a href="<?php echo YUYUN_URL ?>/contact.php" class="<?php echo $current==='contact.php'?'active':'' ?>"><i class="iconfont icon-envelope"></i> <?php echo __('contact') ?></a>
+            <a href="<?php echo e(setting('international_url','https://cloud.loveym.cloud')) ?>" target="_blank"><i class="iconfont icon-globe"></i> <?php echo __('intl') ?></a>
             <?php if (is_logged_in()): ?>
-                <a href="<?php echo YUYUN_URL ?>/user/index.php">用户中心</a>
+                <a href="<?php echo YUYUN_URL ?>/user/index.php"><i class="iconfont icon-user"></i> <?php echo __('user_center') ?></a>
                 <?php if (is_admin()): ?>
-                    <a href="<?php echo YUYUN_URL ?>/admin/index.php">后台</a>
+                    <a href="<?php echo YUYUN_URL ?>/admin/index.php"><i class="iconfont icon-gauge"></i> <?php echo __('admin') ?></a>
                 <?php endif; ?>
-                <a href="<?php echo YUYUN_URL ?>/logout.php">退出</a>
+                <a href="<?php echo YUYUN_URL ?>/logout.php"><i class="iconfont icon-logout"></i> <?php echo __('logout') ?></a>
             <?php else: ?>
-                <a href="<?php echo YUYUN_URL ?>/login.php">登录</a>
+                <a href="<?php echo YUYUN_URL ?>/login.php"><i class="iconfont icon-lock"></i> <?php echo __('login') ?></a>
             <?php endif; ?>
         </nav>
-        <button class="hamburger" id="hamburger" aria-label="菜单"><span></span><span></span><span></span></button>
+        <div class="header-actions">
+            <button class="header-icon-btn" id="themeToggle" title="<?php echo __('theme_dark') ?> / <?php echo __('theme_light') ?>">
+                <i class="iconfont icon-sun theme-icon-light"></i>
+                <i class="iconfont icon-moon theme-icon-dark"></i>
+            </button>
+            <a href="<?php echo langUrl($currentLang === 'zh' ? 'en' : 'zh') ?>" class="header-icon-btn" title="<?php echo __('language') ?>">
+                <i class="iconfont icon-translate"></i>
+            </a>
+            <button class="hamburger" id="hamburger" aria-label="菜单"><i class="iconfont icon-menu"></i></button>
+        </div>
     </div>
 </header>
 <div class="header-spacer"></div>

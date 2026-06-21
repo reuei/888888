@@ -51,9 +51,18 @@ function seedDefaults(PDO $pdo, string $type): void {
         ['company_intro','语云科技（YuYun Technology）专注于为全球企业与开发者提供安全、稳定、高效的云计算、网络加速与数字化解决方案。'],
         ['company_map_url','https://map.baidu.com/search/北京市朝阳区科技园路88号'],
         ['site_email','noreply@loveym.cloud'],
+        ['site_email_from','语云科技 <noreply@loveym.cloud>'],
         ['international_url','https://cloud.loveym.cloud'],
         ['footer_statement','语云科技® 等是我们（语云科技美国有限公司）在中国的注册授权。'],
         ['template','default'],
+        ['banner_enabled','1'],
+        ['banner_text','欢迎来到语云科技官网！我们致力于为全球企业提供安全、稳定、高效的云计算与数字化服务。'],
+        ['banner_bg_color','#0a0a0a'],
+        ['banner_icon','bell'],
+        ['staff_bg_image',''],
+        ['staff_bg_color','#f5f7fa'],
+        ['email_verify_enabled','0'],
+        ['site_language','zh'],
     ];
     $insertSetting = $type === 'mysql'
         ? 'INSERT IGNORE INTO settings (config_key, config_value) VALUES (:k, :v)'

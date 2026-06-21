@@ -58,8 +58,8 @@ function get_flash(): array {
 function render_flash(): string {
     $html = '';
     foreach (get_flash() as $f) {
-        $class = $f['type'] === 'success' ? 'alert-success' : ($f['type'] === 'error' ? 'alert-error' : 'alert-info');
-        $html .= '<div class="alert ' . $class . '">' . e($f['message']) . '</div>';
+        $type = $f['type'] === 'success' ? 'success' : ($f['type'] === 'error' ? 'error' : 'info');
+        $html .= '<div class="flash-data" data-type="' . e($type) . '" data-message="' . e($f['message']) . '" style="display:none"></div>';
     }
     return $html;
 }
@@ -146,12 +146,74 @@ function slugify(string $s): string {
 }
 
 function template_include(string $page): bool {
-    $tpl = preg_replace('/[^a-z0-9_-]/i', '', setting('template', 'default'));
-    if ($tpl === 'default' || $tpl === '') return false;
-    $file = YUYUN_ROOT . '/templates/' . $tpl . '/' . $page;
-    if (is_file($file)) {
-        require $file;
-        return true;
+	$tpl = preg_replace('/[^a-z0-9_-]/i', '', setting('template', 'default'));
+	if ($tpl === 'default' || $tpl === '') return false;
+	$file = YUYUN_ROOT . '/templates/' . $tpl . '/' . $page;
+	if (is_file($file)) {
+		require $file;
+		return true;
+	}
+	return false;
+}
+
+function ensure_notifications_table(): void {
+    $db = getDb();
+    $type = defined('DB_TYPE') && DB_TYPE === 'mysql' ? 'mysql' : 'sqlite';
+    if ($type === 'mysql') {
+        $db->exec("CREATE TABLE IF NOT EXISTS notifications (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            content TEXT,
+            is_read TINYINT DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    } else {
+        $db->exec("CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            content TEXT,
+            is_read INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )");
     }
-    return false;
+}
+
+function ensure_user_columns(): void {
+    $db = getDb();
+    $type = defined('DB_TYPE') && DB_TYPE === 'mysql' ? 'mysql' : 'sqlite';
+    $cols = ['email_verified', 'verify_code', 'code_expire'];
+    foreach ($cols as $col) {
+        try {
+            $db->query("SELECT {$col} FROM users LIMIT 1");
+        } catch (PDOException $e) {
+            if ($type === 'mysql') {
+                $def = $col === 'email_verified' ? 'TINYINT DEFAULT 0' : ($col === 'code_expire' ? 'INT' : 'VARCHAR(20)');
+                $db->exec("ALTER TABLE users ADD COLUMN {$col} {$def}");
+            } else {
+                $def = $col === 'email_verified' ? 'INTEGER DEFAULT 0' : ($col === 'code_expire' ? 'INTEGER' : 'TEXT');
+                $db->exec("ALTER TABLE users ADD COLUMN {$col} {$def}");
+            }
+        }
+    }
+}
+
+function notify_user(int $user_id, string $title, string $content): void {
+    ensure_notifications_table();
+    $db = getDb();
+    $stmt = $db->prepare('INSERT INTO notifications (user_id, title, content, created_at) VALUES (:u, :t, :c, :d)');
+    $stmt->execute([':u' => $user_id, ':t' => $title, ':c' => $content, ':d' => date('Y-m-d H:i:s')]);
+}
+
+function unread_notification_count(int $user_id): int {
+    try {
+        ensure_notifications_table();
+        $db = getDb();
+        $stmt = $db->prepare('SELECT COUNT(*) FROM notifications WHERE user_id=:u AND is_read=0');
+        $stmt->execute([':u' => $user_id]);
+        return (int)$stmt->fetchColumn();
+    } catch (Throwable $e) {
+        return 0;
+    }
 }

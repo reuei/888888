@@ -32,9 +32,7 @@ require __DIR__ . '/includes/header.php';
         <div class="card-grid" style="grid-template-columns:1fr 1.2fr;align-items:start">
             <div>
                 <div class="text-center">
-                    <div class="illustration-3d" style="margin-bottom:16px">
-                        <div class="cube"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
-                    </div>
+                    <div class="ip-illustration" style="width:120px;height:120px;margin-bottom:16px"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="10" width="36" height="26" rx="2"/><path d="M6 14l18 14 18-14"/><circle cx="38" cy="16" r="2" fill="currentColor" stroke="none"/></svg></div>
                 </div>
                 <h2 style="font-size:24px;margin-bottom:16px">联系方式</h2>
                 <ul class="info-list">

@@ -1,11 +1,45 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Hamburger
+    // Hamburger menu
     const hamburger = document.getElementById('hamburger');
     const mainNav = document.getElementById('mainNav');
     if (hamburger && mainNav) {
         hamburger.addEventListener('click', function () {
             mainNav.classList.toggle('open');
+            const icon = hamburger.querySelector('.iconfont');
+            if (icon) icon.className = 'iconfont icon-' + (mainNav.classList.contains('open') ? 'close' : 'menu');
         });
+    }
+
+    // Theme toggle (front)
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function () {
+            document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem('yy_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            } catch (e) {}
+        });
+    }
+
+    // Banner close
+    const banner = document.getElementById('siteBanner');
+    const bannerClose = document.getElementById('bannerClose');
+    if (banner && bannerClose) {
+        bannerClose.addEventListener('click', function () {
+            banner.style.maxHeight = banner.offsetHeight + 'px';
+            requestAnimationFrame(function () {
+                banner.style.transition = 'max-height .35s ease, opacity .35s ease, padding .35s ease';
+                banner.style.maxHeight = '0px';
+                banner.style.opacity = '0';
+                banner.style.overflow = 'hidden';
+            });
+            try { localStorage.setItem('yy_banner_closed', '1'); } catch (e) {}
+        });
+        try {
+            if (localStorage.getItem('yy_banner_closed') === '1') {
+                banner.style.display = 'none';
+            }
+        } catch (e) {}
     }
 
     // Hero slider
@@ -14,12 +48,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (slides.length > 0) {
         let current = 0;
         const show = (idx) => {
-            slides.forEach((s, i) => {
-                s.classList.toggle('active', i === idx);
-            });
-            dots.forEach((d, i) => {
-                d.classList.toggle('active', i === idx);
-            });
+            slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
         };
         dots.forEach((d, i) => d.addEventListener('click', () => { current = i; show(current); }));
         setInterval(() => {
@@ -49,15 +79,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     document.querySelectorAll('.modal-close').forEach(btn => {
         btn.addEventListener('click', function () {
-            this.closest('.modal-overlay').classList.remove('active');
+            const overlay = this.closest('.modal-overlay');
+            if (overlay) overlay.classList.remove('active');
         });
     });
 
-    // Product detail modal injection
+    // Product detail modal
     window.openProductModal = function (title, detail) {
-        document.getElementById('modalProductTitle').textContent = title;
-        document.getElementById('modalProductBody').innerHTML = detail;
-        document.getElementById('productModal').classList.add('active');
+        const t = document.getElementById('modalProductTitle');
+        const b = document.getElementById('modalProductBody');
+        const m = document.getElementById('productModal');
+        if (t) t.textContent = title;
+        if (b) b.innerHTML = detail;
+        if (m) m.classList.add('active');
     };
 
     // Image modal
@@ -66,15 +100,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const img = document.getElementById('modalImageSrc');
         const tip = document.getElementById('modalImageTip');
         if (!src) {
-            tip.textContent = '暂无图片，请前往后台上传资质证照。';
-            img.style.display = 'none';
+            if (tip) tip.textContent = '暂无图片，请前往后台上传资质证照。';
+            if (img) img.style.display = 'none';
         } else {
-            img.src = src;
-            img.alt = title;
-            img.style.display = 'inline-block';
-            tip.textContent = '点击遮罩关闭';
+            if (img) { img.src = src; img.alt = title || ''; img.style.display = 'inline-block'; }
+            if (tip) tip.textContent = '点击遮罩关闭';
         }
-        document.getElementById('modalImageTitle').textContent = title || '证照预览';
+        const t = document.getElementById('modalImageTitle');
+        if (t) t.textContent = title || '证照预览';
         if (modal) modal.classList.add('active');
     };
     window.closeImageModal = function () {
@@ -82,17 +115,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (modal) modal.classList.remove('active');
     };
 
-    // 3D mascot mouse tracking
+    // 3D mascot mouse tracking (smooth)
     const mascot = document.getElementById('heroMascot');
     const mascotWrap = mascot ? mascot.querySelector('.mascot-wrap') : null;
     if (mascot && mascotWrap) {
+        let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
         document.addEventListener('mousemove', function (e) {
             const cx = window.innerWidth / 2;
             const cy = window.innerHeight / 2;
-            const dx = (e.clientX - cx) / cx;
-            const dy = (e.clientY - cy) / cy;
-            mascotWrap.style.transform = 'rotateY(' + (dx * 25) + 'deg) rotateX(' + (-dy * 20) + 'deg)';
+            targetX = ((e.clientX - cx) / cx) * 22;
+            targetY = -((e.clientY - cy) / cy) * 18;
         });
+        function animateMascot() {
+            currentX += (targetX - currentX) * 0.12;
+            currentY += (targetY - currentY) * 0.12;
+            mascotWrap.style.transform = 'rotateY(' + currentX.toFixed(2) + 'deg) rotateX(' + currentY.toFixed(2) + 'deg)';
+            requestAnimationFrame(animateMascot);
+        }
+        animateMascot();
     }
 
     // Sticky header shadow
@@ -112,23 +152,60 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1200);
     }
 
-    // Toast helper
+    // Global top notifier
+    window.showGlobalNotify = function (message, type) {
+        type = type || 'info';
+        const container = document.getElementById('globalNotifier');
+        if (!container) return;
+        const icons = { success: 'check-circle', error: 'alert-circle', info: 'info' };
+        const el = document.createElement('div');
+        el.className = 'global-notify ' + type;
+        el.innerHTML = '<i class="iconfont icon-' + icons[type] + ' icon"></i><span>' + message + '</span>';
+        container.appendChild(el);
+        setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 4100);
+    };
+
+    // Convert flash-data to global notifier / toast
+    document.querySelectorAll('.flash-data').forEach(function (el) {
+        const type = el.dataset.type || 'info';
+        const msg = el.dataset.message || '';
+        if (document.getElementById('toastContainer')) {
+            if (typeof showToast === 'function') showToast(msg, type);
+        } else {
+            showGlobalNotify(msg, type);
+        }
+        el.remove();
+    });
+
+    // Toast helper for admin / pages with toastContainer
     window.showToast = function (message, type) {
         type = type || 'info';
         const container = document.getElementById('toastContainer');
-        if (!container) return;
+        if (!container) {
+            showGlobalNotify(message, type);
+            return;
+        }
+        const icons = { success: 'check-circle', error: 'alert-circle', info: 'info' };
         const toast = document.createElement('div');
         toast.className = 'toast ' + type;
-        toast.innerHTML = '<i class="iconfont icon-' + (type === 'success' ? 'certificate' : type === 'error' ? 'close' : 'bell') + '"></i><span>' + message + '</span>';
+        toast.innerHTML = '<i class="iconfont icon-' + icons[type] + '"></i><span>' + message + '</span>';
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 4000);
     };
 
-    // Convert flash messages to toasts
-    const flashEl = document.querySelector('.flash-message');
-    if (flashEl) {
-        const type = flashEl.classList.contains('flash-error') ? 'error' : 'success';
-        showToast(flashEl.textContent.trim(), type);
-        flashEl.style.display = 'none';
-    }
+    // Form validation hints
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            const required = form.querySelectorAll('[required]');
+            for (let i = 0; i < required.length; i++) {
+                if (!required[i].value.trim()) {
+                    e.preventDefault();
+                    const label = required[i].closest('.form-group')?.querySelector('label')?.textContent || required[i].name || '字段';
+                    showGlobalNotify((label ? label + ' ' : '') + '不能为空', 'error');
+                    required[i].focus();
+                    return false;
+                }
+            }
+        });
+    });
 });

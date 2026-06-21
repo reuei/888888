@@ -33,18 +33,23 @@ require __DIR__ . '/includes/header.php';
 ?>
 <section class="auth-page">
     <div class="auth-box">
+        <div class="text-center">
+            <div class="illustration-3d" style="width:90px;height:90px;margin-bottom:12px">
+                <div class="cube" style="width:40px;height:40px;left:25px;top:25px"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
+            </div>
+        </div>
         <h2>创建账号</h2>
         <p>注册后即可提交工单与建议</p>
         <?php echo render_flash() ?>
         <form method="post">
             <input type="hidden" name="csrf_token" value="<?php echo csrf_token() ?>">
-            <div class="form-group"><label>邮箱</label><input type="email" name="email" class="form-control" required></div>
-            <div class="form-group"><label>昵称</label><input type="text" name="nickname" class="form-control" required></div>
+            <div class="form-group"><label><i class="iconfont icon-envelope"></i> 邮箱</label><input type="email" name="email" class="form-control" required></div>
+            <div class="form-group"><label><i class="iconfont icon-user"></i> 昵称</label><input type="text" name="nickname" class="form-control" required></div>
             <div class="form-row">
-                <div class="form-group"><label>密码</label><input type="password" name="password" class="form-control" required minlength="6"></div>
-                <div class="form-group"><label>确认密码</label><input type="password" name="password2" class="form-control" required minlength="6"></div>
+                <div class="form-group"><label><i class="iconfont icon-lock"></i> 密码</label><input type="password" name="password" class="form-control" required minlength="6"></div>
+                <div class="form-group"><label><i class="iconfont icon-lock"></i> 确认密码</label><input type="password" name="password2" class="form-control" required minlength="6"></div>
             </div>
-            <button type="submit" class="btn btn-primary btn-block" style="width:100%">注册</button>
+            <button type="submit" class="btn btn-primary btn-block" style="width:100%"><i class="iconfont icon-user"></i> 注册</button>
         </form>
         <p style="text-align:center;margin-top:18px;font-size:14px;color:var(--text-2)">
             已有账号？<a href="<?php echo YUYUN_URL ?>/login.php" style="color:var(--brand)">立即登录</a>

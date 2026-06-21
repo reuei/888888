@@ -22,7 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require __DIR__ . '/includes/header.php';
 ?>
 <section class="auth-page">
-    <div class="auth-box">
+    <div class="auth-box" style="position:relative;overflow:hidden">
+        <div class="text-center">
+            <div class="illustration-3d" style="width:90px;height:90px;margin-bottom:12px">
+                <div class="cube" style="width:40px;height:40px;left:25px;top:25px"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
+            </div>
+        </div>
         <h2>欢迎回来</h2>
         <p>登录语云科技用户中心</p>
         <div class="auth-tabs">
@@ -32,9 +37,9 @@ require __DIR__ . '/includes/header.php';
         <?php echo render_flash() ?>
         <form method="post">
             <input type="hidden" name="csrf_token" value="<?php echo csrf_token() ?>">
-            <div class="form-group"><label>邮箱</label><input type="email" name="email" class="form-control" required></div>
-            <div class="form-group"><label>密码</label><input type="password" name="password" class="form-control" required></div>
-            <button type="submit" class="btn btn-primary btn-block" style="width:100%">登录</button>
+            <div class="form-group"><label><i class="iconfont icon-envelope"></i> 邮箱</label><input type="email" name="email" class="form-control" required></div>
+            <div class="form-group"><label><i class="iconfont icon-lock"></i> 密码</label><input type="password" name="password" class="form-control" required></div>
+            <button type="submit" class="btn btn-primary btn-block" style="width:100%"><i class="iconfont icon-user"></i> 登录</button>
         </form>
         <p style="text-align:center;margin-top:18px;font-size:14px;color:var(--text-2)">
             还没有账号？<a href="<?php echo YUYUN_URL ?>/register.php" style="color:var(--brand)">立即注册</a>

@@ -3,15 +3,16 @@ $pageTitle = '站点配置';
 require __DIR__ . '/../includes/admin_header.php';
 $db = getDb();
 $keys = ['site_name','site_slogan','site_short','sales_phone','company_name','company_short','company_address','company_phone','company_group','company_intro','company_map_url','site_email','international_url','site_icp','site_police','site_license','site_ev_license','footer_statement'];
+$imageKeys = ['site_logo','site_favicon','site_license_image','site_ev_license_image','site_security_image','site_trust_image'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     foreach ($keys as $k) {
         setSetting($k, trim($_POST[$k] ?? ''));
     }
-    foreach (['site_logo','site_favicon'] as $f) {
+    foreach ($imageKeys as $f) {
         if (!empty($_FILES[$f]['tmp_name'])) {
             try {
-                $path = upload_file($_FILES[$f], '', ['image/jpeg','image/png','image/webp','image/gif','image/x-icon','image/vnd.microsoft.icon']);
+                $path = upload_file($_FILES[$f], 'cert', ['image/jpeg','image/png','image/webp','image/gif','image/x-icon','image/vnd.microsoft.icon']);
                 setSetting($f, $path);
             } catch (Exception $e) {
                 flash('error', $f . '上传失败：' . $e->getMessage());
@@ -33,8 +34,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="form-group"><label>网站标语</label><input type="text" name="site_slogan" class="form-control" value="<?php echo e(setting('site_slogan')) ?>"></div>
         <div class="form-row">
-            <div class="form-group"><label>LOGO 图片</label><input type="file" name="site_logo" class="form-control" accept="image/*"> <?php if (setting('site_logo')): ?><p style="font-size:12px">当前：<?php echo e(setting('site_logo')) ?></p><?php endif; ?></div>
+            <div class="form-group"><label>LOGO 图片</label><input type="file" name="site_logo" class="form-control" accept="image/*"> <?php if (setting('site_logo')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_logo')) ?>" style="max-height:40px;margin-top:6px;border-radius:4px"></p><?php endif; ?></div>
             <div class="form-group"><label>浏览器图标</label><input type="file" name="site_favicon" class="form-control" accept="image/*,.ico"> <?php if (setting('site_favicon')): ?><p style="font-size:12px">当前：<?php echo e(setting('site_favicon')) ?></p><?php endif; ?></div>
+        </div>
+        <h4 style="margin:24px 0 14px;color:var(--dark);font-size:16px">资质证照图片（首页点击放大预览）</h4>
+        <div class="form-row">
+            <div class="form-group"><label>营业执照图片</label><input type="file" name="site_license_image" class="form-control" accept="image/*"> <?php if (setting('site_license_image')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_license_image')) ?>" style="max-height:60px;margin-top:6px;border-radius:4px;border:1px solid #eee"></p><?php endif; ?></div>
+            <div class="form-group"><label>增值电信业务许可证图片</label><input type="file" name="site_ev_license_image" class="form-control" accept="image/*"> <?php if (setting('site_ev_license_image')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_ev_license_image')) ?>" style="max-height:60px;margin-top:6px;border-radius:4px;border:1px solid #eee"></p><?php endif; ?></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>等保认证图片</label><input type="file" name="site_security_image" class="form-control" accept="image/*"> <?php if (setting('site_security_image')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_security_image')) ?>" style="max-height:60px;margin-top:6px;border-radius:4px;border:1px solid #eee"></p><?php endif; ?></div>
+            <div class="form-group"><label>可信云认证图片</label><input type="file" name="site_trust_image" class="form-control" accept="image/*"> <?php if (setting('site_trust_image')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_trust_image')) ?>" style="max-height:60px;margin-top:6px;border-radius:4px;border:1px solid #eee"></p><?php endif; ?></div>
         </div>
         <div class="form-row">
             <div class="form-group"><label>销售电话</label><input type="text" name="sales_phone" class="form-control" value="<?php echo e(setting('sales_phone')) ?>"></div>

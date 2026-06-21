@@ -10,6 +10,7 @@ $products = $db->query('SELECT * FROM products WHERE is_active=1 ORDER BY sort_o
 $partners = $db->query('SELECT * FROM partners WHERE is_active=1 ORDER BY sort_order,id')->fetchAll(PDO::FETCH_ASSOC);
 $staff = $db->query('SELECT * FROM staff ORDER BY sort_order,id')->fetchAll(PDO::FETCH_ASSOC);
 $gradients = ['linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient(135deg,#1a2980,#26d0ce)','linear-gradient(135deg,#ff512f,#dd2476)'];
+$iconMap = ['fa-cube'=>'icon-cubes','fa-server'=>'icon-store','fa-shield-halved'=>'icon-shield','fa-network-wired'=>'icon-cloud','fa-globe'=>'icon-map','fa-database'=>'icon-store','fa-lock'=>'icon-lock'];
 ?>
 
 <!-- Hero -->
@@ -22,9 +23,9 @@ $gradients = ['linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient
                 <h1><?php echo e($slide['title']) ?></h1>
                 <p><?php echo e($slide['subtitle']) ?></p>
                 <?php if ($slide['link']): ?>
-                    <a href="<?php echo e($slide['link']) ?>" class="btn btn-primary">立即了解 <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="<?php echo e($slide['link']) ?>" class="btn btn-primary">立即了解 <i class="iconfont icon-arrow-right"></i></a>
                 <?php else: ?>
-                    <a href="<?php echo YUYUN_URL ?>/products.php" class="btn btn-primary">查看产品 <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="<?php echo YUYUN_URL ?>/products.php" class="btn btn-primary">查看产品 <i class="iconfont icon-arrow-right"></i></a>
                 <?php endif; ?>
             </div>
         </div>
@@ -37,6 +38,17 @@ $gradients = ['linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
+
+    <!-- 3D tracking mascot -->
+    <div class="hero-mascot" id="heroMascot">
+        <div class="mascot-wrap">
+            <div class="m-head"></div>
+            <div class="m-body"></div>
+            <div class="m-arm left"></div>
+            <div class="m-arm right"></div>
+            <div class="m-shadow"></div>
+        </div>
+    </div>
 </section>
 
 <!-- Products -->
@@ -47,12 +59,15 @@ $gradients = ['linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient
             <p>覆盖云计算、网络安全、企业服务的全栈解决方案</p>
         </div>
         <div class="card-grid">
-            <?php foreach ($products as $prod): ?>
+            <?php foreach ($products as $prod): 
+                $icon = $prod['icon'] ?: 'fa-cube';
+                $iconClass = $iconMap[$icon] ?? 'icon-cubes';
+            ?>
             <div class="product-card" onclick="openProductModal('<?php echo e($prod['name']) ?>','<?php echo e($prod['detail'] ?: $prod['summary']) ?>')">
-                <div class="icon"><i class="fa-solid <?php echo e($prod['icon'] ?: 'fa-cube') ?>"></i></div>
+                <div class="icon"><i class="iconfont <?php echo e($iconClass) ?> icon-2xl"></i></div>
                 <h3><?php echo e($prod['name']) ?></h3>
                 <p><?php echo e($prod['summary']) ?></p>
-                <span class="more">了解详情 <i class="fa-solid fa-chevron-right"></i></span>
+                <span class="more">了解详情 <i class="iconfont icon-chevron-right"></i></span>
             </div>
             <?php endforeach; ?>
         </div>
@@ -111,23 +126,27 @@ $gradients = ['linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient
             <p>合规经营，值得信赖</p>
         </div>
         <div class="cert-grid">
-            <div class="cert-card">
-                <i class="fa-solid fa-certificate"></i>
+            <?php $licenseImg = setting('site_license_image'); ?>
+            <div class="cert-card" onclick="openImageModal('<?php echo e($licenseImg ?: '') ?>','<?php echo e(setting('site_license','营业执照')) ?>')">
+                <?php if ($licenseImg): ?><img src="<?php echo e($licenseImg) ?>" alt="<?php echo e(setting('site_license','营业执照')) ?>"><?php else: ?><i class="iconfont icon-certificate icon-3xl"></i><?php endif; ?>
                 <h4><?php echo e(setting('site_license','营业执照')) ?></h4>
                 <p>工商行政管理机关核发</p>
             </div>
-            <div class="cert-card">
-                <i class="fa-solid fa-shield-halved"></i>
+            <?php $evImg = setting('site_ev_license_image'); ?>
+            <div class="cert-card" onclick="openImageModal('<?php echo e($evImg ?: '') ?>','<?php echo e(setting('site_ev_license','电子增值服务产业证')) ?>')">
+                <?php if ($evImg): ?><img src="<?php echo e($evImg) ?>" alt="<?php echo e(setting('site_ev_license','电子增值服务产业证')) ?>"><?php else: ?><i class="iconfont icon-shield icon-3xl"></i><?php endif; ?>
                 <h4><?php echo e(setting('site_ev_license','电子增值服务产业证')) ?></h4>
                 <p>电信与信息服务业务经营许可</p>
             </div>
-            <div class="cert-card">
-                <i class="fa-solid fa-lock"></i>
+            <?php $securityImg = setting('site_security_image'); ?>
+            <div class="cert-card" onclick="openImageModal('<?php echo e($securityImg ?: '') ?>','信息安全等级保护')">
+                <?php if ($securityImg): ?><img src="<?php echo e($securityImg) ?>" alt="信息安全等级保护"><?php else: ?><i class="iconfont icon-lock icon-3xl"></i><?php endif; ?>
                 <h4>信息安全等级保护</h4>
                 <p>三级等保认证</p>
             </div>
-            <div class="cert-card">
-                <i class="fa-solid fa-cloud"></i>
+            <?php $trustImg = setting('site_trust_image'); ?>
+            <div class="cert-card" onclick="openImageModal('<?php echo e($trustImg ?: '') ?>','可信云服务认证')">
+                <?php if ($trustImg): ?><img src="<?php echo e($trustImg) ?>" alt="可信云服务认证"><?php else: ?><i class="iconfont icon-cloud icon-3xl"></i><?php endif; ?>
                 <h4>可信云服务认证</h4>
                 <p>云计算服务能力评估</p>
             </div>
@@ -148,7 +167,7 @@ $gradients = ['linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient
                 <?php if ($s['avatar']): ?>
                     <img src="<?php echo e($s['avatar']) ?>" alt="<?php echo e($s['name']) ?>">
                 <?php else: ?>
-                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                    <div class="avatar"><i class="iconfont icon-user icon-2xl"></i></div>
                 <?php endif; ?>
                 <h4><?php echo e($s['name']) ?></h4>
                 <div class="pos"><?php echo e($s['position']) ?></div>
@@ -164,9 +183,40 @@ $gradients = ['linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient
     <div class="modal">
         <div class="modal-header">
             <h3 id="modalProductTitle">产品详情</h3>
-            <button class="modal-close">&times;</button>
+            <button class="modal-close"><i class="iconfont icon-close"></i></button>
         </div>
         <div class="modal-body" id="modalProductBody"></div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal-overlay" id="imageModal">
+    <div class="modal" style="max-width:720px">
+        <div class="modal-header">
+            <h3 id="modalImageTitle">证照预览</h3>
+            <button class="modal-close" onclick="closeImageModal()"><i class="iconfont icon-close"></i></button>
+        </div>
+        <div class="modal-body text-center">
+            <img id="modalImageSrc" src="" alt="" style="max-width:100%;border-radius:8px;box-shadow:var(--shadow)">
+            <p id="modalImageTip" style="margin-top:14px;color:var(--text-2)">点击遮罩关闭</p>
+        </div>
+    </div>
+</div>
+
+<!-- Welcome popup -->
+<div class="modal-overlay" id="welcomeModal">
+    <div class="modal" style="max-width:480px;text-align:center">
+        <div class="modal-body" style="padding:34px 28px">
+            <div class="illustration-3d" style="width:100px;height:100px;margin-bottom:16px">
+                <div class="cube" style="width:50px;height:50px;left:25px;top:25px"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
+            </div>
+            <h3 style="margin:0 0 10px;color:var(--dark)">欢迎来到 <?php echo e(setting('site_name','语云科技')) ?></h3>
+            <p style="color:var(--text-2);margin:0 0 22px"><?php echo e(setting('site_slogan','企业与开发者信赖的云计算与数字化服务伙伴')) ?></p>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+                <a href="tel:<?php echo e(setting('sales_phone','400-800-8451')) ?>" class="btn btn-primary"><i class="iconfont icon-phone"></i> 电话咨询</a>
+                <button class="btn btn-outline" onclick="document.getElementById('welcomeModal').classList.remove('active')">稍后再说</button>
+            </div>
+        </div>
     </div>
 </div>
 

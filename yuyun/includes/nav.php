@@ -5,7 +5,7 @@
             <?php if (setting('site_logo')): ?>
                 <img src="<?php echo e(setting('site_logo')) ?>" alt="<?php echo e(setting('site_name')) ?>">
             <?php else: ?>
-                <span class="logo-text"><i class="fa-solid fa-cloud"></i> <?php echo e(setting('site_short','语云')) ?></span>
+                <span class="logo-text"><i class="iconfont icon-cloud"></i> <?php echo e(setting('site_short','语云')) ?></span>
             <?php endif; ?>
         </a>
         <nav class="main-nav" id="mainNav">

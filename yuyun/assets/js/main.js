@@ -60,11 +60,75 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('productModal').classList.add('active');
     };
 
+    // Image modal
+    window.openImageModal = function (src, title) {
+        const modal = document.getElementById('imageModal');
+        const img = document.getElementById('modalImageSrc');
+        const tip = document.getElementById('modalImageTip');
+        if (!src) {
+            tip.textContent = '暂无图片，请前往后台上传资质证照。';
+            img.style.display = 'none';
+        } else {
+            img.src = src;
+            img.alt = title;
+            img.style.display = 'inline-block';
+            tip.textContent = '点击遮罩关闭';
+        }
+        document.getElementById('modalImageTitle').textContent = title || '证照预览';
+        if (modal) modal.classList.add('active');
+    };
+    window.closeImageModal = function () {
+        const modal = document.getElementById('imageModal');
+        if (modal) modal.classList.remove('active');
+    };
+
+    // 3D mascot mouse tracking
+    const mascot = document.getElementById('heroMascot');
+    const mascotWrap = mascot ? mascot.querySelector('.mascot-wrap') : null;
+    if (mascot && mascotWrap) {
+        document.addEventListener('mousemove', function (e) {
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 2;
+            const dx = (e.clientX - cx) / cx;
+            const dy = (e.clientY - cy) / cy;
+            mascotWrap.style.transform = 'rotateY(' + (dx * 25) + 'deg) rotateX(' + (-dy * 20) + 'deg)';
+        });
+    }
+
     // Sticky header shadow
     const header = document.getElementById('header');
     if (header) {
         window.addEventListener('scroll', () => {
             header.style.boxShadow = window.scrollY > 10 ? '0 2px 12px rgba(0,0,0,.08)' : 'none';
         });
+    }
+
+    // Welcome popup (once per session)
+    const welcome = document.getElementById('welcomeModal');
+    if (welcome && !sessionStorage.getItem('yy_welcome_shown')) {
+        setTimeout(() => {
+            welcome.classList.add('active');
+            sessionStorage.setItem('yy_welcome_shown', '1');
+        }, 1200);
+    }
+
+    // Toast helper
+    window.showToast = function (message, type) {
+        type = type || 'info';
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.innerHTML = '<i class="iconfont icon-' + (type === 'success' ? 'certificate' : type === 'error' ? 'close' : 'bell') + '"></i><span>' + message + '</span>';
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    };
+
+    // Convert flash messages to toasts
+    const flashEl = document.querySelector('.flash-message');
+    if (flashEl) {
+        const type = flashEl.classList.contains('flash-error') ? 'error' : 'success';
+        showToast(flashEl.textContent.trim(), type);
+        flashEl.style.display = 'none';
     }
 });

@@ -47,6 +47,11 @@ require __DIR__ . '/includes/header.php';
 ?>
 <section class="auth-page">
     <div class="auth-box">
+        <div class="text-center">
+            <div class="illustration-3d" style="width:90px;height:90px;margin-bottom:12px">
+                <div class="cube" style="width:40px;height:40px;left:25px;top:25px"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
+            </div>
+        </div>
         <h2>邮箱验证码登录</h2>
         <p>无需密码，验证码 5 分钟内有效</p>
         <div class="auth-tabs">
@@ -58,15 +63,15 @@ require __DIR__ . '/includes/header.php';
         <form method="post">
             <input type="hidden" name="csrf_token" value="<?php echo csrf_token() ?>">
             <input type="hidden" name="send" value="1">
-            <div class="form-group"><label>邮箱</label><input type="email" name="email" class="form-control" required></div>
-            <button type="submit" class="btn btn-primary btn-block" style="width:100%">发送验证码</button>
+            <div class="form-group"><label><i class="iconfont icon-envelope"></i> 邮箱</label><input type="email" name="email" class="form-control" required></div>
+            <button type="submit" class="btn btn-primary btn-block" style="width:100%"><i class="iconfont icon-send"></i> 发送验证码</button>
         </form>
         <?php else: ?>
         <form method="post">
             <input type="hidden" name="csrf_token" value="<?php echo csrf_token() ?>">
-            <div class="form-group"><label>邮箱</label><input type="email" name="email" class="form-control" value="<?php echo e($_GET['email'] ?? '') ?>" required></div>
-            <div class="form-group"><label>验证码</label><input type="text" name="code" class="form-control" required maxlength="6"></div>
-            <button type="submit" class="btn btn-primary btn-block" style="width:100%">登录</button>
+            <div class="form-group"><label><i class="iconfont icon-envelope"></i> 邮箱</label><input type="email" name="email" class="form-control" value="<?php echo e($_GET['email'] ?? '') ?>" required></div>
+            <div class="form-group"><label><i class="iconfont icon-certificate"></i> 验证码</label><input type="text" name="code" class="form-control" required maxlength="6"></div>
+            <button type="submit" class="btn btn-primary btn-block" style="width:100%"><i class="iconfont icon-user"></i> 登录</button>
         </form>
         <?php endif; ?>
     </div>

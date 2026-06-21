@@ -8,7 +8,7 @@
                     <?php if (setting('site_logo')): ?>
                         <img src="<?php echo e(setting('site_logo')) ?>" alt="<?php echo e(setting('site_name')) ?>">
                     <?php else: ?>
-                        <i class="fa-solid fa-cloud"></i> <?php echo e(setting('site_name','语云科技')) ?>
+                        <i class="iconfont icon-cloud"></i> <?php echo e(setting('site_name','语云科技')) ?>
                     <?php endif; ?>
                 </div>
                 <p class="sales-phone">销售电话：<a href="tel:<?php echo e(setting('sales_phone','400-800-8451')) ?>"><?php echo e(setting('sales_phone','400-800-8451')) ?></a></p>
@@ -50,9 +50,9 @@
 </footer>
 
 <div class="float-tools">
-    <a href="tel:<?php echo e(setting('sales_phone','400-800-8451')) ?>" class="float-btn" title="销售电话"><i class="fa-solid fa-phone"></i><span>电话</span></a>
-    <a href="<?php echo YUYUN_URL ?>/contact.php" class="float-btn" title="在线咨询"><i class="fa-solid fa-headset"></i><span>客服</span></a>
-    <button class="float-btn" id="backTop" title="返回顶部"><i class="fa-solid fa-arrow-up"></i><span>顶部</span></button>
+    <a href="tel:<?php echo e(setting('sales_phone','400-800-8451')) ?>" class="float-btn" title="销售电话"><i class="iconfont icon-phone"></i><span>电话</span></a>
+    <a href="<?php echo YUYUN_URL ?>/contact.php" class="float-btn" title="在线咨询"><i class="iconfont icon-headset"></i><span>客服</span></a>
+    <button class="float-btn" id="backTop" title="返回顶部"><i class="iconfont icon-arrow-up"></i><span>顶部</span></button>
 </div>
 
 <script src="<?php echo YUYUN_URL ?>/assets/js/main.js"></script>

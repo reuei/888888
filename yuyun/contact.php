@@ -29,21 +29,26 @@ require __DIR__ . '/includes/header.php';
 </section>
 <section class="section bg-white">
     <div class="container">
-        <div class="card-grid" style="grid-template-columns:1fr 1.2fr">
+        <div class="card-grid" style="grid-template-columns:1fr 1.2fr;align-items:start">
             <div>
+                <div class="text-center">
+                    <div class="illustration-3d" style="margin-bottom:16px">
+                        <div class="cube"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
+                    </div>
+                </div>
                 <h2 style="font-size:24px;margin-bottom:16px">联系方式</h2>
                 <ul class="info-list">
-                    <li><i class="fa-solid fa-building"></i> <?php echo e(setting('company_name')) ?></li>
-                    <li><i class="fa-solid fa-location-dot"></i> <?php echo e(setting('company_address')) ?></li>
-                    <li><i class="fa-solid fa-phone"></i> <?php echo e(setting('company_phone')) ?></li>
-                    <li><i class="fa-solid fa-envelope"></i> <?php echo e(setting('site_email')) ?></li>
-                    <li><i class="fa-solid fa-users"></i> <a href="<?php echo e(setting('company_group')) ?>" target="_blank">官方群聊</a></li>
+                    <li><i class="iconfont icon-building"></i> <?php echo e(setting('company_name')) ?></li>
+                    <li><i class="iconfont icon-map"></i> <?php echo e(setting('company_address')) ?></li>
+                    <li><i class="iconfont icon-phone"></i> <?php echo e(setting('company_phone')) ?></li>
+                    <li><i class="iconfont icon-envelope"></i> <?php echo e(setting('site_email')) ?></li>
+                    <li><i class="iconfont icon-users"></i> <a href="<?php echo e(setting('company_group')) ?>" target="_blank">官方群聊</a></li>
                 </ul>
                 <iframe class="map-embed" src="<?php echo e(setting('company_map_url','https://map.baidu.com/search/北京市')) ?>" loading="lazy"></iframe>
             </div>
             <div>
                 <div class="admin-card" style="box-shadow:var(--shadow)">
-                    <h3 style="margin-bottom:18px">在线留言</h3>
+                    <h3 style="margin-bottom:18px"><i class="iconfont icon-send"></i> 在线留言</h3>
                     <?php echo render_flash() ?>
                     <form method="post">
                         <input type="hidden" name="csrf_token" value="<?php echo csrf_token() ?>">
@@ -61,7 +66,7 @@ require __DIR__ . '/includes/header.php';
                             <label>留言内容</label>
                             <textarea name="message" class="form-control" required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">提交留言</button>
+                        <button type="submit" class="btn btn-primary"><i class="iconfont icon-send"></i> 提交留言</button>
                     </form>
                 </div>
             </div>

@@ -13,6 +13,11 @@ require __DIR__ . '/includes/header.php';
 <section class="section bg-white">
     <div class="container">
         <div style="max-width:900px;margin:0 auto">
+            <div class="text-center">
+                <div class="illustration-3d" style="margin-bottom:24px">
+                    <div class="cube"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
+                </div>
+            </div>
             <h2 style="font-size:26px;margin-bottom:16px">公司介绍</h2>
             <p style="color:var(--text-2);line-height:1.9;margin-bottom:28px">
                 <?php echo e(setting('company_name','语云科技（美国）有限公司')) ?> 是一家全球化云计算与数字化服务提供商。我们依托自建数据中心与全球合作伙伴网络，为企业客户提供云服务器、裸金属、CDN 加速、DDoS 防护、企业邮箱以及 IDC 财务系统授权等一站式解决方案。
@@ -31,17 +36,17 @@ require __DIR__ . '/includes/header.php';
             <h3 style="margin:24px 0 12px">核心优势</h3>
             <div class="card-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:20px">
                 <div class="product-card">
-                    <div class="icon"><i class="fa-solid fa-network-wired"></i></div>
+                    <div class="icon"><i class="iconfont icon-cloud icon-2xl"></i></div>
                     <h3>全球网络</h3>
                     <p>多地域、多运营商骨干网络，智能调度。</p>
                 </div>
                 <div class="product-card">
-                    <div class="icon"><i class="fa-solid fa-shield-virus"></i></div>
+                    <div class="icon"><i class="iconfont icon-shield icon-2xl"></i></div>
                     <h3>安全防护</h3>
                     <p>T 级 DDoS 清洗与 Web 应用防火墙。</p>
                 </div>
                 <div class="product-card">
-                    <div class="icon"><i class="fa-solid fa-headset"></i></div>
+                    <div class="icon"><i class="iconfont icon-headset icon-2xl"></i></div>
                     <h3>7×24 支持</h3>
                     <p>专业技术团队全天候响应。</p>
                 </div>

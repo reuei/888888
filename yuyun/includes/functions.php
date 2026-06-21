@@ -131,9 +131,14 @@ function upload_file(array $file, string $subdir = '', array $allowed = ['image/
 }
 
 function send_code(string $email, string $code): bool {
-    $subject = '【语云科技】您的登录验证码';
-    $message = "您好，\n\n您的验证码是：{$code}，5分钟内有效。\n\n如非本人操作，请忽略此邮件。";
-    $headers = "From: " . (setting('site_email', 'noreply@loveym.cloud')) . "\r\n";
+    $subject = '【' . e(setting('site_name', L('nav.home', '语云科技'))) . '】' . L('mail.code_subject', '您的登录验证码');
+    $message = str_replace('{code}', $code, L('mail.code_body', "您好，\n\n您的验证码是：{$code}，5分钟内有效。\n\n如非本人操作，请忽略此邮件。"));
+    $from = setting('smtp_from') ?: setting('site_email', 'noreply@loveym.cloud');
+    $fromName = setting('site_name', L('nav.home', '语云科技'));
+    if (setting('smtp_host') && setting('smtp_user') && setting('smtp_pass')) {
+        return smtp_send($email, $subject, $message, $from, $fromName);
+    }
+    $headers = "From: " . $fromName . " <" . $from . ">\r\n";
     return mail($email, $subject, $message, $headers);
 }
 

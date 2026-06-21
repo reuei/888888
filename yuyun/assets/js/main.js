@@ -2,9 +2,56 @@ document.addEventListener('DOMContentLoaded', function () {
     // Hamburger
     const hamburger = document.getElementById('hamburger');
     const mainNav = document.getElementById('mainNav');
+    const hamIcon = hamburger ? hamburger.querySelector('i') : null;
     if (hamburger && mainNav) {
         hamburger.addEventListener('click', function () {
             mainNav.classList.toggle('open');
+            if (hamIcon) {
+                hamIcon.className = mainNav.classList.contains('open') ? 'iconfont icon-close' : 'iconfont icon-menu';
+            }
+        });
+    }
+
+    // Theme toggle
+    const themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) {
+        const updateThemeIcon = function () {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            themeBtn.innerHTML = '<i class="iconfont icon-' + (isDark ? 'sun' : 'moon') + '"></i>';
+        };
+        updateThemeIcon();
+        themeBtn.addEventListener('click', function () {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const next = isDark ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('yy_theme', next);
+            updateThemeIcon();
+        });
+    }
+
+    // Language toggle
+    const langBtn = document.getElementById('langToggle');
+    if (langBtn) {
+        const currentLang = document.documentElement.lang || 'zh';
+        langBtn.innerHTML = '<i class="iconfont icon-translate"></i><span style="font-size:11px;margin-left:2px">' + (currentLang === 'zh' ? 'EN' : '中') + '</span>';
+        langBtn.addEventListener('click', function () {
+            const nextLang = currentLang === 'zh' ? 'en' : 'zh';
+            const url = new URL(window.location.href);
+            url.searchParams.set('lang', nextLang);
+            window.location.href = url.toString();
+        });
+    }
+
+    // Pause banner on hover
+    const bannerScroll = document.querySelector('.top-banner-scroll');
+    if (bannerScroll) {
+        bannerScroll.addEventListener('mouseenter', function () {
+            const span = this.querySelector('span');
+            if (span) span.style.animationPlayState = 'paused';
+        });
+        bannerScroll.addEventListener('mouseleave', function () {
+            const span = this.querySelector('span');
+            if (span) span.style.animationPlayState = 'running';
         });
     }
 

@@ -1,0 +1,534 @@
+/* ============================================
+   语云科技企业官网 - 响应式设计
+   ============================================ */
+
+/* 大屏幕优化 (>1400px) */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+}
+
+/* 平板横屏 (992px - 1199px) */
+@media (max-width: 1199px) {
+    :root {
+        --nav-height: 66px;
+    }
+
+    .section {
+        padding: 60px 0;
+    }
+
+    .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-6 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    .footer-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+    }
+
+    .hero-carousel {
+        height: 520px;
+    }
+}
+
+/* 平板竖屏 (768px - 991px) */
+@media (max-width: 991px) {
+    :root {
+        --nav-height: 64px;
+    }
+
+    .section {
+        padding: 50px 0;
+    }
+
+    .section-header {
+        margin-bottom: 40px;
+    }
+
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-6 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* 隐藏桌面导航菜单，显示汉堡按钮 */
+    .nav-menu {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+
+    .mobile-menu-overlay {
+        display: block;
+    }
+
+    .hero-carousel {
+        height: 450px;
+    }
+
+    .carousel-title {
+        font-size: 32px;
+    }
+
+    .carousel-subtitle {
+        font-size: 17px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .footer-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+    }
+
+    .side-toolbar {
+        right: 12px;
+    }
+
+    .toolbar-item {
+        width: 46px;
+        height: 46px;
+        font-size: 10px;
+    }
+
+    .stat-number {
+        font-size: 38px;
+    }
+
+    .page-hero {
+        padding: 120px 0 55px;
+    }
+}
+
+/* 手机 (<768px) */
+@media (max-width: 767px) {
+    :root {
+        --nav-height: 60px;
+    }
+
+    .container {
+        padding: 0 16px;
+    }
+
+    .section {
+        padding: 40px 0;
+    }
+
+    .section-header {
+        margin-bottom: 32px;
+    }
+
+    .section-title {
+        font-size: 26px;
+    }
+
+    .section-subtitle {
+        font-size: 15px;
+    }
+
+    /* 单列布局 */
+    .grid-2,
+    .grid-3,
+    .grid-4,
+    .grid-6 {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .stat-item {
+        padding: 20px 12px;
+    }
+
+    .stat-number {
+        font-size: 32px;
+    }
+
+    /* 导航栏 */
+    .navbar {
+        height: var(--nav-height);
+    }
+
+    .nav-logo img {
+        height: 32px;
+    }
+
+    .nav-logo-text {
+        font-size: 17px;
+    }
+
+    .nav-actions .btn {
+        padding: 7px 14px;
+        font-size: 13px;
+    }
+
+    /* 移动端菜单 */
+    .mobile-menu {
+        width: 280px;
+        right: -280px;
+    }
+
+    /* 轮播图 */
+    .hero-carousel {
+        height: 380px;
+        margin-top: var(--nav-height);
+    }
+
+    .carousel-title {
+        font-size: 26px;
+        margin-bottom: 14px;
+    }
+
+    .carousel-subtitle {
+        font-size: 15px;
+        margin-bottom: 24px;
+    }
+
+    .carousel-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+
+    .carousel-btn-prev { left: 12px; }
+    .carousel-btn-next { right: 12px; }
+
+    .carousel-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .carousel-actions .btn {
+        width: 100%;
+        max-width: 260px;
+    }
+
+    /* 产品卡片 */
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .product-card {
+        padding: 24px 20px;
+    }
+
+    .product-icon {
+        width: 54px;
+        height: 54px;
+        font-size: 24px;
+    }
+
+    .product-name {
+        font-size: 18px;
+    }
+
+    /* 地图区域 */
+    .map-section {
+        padding: 50px 0;
+    }
+
+    .map-tooltip-card {
+        min-width: 150px;
+        padding: 10px 14px;
+    }
+
+    /* 员工卡片 */
+    .staff-card {
+        width: 220px;
+        padding: 24px 18px;
+    }
+
+    .staff-avatar {
+        width: 72px;
+        height: 72px;
+    }
+
+    /* 资质证书 */
+    .certificates-grid {
+        gap: 16px;
+    }
+
+    .certificate-card {
+        width: 160px;
+        padding: 14px;
+    }
+
+    .certificate-img {
+        height: 110px;
+    }
+
+    /* 页脚 */
+    .footer {
+        padding-top: 40px;
+    }
+
+    .footer-main {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding-bottom: 32px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-beian {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .footer-beian a {
+        margin-left: 0;
+    }
+
+    .footer-phone {
+        font-size: 22px;
+    }
+
+    /* 右侧工具栏 - 移动端隐藏或缩小 */
+    .side-toolbar {
+        right: 8px;
+        gap: 4px;
+    }
+
+    .toolbar-item {
+        width: 42px;
+        height: 42px;
+        font-size: 9px;
+    }
+
+    .toolbar-item i {
+        font-size: 16px;
+    }
+
+    .toolbar-tooltip {
+        display: none;
+    }
+
+    /* 弹窗 */
+    .modal {
+        max-width: calc(100% - 32px);
+        margin: 0 16px;
+        border-radius: var(--radius-lg);
+    }
+
+    .modal-header {
+        padding: 20px 20px 0;
+    }
+
+    .modal-body {
+        padding: 16px 20px 20px;
+    }
+
+    .modal-footer {
+        padding: 0 20px 20px;
+        flex-direction: column-reverse;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
+    }
+
+    /* Toast通知 */
+    .toast-container {
+        right: 12px;
+        left: 12px;
+    }
+
+    .toast {
+        min-width: unset;
+        max-width: unset;
+    }
+
+    /* 页面Hero */
+    .page-hero {
+        padding: 100px 0 45px;
+    }
+
+    .page-hero h1 {
+        font-size: 26px;
+    }
+
+    .page-hero p {
+        font-size: 15px;
+    }
+
+    /* 按钮 */
+    .btn-lg {
+        padding: 13px 28px;
+        font-size: 15px;
+    }
+
+    /* 表单 */
+    .form-input,
+    .form-select,
+    .form-textarea {
+        padding: 11px 14px;
+        font-size: 15px;
+    }
+}
+
+/* 超小手机 (<400px) */
+@media (max-width: 399px) {
+    .container {
+        padding: 0 12px;
+    }
+
+    .hero-carousel {
+        height: 340px;
+    }
+
+    .carousel-title {
+        font-size: 22px;
+    }
+
+    .carousel-subtitle {
+        font-size: 14px;
+    }
+
+    .staff-card {
+        width: 190px;
+    }
+
+    .certificate-card {
+        width: 140px;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .navbar,
+    .side-toolbar,
+    .footer,
+    .hero-carousel,
+    .modal-overlay,
+    .toast-container {
+        display: none !important;
+    }
+
+    body {
+        color: #000;
+        background: #fff;
+    }
+
+    .section {
+        padding: 20px 0;
+    }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    .partners-track {
+        animation: none;
+    }
+
+    [data-animate] {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    :root {
+        --gray-200: #888;
+        --gray-300: #666;
+        --gray-400: #444;
+        --gray-500: #333;
+    }
+
+    .btn-primary,
+    .btn-accent {
+        border: 2px solid currentColor;
+    }
+}
+
+/* 触控设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .toolbar-item:hover {
+        transform: none;
+    }
+
+    .product-card:hover {
+        transform: none;
+    }
+
+    .partner-logo:hover {
+        transform: none;
+    }
+
+    .nav-link:hover {
+        background: transparent;
+    }
+
+    /* 增大触控目标 */
+    .nav-link {
+        padding: 10px 20px;
+    }
+
+    .toolbar-item {
+        width: 52px;
+        height: 52px;
+    }
+}
+
+/* 横屏手机 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero-carousel {
+        height: 300px;
+    }
+
+    .carousel-title {
+        font-size: 22px;
+    }
+
+    .carousel-subtitle {
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+
+    .page-hero {
+        padding: 80px 0 30px;
+    }
+}

@@ -1,0 +1,37 @@
+# URL重写规则
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 防止直接访问敏感文件
+    RewriteRule ^data/ - [F,L]
+    RewriteRule ^core/ - [F,L]
+    RewriteRule ^config\.php$ - [F,L]
+
+    # 如果请求的文件或目录存在，直接访问
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # 默认处理
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# 防止目录列表
+Options -Indexes
+
+# 默认字符集
+AddDefaultCharset UTF-8
+
+# 安全头
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# PHP设置（如果允许）
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>

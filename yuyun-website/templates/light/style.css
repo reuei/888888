@@ -1,0 +1,376 @@
+/* Light Theme - Minimalist Clean */
+:root {
+    /* 主色调 - 柔和蓝 */
+    --primary: #2563EB;
+    --primary-dark: #1D4ED8;
+    --primary-light: #3B82F6;
+    --accent: #059669;
+    --accent-hover: #047857;
+
+    /* 背景色 - 纯白系 */
+    --bg-body: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-section: #FAFBFC;
+
+    /* 文字色 */
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+
+    /* 导航栏 */
+    --navbar-bg: rgba(255, 255, 255, 0.92);
+    --navbar-text: #111827;
+    --navbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+    /* 按钮 */
+    --btn-primary-bg: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    --btn-primary-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);
+    --btn-radius: 20px;
+
+    /* 卡片 - 极简白色 + 大圆角 */
+    --card-bg: #FFFFFF;
+    --card-border: 1px solid #F3F4F6;
+    --card-shadow: 0 1px 8px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.06);
+    --card-radius: 20px;
+    --card-hover-shadow: 0 4px 24px rgba(37, 99, 235, 0.08), 0 0 1px rgba(0, 0, 0, 0.04);
+
+    /* 页脚 */
+    --footer-bg: #F9FAFB;
+    --footer-text: #9CA3AF;
+
+    /* 表单 */
+    --input-bg: #FFFFFF;
+    --input-border: #E5E7EB;
+    --input-focus-border: #2563EB;
+    --input-focus-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+
+    /* Hero区域 - 纯净渐变 */
+    --hero-bg: linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%);
+
+    /* 链接 */
+    --link-color: #2563EB;
+    --link-hover: #1D4ED8;
+
+    /* 分割线 - 极细 */
+    --divider: #F3F4F6;
+}
+
+/* 全局纯白背景 */
+body,
+html {
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 导航栏 - 极简透明 */
+.navbar,
+.header,
+nav {
+    background: var(--navbar-bg) !important;
+    color: var(--navbar-text) !important;
+    box-shadow: var(--navbar-shadow) !important;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.navbar a,
+.navbar .nav-link,
+.header a,
+nav a {
+    color: var(--text-secondary) !important;
+    font-weight: 400 !important;
+    transition: color 0.25s ease !important;
+}
+
+.navbar a:hover,
+.navbar .nav-link:hover,
+.header a:hover,
+nav a:hover {
+    color: var(--primary) !important;
+}
+
+/* 按钮 - 大圆角 + 柔和阴影 */
+.btn-primary,
+button[type="submit"],
+.btn-submit {
+    background: var(--btn-primary-bg) !important;
+    box-shadow: var(--btn-primary-shadow) !important;
+    border: none !important;
+    border-radius: var(--btn-radius) !important;
+    padding: 12px 32px !important;
+    font-weight: 500 !important;
+    transition: all 0.35s ease !important;
+}
+
+.btn-primary:hover,
+button[type="submit"]:hover,
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(37, 99, 235, 0.22) !important;
+}
+
+/* 卡片 - 大圆角 + 极细边框 + 轻柔阴影 */
+.card,
+.product-card,
+.service-card,
+section > div[class*="card"] {
+    background: var(--card-bg) !important;
+    border: var(--card-border) !important;
+    border-radius: var(--card-radius) !important;
+    box-shadow: var(--card-shadow) !important;
+    color: var(--text-primary) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    overflow: hidden !important;
+}
+
+.card:hover,
+.product-card:hover,
+.service-card:hover {
+    box-shadow: var(--card-hover-shadow) !important;
+    transform: translateY(-6px);
+    border-color: rgba(37, 99, 235, 0.15) !important;
+}
+
+.card h3,
+.card h2,
+.card h4,
+.product-card h3,
+.service-card h3 {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+}
+
+.card p,
+.product-card p,
+.service-card p {
+    color: var(--text-secondary) !important;
+    line-height: 1.7 !important;
+}
+
+/* 表单输入框 - 简洁样式 */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+    background: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--btn-radius) !important;
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+    transition: all 0.25s ease !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--input-focus-border) !important;
+    box-shadow: var(--input-focus-shadow) !important;
+    outline: none !important;
+}
+
+/* 页脚 - 浅灰干净 */
+footer,
+.footer {
+    background: var(--footer-bg) !important;
+    color: var(--footer-text) !important;
+    border-top: 1px solid var(--divider) !important;
+    padding: 60px 0 30px !important;
+}
+
+footer a,
+.footer a {
+    color: var(--text-secondary) !important;
+    transition: color 0.2s ease !important;
+}
+
+footer a:hover,
+.footer a:hover {
+    color: var(--primary) !important;
+}
+
+/* Section - 更多留白 */
+section {
+    background: transparent !important;
+    padding: 80px 0 !important;
+}
+
+section:nth-child(even),
+.section-alt {
+    background: var(--bg-section) !important;
+}
+
+/* 文字排版 - 更舒适阅读 */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary) !important;
+    letter-spacing: -0.01em !important;
+}
+
+p, span, li {
+    color: var(--text-secondary) !important;
+    line-height: 1.75 !important;
+}
+
+/* 链接颜色 */
+a:not(.btn):not(.navbar a):not(nav a):not(footer a):not(.footer a) {
+    color: var(--link-color) !important;
+    text-decoration: none !important;
+    border-bottom: 1px solid transparent !important;
+    transition: border-color 0.2s ease !important;
+}
+
+a:not(.btn):not(.navbar a):not(nav a):not(footer a):not(.footer a):hover {
+    color: var(--link-hover) !important;
+    border-bottom-color: var(--link-hover) !important;
+}
+
+/* 表格 - 简洁线条 */
+table {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border: 1px solid var(--divider) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+}
+
+table th {
+    background: var(--bg-section) !important;
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    border-bottom: 1px solid var(--divider) !important;
+    padding: 16px 20px !important;
+}
+
+table td {
+    border-bottom: 1px solid var(--divider) !important;
+    color: var(--text-secondary) !important;
+    padding: 14px 20px !important;
+}
+
+table tr:last-child td {
+    border-bottom: none !important;
+}
+
+table tr:hover {
+    background: rgba(37, 99, 235, 0.02) !important;
+}
+
+/* 代码块 - 清爽浅色 */
+code {
+    background: #F3F4F6 !important;
+    color: #DC2626 !important;
+    padding: 2px 8px !important;
+    border-radius: 6px !important;
+    font-size: 0.9em !important;
+}
+
+pre {
+    background: #F9FAFB !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--divider) !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    overflow-x: auto !important;
+}
+
+/* 标签/徽章 - 绿色强调 */
+.badge,
+.tag,
+.label {
+    background: rgba(5, 150, 105, 0.08) !important;
+    color: var(--accent) !important;
+    border: 1px solid rgba(5, 150, 105, 0.15) !important;
+    border-radius: 20px !important;
+    padding: 4px 14px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+
+/* 分割线 - 极细淡雅 */
+hr,
+.divider {
+    border: none !important;
+    height: 1px !important;
+    background: var(--divider) !important;
+    margin: 40px auto !important;
+}
+
+/* Modal 弹窗 - 圆润简洁 */
+.modal,
+.modal-content,
+.dialog {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 24px !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.08) !important;
+}
+
+.modal-header,
+.dialog-header {
+    border-bottom: 1px solid var(--divider) !important;
+    padding: 24px 28px 20px !important;
+}
+
+.modal-footer,
+.dialog-footer {
+    border-top: 1px solid var(--divider) !important;
+    padding: 16px 28px 24px !important;
+}
+
+/* 下拉菜单 - 干净清爽 */
+.dropdown-menu,
+.select-dropdown {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.06) !important;
+    padding: 8px !important;
+}
+
+.dropdown-item,
+.dropdown-menu a {
+    color: var(--text-secondary) !important;
+    border-radius: 10px !important;
+    padding: 10px 16px !important;
+}
+
+.dropdown-item:hover,
+.dropdown-menu a:hover {
+    background: rgba(37, 99, 235, 0.05) !important;
+    color: var(--primary) !important;
+}
+
+/* 图片 - 轻柔效果 */
+img {
+    border-radius: 16px !important;
+    transition: transform 0.4s ease !important;
+}
+
+img:hover {
+    transform: scale(1.02);
+}
+
+/* 强调按钮 - 绿色 */
+.btn-accent,
+.btn-success {
+    background: var(--accent) !important;
+    border: none !important;
+    border-radius: var(--btn-radius) !important;
+    color: #FFFFFF !important;
+}
+
+.btn-accent:hover,
+.btn-success:hover {
+    background: var(--accent-hover) !important;
+}

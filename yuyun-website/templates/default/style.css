@@ -1,0 +1,99 @@
+/* Default Theme - Tencent Cloud Blue */
+:root {
+    --primary: #0066CC;
+    --primary-dark: #004999;
+    --primary-light: #00A8E8;
+    --accent: #FF6B00;
+    --accent-hover: #E55A00;
+
+    /* 背景色 */
+    --bg-body: #F5F7FA;
+    --bg-card: #FFFFFF;
+    --bg-section: #F0F4F8;
+
+    /* 文字色 */
+    --text-primary: #1A1A2E;
+    --text-secondary: #5A5A72;
+    --text-muted: #8E8EA0;
+
+    /* 导航栏 */
+    --navbar-bg: rgba(255, 255, 255, 0.95);
+    --navbar-text: #1A1A2E;
+    --navbar-shadow: 0 2px 12px rgba(0, 102, 204, 0.08);
+
+    /* 按钮 */
+    --btn-primary-bg: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
+    --btn-primary-shadow: 0 4px 14px rgba(0, 102, 204, 0.35);
+    --btn-radius: 8px;
+
+    /* 卡片 */
+    --card-bg: #FFFFFF;
+    --card-border: 1px solid #E8ECF1;
+    --card-shadow: 0 4px 20px rgba(0, 51, 128, 0.08), 0 2px 8px rgba(0, 102, 204, 0.04);
+    --card-radius: 12px;
+    --card-hover-shadow: 0 8px 30px rgba(0, 51, 128, 0.15), 0 4px 12px rgba(0, 102, 204, 0.08);
+
+    /* 页脚 */
+    --footer-bg: #1A1A2E;
+    --footer-text: #C8C9D8;
+
+    /* 表单 */
+    --input-bg: #FFFFFF;
+    --input-border: #D1D5DB;
+    --input-focus-border: #0066CC;
+    --input-focus-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+
+    /* Hero区域 */
+    --hero-bg: linear-gradient(135deg, #0066CC 0%, #004999 50%, #003366 100%);
+
+    /* 链接 */
+    --link-color: #0066CC;
+    --link-hover: #0052A3;
+
+    /* 分割线 */
+    --divider: #E5E7EB;
+}
+
+/* 按钮渐变效果 */
+.btn-primary,
+button[type="submit"],
+.btn-submit {
+    background: var(--btn-primary-bg) !important;
+    box-shadow: var(--btn-primary-shadow) !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary:hover,
+button[type="submit"]:hover,
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.45) !important;
+}
+
+/* 卡片悬浮效果 */
+.card,
+.product-card,
+.service-card {
+    background: var(--card-bg) !important;
+    border: var(--card-border) !important;
+    border-radius: var(--card-radius) !important;
+    box-shadow: var(--card-shadow) !important;
+    transition: all 0.3s ease !important;
+}
+
+.card:hover,
+.product-card:hover,
+.service-card:hover {
+    box-shadow: var(--card-hover-shadow) !important;
+    transform: translateY(-4px);
+}
+
+/* 导航栏样式 */
+.navbar,
+.header,
+nav {
+    background: var(--navbar-bg) !important;
+    box-shadow: var(--navbar-shadow) !important;
+    backdrop-filter: blur(10px);
+}

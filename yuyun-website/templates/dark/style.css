@@ -1,0 +1,339 @@
+/* Dark Theme - Cloudflare Style */
+:root {
+    /* 主色调 - Cloudflare橙 */
+    --primary: #F58529;
+    --primary-dark: #E07418;
+    --primary-light: #FDAA2D;
+    --accent: #00D2FF;
+    --accent-hover: #00B8E0;
+
+    /* 背景色 - 深色系 */
+    --bg-body: #0D1117;
+    --bg-card: #161B22;
+    --bg-section: #1C2128;
+
+    /* 文字色 */
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+
+    /* 导航栏 - 半透明深色 */
+    --navbar-bg: rgba(13, 17, 23, 0.85);
+    --navbar-text: #E6EDF3;
+    --navbar-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+
+    /* 按钮 */
+    --btn-primary-bg: linear-gradient(135deg, #F58529 0%, #E07418 100%);
+    --btn-primary-shadow: 0 4px 14px rgba(245, 133, 41, 0.35);
+    --btn-radius: 8px;
+
+    /* 卡片 - 深色背景 + 边框 */
+    --card-bg: #161B22;
+    --card-border: 1px solid #30363D;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(48, 54, 61, 0.5);
+    --card-radius: 12px;
+    --card-hover-shadow: 0 8px 30px rgba(245, 133, 41, 0.15), 0 0 0 1px rgba(245, 133, 41, 0.3);
+
+    /* 页脚 - 更深色 */
+    --footer-bg: #010409;
+    --footer-text: #6E7681;
+
+    /* 表单 - 深色输入框 */
+    --input-bg: #0D1117;
+    --input-border: #30363D;
+    --input-focus-border: #F58529;
+    --input-focus-shadow: 0 0 0 3px rgba(245, 133, 41, 0.15);
+    --input-text: #E6EDF3;
+    --input-placeholder: #6E7681;
+
+    /* Hero区域 - 深色渐变 */
+    --hero-bg: linear-gradient(135deg, #0D1117 0%, #161B22 50%, #1C2128 100%);
+
+    /* 链接 */
+    --link-color: #F58529;
+    --link-hover: #FDAA2D;
+
+    /* 分割线 */
+    --divider: #21262D;
+
+    /* 代码/标签背景 */
+    --code-bg: #161B22;
+    --tag-bg: rgba(245, 133, 41, 0.12);
+    --tag-color: #F58529;
+
+    /* 滚动条 */
+    --scrollbar-track: #0D1117;
+    --scrollbar-thumb: #30363D;
+}
+
+/* 全局深色背景 */
+body,
+html {
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 导航栏半透明深色效果 */
+.navbar,
+.header,
+nav {
+    background: var(--navbar-bg) !important;
+    color: var(--navbar-text) !important;
+    box-shadow: var(--navbar-shadow) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid rgba(48, 54, 61, 0.6) !important;
+}
+
+.navbar a,
+.navbar .nav-link,
+.header a,
+nav a {
+    color: var(--text-secondary) !important;
+    transition: color 0.2s ease !important;
+}
+
+.navbar a:hover,
+.navbar .nav-link:hover,
+.header a:hover,
+nav a:hover {
+    color: var(--primary) !important;
+}
+
+/* 按钮 - Cloudflare橙渐变 */
+.btn-primary,
+button[type="submit"],
+.btn-submit {
+    background: var(--btn-primary-bg) !important;
+    box-shadow: var(--btn-primary-shadow) !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary:hover,
+button[type="submit"]:hover,
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(245, 133, 41, 0.5) !important;
+}
+
+/* 卡片深色样式 */
+.card,
+.product-card,
+.service-card,
+section > div[class*="card"] {
+    background: var(--card-bg) !important;
+    border: var(--card-border) !important;
+    border-radius: var(--card-radius) !important;
+    box-shadow: var(--card-shadow) !important;
+    color: var(--text-primary) !important;
+    transition: all 0.3s ease !important;
+}
+
+.card:hover,
+.product-card:hover,
+.service-card:hover {
+    box-shadow: var(--card-hover-shadow) !important;
+    transform: translateY(-4px);
+    border-color: rgba(245, 133, 41, 0.3) !important;
+}
+
+.card h3,
+.card h2,
+.card h4,
+.product-card h3,
+.service-card h3 {
+    color: var(--text-primary) !important;
+}
+
+.card p,
+.product-card p,
+.service-card p {
+    color: var(--text-secondary) !important;
+}
+
+/* 表单输入框深色适配 */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+    background: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--input-text) !important;
+    border-radius: var(--btn-radius) !important;
+    transition: all 0.2s ease !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--input-placeholder) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--input-focus-border) !important;
+    box-shadow: var(--input-focus-shadow) !important;
+    outline: none !important;
+}
+
+/* 页脚深色 */
+footer,
+.footer {
+    background: var(--footer-bg) !important;
+    color: var(--footer-text) !important;
+    border-top: 1px solid #21262D !important;
+}
+
+footer a,
+.footer a {
+    color: var(--text-secondary) !important;
+}
+
+footer a:hover,
+.footer a:hover {
+    color: var(--primary) !important;
+}
+
+/* Section 背景适配 */
+section {
+    background: transparent !important;
+}
+
+section:nth-child(even),
+.section-alt {
+    background: var(--bg-section) !important;
+}
+
+/* 文字颜色适配 */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary) !important;
+}
+
+p, span, li {
+    color: var(--text-secondary) !important;
+}
+
+/* 链接颜色 */
+a:not(.btn):not(.navbar a):not(nav a):not(footer a):not(.footer a) {
+    color: var(--link-color) !important;
+}
+
+a:not(.btn):not(.navbar a):not(nav a):not(footer a):not(.footer a):hover {
+    color: var(--link-hover) !important;
+}
+
+/* 表格深色适配 */
+table {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--divider) !important;
+}
+
+table th {
+    background: var(--bg-section) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--divider) !important;
+}
+
+table td {
+    border-color: var(--divider) !important;
+    color: var(--text-secondary) !important;
+}
+
+table tr:hover {
+    background: rgba(245, 133, 41, 0.05) !important;
+}
+
+/* 代码块深色 */
+code,
+pre {
+    background: var(--code-bg) !important;
+    color: #E6EDF3 !important;
+    border-color: var(--divider) !important;
+}
+
+/* 标签/徽章 */
+.badge,
+.tag,
+.label {
+    background: var(--tag-bg) !important;
+    color: var(--tag-color) !important;
+    border: 1px solid rgba(245, 133, 41, 0.25) !important;
+}
+
+/* 分割线 */
+hr,
+.divider {
+    border-color: var(--divider) !important;
+    background: var(--divider) !important;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #484F58;
+}
+
+/* 图片暗角适配 */
+img {
+    opacity: 0.95;
+}
+
+img:hover {
+    opacity: 1;
+}
+
+/* Modal 弹窗深色 */
+.modal,
+.modal-content,
+.dialog {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--card-border) !important;
+    color: var(--text-primary) !important;
+}
+
+.modal-header,
+.dialog-header {
+    border-bottom-color: var(--divider) !important;
+}
+
+.modal-footer,
+.dialog-footer {
+    border-top-color: var(--divider) !important;
+}
+
+/* 下拉菜单深色 */
+.dropdown-menu,
+.select-dropdown {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--card-border) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dropdown-item,
+.dropdown-menu a {
+    color: var(--text-secondary) !important;
+}
+
+.dropdown-item:hover,
+.dropdown-menu a:hover {
+    background: rgba(245, 133, 41, 0.1) !important;
+    color: var(--primary) !important;
+}

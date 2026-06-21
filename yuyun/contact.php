@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/includes/config.php';
 if (template_include('contact.php')) exit;
-$pageTitle = L('contact.title', '联系我们');
+$pageTitle = '联系我们';
 $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -23,9 +23,8 @@ require __DIR__ . '/includes/header.php';
 ?>
 <section class="page-banner">
     <div class="container">
-        <div class="ip-illustration ip-message page-intro-illustration"></div>
-        <h1><?php echo L('contact.title', '联系我们') ?></h1>
-        <p><?php echo L('contact.subtitle', '期待与您携手合作') ?></p>
+        <h1>联系我们</h1>
+        <p>期待与您携手合作</p>
     </div>
 </section>
 <section class="section bg-white">
@@ -33,9 +32,11 @@ require __DIR__ . '/includes/header.php';
         <div class="card-grid" style="grid-template-columns:1fr 1.2fr;align-items:start">
             <div>
                 <div class="text-center">
-                    <div class="ip-illustration ip-message page-intro-illustration"></div>
+                    <div class="illustration-3d" style="margin-bottom:16px">
+                        <div class="cube"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
+                    </div>
                 </div>
-                <h2 style="font-size:24px;margin-bottom:16px"><?php echo L('contact.info_title', '联系方式') ?></h2>
+                <h2 style="font-size:24px;margin-bottom:16px">联系方式</h2>
                 <ul class="info-list">
                     <li><i class="iconfont icon-building"></i> <?php echo e(setting('company_name')) ?></li>
                     <li><i class="iconfont icon-map"></i> <?php echo e(setting('company_address')) ?></li>

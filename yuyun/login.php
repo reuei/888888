@@ -11,10 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([':e' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user && $user['password'] && password_verify($password, $user['password'])) {
-        if (setting('site_email_verify') && empty($user['email_verified'])) {
-            flash('error', L('auth.verify_first', '请先验证邮箱'));
-            redirect(YUYUN_URL . '/verify.php?mode=verify_email&email=' . urlencode($email));
-        }
         $_SESSION['user_id'] = $user['id'];
         flash('success', '登录成功');
         redirect($user['is_admin'] ? YUYUN_URL . '/admin/index.php' : YUYUN_URL . '/user/index.php');

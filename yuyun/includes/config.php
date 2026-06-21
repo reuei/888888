@@ -20,13 +20,7 @@ if (!$installed && !$isInstall) {
 
 require __DIR__ . '/db.php';
 require __DIR__ . '/functions.php';
-require __DIR__ . '/smtp.php';
-require __DIR__ . '/lang.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-if (isset($_GET['lang'])) {
-    current_lang();
-}
-init_patch2_tables();

@@ -13,41 +13,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif ($password !== $password2) flash('error', '两次密码不一致');
     else {
         $db = getDb();
-        $check = $db->prepare('SELECT id, email_verified FROM users WHERE email = :e');
+        $check = $db->prepare('SELECT id FROM users WHERE email = :e');
         $check->execute([':e' => $email]);
-        $existing = $check->fetch(PDO::FETCH_ASSOC);
-        if ($existing && !empty($existing['email_verified'])) {
+        if ($check->fetch()) {
             flash('error', '该邮箱已注册');
-            redirect(YUYUN_URL . '/register.php');
-        }
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $now = date('Y-m-d H:i:s');
-        $emailVerify = setting('site_email_verify');
-        if ($emailVerify) {
-            $code = generate_code();
-            $expire = time() + 300;
-            if ($existing) {
-                $db->prepare('UPDATE users SET password=:p, nickname=:n, verify_code=:c, code_expire=:ex WHERE id=:id')->execute([':p'=>$hash,':n'=>$nickname,':c'=>$code,':ex'=>$expire,':id'=>$existing['id']]);
-            } else {
-                $stmt = $db->prepare('INSERT INTO users (email, password, nickname, email_verified, verify_code, code_expire, created_at) VALUES (:e,:p,:n,0,:c,:ex,:t)');
-                $stmt->execute([':e'=>$email,':p'=>$hash,':n'=>$nickname,':c'=>$code,':ex'=>$expire,':t'=>$now]);
-            }
-            send_verify_email($email, $code);
-            flash('success', '验证码已发送至邮箱，请完成验证');
-            redirect(YUYUN_URL . '/verify.php?mode=verify_email&email=' . urlencode($email));
         } else {
-            if ($existing) {
-                $db->prepare('UPDATE users SET password=:p, nickname=:n, email_verified=1, verify_code=NULL, code_expire=NULL WHERE id=:id')->execute([':p'=>$hash,':n'=>$nickname,':id'=>$existing['id']]);
-                $_SESSION['user_id'] = $existing['id'];
-            } else {
-                $stmt = $db->prepare('INSERT INTO users (email, password, nickname, email_verified, created_at) VALUES (:e,:p,:n,1,:t)');
-                $stmt->execute([':e'=>$email,':p'=>$hash,':n'=>$nickname,':t'=>$now]);
-                $_SESSION['user_id'] = $db->lastInsertId();
-            }
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $now = date('Y-m-d H:i:s');
+            $stmt = $db->prepare('INSERT INTO users (email, password, nickname, email_verified, created_at) VALUES (:e,:p,:n,1,:t)');
+            $stmt->execute([':e'=>$email,':p'=>$hash,':n'=>$nickname,':t'=>$now]);
+            $_SESSION['user_id'] = $db->lastInsertId();
             flash('success', '注册成功');
             redirect(YUYUN_URL . '/user/index.php');
         }
     }
+    redirect(YUYUN_URL . '/register.php');
 }
 require __DIR__ . '/includes/header.php';
 ?>

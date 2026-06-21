@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/includes/config.php';
 if (template_include('index.php')) exit;
-$pageTitle = L('nav.home', '首页');
+$pageTitle = '首页';
 require __DIR__ . '/includes/header.php';
 
 $db = getDb();
@@ -10,8 +10,7 @@ $products = $db->query('SELECT * FROM products WHERE is_active=1 ORDER BY sort_o
 $partners = $db->query('SELECT * FROM partners WHERE is_active=1 ORDER BY sort_order,id')->fetchAll(PDO::FETCH_ASSOC);
 $staff = $db->query('SELECT * FROM staff ORDER BY sort_order,id')->fetchAll(PDO::FETCH_ASSOC);
 $gradients = ['linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient(135deg,#1a2980,#26d0ce)','linear-gradient(135deg,#ff512f,#dd2476)'];
-
-$staffBg = setting('site_staff_bg_image');
+$iconMap = ['fa-cube'=>'icon-cubes','fa-server'=>'icon-store','fa-shield-halved'=>'icon-shield','fa-network-wired'=>'icon-cloud','fa-globe'=>'icon-map','fa-database'=>'icon-store','fa-lock'=>'icon-lock'];
 ?>
 
 <!-- Hero -->
@@ -24,9 +23,9 @@ $staffBg = setting('site_staff_bg_image');
                 <h1><?php echo e($slide['title']) ?></h1>
                 <p><?php echo e($slide['subtitle']) ?></p>
                 <?php if ($slide['link']): ?>
-                    <a href="<?php echo e($slide['link']) ?>" class="btn btn-primary"><?php echo L('btn.learn_more', '立即了解') ?> <i class="iconfont icon-arrow-right"></i></a>
+                    <a href="<?php echo e($slide['link']) ?>" class="btn btn-primary">立即了解 <i class="iconfont icon-arrow-right"></i></a>
                 <?php else: ?>
-                    <a href="<?php echo YUYUN_URL ?>/products.php" class="btn btn-primary"><?php echo L('btn.view_products', '查看产品') ?> <i class="iconfont icon-arrow-right"></i></a>
+                    <a href="<?php echo YUYUN_URL ?>/products.php" class="btn btn-primary">查看产品 <i class="iconfont icon-arrow-right"></i></a>
                 <?php endif; ?>
             </div>
         </div>
@@ -56,18 +55,19 @@ $staffBg = setting('site_staff_bg_image');
 <section class="section bg-white">
     <div class="container">
         <div class="section-title">
-            <h2><?php echo L('home.products_title', '业务与产品') ?></h2>
-            <p><?php echo L('home.products_subtitle', '覆盖云计算、网络安全、企业服务的全栈解决方案') ?></p>
+            <h2>业务与产品</h2>
+            <p>覆盖云计算、网络安全、企业服务的全栈解决方案</p>
         </div>
         <div class="card-grid">
-            <?php foreach ($products as $prod):
-                $iconClass = map_fa_to_iconfont($prod['icon'] ?: 'fa-cube');
+            <?php foreach ($products as $prod): 
+                $icon = $prod['icon'] ?: 'fa-cube';
+                $iconClass = $iconMap[$icon] ?? 'icon-cubes';
             ?>
             <div class="product-card" onclick="openProductModal('<?php echo e($prod['name']) ?>','<?php echo e($prod['detail'] ?: $prod['summary']) ?>')">
                 <div class="icon"><i class="iconfont <?php echo e($iconClass) ?> icon-2xl"></i></div>
                 <h3><?php echo e($prod['name']) ?></h3>
                 <p><?php echo e($prod['summary']) ?></p>
-                <span class="more"><?php echo L('btn.learn_more', '了解详情') ?> <i class="iconfont icon-chevron-right"></i></span>
+                <span class="more">了解详情 <i class="iconfont icon-chevron-right"></i></span>
             </div>
             <?php endforeach; ?>
         </div>
@@ -78,7 +78,7 @@ $staffBg = setting('site_staff_bg_image');
 <section class="partner-section">
     <div class="container" style="margin-bottom:20px">
         <div class="section-title" style="margin-bottom:0">
-            <h2 style="font-size:24px"><?php echo L('home.partners_title', '我们与以下企业 / 组织携手共进') ?></h2>
+            <h2 style="font-size:24px">我们与以下企业 / 组织携手共进</h2>
         </div>
     </div>
     <div class="partner-track">
@@ -98,42 +98,22 @@ $staffBg = setting('site_staff_bg_image');
 <section class="map-section">
     <div class="container">
         <div class="section-title">
-            <h2><?php echo L('home.map_title', '公司分布') ?></h2>
-            <p><?php echo L('home.map_subtitle', '全球节点布局，保障业务稳定低延迟') ?></p>
+            <h2>公司分布</h2>
+            <p>全球节点布局，保障业务稳定低延迟</p>
         </div>
         <div class="map-wrap">
-            <svg class="map-svg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <radialGradient id="mapGlow" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stop-color="rgba(255,106,0,.35)"/>
-                        <stop offset="100%" stop-color="rgba(255,106,0,0)"/>
-                    </radialGradient>
-                </defs>
-                <g class="map-grid">
-                    <line x1="100" y1="0" x2="100" y2="500"/><line x1="300" y1="0" x2="300" y2="500"/><line x1="500" y1="0" x2="500" y2="500"/><line x1="700" y1="0" x2="700" y2="500"/><line x1="900" y1="0" x2="900" y2="500"/>
-                    <line x1="0" y1="125" x2="1000" y2="125"/><line x1="0" y1="250" x2="1000" y2="250"/><line x1="0" y1="375" x2="1000" y2="375"/>
-                </g>
-                <path class="map-continent" d="M120,70 Q180,30 260,50 T380,120 Q400,170 350,220 T220,250 Q150,240 110,180 T80,100 Z"/>
-                <path class="map-continent" d="M260,280 Q310,270 340,320 T350,420 Q330,470 290,460 T240,380 Q230,320 260,280 Z"/>
-                <path class="map-continent" d="M450,80 Q520,40 620,50 T780,90 Q850,120 880,180 T860,270 Q800,300 720,280 T580,230 Q500,190 460,140 T450,80 Z"/>
-                <path class="map-continent" d="M470,150 Q520,140 560,180 T590,300 Q570,380 510,390 T450,300 Q440,210 470,150 Z"/>
-                <path class="map-continent" d="M780,320 Q840,300 900,340 T920,420 Q880,460 820,450 T760,390 Q750,350 780,320 Z"/>
-
-                <g class="map-node-wrap"><circle class="map-city" cx="780" cy="165" r="5"/><text class="map-label" x="780" y="185">北京</text><title>中国 · 北京</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="795" cy="178" r="4"/><text class="map-label" x="795" y="195">青岛</text><title>中国 · 青岛</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="650" cy="140" r="5"/><text class="map-label" x="650" y="125">莫斯科</text><title>俄罗斯 · 莫斯科</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="630" cy="125" r="4"/><text class="map-label" x="630" y="110">圣彼得堡</text><title>俄罗斯 · 圣彼得堡</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="810" cy="175" r="4"/><text class="map-label" x="810" y="193">首尔</text><title>韩国 · 首尔</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="870" cy="185" r="5"/><text class="map-label" x="870" y="205">东京</text><title>日本 · 东京</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="785" cy="265" r="5"/><text class="map-label" x="785" y="285">新加坡</text><title>新加坡</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="900" cy="380" r="5"/><text class="map-label" x="900" y="400">悉尼</text><title>澳大利亚 · 悉尼</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="250" cy="170" r="5"/><text class="map-label" x="250" y="190">纽约</text><title>美国 · 纽约</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="245" cy="185" r="4"/><text class="map-label" x="245" y="203">华盛顿</text><title>美国 · 华盛顿</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="150" cy="175" r="5"/><text class="map-label" x="150" y="195">旧金山</text><title>美国 · 旧金山</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="475" cy="150" r="5"/><text class="map-label" x="475" y="170">伦敦</text><title>英国 · 伦敦</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="500" cy="155" r="4"/><text class="map-label" x="500" y="140">法兰克福</text><title>德国 · 法兰克福</title></g>
-                <g class="map-node-wrap"><circle class="map-city" cx="660" cy="225" r="5"/><text class="map-label" x="660" y="245">迪拜</text><title>阿联酋 · 迪拜</title></g>
-            </svg>
+            <span class="map-node" style="left:54%;top:38%" data-city="中国 · 北京"></span>
+            <span class="map-node" style="left:56%;top:42%" data-city="中国 · 青岛"></span>
+            <span class="map-node" style="left:52%;top:26%" data-city="俄罗斯 · 莫斯科"></span>
+            <span class="map-node" style="left:50%;top:24%" data-city="俄罗斯 · 圣彼得堡"></span>
+            <span class="map-node" style="left:60%;top:40%" data-city="韩国 · 首尔"></span>
+            <span class="map-node" style="left:50%;top:55%" data-city="东南亚 · 新加坡"></span>
+            <span class="map-node" style="left:66%;top:68%" data-city="澳大利亚 · 悉尼"></span>
+            <span class="map-node" style="left:22%;top:34%" data-city="美国 · 纽约"></span>
+            <span class="map-node" style="left:24%;top:38%" data-city="美国 · 华盛顿"></span>
+            <span class="map-node" style="left:16%;top:40%" data-city="美国 · 旧金山"></span>
+            <span class="map-node" style="left:42%;top:30%" data-city="欧洲地区"></span>
+            <span class="map-node" style="left:46%;top:46%" data-city="中东地区"></span>
         </div>
     </div>
 </section>
@@ -142,8 +122,8 @@ $staffBg = setting('site_staff_bg_image');
 <section class="section bg-white">
     <div class="container">
         <div class="section-title">
-            <h2><?php echo L('home.certs_title', '资质证照') ?></h2>
-            <p><?php echo L('home.certs_subtitle', '合规经营，值得信赖') ?></p>
+            <h2>资质证照</h2>
+            <p>合规经营，值得信赖</p>
         </div>
         <div class="cert-grid">
             <?php $licenseImg = setting('site_license_image'); ?>
@@ -175,17 +155,17 @@ $staffBg = setting('site_staff_bg_image');
 </section>
 
 <!-- Staff -->
-<section class="section staff-section" <?php echo $staffBg ? 'style="background-image:url(\''.e($staffBg).'\')"' : '' ?>>
+<section class="section">
     <div class="container">
         <div class="section-title">
-            <h2><?php echo L('home.staff_title', '核心团队') ?></h2>
-            <p><?php echo L('home.staff_subtitle', '来自全球顶尖科技与互联网企业') ?></p>
+            <h2>核心团队</h2>
+            <p>来自全球顶尖科技与互联网企业</p>
         </div>
-        <div class="staff-scroll">
+        <div class="staff-grid">
             <?php foreach ($staff as $s): ?>
             <div class="staff-card">
                 <?php if ($s['avatar']): ?>
-                    <div class="avatar"><img src="<?php echo e($s['avatar']) ?>" alt="<?php echo e($s['name']) ?>"></div>
+                    <img src="<?php echo e($s['avatar']) ?>" alt="<?php echo e($s['name']) ?>">
                 <?php else: ?>
                     <div class="avatar"><i class="iconfont icon-user icon-2xl"></i></div>
                 <?php endif; ?>
@@ -202,7 +182,7 @@ $staffBg = setting('site_staff_bg_image');
 <div class="modal-overlay" id="productModal">
     <div class="modal">
         <div class="modal-header">
-            <h3 id="modalProductTitle"><?php echo L('home.products_title', '产品详情') ?></h3>
+            <h3 id="modalProductTitle">产品详情</h3>
             <button class="modal-close"><i class="iconfont icon-close"></i></button>
         </div>
         <div class="modal-body" id="modalProductBody"></div>
@@ -213,7 +193,7 @@ $staffBg = setting('site_staff_bg_image');
 <div class="modal-overlay" id="imageModal">
     <div class="modal" style="max-width:720px">
         <div class="modal-header">
-            <h3 id="modalImageTitle"><?php echo L('home.certs_title', '证照预览') ?></h3>
+            <h3 id="modalImageTitle">证照预览</h3>
             <button class="modal-close" onclick="closeImageModal()"><i class="iconfont icon-close"></i></button>
         </div>
         <div class="modal-body text-center">
@@ -230,11 +210,11 @@ $staffBg = setting('site_staff_bg_image');
             <div class="illustration-3d" style="width:100px;height:100px;margin-bottom:16px">
                 <div class="cube" style="width:50px;height:50px;left:25px;top:25px"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
             </div>
-            <h3 style="margin:0 0 10px;color:var(--dark)"><?php echo L('home.welcome_title', '欢迎来到') ?> <?php echo e(setting('site_name','语云科技')) ?></h3>
-            <p style="color:var(--text-2);margin:0 0 22px"><?php echo e(setting('site_slogan', L('home.welcome_subtitle', '企业与开发者信赖的云计算与数字化服务伙伴'))) ?></p>
+            <h3 style="margin:0 0 10px;color:var(--dark)">欢迎来到 <?php echo e(setting('site_name','语云科技')) ?></h3>
+            <p style="color:var(--text-2);margin:0 0 22px"><?php echo e(setting('site_slogan','企业与开发者信赖的云计算与数字化服务伙伴')) ?></p>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-                <a href="tel:<?php echo e(setting('sales_phone','400-800-8451')) ?>" class="btn btn-primary"><i class="iconfont icon-phone"></i> <?php echo L('btn.phone', '电话咨询') ?></a>
-                <button class="btn btn-outline" onclick="document.getElementById('welcomeModal').classList.remove('active')"><?php echo L('btn.later', '稍后再说') ?></button>
+                <a href="tel:<?php echo e(setting('sales_phone','400-800-8451')) ?>" class="btn btn-primary"><i class="iconfont icon-phone"></i> 电话咨询</a>
+                <button class="btn btn-outline" onclick="document.getElementById('welcomeModal').classList.remove('active')">稍后再说</button>
             </div>
         </div>
     </div>

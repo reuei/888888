@@ -45,7 +45,7 @@ $products = $db->query('SELECT * FROM products ORDER BY sort_order,id')->fetchAl
         <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo $edit['id'] ?>"><?php endif; ?>
         <div class="form-row">
             <div class="form-group"><label>名称</label><input type="text" name="name" class="form-control" value="<?php echo e($edit['name'] ?? '') ?>" required></div>
-            <div class="form-group"><label>图标（iconfont 类名，如 icon-store）</label><input type="text" name="icon" class="form-control" value="<?php echo e($edit['icon'] ?? '') ?>" placeholder="icon-store"></div>
+            <div class="form-group"><label>图标（Font Awesome class）</label><input type="text" name="icon" class="form-control" value="<?php echo e($edit['icon'] ?? '') ?>" placeholder="fa-server"></div>
         </div>
         <div class="form-group"><label>一句话简介</label><input type="text" name="summary" class="form-control" value="<?php echo e($edit['summary'] ?? '') ?>"></div>
         <div class="form-group"><label>详情</label><textarea name="detail" class="form-control" rows="5"><?php echo e($edit['detail'] ?? '') ?></textarea></div>
@@ -65,7 +65,7 @@ $products = $db->query('SELECT * FROM products ORDER BY sort_order,id')->fetchAl
         <tbody>
             <?php foreach ($products as $p): ?>
             <tr>
-                <td><?php echo admin_icon_preview($p['icon']) ?> <?php echo e($p['name']) ?></td>
+                <td><?php echo e($p['name']) ?></td>
                 <td><?php echo e($p['summary']) ?></td>
                 <td><?php echo e($p['sort_order']) ?></td>
                 <td><?php echo $p['is_active']?'启用':'禁用' ?></td>

@@ -1,25 +1,26 @@
 <?php
 require __DIR__ . '/includes/config.php';
 if (template_include('company.php')) exit;
-$pageTitle = L('company.title', '公司简介');
+$pageTitle = '公司简介';
 require __DIR__ . '/includes/header.php';
 ?>
 <section class="page-banner">
     <div class="container">
-        <div class="ip-illustration ip-team page-intro-illustration"></div>
-        <h1><?php echo L('company.title', '公司简介') ?></h1>
-        <p><?php echo L('company.subtitle', '发展历程 · 企业文化 · 核心优势') ?></p>
+        <h1>公司简介</h1>
+        <p>发展历程 · 企业文化 · 核心优势</p>
     </div>
 </section>
 <section class="section bg-white">
     <div class="container">
         <div style="max-width:900px;margin:0 auto">
             <div class="text-center">
-                <div class="ip-illustration ip-global page-intro-illustration"></div>
+                <div class="illustration-3d" style="margin-bottom:24px">
+                    <div class="cube"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
+                </div>
             </div>
-            <h2 style="font-size:26px;margin-bottom:16px"><?php echo L('company.intro_title', '公司介绍') ?></h2>
+            <h2 style="font-size:26px;margin-bottom:16px">公司介绍</h2>
             <p style="color:var(--text-2);line-height:1.9;margin-bottom:28px">
-                <?php echo e(setting('company_name','语云科技（美国）有限公司')) ?> 是一家全球化云计算与数字化服务提供商。我们依托自建数据中心与全球合作伙伴网络，为企业客户提供云服务器、裸金属、CDN 加速、DDoS 防护、企业邮箱以及 IDC 财务系统授权等一站式解决方案。秉持「让云上业务更简单」的使命，我们持续打磨产品体验，助力客户在全球市场快速落地与增长。
+                <?php echo e(setting('company_name','语云科技（美国）有限公司')) ?> 是一家全球化云计算与数字化服务提供商。我们依托自建数据中心与全球合作伙伴网络，为企业客户提供云服务器、裸金属、CDN 加速、DDoS 防护、企业邮箱以及 IDC 财务系统授权等一站式解决方案。
             </p>
             <h3 style="margin:24px 0 12px">发展历程</h3>
             <ul style="color:var(--text-2);line-height:2;padding-left:20px;margin-bottom:28px">

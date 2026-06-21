@@ -2,9 +2,8 @@
 $pageTitle = '站点配置';
 require __DIR__ . '/../includes/admin_header.php';
 $db = getDb();
-$keys = ['site_name','site_slogan','site_short','sales_phone','company_name','company_short','company_address','company_phone','company_group','company_intro','company_map_url','site_email','international_url','site_icp','site_police','site_license','site_ev_license','footer_statement','top_banner_enabled','top_banner_bg','top_banner_text','top_banner_icon','site_default_theme','site_language','site_email_verify'];
-$imageKeys = ['site_logo','site_favicon','site_license_image','site_ev_license_image','site_security_image','site_trust_image','site_staff_bg_image'];
-$iconList = ['bell','announcement','gift','info','cloud','shield','envelope','phone'];
+$keys = ['site_name','site_slogan','site_short','sales_phone','company_name','company_short','company_address','company_phone','company_group','company_intro','company_map_url','site_email','international_url','site_icp','site_police','site_license','site_ev_license','footer_statement'];
+$imageKeys = ['site_logo','site_favicon','site_license_image','site_ev_license_image','site_security_image','site_trust_image'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     foreach ($keys as $k) {
@@ -73,42 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-row">
             <div class="form-group"><label>营业执照名称</label><input type="text" name="site_license" class="form-control" value="<?php echo e(setting('site_license')) ?>"></div>
             <div class="form-group"><label>底部授权声明</label><input type="text" name="footer_statement" class="form-control" value="<?php echo e(setting('footer_statement')) ?>"></div>
-        </div>
-
-        <h4 style="margin:28px 0 14px;color:var(--dark);font-size:16px">顶部公告横幅</h4>
-        <div class="form-row">
-            <div class="form-group"><label><input type="checkbox" name="top_banner_enabled" value="1" <?php echo setting('top_banner_enabled')?'checked':'' ?>> 启用顶部公告</label></div>
-            <div class="form-group"><label>公告背景色</label><input type="color" name="top_banner_bg" class="form-control" value="<?php echo e(setting('top_banner_bg','#ff6a00')) ?>" style="height:40px"></div>
-        </div>
-        <div class="form-row">
-            <div class="form-group"><label>公告图标</label>
-                <select name="top_banner_icon" class="form-control">
-                    <?php foreach ($iconList as $ic): ?>
-                    <option value="<?php echo e($ic) ?>" <?php echo setting('top_banner_icon','bell')===$ic?'selected':'' ?>><?php echo e($ic) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group"><label>公告文字</label><input type="text" name="top_banner_text" class="form-control" value="<?php echo e(setting('top_banner_text','欢迎来到语云科技官网，我们提供全球领先的云计算与网络安全服务！')) ?>"></div>
-        </div>
-
-        <h4 style="margin:28px 0 14px;color:var(--dark);font-size:16px">主题、语言与邮箱验证</h4>
-        <div class="form-row">
-            <div class="form-group"><label>默认主题</label>
-                <select name="site_default_theme" class="form-control">
-                    <option value="light" <?php echo setting('site_default_theme','light')==='light'?'selected':'' ?>>浅色</option>
-                    <option value="dark" <?php echo setting('site_default_theme','light')==='dark'?'selected':'' ?>>深色</option>
-                </select>
-            </div>
-            <div class="form-group"><label>默认语言</label>
-                <select name="site_language" class="form-control">
-                    <option value="zh" <?php echo setting('site_language','zh')==='zh'?'selected':'' ?>>中文</option>
-                    <option value="en" <?php echo setting('site_language','zh')==='en'?'selected':'' ?>>English</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group"><label><input type="checkbox" name="site_email_verify" value="1" <?php echo setting('site_email_verify')?'checked':'' ?>> 注册后需邮箱验证</label></div>
-            <div class="form-group"><label>员工区背景图</label><input type="file" name="site_staff_bg_image" class="form-control" accept="image/*"> <?php if (setting('site_staff_bg_image')): ?><p style="font-size:12px"><img src="<?php echo e(setting('site_staff_bg_image')) ?>" style="max-height:60px;margin-top:6px;border-radius:4px;border:1px solid #eee"></p><?php endif; ?></div>
         </div>
         <button type="submit" class="btn btn-primary">保存配置</button>
     </form>

@@ -11,7 +11,6 @@ $adminMenu = [
     ['staff.php','icon-users','员工卡片'],
     ['users.php','icon-user-shield','用户管理'],
     ['tickets.php','icon-ticket','工单管理'],
-    ['messages.php','icon-bell','消息通知'],
     ['templates.php','icon-paint-brush','模板管理'],
     ['update.php','icon-cloud-arrow-up','代码更新'],
 ];

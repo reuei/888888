@@ -2,56 +2,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Hamburger
     const hamburger = document.getElementById('hamburger');
     const mainNav = document.getElementById('mainNav');
-    const hamIcon = hamburger ? hamburger.querySelector('i') : null;
     if (hamburger && mainNav) {
         hamburger.addEventListener('click', function () {
             mainNav.classList.toggle('open');
-            if (hamIcon) {
-                hamIcon.className = mainNav.classList.contains('open') ? 'iconfont icon-close' : 'iconfont icon-menu';
-            }
-        });
-    }
-
-    // Theme toggle
-    const themeBtn = document.getElementById('themeToggle');
-    if (themeBtn) {
-        const updateThemeIcon = function () {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            themeBtn.innerHTML = '<i class="iconfont icon-' + (isDark ? 'sun' : 'moon') + '"></i>';
-        };
-        updateThemeIcon();
-        themeBtn.addEventListener('click', function () {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const next = isDark ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('yy_theme', next);
-            updateThemeIcon();
-        });
-    }
-
-    // Language toggle
-    const langBtn = document.getElementById('langToggle');
-    if (langBtn) {
-        const currentLang = document.documentElement.lang || 'zh';
-        langBtn.innerHTML = '<i class="iconfont icon-translate"></i><span style="font-size:11px;margin-left:2px">' + (currentLang === 'zh' ? 'EN' : '中') + '</span>';
-        langBtn.addEventListener('click', function () {
-            const nextLang = currentLang === 'zh' ? 'en' : 'zh';
-            const url = new URL(window.location.href);
-            url.searchParams.set('lang', nextLang);
-            window.location.href = url.toString();
-        });
-    }
-
-    // Pause banner on hover
-    const bannerScroll = document.querySelector('.top-banner-scroll');
-    if (bannerScroll) {
-        bannerScroll.addEventListener('mouseenter', function () {
-            const span = this.querySelector('span');
-            if (span) span.style.animationPlayState = 'paused';
-        });
-        bannerScroll.addEventListener('mouseleave', function () {
-            const span = this.querySelector('span');
-            if (span) span.style.animationPlayState = 'running';
         });
     }
 
@@ -159,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1200);
     }
 
-    // Toast helper (admin fallback)
+    // Toast helper
     window.showToast = function (message, type) {
         type = type || 'info';
         const container = document.getElementById('toastContainer');
@@ -171,42 +124,11 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => toast.remove(), 4000);
     };
 
-    // Top sliding notice
-    window.showTopNotice = function (message, type) {
-        type = type || 'info';
-        const container = document.getElementById('topNoticeContainer');
-        if (!container) return;
-        const iconMap = { success: 'certificate', error: 'close', info: 'bell' };
-        const notice = document.createElement('div');
-        notice.className = 'top-notice ' + type;
-        notice.innerHTML = '<i class="iconfont icon-' + iconMap[type] + '"></i><span>' + message + '</span>';
-        container.appendChild(notice);
-        setTimeout(() => notice.remove(), 4000);
-    };
-
-    // Convert flash messages to top notices
-    document.querySelectorAll('.flash-message').forEach(function (el) {
-        const type = el.getAttribute('data-type') || 'info';
-        showTopNotice(el.textContent.trim(), type);
-        el.style.display = 'none';
-    });
-
-    // Form validation top notice
-    document.addEventListener('invalid', function (e) {
-        e.preventDefault();
-        const target = e.target;
-        const label = target.closest('.form-group')?.querySelector('label')?.textContent?.trim() || target.placeholder || target.name || '必填项';
-        showTopNotice('请填写：' + label, 'error');
-        target.focus();
-    }, true);
-
-    // Theme toggle icon sync
-    const themeBtn = document.getElementById('themeToggle');
-    if (themeBtn) {
-        const updateThemeIcon = function () {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            themeBtn.innerHTML = '<i class="iconfont icon-' + (isDark ? 'sun' : 'moon') + '"></i>';
-        };
-        updateThemeIcon();
+    // Convert flash messages to toasts
+    const flashEl = document.querySelector('.flash-message');
+    if (flashEl) {
+        const type = flashEl.classList.contains('flash-error') ? 'error' : 'success';
+        showToast(flashEl.textContent.trim(), type);
+        flashEl.style.display = 'none';
     }
 });

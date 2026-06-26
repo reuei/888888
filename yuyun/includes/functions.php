@@ -22,10 +22,13 @@ function setting(string $key, ?string $default = null): ?string {
 
 function setSetting(string $key, ?string $value): void {
     $db = getDb();
-    if (defined('DB_TYPE') && DB_TYPE === 'mysql') {
-        $stmt = $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v) ON DUPLICATE KEY UPDATE config_value=:v');
+    // 兼容旧版 SQLite（不支持 ON CONFLICT / UPSERT）
+    $check = $db->prepare('SELECT config_key FROM settings WHERE config_key = :k LIMIT 1');
+    $check->execute([':k' => $key]);
+    if ($check->fetch()) {
+        $stmt = $db->prepare('UPDATE settings SET config_value = :v WHERE config_key = :k');
     } else {
-        $stmt = $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v) ON CONFLICT(config_key) DO UPDATE SET config_value=:v');
+        $stmt = $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v)');
     }
     $stmt->execute([':k' => $key, ':v' => $value]);
 }

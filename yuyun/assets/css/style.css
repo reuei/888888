@@ -295,6 +295,28 @@ textarea.form-control{min-height:120px;resize:vertical}
 .admin-topbar{background:#fff;border-radius:12px;padding:16px 22px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px}
 .admin-topbar h1{font-size:20px;color:var(--dark)}
 .admin-actions{display:flex;gap:10px}
+
+/* User center sidebar */
+.user-layout{display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:start}
+.user-sidebar{background:var(--white);border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;height:fit-content}
+.user-sidebar a{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:8px;color:var(--text);font-size:14px;font-weight:500;transition:.2s;position:relative}
+.user-sidebar a i{font-size:18px;width:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--text-2)}
+.user-sidebar a:hover{background:rgba(255,106,0,.08);color:var(--brand)}
+.user-sidebar a:hover i{color:var(--brand)}
+.user-sidebar a.active{background:linear-gradient(135deg,var(--brand),var(--brand-dark));color:#fff;box-shadow:0 4px 12px rgba(255,106,0,.3)}
+.user-sidebar a.active i{color:#fff}
+.user-sidebar .sidebar-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;min-width:18px;text-align:center}
+.user-sidebar a.active .sidebar-badge{background:#fff;color:var(--brand)}
+@media(max-width:768px){
+    .user-layout{grid-template-columns:1fr}
+    .user-sidebar{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;padding:8px;gap:6px;-webkit-overflow-scrolling:touch}
+    .user-sidebar a{flex:0 0 auto;white-space:nowrap;padding:10px 14px}
+    .user-sidebar a i{width:auto}
+    .user-sidebar .sidebar-badge{margin-left:4px}
+}
+html.dark .user-sidebar{border-color:rgba(255,255,255,.06)}
+html.dark .user-sidebar a{color:var(--text)}
+html.dark .user-sidebar a i{color:var(--text-2)}
 .admin-card{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:24px;border:1px solid #f0f0f0}
 .admin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1100;display:none;backdrop-filter:blur(2px)}
 .admin-overlay.active{display:block}

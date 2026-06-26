@@ -21,7 +21,37 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Banner close
+    // Language popup toggle (front)
+    const langBtn = document.getElementById('langSwitcherBtn');
+    const langPopup = document.getElementById('langPopup');
+    if (langBtn && langPopup) {
+        langBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            langPopup.classList.toggle('open');
+        });
+        document.addEventListener('click', function (e) {
+            if (!langPopup.contains(e.target) && e.target !== langBtn) {
+                langPopup.classList.remove('open');
+            }
+        });
+    }
+
+    // Language popup toggle (admin)
+    const adminLangBtn = document.getElementById('adminLangSwitcherBtn');
+    const adminLangPopup = document.getElementById('adminLangPopup');
+    if (adminLangBtn && adminLangPopup) {
+        adminLangBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            adminLangPopup.classList.toggle('open');
+        });
+        document.addEventListener('click', function (e) {
+            if (!adminLangPopup.contains(e.target) && e.target !== adminLangBtn) {
+                adminLangPopup.classList.remove('open');
+            }
+        });
+    }
+
+    // Banner close → collapse to side
     const banner = document.getElementById('siteBanner');
     const bannerClose = document.getElementById('bannerClose');
     if (banner && bannerClose) {
@@ -42,20 +72,66 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (e) {}
     }
 
-    // Hero slider
-    const slides = document.querySelectorAll('.hero-slide');
-    const dots = document.querySelectorAll('.hero-dot');
-    if (slides.length > 0) {
+    // Hero 3D flip carousel with progress bar
+    const heroSlides = document.querySelectorAll('.hero-slide-3d');
+    const progressBars = document.querySelectorAll('.hero-progress-bar');
+    if (heroSlides.length > 0) {
         let current = 0;
-        const show = (idx) => {
-            slides.forEach((s, i) => s.classList.toggle('active', i === idx));
-            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-        };
-        dots.forEach((d, i) => d.addEventListener('click', () => { current = i; show(current); }));
-        setInterval(() => {
-            current = (current + 1) % slides.length;
-            show(current);
-        }, 5000);
+        let autoTimer = null;
+        const SLIDE_DURATION = 5000; // 5秒
+
+        function showSlide(idx) {
+            // 先移除所有active
+            heroSlides.forEach(function(s) { s.classList.remove('active','prev'); });
+            progressBars.forEach(function(b) { b.classList.remove('active'); var f=b.querySelector('.hero-progress-fill'); if(f){f.style.transition='none';f.style.width='0%';} });
+
+            // 设置当前为active
+            if (heroSlides[idx]) heroSlides[idx].classList.add('active');
+            if (progressBars[idx]) progressBars[idx].classList.add('active');
+
+            // 进度条动画：从0%到100%耗时5秒
+            var fill = progressBars[idx] ? progressBars[idx].querySelector('.hero-progress-fill') : null;
+            if (fill) {
+                requestAnimationFrame(function() {
+                    fill.style.transition = 'width ' + SLIDE_DURATION + 'ms linear';
+                    fill.style.width = '100%';
+                });
+            }
+            current = idx;
+        }
+
+        function nextSlide() {
+            current = (current + 1) % heroSlides.length;
+            showSlide(current);
+        }
+
+        function startAuto() {
+            stopAuto();
+            autoTimer = setInterval(nextSlide, SLIDE_DURATION);
+        }
+        function stopAuto() {
+            if (autoTimer) clearInterval(autoTimer);
+        }
+
+        // 点击进度条跳转
+        progressBars.forEach(function(bar, i) {
+            bar.addEventListener('click', function() {
+                stopAuto();
+                showSlide(i);
+                startAuto();
+            });
+        });
+
+        // 鼠标悬停暂停
+        var hero = document.getElementById('hero');
+        if (hero) {
+            hero.addEventListener('mouseenter', stopAuto);
+            hero.addEventListener('mouseleave', startAuto);
+        }
+
+        // 初始化第一张
+        showSlide(0);
+        startAuto();
     }
 
     // Back to top
@@ -74,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', function (e) {
-            if (e.target === this) this.classList.remove('active');
+            if (e.target === this && this.id !== 'welcomeModal') this.classList.remove('active');
         });
     });
     document.querySelectorAll('.modal-close').forEach(btn => {
@@ -96,18 +172,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Image modal
     window.openImageModal = function (src, title) {
+        var noImgText = (document.documentElement.lang || '').indexOf('en') === 0 ? 'No image available, please upload in admin panel.' : '暂无图片，请前往后台上传资质证照。';
+        var clickClose = (document.documentElement.lang || '').indexOf('en') === 0 ? 'Click overlay to close' : '点击遮罩关闭';
         const modal = document.getElementById('imageModal');
         const img = document.getElementById('modalImageSrc');
         const tip = document.getElementById('modalImageTip');
         if (!src) {
-            if (tip) tip.textContent = '暂无图片，请前往后台上传资质证照。';
+            if (tip) tip.textContent = noImgText;
             if (img) img.style.display = 'none';
         } else {
             if (img) { img.src = src; img.alt = title || ''; img.style.display = 'inline-block'; }
-            if (tip) tip.textContent = '点击遮罩关闭';
+            if (tip) tip.textContent = clickClose;
         }
         const t = document.getElementById('modalImageTitle');
-        if (t) t.textContent = title || '证照预览';
+        if (t) t.textContent = title || (document.documentElement.lang.indexOf('en')===0?'Certificate Preview':'证照预览');
         if (modal) modal.classList.add('active');
     };
     window.closeImageModal = function () {
@@ -143,13 +221,42 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Welcome popup (once per session)
+    // Welcome popup → collapse to side after closing
     const welcome = document.getElementById('welcomeModal');
+    const welcomeCloseBtn = document.getElementById('welcomeCloseBtn');
+    const welcomeSideTab = document.getElementById('welcomeSideTab');
     if (welcome && !sessionStorage.getItem('yy_welcome_shown')) {
         setTimeout(() => {
             welcome.classList.add('active');
             sessionStorage.setItem('yy_welcome_shown', '1');
         }, 1200);
+    }
+    // 关闭后缩至侧边
+    function collapseWelcome() {
+        if (welcome) {
+            welcome.classList.remove('active');
+            if (welcomeSideTab) {
+                welcomeSideTab.classList.add('visible');
+            }
+        }
+    }
+    if (welcomeCloseBtn) {
+        welcomeCloseBtn.addEventListener('click', collapseWelcome);
+    }
+    // 点击遮罩也可关闭（但不是移除，而是缩至侧边）
+    if (welcome) {
+        welcome.addEventListener('click', function(e) {
+            if (e.target === welcome) collapseWelcome();
+        });
+    }
+    // 点击侧边标签重新展开
+    if (welcomeSideTab) {
+        welcomeSideTab.addEventListener('click', function() {
+            if (welcome) {
+                welcome.classList.add('active');
+                welcomeSideTab.classList.remove('visible');
+            }
+        });
     }
 
     // Global top notifier
@@ -194,14 +301,15 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Form validation hints
+    var langIsEn = (document.documentElement.lang || '').indexOf('en') === 0;
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function (e) {
             const required = form.querySelectorAll('[required]');
             for (let i = 0; i < required.length; i++) {
                 if (!required[i].value.trim()) {
                     e.preventDefault();
-                    const label = required[i].closest('.form-group')?.querySelector('label')?.textContent || required[i].name || '字段';
-                    showGlobalNotify((label ? label + ' ' : '') + '不能为空', 'error');
+                    var label = required[i].closest('.form-group')?.querySelector('label')?.textContent || required[i].name || (langIsEn?'Field':'字段');
+                    showGlobalNotify((label ? label + ' ' : '') + (langIsEn?'cannot be empty':'不能为空'), 'error');
                     required[i].focus();
                     return false;
                 }

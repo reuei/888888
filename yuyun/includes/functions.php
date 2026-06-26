@@ -3,11 +3,34 @@ function e(?string $s): string {
     return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
 }
 
+function ensure_settings_table(): void {
+    static $ensured = false;
+    if ($ensured) return;
+    $ensured = true;
+    try {
+        $db = getDb();
+        $type = defined('DB_TYPE') && DB_TYPE === 'mysql' ? 'mysql' : 'sqlite';
+        if ($type === 'mysql') {
+            $db->exec("CREATE TABLE IF NOT EXISTS settings (
+                config_key VARCHAR(100) PRIMARY KEY,
+                config_value TEXT
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        } else {
+            $db->exec("CREATE TABLE IF NOT EXISTS settings (
+                config_key TEXT PRIMARY KEY,
+                config_value TEXT
+            )");
+        }
+    } catch (Throwable $e) { /* ignore */ }
+}
+
 function setting(string $key, ?string $default = null): ?string {
     static $cache = null;
-    if ($cache === null) {
+    if ($cache === null || !empty($GLOBALS['__yy_settings_dirty'])) {
         $cache = [];
+        $GLOBALS['__yy_settings_dirty'] = false;
         try {
+            ensure_settings_table();
             $db = getDb();
             $stmt = $db->query('SELECT config_key, config_value FROM settings');
             foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -21,13 +44,15 @@ function setting(string $key, ?string $default = null): ?string {
 }
 
 function setSetting(string $key, ?string $value): void {
+    ensure_settings_table();
     $db = getDb();
     if (defined('DB_TYPE') && DB_TYPE === 'mysql') {
-        $stmt = $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v) ON DUPLICATE KEY UPDATE config_value=:v');
+        $stmt = $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v) ON DUPLICATE KEY UPDATE config_value=VALUES(config_value)');
     } else {
         $stmt = $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v) ON CONFLICT(config_key) DO UPDATE SET config_value=:v');
     }
     $stmt->execute([':k' => $key, ':v' => $value]);
+    $GLOBALS['__yy_settings_dirty'] = true; // 下次 setting() 调用时重新加载
 }
 
 function csrf_token(): string {

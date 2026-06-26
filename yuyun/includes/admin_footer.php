@@ -37,6 +37,34 @@ document.addEventListener('DOMContentLoaded', function () {
             } catch(e){}
         });
     }
+
+    // Admin language popup toggle
+    var adminLangBtn = document.getElementById('adminLangSwitcherBtn');
+    var adminLangPopup = document.getElementById('adminLangPopup');
+    if (adminLangBtn && adminLangPopup) {
+        adminLangBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            adminLangPopup.classList.toggle('open');
+        });
+        document.addEventListener('click', function (e) {
+            if (!adminLangPopup.contains(e.target) && e.target !== adminLangBtn) {
+                adminLangPopup.classList.remove('open');
+            }
+        });
+    }
+
+    // Toast helper
+    window.showToast = function (message, type) {
+        type = type || 'info';
+        var container = document.getElementById('toastContainer');
+        if (!container) return;
+        var icons = { success: 'check-circle', error: 'alert-circle', info: 'info' };
+        var toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.innerHTML = '<i class="iconfont icon-' + icons[type] + '"></i><span>' + message + '</span>';
+        container.appendChild(toast);
+        setTimeout(function() { toast.remove(); }, 4000);
+    };
 });
 </script>
 </body>

@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/../includes/config.php';
 require_login();
-$pageTitle = '建议与举报';
+$pageTitle = __('feedback');
 $db = getDb();
 $user = current_user();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -12,9 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($content) {
         $now = date('Y-m-d H:i:s');
         $db->prepare('INSERT INTO feedback (user_id, type, content, contact, created_at) VALUES (:uid,:t,:c,:contact,:now)')->execute([':uid'=>$user['id'],':t'=>$type,':c'=>$content,':contact'=>$contact,':now'=>$now]);
-        flash('success', '提交成功，感谢您的反馈');
+        flash('success', __('feedback_submitted'));
     } else {
-        flash('error', '请填写内容');
+        flash('error', __('fill_content'));
     }
     redirect(YUYUN_URL . '/user/feedback.php');
 }
@@ -22,42 +22,42 @@ require __DIR__ . '/../includes/header.php';
 ?>
 <section class="section bg-white">
     <div class="container">
-        <div style="display:grid;grid-template-columns:240px 1fr;gap:24px">
-            <div style="background:var(--dark-2);border-radius:12px;padding:14px 0;height:fit-content">
+        <div class="user-layout">
+            <div class="user-sidebar">
                 <a href="<?php echo YUYUN_URL ?>/user/index.php"><i class="iconfont icon-gauge"></i> <?php echo __('welcome') ?></a>
                 <a href="<?php echo YUYUN_URL ?>/user/notifications.php"><i class="iconfont icon-bell"></i> <?php echo __('notifications') ?></a>
                 <a href="<?php echo YUYUN_URL ?>/user/tickets.php"><i class="iconfont icon-ticket"></i> <?php echo __('my_tickets') ?></a>
                 <a href="<?php echo YUYUN_URL ?>/user/feedback.php" class="active"><i class="iconfont icon-edit"></i> <?php echo __('feedback') ?></a>
                 <a href="<?php echo YUYUN_URL ?>/user/profile.php"><i class="iconfont icon-user"></i> <?php echo __('profile') ?></a>
             </div>
-            <div>
-                <h2 style="margin-bottom:20px">建议 / 举报</h2>
+            <div class="user-content">
+                <h2 style="margin-bottom:20px"><?php echo __('feedback') ?></h2>
                 <?php echo render_flash() ?>
                 <div class="admin-card" style="max-width:640px">
                     <form method="post">
                         <input type="hidden" name="csrf_token" value="<?php echo csrf_token() ?>">
-                        <div class="form-group"><label>类型</label>
+                        <div class="form-group"><label><?php echo __('feedback_type') ?></label>
                             <select name="type" class="form-control">
-                                <option value="suggestion">产品建议</option>
-                                <option value="report">违规举报</option>
-                                <option value="complaint">投诉</option>
+                                <option value="suggestion"><?php echo __('suggestion') ?></option>
+                                <option value="report"><?php echo __('report') ?></option>
+                                <option value="complaint"><?php echo __('complaint') ?></option>
                             </select>
                         </div>
-                        <div class="form-group"><label>内容</label><textarea name="content" class="form-control" required></textarea></div>
-                        <div class="form-group"><label>联系方式（选填）</label><input type="text" name="contact" class="form-control"></div>
-                        <button type="submit" class="btn btn-primary">提交</button>
+                        <div class="form-group"><label><?php echo __('feedback_content') ?></label><textarea name="content" class="form-control" required></textarea></div>
+                        <div class="form-group"><label><?php echo __('contact_info') ?></label><input type="text" name="contact" class="form-control"></div>
+                        <button type="submit" class="btn btn-primary"><?php echo __('submit') ?></button>
                     </form>
                 </div>
                 <div class="admin-card">
-                    <h3 style="margin-bottom:16px">历史记录</h3>
+                    <h3 style="margin-bottom:16px"><?php echo __('history') ?></h3>
                     <table class="admin-table">
-                        <thead><tr><th>类型</th><th>内容</th><th>提交时间</th></tr></thead>
+                        <thead><tr><th><?php echo __('feedback_type') ?></th><th><?php echo __('feedback_content') ?></th><th>提交时间</th></tr></thead>
                         <tbody>
                             <?php
                             $list = $db->prepare('SELECT * FROM feedback WHERE user_id=:uid ORDER BY created_at DESC');
                             $list->execute([':uid'=>$user['id']]);
                             foreach ($list->fetchAll(PDO::FETCH_ASSOC) as $f):
-                                $typeLabel = ['suggestion'=>'建议','report'=>'举报','complaint'=>'投诉','contact'=>'留言'][$f['type']] ?? $f['type'];
+                                $typeLabel = ['suggestion'=>__('suggestion'),'report'=>__('report'),'complaint'=>__('complaint'),'contact'=>__('contact')][$f['type']] ?? $f['type'];
                             ?>
                             <tr>
                                 <td><?php echo e($typeLabel) ?></td>

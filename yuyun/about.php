@@ -6,8 +6,8 @@ require __DIR__ . '/includes/header.php';
 ?>
 <section class="page-banner">
     <div class="container">
-        <h1>关于我们</h1>
-        <p>了解语云科技的使命与价值观</p>
+        <h1><?php echo __('about_title') ?></h1>
+        <p><?php echo __('about_sub') ?></p>
     </div>
 </section>
 <section class="section bg-white">
@@ -22,8 +22,8 @@ require __DIR__ . '/includes/header.php';
                 <ul class="info-list">
                     <li><i class="iconfont icon-map"></i> <?php echo e(setting('company_address','中国北京市朝阳区')) ?></li>
                     <li><i class="iconfont icon-phone"></i> <?php echo e(setting('company_phone','400-800-8451')) ?></li>
-                    <li><i class="iconfont icon-users"></i> <a href="<?php echo e(setting('company_group','#')) ?>" target="_blank">官方群聊</a></li>
-                    <li><i class="iconfont icon-cloud"></i> <a href="<?php echo e(setting('international_url','https://cloud.loveym.cloud')) ?>" target="_blank">国际版官网</a></li>
+                    <li><i class="iconfont icon-users"></i> <a href="<?php echo e(setting('company_group','#')) ?>" target="_blank"><?php echo __('official_group') ?></a></li>
+                    <li><i class="iconfont icon-cloud"></i> <a href="<?php echo e(setting('international_url','https://cloud.loveym.cloud')) ?>" target="_blank"><?php echo __('international_site') ?></a></li>
                 </ul>
                 <iframe class="map-embed" src="<?php echo e(setting('company_map_url','https://map.baidu.com/search/北京市')) ?>" loading="lazy"></iframe>
             </div>

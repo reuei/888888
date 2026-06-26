@@ -24,15 +24,15 @@ $notifications = $list->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <section class="section bg-white">
     <div class="container">
-        <div style="display:grid;grid-template-columns:240px 1fr;gap:24px">
-            <div style="background:var(--dark-2);border-radius:12px;padding:14px 0;height:fit-content">
+        <div class="user-layout">
+            <div class="user-sidebar">
                 <a href="<?php echo YUYUN_URL ?>/user/index.php"><i class="iconfont icon-gauge"></i> <?php echo __('welcome') ?></a>
                 <a href="<?php echo YUYUN_URL ?>/user/notifications.php" class="active"><i class="iconfont icon-bell"></i> <?php echo __('notifications') ?></a>
                 <a href="<?php echo YUYUN_URL ?>/user/tickets.php"><i class="iconfont icon-ticket"></i> <?php echo __('my_tickets') ?></a>
                 <a href="<?php echo YUYUN_URL ?>/user/feedback.php"><i class="iconfont icon-edit"></i> <?php echo __('feedback') ?></a>
                 <a href="<?php echo YUYUN_URL ?>/user/profile.php"><i class="iconfont icon-user"></i> <?php echo __('profile') ?></a>
             </div>
-            <div>
+            <div class="user-content">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
                     <h2 style="margin:0"><?php echo __('notifications') ?></h2>
                     <?php if (count($notifications) > 0): ?>

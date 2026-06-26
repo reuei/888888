@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/includes/config.php';
 if (template_include('products.php')) exit;
-$pageTitle = '产品介绍';
+$pageTitle = __('page_products');
 require __DIR__ . '/includes/header.php';
 $db = getDb();
 $products = $db->query('SELECT * FROM products WHERE is_active=1 ORDER BY sort_order,id')->fetchAll(PDO::FETCH_ASSOC);
@@ -9,8 +9,8 @@ $iconMap = ['fa-cube'=>'icon-cubes','fa-server'=>'icon-store','fa-shield-halved'
 ?>
 <section class="page-banner">
     <div class="container">
-        <h1>产品介绍</h1>
-        <p>全栈云产品与数字化解决方案</p>
+        <h1><?php echo __('products_title_page') ?></h1>
+        <p><?php echo __('products_sub') ?></p>
     </div>
 </section>
 <section class="section bg-white">
@@ -27,7 +27,7 @@ $iconMap = ['fa-cube'=>'icon-cubes','fa-server'=>'icon-store','fa-shield-halved'
                 <div class="icon"><i class="iconfont <?php echo e($iconClass) ?> icon-2xl"></i></div>
                 <h3><?php echo e($prod['name']) ?></h3>
                 <p><?php echo e($prod['summary']) ?></p>
-                <span class="more">了解详情 <i class="iconfont icon-chevron-right"></i></span>
+                <span class="more"><?php echo __('detail') ?> <i class="iconfont icon-chevron-right"></i></span>
             </div>
             <?php endforeach; ?>
         </div>
@@ -36,7 +36,7 @@ $iconMap = ['fa-cube'=>'icon-cubes','fa-server'=>'icon-store','fa-shield-halved'
 <div class="modal-overlay" id="productModal">
     <div class="modal">
         <div class="modal-header">
-            <h3 id="modalProductTitle">产品详情</h3>
+            <h3 id="modalProductTitle"><?php echo __('product_detail') ?></h3>
             <button class="modal-close"><i class="iconfont icon-close"></i></button>
         </div>
         <div class="modal-body" id="modalProductBody"></div>

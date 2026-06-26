@@ -31,9 +31,10 @@ $bannerIcon = setting('banner_icon','megaphone');
 <?php if ($bannerEnabled && trim($bannerText) !== ''): ?>
 <div class="site-banner" id="siteBanner" style="background:<?php echo e($bannerBg) ?>">
     <div class="container banner-inner">
+        <div class="banner-icon-left"><i class="iconfont icon-<?php echo e($bannerIcon) ?>"></i></div>
         <div class="banner-marquee">
-            <span class="banner-text"><i class="iconfont icon-<?php echo e($bannerIcon) ?>"></i> <?php echo e($bannerText) ?></span>
-            <span class="banner-text" aria-hidden="true"><i class="iconfont icon-<?php echo e($bannerIcon) ?>"></i> <?php echo e($bannerText) ?></span>
+            <span class="banner-text"><?php echo e($bannerText) ?></span>
+            <span class="banner-text" aria-hidden="true"><?php echo e($bannerText) ?></span>
         </div>
         <button class="banner-close" id="bannerClose" aria-label="关闭公告"><i class="iconfont icon-close"></i></button>
     </div>

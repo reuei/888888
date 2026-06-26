@@ -1,15 +1,15 @@
 <?php
 require __DIR__ . '/includes/config.php';
 if (template_include('partners.php')) exit;
-$pageTitle = '合作伙伴';
+$pageTitle = __('page_partners');
 require __DIR__ . '/includes/header.php';
 $db = getDb();
 $partners = $db->query('SELECT * FROM partners WHERE is_active=1 ORDER BY sort_order,id')->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <section class="page-banner">
     <div class="container">
-        <h1>合作伙伴</h1>
-        <p>携手行业领袖，共建生态未来</p>
+        <h1><?php echo __('partners_title_page') ?></h1>
+        <p><?php echo __('partners_sub') ?></p>
     </div>
 </section>
 <section class="section bg-white">
@@ -27,7 +27,7 @@ $partners = $db->query('SELECT * FROM partners WHERE is_active=1 ORDER BY sort_o
                 <?php endif; ?>
                 <h3><?php echo e($p['name']) ?></h3>
                 <?php if ($p['link']): ?>
-                    <a href="<?php echo e($p['link']) ?>" target="_blank" class="more">访问官网 <i class="iconfont icon-arrow-right"></i></a>
+                    <a href="<?php echo e($p['link']) ?>" target="_blank" class="more"><?php echo __('visit_official') ?> <i class="iconfont icon-arrow-right"></i></a>
                 <?php endif; ?>
             </div>
             <?php endforeach; ?>

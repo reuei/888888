@@ -30,8 +30,14 @@ require __DIR__ . '/../includes/header.php';
 ?>
 <section class="section bg-white">
     <div class="container">
-        <div class="user-layout">
-            <?php require __DIR__ . '/../includes/user_sidebar.php'; ?>
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:24px">
+            <div style="background:var(--dark-2);border-radius:12px;padding:14px 0;height:fit-content">
+                <a href="<?php echo YUYUN_URL ?>/user/index.php"><i class="iconfont icon-gauge"></i> <?php echo __('welcome') ?></a>
+                <a href="<?php echo YUYUN_URL ?>/user/notifications.php"><i class="iconfont icon-bell"></i> <?php echo __('notifications') ?></a>
+                <a href="<?php echo YUYUN_URL ?>/user/tickets.php"><i class="iconfont icon-ticket"></i> <?php echo __('my_tickets') ?></a>
+                <a href="<?php echo YUYUN_URL ?>/user/feedback.php"><i class="iconfont icon-edit"></i> <?php echo __('feedback') ?></a>
+                <a href="<?php echo YUYUN_URL ?>/user/profile.php" class="active"><i class="iconfont icon-user"></i> <?php echo __('profile') ?></a>
+            </div>
             <div>
                 <h2 style="margin-bottom:20px">个人资料</h2>
                 <div class="admin-card" style="max-width:600px">

@@ -22,24 +22,12 @@ function setting(string $key, ?string $default = null): ?string {
 
 function setSetting(string $key, ?string $value): void {
     $db = getDb();
-    try {
-        if (defined('DB_TYPE') && DB_TYPE === 'mysql') {
-            $stmt = $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v) ON DUPLICATE KEY UPDATE config_value=:v');
-            $stmt->execute([':k' => $key, ':v' => $value]);
-            return;
-        }
+    if (defined('DB_TYPE') && DB_TYPE === 'mysql') {
+        $stmt = $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v) ON DUPLICATE KEY UPDATE config_value=:v');
+    } else {
         $stmt = $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v) ON CONFLICT(config_key) DO UPDATE SET config_value=:v');
-        $stmt->execute([':k' => $key, ':v' => $value]);
-    } catch (PDOException $e) {
-        // Fallback for older SQLite / virtual hosts without UPSERT support
-        $check = $db->prepare('SELECT id FROM settings WHERE config_key=:k');
-        $check->execute([':k' => $key]);
-        if ($check->fetch()) {
-            $db->prepare('UPDATE settings SET config_value=:v WHERE config_key=:k')->execute([':k' => $key, ':v' => $value]);
-        } else {
-            $db->prepare('INSERT INTO settings (config_key, config_value) VALUES (:k, :v)')->execute([':k' => $key, ':v' => $value]);
-        }
     }
+    $stmt->execute([':k' => $key, ':v' => $value]);
 }
 
 function csrf_token(): string {

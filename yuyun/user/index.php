@@ -13,9 +13,16 @@ $unread = unread_notification_count($user['id']);
 ?>
 <section class="section bg-white">
     <div class="container">
-        <div class="user-layout">
-            <?php require __DIR__ . '/../includes/user_sidebar.php'; ?>
-            <div>
+        <div class="admin-body" style="min-height:auto;display:block">
+            <div style="display:grid;grid-template-columns:240px 1fr;gap:24px">
+                <div style="background:var(--dark-2);border-radius:12px;padding:14px 0;height:fit-content">
+                    <a href="<?php echo YUYUN_URL ?>/user/index.php" class="active"><i class="iconfont icon-gauge"></i> <?php echo __('welcome') ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/notifications.php"><i class="iconfont icon-bell"></i> <?php echo __('notifications') ?><?php if ($unread > 0): ?><span style="background:var(--brand);color:#fff;border-radius:10px;padding:1px 7px;font-size:12px;margin-left:6px"><?php echo $unread ?></span><?php endif; ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/tickets.php"><i class="iconfont icon-ticket"></i> <?php echo __('my_tickets') ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/feedback.php"><i class="iconfont icon-edit"></i> <?php echo __('feedback') ?></a>
+                    <a href="<?php echo YUYUN_URL ?>/user/profile.php"><i class="iconfont icon-user"></i> <?php echo __('profile') ?></a>
+                </div>
+                <div>
                     <h2 style="margin-bottom:20px"><?php echo __('welcome') ?>，<?php echo e($user['nickname'] ?: $user['email']) ?></h2>
                     <div class="card-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
                         <div class="admin-card" style="text-align:center">
@@ -41,5 +48,6 @@ $unread = unread_notification_count($user['id']);
                 </div>
             </div>
         </div>
+    </div>
 </section>
 <?php require __DIR__ . '/../includes/footer.php'; ?>

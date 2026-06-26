@@ -1,7 +1,6 @@
 </main>
 <div class="admin-overlay" id="adminOverlay"></div>
 <div class="toast-container" id="toastContainer"></div>
-<script src="<?php echo YUYUN_URL ?>/assets/js/main.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const toggle = document.getElementById('adminMenuToggle');

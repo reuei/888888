@@ -41,7 +41,6 @@ function project($lat,$lon){
     $y = ((90 - $lat) / 180) * 500;
     return [$x,$y];
 }
-require __DIR__ . '/includes/world_map_path.php';
 ?>
 
 <!-- Hero -->
@@ -136,7 +135,10 @@ require __DIR__ . '/includes/world_map_path.php';
         </div>
         <div class="map-wrap">
             <svg class="map-svg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
-                <path class="map-land" d="<?php echo $worldMapPath ?>"/>
+                <path class="map-continent" d="M150,130 C220,80 320,80 360,120 C400,90 480,80 560,100 C680,70 820,90 900,130 C920,180 880,260 820,300 C780,320 720,300 680,280 C640,300 580,310 520,290 C480,330 420,340 360,320 C300,340 220,330 150,300 C120,250 120,180 150,130 Z"/>
+                <path class="map-continent" d="M330,250 C360,230 390,240 410,260 C420,320 410,390 380,420 C350,410 330,380 320,340 C310,300 315,270 330,250 Z"/>
+                <path class="map-continent" d="M430,190 C480,180 540,190 570,220 C590,290 580,360 550,390 C500,380 460,360 440,320 C425,280 420,230 430,190 Z"/>
+                <path class="map-continent" d="M750,300 C800,290 870,300 890,330 C900,370 880,410 840,420 C790,410 760,380 750,350 C740,330 740,310 750,300 Z"/>
                 <?php foreach ($nodes as $n): $p = project($n[1],$n[2]); ?>
                 <circle class="map-node-s" cx="<?php echo $p[0] ?>" cy="<?php echo $p[1] ?>" r="5" data-city="<?php echo e($n[0]) ?>">
                     <title><?php echo e($n[0]) ?></title>

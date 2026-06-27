@@ -422,6 +422,100 @@ CREATE TABLE `jz_finance_flow` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='资金流水表';
 
 -- ----------------------------
+-- 代理商品表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_agent_goods`;
+CREATE TABLE `jz_agent_goods` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `goods_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '关联商品ID',
+  `commission_rate` decimal(5,4) NOT NULL DEFAULT '0.0000' COMMENT '佣金比例',
+  `commission_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '固定佣金金额',
+  `commission_mode` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1按比例 2按固定金额',
+  `multi_level` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否多级分销 0否 1是',
+  `level2_rate` decimal(5,4) NOT NULL DEFAULT '0.0000' COMMENT '二级佣金比例',
+  `level3_rate` decimal(5,4) NOT NULL DEFAULT '0.0000' COMMENT '三级佣金比例',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_goods` (`goods_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='代理商品表';
+
+-- ----------------------------
+-- 代理用户表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_agent_user`;
+CREATE TABLE `jz_agent_user` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
+  `parent_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '上级代理用户ID',
+  `level` int(11) unsigned NOT NULL DEFAULT 1 COMMENT '代理层级',
+  `path` varchar(500) NOT NULL DEFAULT '' COMMENT '代理路径 如: 0,1,2,',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1正常',
+  `total_commission` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '累计佣金',
+  `settled_commission` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '已结算佣金',
+  `pending_commission` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '待结算佣金',
+  `invite_code` varchar(32) NOT NULL DEFAULT '' COMMENT '邀请码',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user` (`user_id`),
+  UNIQUE KEY `uk_invite` (`invite_code`),
+  KEY `idx_parent` (`parent_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='代理用户表';
+
+-- ----------------------------
+-- 佣金记录表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_agent_commission`;
+CREATE TABLE `jz_agent_commission` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '来源订单ID',
+  `order_no` varchar(50) NOT NULL DEFAULT '' COMMENT '订单编号',
+  `user_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '获得佣金用户ID',
+  `from_user_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '消费用户ID',
+  `goods_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '商品ID',
+  `amount` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '订单金额',
+  `commission` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '佣金金额',
+  `level` int(11) unsigned NOT NULL DEFAULT 1 COMMENT '佣金层级',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0待结算 1已结算 2已取消',
+  `settle_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '结算单ID',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_order` (`order_id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_settle` (`settle_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='佣金记录表';
+
+-- ----------------------------
+-- 代理结算表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_agent_settlement`;
+CREATE TABLE `jz_agent_settlement` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `settle_no` varchar(50) NOT NULL DEFAULT '' COMMENT '结算单号',
+  `user_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '代理用户ID',
+  `amount` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '结算金额',
+  `fee` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '手续费',
+  `real_amount` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '实际到账',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0待处理 1处理中 2成功 3失败',
+  `channel` varchar(30) NOT NULL DEFAULT '' COMMENT '结算渠道',
+  `account` varchar(255) NOT NULL DEFAULT '' COMMENT '收款账号',
+  `remark` varchar(255) NOT NULL DEFAULT '',
+  `pay_time` datetime DEFAULT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_settle_no` (`settle_no`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='代理结算表';
+
+-- ----------------------------
 -- 初始化默认费率分组
 -- ----------------------------
 INSERT INTO `jz_rate_group` (`name`, `rate`, `max_fee`, `cost_rate`, `is_default`) VALUES

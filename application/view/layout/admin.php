@@ -31,6 +31,7 @@ $menu = [
     ['name' => '代理分销', 'icon' => '⧉', 'url' => '#', 'children' => [
         ['name' => '代理商品', 'url' => 'admin/agent/goods'],
         ['name' => '代理树', 'url' => 'admin/agent/tree'],
+        ['name' => '佣金记录', 'url' => 'admin/agent/commission'],
         ['name' => '佣金结算', 'url' => 'admin/agent/settle'],
     ]],
     ['name' => '财务结算', 'icon' => '¥', 'url' => '#', 'children' => [

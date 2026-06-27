@@ -306,6 +306,30 @@ CREATE TABLE `jz_banned_keyword` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='禁售关键词表';
 
 -- ----------------------------
+-- 投诉表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_complaint`;
+CREATE TABLE `jz_complaint` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '订单ID',
+  `merchant_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '商户ID',
+  `user_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
+  `type` varchar(50) NOT NULL DEFAULT '' COMMENT '投诉类型',
+  `content` text COMMENT '投诉内容',
+  `images` text COMMENT '图片凭证JSON',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0待处理 1已处理',
+  `result` varchar(50) NOT NULL DEFAULT '' COMMENT '处理结果',
+  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '处理备注',
+  `handle_time` datetime DEFAULT NULL COMMENT '处理时间',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_order` (`order_id`),
+  KEY `idx_merchant` (`merchant_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='投诉表';
+
+-- ----------------------------
 -- 初始化默认费率分组
 -- ----------------------------
 INSERT INTO `jz_rate_group` (`name`, `rate`, `max_fee`, `cost_rate`, `is_default`) VALUES

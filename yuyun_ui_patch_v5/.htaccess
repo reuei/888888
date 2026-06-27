@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    # Optional: pretty URLs can be added here if needed
+</IfModule>
+
+# Protect sensitive files
+<FilesMatch "^(config\.php|installed\.lock)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

@@ -330,6 +330,24 @@ CREATE TABLE `jz_complaint` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='投诉表';
 
 -- ----------------------------
+-- 用户等级分组表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_user_group`;
+CREATE TABLE `jz_user_group` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '分组名称',
+  `level` int(11) unsigned NOT NULL DEFAULT 1 COMMENT '等级',
+  `discount` decimal(5,4) NOT NULL DEFAULT '1.0000' COMMENT '折扣率',
+  `icon` varchar(255) NOT NULL DEFAULT '' COMMENT '等级图标',
+  `sort` int(11) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_level` (`level`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户等级分组表';
+
+-- ----------------------------
 -- 初始化默认费率分组
 -- ----------------------------
 INSERT INTO `jz_rate_group` (`name`, `rate`, `max_fee`, `cost_rate`, `is_default`) VALUES

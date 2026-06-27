@@ -13,6 +13,16 @@
     <span style="font-size: 13px; color: #64748B; font-weight: normal;">共 <?php echo $total; ?> 件商品</span>
 </div>
 
+<?php if (!empty($categoryTop)): ?>
+<div style="margin-bottom: 16px;">
+    <?php foreach ($categoryTop as $ad): ?>
+    <a href="<?php echo h($ad['link'] ?: 'javascript:;'); ?>" target="_blank" style="display: block; border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0; margin-bottom: 12px;">
+        <img src="<?php echo h($ad['image']); ?>" alt="<?php echo h($ad['title']); ?>" style="width: 100%; height: 120px; object-fit: cover; display: block;">
+    </a>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
 <?php if (empty($list)): ?>
 <div class="card empty-tip">暂无商品</div>
 <?php else: ?>

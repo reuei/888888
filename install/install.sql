@@ -239,6 +239,25 @@ CREATE TABLE `jz_article` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章公告表';
 
 -- ----------------------------
+-- 广告位表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_ad`;
+CREATE TABLE `jz_ad` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL DEFAULT '' COMMENT '广告标题',
+  `image` varchar(500) NOT NULL DEFAULT '' COMMENT '图片URL',
+  `link` varchar(500) NOT NULL DEFAULT '' COMMENT '跳转链接',
+  `position` varchar(50) NOT NULL DEFAULT 'home_banner' COMMENT 'home_banner-首页轮播 home_top-首页顶部 category_top-分类顶部',
+  `sort` int(11) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_position` (`position`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='广告位表';
+
+-- ----------------------------
 -- 费率分组表
 -- ----------------------------
 DROP TABLE IF EXISTS `jz_rate_group`;

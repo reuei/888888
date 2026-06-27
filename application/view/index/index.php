@@ -56,6 +56,16 @@
     <a href="<?php echo url('index/category'); ?>" class="btn btn-lg">立即购卡</a>
 </div>
 
+<?php if (!empty($homeTop)): ?>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 16px;">
+    <?php foreach ($homeTop as $ad): ?>
+    <a href="<?php echo h($ad['link'] ?: 'javascript:;'); ?>" target="_blank" style="border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0; display: block;">
+        <img src="<?php echo h($ad['image']); ?>" alt="<?php echo h($ad['title']); ?>" style="width: 100%; height: 100px; object-fit: cover; display: block;">
+    </a>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
 <?php if (!empty($articles)): ?>
 <div class="notice-bar">
     <strong>公告</strong>
@@ -74,6 +84,16 @@
     <a href="<?php echo url('index/category', ['id' => $c['id']]); ?>"><?php echo h($c['name']); ?></a>
     <?php endforeach; ?>
     <a href="<?php echo url('index/category'); ?>" style="color:#2563EB; border-color:#2563EB;">全部商品 →</a>
+</div>
+<?php endif; ?>
+
+<?php if (!empty($homeBanner)): ?>
+<div style="margin-bottom: 24px;">
+    <?php foreach ($homeBanner as $ad): ?>
+    <a href="<?php echo h($ad['link'] ?: 'javascript:;'); ?>" target="_blank" style="display: block; border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0; margin-bottom: 12px;">
+        <img src="<?php echo h($ad['image']); ?>" alt="<?php echo h($ad['title']); ?>" style="width: 100%; height: 160px; object-fit: cover; display: block;">
+    </a>
+    <?php endforeach; ?>
 </div>
 <?php endif; ?>
 

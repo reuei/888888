@@ -32,10 +32,16 @@ class Index extends Controller
         // 公告
         $articles = Db::query("SELECT id, title, create_time FROM jz_article WHERE status = 1 ORDER BY id DESC LIMIT 5");
 
+        // 首页广告
+        $homeBanner = Db::query("SELECT * FROM jz_ad WHERE position = 'home_banner' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 5");
+        $homeTop = Db::query("SELECT * FROM jz_ad WHERE position = 'home_top' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 3");
+
         $this->assign('title', '首页');
         $this->assign('categories', $categories);
         $this->assign('goods', $goods);
         $this->assign('articles', $articles);
+        $this->assign('homeBanner', $homeBanner);
+        $this->assign('homeTop', $homeTop);
         $this->fetch('index/index');
     }
 
@@ -91,6 +97,9 @@ class Index extends Controller
             $category = Db::fetch("SELECT * FROM jz_category WHERE id = ? AND status = 1", [$categoryId]);
         }
 
+        // 分类页广告
+        $categoryTop = Db::query("SELECT * FROM jz_ad WHERE position = 'category_top' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 3");
+
         $this->assign('title', $category ? h($category['name']) : '全部商品');
         $this->assign('category', $category);
         $this->assign('list', $list);
@@ -98,6 +107,7 @@ class Index extends Controller
         $this->assign('page', $page);
         $this->assign('totalPages', $totalPages);
         $this->assign('total', $total);
+        $this->assign('categoryTop', $categoryTop);
         $this->fetch('index/category');
     }
 
@@ -128,9 +138,13 @@ class Index extends Controller
             [$goods['category_id'], $id]
         );
 
+        // 商品详情页广告
+        $goodsBottom = Db::query("SELECT * FROM jz_ad WHERE position = 'goods_bottom' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 3");
+
         $this->assign('title', h($goods['name']));
         $this->assign('goods', $goods);
         $this->assign('recommend', $recommend);
+        $this->assign('goodsBottom', $goodsBottom);
         $this->fetch('index/goods');
     }
 

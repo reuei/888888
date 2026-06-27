@@ -89,6 +89,19 @@
     </div>
 </div>
 
+<?php if (!empty($goodsBottom)): ?>
+<div class="section-title" style="margin-top: 24px;">
+    <span>精选推荐</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+    <?php foreach ($goodsBottom as $ad): ?>
+    <a href="<?php echo h($ad['link'] ?: 'javascript:;'); ?>" target="_blank" style="border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0; display: block;">
+        <img src="<?php echo h($ad['image']); ?>" alt="<?php echo h($ad['title']); ?>" style="width: 100%; height: 120px; object-fit: cover; display: block;">
+    </a>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
 <?php if (!empty($recommend)): ?>
 <div class="section-title" style="margin-top: 24px;">
     <span>同类推荐</span>

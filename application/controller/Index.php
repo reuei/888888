@@ -221,6 +221,224 @@ class Index extends Controller
     }
 
     /**
+     * 校验优惠券
+     */
+    private function validateCoupon($code, $goodsId, $categoryId, $totalAmount)
+    {
+        $now = date('Y-m-d H:i:s');
+
+        // 优先查询用户已领取的优惠券
+        $userCoupon = Db::fetch(
+            "SELECT uc.*, c.scope, c.scope_id
+             FROM jz_user_coupon uc
+             LEFT JOIN jz_coupon c ON uc.coupon_id = c.id
+             WHERE uc.coupon_code = ? AND uc.status = 0",
+            [$code]
+        );
+
+        if ($userCoupon) {
+            if ($userCoupon['expire_time'] && $userCoupon['expire_time'] < $now) {
+                return ['valid' => false, 'msg' => '优惠券已过期'];
+            }
+            if ((float) $userCoupon['min_amount'] > $totalAmount) {
+                return ['valid' => false, 'msg' => '订单金额未满 ¥' . $userCoupon['min_amount']];
+            }
+            if ($userCoupon['scope'] === 'category' && (int) $userCoupon['scope_id'] !== (int) $categoryId) {
+                return ['valid' => false, 'msg' => '该优惠券不适用当前分类'];
+            }
+            if ($userCoupon['scope'] === 'goods' && (int) $userCoupon['scope_id'] !== (int) $goodsId) {
+                return ['valid' => false, 'msg' => '该优惠券不适用当前商品'];
+            }
+
+            $coupon = $userCoupon;
+            $coupon['user_coupon_id'] = $userCoupon['id'];
+        } else {
+            // 查询固定券码
+            $coupon = Db::fetch("SELECT * FROM jz_coupon WHERE code = ? AND status = 1", [$code]);
+            if (!$coupon) {
+                return ['valid' => false, 'msg' => '优惠券不存在或已禁用'];
+            }
+            if ($coupon['start_time'] && $coupon['start_time'] > $now) {
+                return ['valid' => false, 'msg' => '优惠券尚未开始'];
+            }
+            if ($coupon['end_time'] && $coupon['end_time'] < $now) {
+                return ['valid' => false, 'msg' => '优惠券已过期'];
+            }
+            if ($coupon['total_count'] > 0 && $coupon['used_count'] >= $coupon['total_count']) {
+                return ['valid' => false, 'msg' => '优惠券已发放完毕'];
+            }
+            if ((float) $coupon['min_amount'] > $totalAmount) {
+                return ['valid' => false, 'msg' => '订单金额未满 ¥' . $coupon['min_amount']];
+            }
+            if ($coupon['scope'] === 'category' && (int) $coupon['scope_id'] !== (int) $categoryId) {
+                return ['valid' => false, 'msg' => '该优惠券不适用当前分类'];
+            }
+            if ($coupon['scope'] === 'goods' && (int) $coupon['scope_id'] !== (int) $goodsId) {
+                return ['valid' => false, 'msg' => '该优惠券不适用当前商品'];
+            }
+        }
+
+        $amount = 0;
+        if ((int) $coupon['type'] === 1) {
+            // 满减
+            $amount = min((float) $coupon['amount'], $totalAmount);
+        } elseif ((int) $coupon['type'] === 2) {
+            // 折扣
+            $amount = round($totalAmount * (1 - (float) $coupon['amount']), 2);
+            $amount = min($amount, $totalAmount - 0.01);
+        } else {
+            // 固定金额
+            $amount = min((float) $coupon['amount'], $totalAmount);
+        }
+
+        return ['valid' => true, 'amount' => max(0, $amount)];
+    }
+
+    /**
+     * 将已过期的用户优惠券标记为已过期
+     */
+    private function expireUserCoupons()
+    {
+        $now = date('Y-m-d H:i:s');
+        Db::execute(
+            "UPDATE jz_user_coupon SET status = 2 WHERE status = 0 AND expire_time IS NOT NULL AND expire_time < ?",
+            [$now]
+        );
+    }
+
+    /**
+     * 优惠券领取中心
+     */
+    public function coupon()
+    {
+        $this->expireUserCoupons();
+
+        $contact = trim(input('contact', ''));
+        $now = date('Y-m-d H:i:s');
+
+        // 可领取优惠券：启用、领取券（code为空）、未过期、未领完
+        $where = "status = 1 AND code = '' AND (total_count = 0 OR receive_count < total_count)";
+        $params = [];
+        if ($now) {
+            $where .= " AND (start_time IS NULL OR start_time <= ?) AND (end_time IS NULL OR end_time >= ?)";
+            $params[] = $now;
+            $params[] = $now;
+        }
+
+        $list = Db::query(
+            "SELECT * FROM jz_coupon WHERE {$where} ORDER BY id DESC",
+            $params
+        );
+
+        // 用户已领取的优惠券
+        $myCoupons = [];
+        if ($contact) {
+            $user = Db::fetch("SELECT id FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+            if ($user) {
+                $myCoupons = Db::query(
+                    "SELECT uc.*, c.name AS coupon_name, c.scope, c.scope_id
+                     FROM jz_user_coupon uc
+                     LEFT JOIN jz_coupon c ON uc.coupon_id = c.id
+                     WHERE uc.user_id = ? AND uc.status = 0
+                     ORDER BY uc.id DESC",
+                    [$user['id']]
+                );
+            }
+        }
+
+        $this->assign('title', '领券中心');
+        $this->assign('list', $list);
+        $this->assign('myCoupons', $myCoupons);
+        $this->assign('contact', $contact);
+        $this->fetch('index/coupon');
+    }
+
+    /**
+     * 领取优惠券（Ajax）
+     */
+    public function receiveCoupon()
+    {
+        $couponId = (int) input('coupon_id', 0);
+        $contact = trim(input('contact', ''));
+
+        if (!$couponId) {
+            json_error('请选择优惠券');
+        }
+        if (!$contact) {
+            json_error('请填写联系方式');
+        }
+
+        $coupon = Db::fetch("SELECT * FROM jz_coupon WHERE id = ? AND status = 1", [$couponId]);
+        if (!$coupon) {
+            json_error('优惠券不存在或已禁用');
+        }
+        if ($coupon['code'] !== '') {
+            json_error('该券不支持领取');
+        }
+
+        $now = date('Y-m-d H:i:s');
+        if ($coupon['start_time'] && $coupon['start_time'] > $now) {
+            json_error('优惠券尚未开始');
+        }
+        if ($coupon['end_time'] && $coupon['end_time'] < $now) {
+            json_error('优惠券已过期');
+        }
+        if ($coupon['total_count'] > 0 && (int) $coupon['receive_count'] >= (int) $coupon['total_count']) {
+            json_error('优惠券已领取完毕');
+        }
+
+        // 查找或创建用户
+        $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+        if (!$user) {
+            $userId = Db::insert('jz_user', [
+                'nickname' => $contact,
+                'mobile' => $contact,
+                'password' => password_hash_custom(substr(md5(uniqid()), 0, 8)),
+                'create_time' => $now,
+            ]);
+        } else {
+            $userId = $user['id'];
+        }
+
+        // 每人限领
+        $limit = (int) $coupon['limit_per_user'];
+        if ($limit > 0) {
+            $received = Db::fetch(
+                "SELECT COUNT(*) AS total FROM jz_user_coupon WHERE coupon_id = ? AND user_id = ?",
+                [$couponId, $userId]
+            );
+            if ((int) ($received['total'] ?? 0) >= $limit) {
+                json_error('您已达到领取上限');
+            }
+        }
+
+        // 生成唯一券码
+        $code = 'CP' . date('Ymd') . strtoupper(substr(uniqid(), -6)) . mt_rand(10, 99);
+        while (Db::fetch("SELECT id FROM jz_user_coupon WHERE coupon_code = ?", [$code])) {
+            $code = 'CP' . date('Ymd') . strtoupper(substr(uniqid(), -6)) . mt_rand(10, 99);
+        }
+
+        // 过期时间：优先使用优惠券结束时间
+        $expireTime = $coupon['end_time'] ?: null;
+
+        Db::insert('jz_user_coupon', [
+            'user_id' => $userId,
+            'coupon_id' => $couponId,
+            'coupon_code' => $code,
+            'amount' => $coupon['amount'],
+            'min_amount' => $coupon['min_amount'],
+            'type' => $coupon['type'],
+            'status' => 0,
+            'expire_time' => $expireTime,
+            'create_time' => $now,
+        ]);
+
+        Db::execute("UPDATE jz_coupon SET receive_count = receive_count + 1 WHERE id = ?", [$couponId]);
+
+        json_success('领取成功', ['coupon_code' => $code]);
+    }
+
+    /**
      * 创建订单（Ajax）
      */
     public function buy()
@@ -294,12 +512,26 @@ class Index extends Controller
             json_error('库存不足，当前剩余 ' . $goods['stock']);
         }
 
+        // 优惠券校验与抵扣
+        $couponCode = trim(input('coupon_code', ''));
+        $couponAmount = 0;
+        $userCouponId = 0;
+        if ($couponCode) {
+            $couponResult = $this->validateCoupon($couponCode, $goodsId, $goods['category_id'], $totalAmount);
+            if ($couponResult['valid']) {
+                $couponAmount = $couponResult['amount'];
+                $userCouponId = $couponResult['user_coupon_id'] ?? 0;
+            } else {
+                json_error($couponResult['msg']);
+            }
+        }
+
         // 金额随机化（用于规避风控）
-        $payAmount = $totalAmount;
+        $payAmount = max(0.01, round($totalAmount - $couponAmount, 2));
         if (($risk['amount_jitter'] ?? '0') === '1') {
             $range = (float) ($risk['jitter_range'] ?? 0.01);
-            $jitter = $totalAmount * $range * (mt_rand(-100, 100) / 100);
-            $payAmount = round($totalAmount + $jitter, 2);
+            $jitter = $payAmount * $range * (mt_rand(-100, 100) / 100);
+            $payAmount = round($payAmount + $jitter, 2);
             $payAmount = max(0.01, $payAmount);
         }
 
@@ -316,11 +548,24 @@ class Index extends Controller
             'price' => $goods['price'],
             'total_amount' => $totalAmount,
             'pay_amount' => $payAmount,
+            'coupon_code' => $couponCode,
+            'coupon_amount' => $couponAmount,
             'status' => 0,
             'client_ip' => $clientIp,
             'contact' => $contact,
             'create_time' => date('Y-m-d H:i:s'),
         ]);
+
+        // 更新优惠券使用统计
+        if ($couponCode && $couponAmount > 0) {
+            Db::execute("UPDATE jz_coupon SET used_count = used_count + 1 WHERE code = ?", [$couponCode]);
+            if ($userCouponId > 0) {
+                Db::execute(
+                    "UPDATE jz_user_coupon SET status = 1, order_id = ?, use_time = ? WHERE id = ?",
+                    [$orderId, date('Y-m-d H:i:s'), $userCouponId]
+                );
+            }
+        }
 
         // 扣减库存（下单即冻结库存，支付后发货）
         if ($goods['type'] == 1) {

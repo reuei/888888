@@ -84,6 +84,10 @@
                 <label>联系方式（用于查询订单）</label>
                 <input type="text" name="contact" id="contact" placeholder="邮箱 / QQ / 手机号" required>
             </div>
+            <div class="form-group">
+                <label>优惠券码（选填）</label>
+                <input type="text" name="coupon_code" id="couponCode" placeholder="输入券码享受优惠">
+            </div>
             <button type="submit" class="btn btn-lg btn-block" id="buyBtn">立即购买</button>
         </form>
     </div>

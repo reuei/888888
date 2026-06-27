@@ -208,6 +208,8 @@ CREATE TABLE `jz_order` (
   `client_ip` varchar(50) NOT NULL DEFAULT '',
   `contact` varchar(100) NOT NULL DEFAULT '' COMMENT '买家联系方式',
   `deliver_content` text COMMENT '发货内容',
+  `coupon_code` varchar(32) NOT NULL DEFAULT '' COMMENT '使用的优惠券码',
+  `coupon_amount` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '优惠券抵扣金额',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -514,6 +516,57 @@ CREATE TABLE `jz_agent_settlement` (
   KEY `idx_user` (`user_id`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='代理结算表';
+
+-- ----------------------------
+-- 优惠券表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_coupon`;
+CREATE TABLE `jz_coupon` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '优惠券名称',
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '优惠券码（留空为领取券）',
+  `type` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1满减 2折扣 3固定金额',
+  `amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '优惠金额/折扣率',
+  `min_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '最低使用金额',
+  `total_count` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '发放总量（0为不限）',
+  `used_count` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '已使用数量',
+  `receive_count` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '已领取数量',
+  `limit_per_user` int(11) unsigned NOT NULL DEFAULT 1 COMMENT '每人限领',
+  `start_time` datetime DEFAULT NULL COMMENT '开始时间',
+  `end_time` datetime DEFAULT NULL COMMENT '结束时间',
+  `scope` varchar(20) NOT NULL DEFAULT 'all' COMMENT '适用范围 all/category/goods',
+  `scope_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '范围ID',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`),
+  KEY `idx_status` (`status`),
+  KEY `idx_type` (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='优惠券表';
+
+-- ----------------------------
+-- 用户优惠券表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_user_coupon`;
+CREATE TABLE `jz_user_coupon` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL DEFAULT 0,
+  `coupon_id` int(11) unsigned NOT NULL DEFAULT 0,
+  `coupon_code` varchar(32) NOT NULL DEFAULT '',
+  `amount` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `min_amount` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `type` tinyint(1) NOT NULL DEFAULT 1,
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0未使用 1已使用 2已过期',
+  `order_id` int(11) unsigned NOT NULL DEFAULT 0,
+  `use_time` datetime DEFAULT NULL,
+  `expire_time` datetime DEFAULT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_coupon` (`coupon_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户优惠券表';
 
 -- ----------------------------
 -- 初始化默认费率分组

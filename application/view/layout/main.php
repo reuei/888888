@@ -192,6 +192,7 @@
         </div>
         <div class="topbar-links">
             <a href="<?php echo url('index/category'); ?>">购卡中心</a>
+            <a href="<?php echo url('index/coupon'); ?>">领券中心</a>
             <a href="<?php echo url('index/order'); ?>">查询订单</a>
             <a href="<?php echo url('login'); ?>?type=admin">总站后台</a>
             <a href="<?php echo url('login'); ?>?type=merchant">商户后台</a>

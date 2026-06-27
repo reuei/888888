@@ -40,6 +40,10 @@
         <div class="row"><span>订单编号</span><span><?php echo h($order['order_no']); ?></span></div>
         <div class="row"><span>商品名称</span><span><?php echo h($order['goods_name']); ?></span></div>
         <div class="row"><span>购买数量</span><span><?php echo $order['quantity']; ?></span></div>
+        <div class="row"><span>商品总价</span><span>¥<?php echo $order['total_amount']; ?></span></div>
+        <?php if ($order['coupon_amount'] > 0): ?>
+        <div class="row"><span>优惠券抵扣</span><span style="color: #059669;">-¥<?php echo $order['coupon_amount']; ?> (<?php echo h($order['coupon_code']); ?>)</span></div>
+        <?php endif; ?>
         <div class="row"><span>联系方式</span><span><?php echo h($order['contact']); ?></span></div>
     </div>
 

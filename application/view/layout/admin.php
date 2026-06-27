@@ -57,11 +57,12 @@ $menu = [
         ['name' => '操作日志', 'url' => 'admin/stat/log'],
     ]],
     ['name' => '系统设置', 'icon' => '⚙', 'url' => '#', 'children' => [
+        ['name' => '站点基础', 'url' => 'admin/setting'],
         ['name' => '邮件系统', 'url' => 'admin/setting/email'],
         ['name' => '短信通知', 'url' => 'admin/setting/sms'],
         ['name' => '文件存储', 'url' => 'admin/setting/storage'],
-        ['name' => '二次认证', 'url' => 'admin/setting/2fa'],
-    ]],
+        ['name' => '二次认证', 'url' => 'admin/setting/security'],
+    ]]
 ];
 ?>
 <!DOCTYPE html>
@@ -69,7 +70,7 @@ $menu = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo h($title ?? '后台'); ?> - 鲸商城 Pro S端</title>
+    <title><?php echo h($title ?? '后台'); ?> - <?php echo h(site_config('site_name', '鲸商城 Pro')); ?> S端</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -211,7 +212,7 @@ $menu = [
     <div class="topbar">
         <div class="topbar-left">
             <div class="menu-toggle" id="menuToggle">☰</div>
-            <div class="logo">鲸商城 Pro · S端</div>
+            <div class="logo"><?php echo h(site_config('site_name', '鲸商城 Pro')); ?> · S端</div>
         </div>
         <div class="topbar-right">
             <a href="#">消息</a>
@@ -252,7 +253,7 @@ $menu = [
             <?php echo $__content__ ?? ''; ?>
         </div>
         <div class="footer">
-            鲸商城 Pro v1.0.0 | 操作手册 | 客服入口
+            <?php echo h(site_config('copyright', '鲸商城 Pro v1.0.0')); ?> | <?php echo h(site_config('icp') ?: ''); ?><?php echo site_config('icp') ? ' | ' : ''; ?>客服：<?php echo h(site_config('contact') ?: '-'); ?>
         </div>
     </div>
 

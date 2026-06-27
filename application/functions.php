@@ -81,3 +81,38 @@ function generate_token($length = 32)
 {
     return bin2hex(random_bytes($length / 2));
 }
+
+/**
+ * 读取站点配置
+ */
+function site_config($key = null, $default = null)
+{
+    static $config = null;
+    if ($config === null) {
+        $config = [];
+        try {
+            $rows = Db::query("SELECT cfg_key, cfg_value FROM jz_config WHERE cfg_group = 'base'");
+            foreach ($rows as $row) {
+                $shortKey = substr($row['cfg_key'], 5);
+                $config[$shortKey] = $row['cfg_value'];
+            }
+        } catch (Exception $e) {
+            // 安装前或未初始化时忽略
+        }
+    }
+
+    if ($key === null) {
+        return $config;
+    }
+
+    $defaults = [
+        'site_name' => '鲸商城 Pro',
+        'copyright' => '鲸商城 Pro v1.0.0',
+    ];
+
+    if (!isset($config[$key]) && isset($defaults[$key])) {
+        return $defaults[$key];
+    }
+
+    return $config[$key] ?? $default;
+}

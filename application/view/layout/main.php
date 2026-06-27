@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo h($title ?? '鲸商城 Pro'); ?></title>
+    <title><?php echo h($title ?? site_config('site_name')); ?></title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -178,7 +178,13 @@
 <body>
     <div class="topbar">
         <div class="topbar-left">
-            <a href="<?php echo url('/'); ?>" class="logo">鲸商城 Pro</a>
+            <a href="<?php echo url('/'); ?>" class="logo">
+                <?php if (site_config('logo')): ?>
+                <img src="<?php echo h(site_config('logo')); ?>" alt="<?php echo h(site_config('site_name')); ?>" style="height: 32px; vertical-align: middle;">
+                <?php else: ?>
+                <?php echo h(site_config('site_name')); ?>
+                <?php endif; ?>
+            </a>
             <form class="search-box" method="get" action="<?php echo url('index/category'); ?>">
                 <input type="text" name="keyword" placeholder="搜索商品" value="<?php echo h($_GET['keyword'] ?? ''); ?>">
                 <button type="submit" class="btn">搜索</button>
@@ -195,7 +201,7 @@
         <?php echo $__content__ ?? ''; ?>
     </div>
     <div class="footer">
-        鲸商城 Pro v1.0.0 | 操作手册 | 客服入口
+        <?php echo h(site_config('copyright', '鲸商城 Pro v1.0.0')); ?> | <?php echo h(site_config('icp') ?: ''); ?><?php echo site_config('icp') ? ' | ' : ''; ?>客服：<?php echo h(site_config('contact') ?: '-'); ?>
     </div>
 </body>
 </html>

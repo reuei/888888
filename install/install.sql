@@ -291,6 +291,21 @@ CREATE TABLE `jz_admin_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志表';
 
 -- ----------------------------
+-- 禁售关键词表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_banned_keyword`;
+CREATE TABLE `jz_banned_keyword` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `keyword` varchar(100) NOT NULL DEFAULT '' COMMENT '禁售关键词',
+  `type` varchar(20) NOT NULL DEFAULT 'goods' COMMENT 'goods-商品名 category-类目',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_keyword` (`keyword`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='禁售关键词表';
+
+-- ----------------------------
 -- 初始化默认费率分组
 -- ----------------------------
 INSERT INTO `jz_rate_group` (`name`, `rate`, `max_fee`, `cost_rate`, `is_default`) VALUES

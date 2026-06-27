@@ -239,6 +239,21 @@ CREATE TABLE `jz_article` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章公告表';
 
 -- ----------------------------
+-- 系统配置表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_config`;
+CREATE TABLE `jz_config` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `cfg_key` varchar(100) NOT NULL DEFAULT '' COMMENT '配置键',
+  `cfg_value` text COMMENT '配置值',
+  `cfg_group` varchar(50) NOT NULL DEFAULT 'base' COMMENT '配置分组',
+  `description` varchar(255) NOT NULL DEFAULT '' COMMENT '配置说明',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_key` (`cfg_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统配置表';
+
+-- ----------------------------
 -- 广告位表
 -- ----------------------------
 DROP TABLE IF EXISTS `jz_ad`;

@@ -161,9 +161,6 @@ class Index extends Controller
         if (!$goodsId) {
             json_error('请选择商品');
         }
-        if (!$contact) {
-            json_error('请填写联系方式，用于查询订单');
-        }
 
         $goods = Db::fetch(
             "SELECT g.*, m.shop_name FROM jz_goods g
@@ -175,12 +172,65 @@ class Index extends Controller
             json_error('商品不存在或已下架');
         }
 
+        // 风控配置
+        $risk = $this->getRiskConfig();
+
+        // 联系方式校验
+        if (($risk['contact_required'] ?? '1') === '1' && !$contact) {
+            json_error('请填写联系方式，用于查询订单');
+        }
+
+        // 黑名单关键词
+        $blacklist = trim($risk['blacklist_words'] ?? '');
+        if ($blacklist) {
+            $words = array_filter(array_map('trim', explode(',', $blacklist)));
+            $checkText = $contact . ' ' . $goods['name'];
+            foreach ($words as $word) {
+                if ($word && mb_stripos($checkText, $word) !== false) {
+                    json_error('订单存在风险，请联系客服');
+                }
+            }
+        }
+
+        // 金额校验
+        $totalAmount = round($goods['price'] * $quantity, 2);
+        $minAmount = (float) ($risk['min_amount'] ?? 0.01);
+        $maxAmount = (float) ($risk['max_amount'] ?? 50000);
+        if ($totalAmount < $minAmount) {
+            json_error('订单金额低于最小限额 ¥' . $minAmount);
+        }
+        if ($totalAmount > $maxAmount) {
+            json_error('订单金额超过最大限额 ¥' . $maxAmount);
+        }
+
+        // 同IP限购
+        if (($risk['ip_limit'] ?? '0') === '1') {
+            $ipLimitCount = (int) ($risk['ip_limit_count'] ?? 0);
+            if ($ipLimitCount > 0) {
+                $todayCount = Db::fetch(
+                    "SELECT COUNT(*) AS total FROM jz_order WHERE client_ip = ? AND create_time > ?",
+                    [$clientIp, date('Y-m-d 00:00:00')]
+                );
+                if ((int) ($todayCount['total'] ?? 0) >= $ipLimitCount) {
+                    json_error('今日下单次数已达上限');
+                }
+            }
+        }
+
         // 卡密类商品校验库存
         if ($goods['type'] == 1 && $goods['stock'] < $quantity) {
             json_error('库存不足，当前剩余 ' . $goods['stock']);
         }
 
-        $totalAmount = round($goods['price'] * $quantity, 2);
+        // 金额随机化（用于规避风控）
+        $payAmount = $totalAmount;
+        if (($risk['amount_jitter'] ?? '0') === '1') {
+            $range = (float) ($risk['jitter_range'] ?? 0.01);
+            $jitter = $totalAmount * $range * (mt_rand(-100, 100) / 100);
+            $payAmount = round($totalAmount + $jitter, 2);
+            $payAmount = max(0.01, $payAmount);
+        }
+
         $orderNo = 'JZ' . date('YmdHis') . mt_rand(1000, 9999);
 
         $orderId = Db::insert('jz_order', [
@@ -193,7 +243,7 @@ class Index extends Controller
             'quantity' => $quantity,
             'price' => $goods['price'],
             'total_amount' => $totalAmount,
-            'pay_amount' => $totalAmount,
+            'pay_amount' => $payAmount,
             'status' => 0,
             'client_ip' => $clientIp,
             'contact' => $contact,
@@ -210,6 +260,32 @@ class Index extends Controller
             'order_no' => $orderNo,
             'redirect' => url('index/pay', ['order_no' => $orderNo]),
         ]);
+    }
+
+    /**
+     * 读取风控配置
+     */
+    private function getRiskConfig()
+    {
+        $default = [
+            'amount_jitter' => '0',
+            'jitter_range' => '0.01',
+            'min_amount' => '0.01',
+            'max_amount' => '50000.00',
+            'ip_limit' => '0',
+            'ip_limit_count' => '10',
+            'blacklist_words' => '',
+            'contact_required' => '1',
+        ];
+
+        $rows = Db::query("SELECT cfg_key, cfg_value FROM jz_config WHERE cfg_group = 'risk'");
+        $config = [];
+        foreach ($rows as $row) {
+            $shortKey = substr($row['cfg_key'], 5);
+            $config[$shortKey] = $row['cfg_value'];
+        }
+
+        return array_merge($default, $config);
     }
 
     /**

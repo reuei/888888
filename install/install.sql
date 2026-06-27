@@ -62,6 +62,9 @@ CREATE TABLE `jz_merchant` (
   `frozen_balance` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '冻结余额',
   `rate_group_id` int(11) unsigned NOT NULL DEFAULT 0,
   `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0待审核 1正常 2封禁 3冻结',
+  `audit_remark` varchar(255) NOT NULL DEFAULT '' COMMENT '审核备注/驳回原因',
+  `audit_time` datetime DEFAULT NULL COMMENT '审核时间',
+  `invite_code_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '使用的邀请码ID（0为自助注册）',
   `open_time` datetime DEFAULT NULL COMMENT '开店时间',
   `last_login_time` datetime DEFAULT NULL,
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -72,6 +75,27 @@ CREATE TABLE `jz_merchant` (
   KEY `idx_subsite` (`subsite_id`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商户表';
+
+-- ----------------------------
+-- 邀请码表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_invite_code`;
+CREATE TABLE `jz_invite_code` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(32) NOT NULL DEFAULT '' COMMENT '邀请码',
+  `subsite_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '分站归属（0为总站全局）',
+  `rate_group_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '默认费率分组',
+  `max_uses` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '最大使用次数（0为不限）',
+  `used_count` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '已使用次数',
+  `expire_time` datetime DEFAULT NULL COMMENT '过期时间',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0失效 1有效',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`),
+  KEY `idx_subsite` (`subsite_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邀请码表';
 
 -- ----------------------------
 -- 用户表

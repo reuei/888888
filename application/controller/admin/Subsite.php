@@ -238,6 +238,9 @@ class Admin_Subsite extends Controller
         $sort = input('sort', 'amount');
         $period = input('period', '7d');
 
+        $allowedSort = ['amount' => 'total_amount', 'order' => 'order_count', 'merchant' => 'merchant_count', 'complaint' => 'complaint_rate'];
+        $orderBy = $allowedSort[$sort] ?? 'total_amount';
+
         // 模拟监控数据（实际应从统计表或订单表汇总）
         $list = Db::query(
             "SELECT s.id, s.name, s.domain_prefix, s.status,

@@ -9,8 +9,16 @@
 </div>
 
 <div class="section-title">
-    <span><?php echo $category ? h($category['name']) : '全部商品'; ?></span>
+    <span><?php echo $category ? h($category['name']) : h($tpl['goods_seo_title'] ?? '全部商品'); ?></span>
     <span style="font-size: 13px; color: #64748B; font-weight: normal;">共 <?php echo $total; ?> 件商品</span>
+    <div style="margin-left: auto;">
+        <select onchange="location.href=this.value" style="padding: 6px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 13px;">
+            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'sort' => 'sold']); ?>" <?php echo $sort === 'sold' ? 'selected' : ''; ?>>按销量</option>
+            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'sort' => 'id']); ?>" <?php echo $sort === 'id' ? 'selected' : ''; ?>>按最新</option>
+            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'sort' => 'price_asc']); ?>" <?php echo $sort === 'price_asc' ? 'selected' : ''; ?>>价格从低到高</option>
+            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'sort' => 'price_desc']); ?>" <?php echo $sort === 'price_desc' ? 'selected' : ''; ?>>价格从高到低</option>
+        </select>
+    </div>
 </div>
 
 <?php if (!empty($categoryTop)): ?>
@@ -24,7 +32,7 @@
 <?php endif; ?>
 
 <?php if (empty($list)): ?>
-<div class="card empty-tip">暂无商品</div>
+<div class="card empty-tip"><?php echo h($tpl['goods_empty_tip'] ?? '暂无商品'); ?></div>
 <?php else: ?>
 <div class="grid">
     <?php foreach ($list as $item): ?>
@@ -41,8 +49,20 @@
                 <div class="goods-name"><?php echo h($item['name']); ?></div>
                 <div class="goods-meta">
                     <span class="goods-price">¥<?php echo $item['price']; ?></span>
+                    <?php if (($tpl['goods_show_sold'] ?? '1') === '1'): ?>
                     <span class="goods-sold">已售 <?php echo $item['sold']; ?></span>
+                    <?php endif; ?>
                 </div>
+                <?php if (($tpl['goods_show_stock'] ?? '1') === '1' || ($tpl['goods_show_merchant'] ?? '1') === '1'): ?>
+                <div style="font-size: 12px; color: #94A3B8; margin-top: 6px;">
+                    <?php if (($tpl['goods_show_stock'] ?? '1') === '1'): ?>
+                    <span>库存 <?php echo $item['stock']; ?></span>
+                    <?php endif; ?>
+                    <?php if (($tpl['goods_show_merchant'] ?? '1') === '1'): ?>
+                    <span><?php echo ($tpl['goods_show_stock'] ?? '1') === '1' ? ' | ' : ''; ?><?php echo h($item['shop_name'] ?? '-'); ?></span>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
             </div>
         </a>
     </div>
@@ -52,11 +72,11 @@
 <?php if ($totalPages > 1): ?>
 <div style="display: flex; justify-content: center; gap: 8px; margin-top: 24px;">
     <?php if ($page > 1): ?>
-    <a href="<?php echo url('index/category') . '?page=' . ($page - 1) . '&id=' . ($category['id'] ?? 0) . '&keyword=' . urlencode($keyword); ?>" class="btn btn-outline">上一页</a>
+    <a href="<?php echo url('index/category') . '?page=' . ($page - 1) . '&id=' . ($category['id'] ?? 0) . '&keyword=' . urlencode($keyword) . '&sort=' . $sort; ?>" class="btn btn-outline">上一页</a>
     <?php endif; ?>
     <span style="padding: 8px 16px; color: #64748B;"><?php echo $page; ?> / <?php echo $totalPages; ?></span>
     <?php if ($page < $totalPages): ?>
-    <a href="<?php echo url('index/category') . '?page=' . ($page + 1) . '&id=' . ($category['id'] ?? 0) . '&keyword=' . urlencode($keyword); ?>" class="btn btn-outline">下一页</a>
+    <a href="<?php echo url('index/category') . '?page=' . ($page + 1) . '&id=' . ($category['id'] ?? 0) . '&keyword=' . urlencode($keyword) . '&sort=' . $sort; ?>" class="btn btn-outline">下一页</a>
     <?php endif; ?>
 </div>
 <?php endif; ?>

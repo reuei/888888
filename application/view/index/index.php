@@ -51,7 +51,7 @@
 </style>
 
 <div class="hero">
-    <h1>鲸商城 Pro</h1>
+    <h1><?php echo h(site_config('site_name', '鲸商城 Pro')); ?></h1>
     <p>安全、便捷的卡密自动发货平台，汇聚海量优质商品</p>
     <a href="<?php echo url('index/category'); ?>" class="btn btn-lg">立即购卡</a>
 </div>
@@ -103,7 +103,7 @@
 </div>
 
 <?php if (empty($goods)): ?>
-<div class="card empty-tip">暂无上架商品</div>
+<div class="card empty-tip"><?php echo h($tpl['goods_empty_tip'] ?? '暂无上架商品'); ?></div>
 <?php else: ?>
 <div class="grid">
     <?php foreach ($goods as $item): ?>
@@ -120,11 +120,30 @@
                 <div class="goods-name"><?php echo h($item['name']); ?></div>
                 <div class="goods-meta">
                     <span class="goods-price">¥<?php echo $item['price']; ?></span>
+                    <?php if (($tpl['goods_show_sold'] ?? '1') === '1'): ?>
                     <span class="goods-sold">已售 <?php echo $item['sold']; ?></span>
+                    <?php endif; ?>
                 </div>
+                <?php if (($tpl['goods_show_stock'] ?? '1') === '1' || ($tpl['goods_show_merchant'] ?? '1') === '1'): ?>
+                <div style="font-size: 12px; color: #94A3B8; margin-top: 6px;">
+                    <?php if (($tpl['goods_show_stock'] ?? '1') === '1'): ?>
+                    <span>库存 <?php echo $item['stock']; ?></span>
+                    <?php endif; ?>
+                    <?php if (($tpl['goods_show_merchant'] ?? '1') === '1'): ?>
+                    <span><?php echo ($tpl['goods_show_stock'] ?? '1') === '1' ? ' | ' : ''; ?><?php echo h($item['shop_name'] ?? '-'); ?></span>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
             </div>
         </a>
     </div>
     <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
+<?php if (($tpl['home_show_stats'] ?? '1') === '1'): ?>
+<div class="card" style="margin-top: 24px; text-align: center; background: #F8FAFC;">
+    <div style="font-size: 15px; font-weight: 500; color: #334155;"><?php echo h($tpl['home_stats_text'] ?? '平台交易 安全快捷'); ?></div>
+    <div style="font-size: 12px; color: #94A3B8; margin-top: 8px;">卡密自动发货 · 7×24小时服务 · 订单即时查询</div>
 </div>
 <?php endif; ?>

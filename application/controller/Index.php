@@ -11,32 +11,83 @@ class Index extends Controller
     }
 
     /**
+     * 读取模板配置
+     */
+    private function getTemplateConfig()
+    {
+        $default = [
+            'home_seo_title' => '',
+            'home_category_limit' => '12',
+            'home_show_categories' => '1',
+            'home_show_articles' => '1',
+            'home_article_limit' => '5',
+            'home_goods_order' => 'sold',
+            'home_goods_limit' => '24',
+            'home_show_stats' => '1',
+            'home_stats_text' => '平台交易 安全快捷',
+            'goods_seo_title' => '全部商品',
+            'goods_page_size' => '24',
+            'goods_default_sort' => 'sold',
+            'goods_show_stock' => '1',
+            'goods_show_sold' => '1',
+            'goods_show_merchant' => '1',
+            'goods_show_recommend' => '1',
+            'goods_recommend_limit' => '6',
+            'goods_empty_tip' => '暂无相关商品',
+        ];
+
+        $rows = Db::query("SELECT cfg_key, cfg_value FROM jz_config WHERE cfg_group = 'template'");
+        $config = [];
+        foreach ($rows as $row) {
+            $shortKey = substr($row['cfg_key'], 10);
+            $config[$shortKey] = $row['cfg_value'];
+        }
+
+        return array_merge($default, $config);
+    }
+
+    /**
      * 首页
      */
     public function index()
     {
+        $tpl = $this->getTemplateConfig();
+
         // 导航分类
-        $categories = Db::query("SELECT * FROM jz_category WHERE status = 1 AND is_nav = 1 ORDER BY sort DESC, id ASC LIMIT 12");
+        $categories = [];
+        if (($tpl['home_show_categories'] ?? '1') === '1') {
+            $limit = (int) ($tpl['home_category_limit'] ?? 12);
+            $categories = Db::query("SELECT * FROM jz_category WHERE status = 1 AND is_nav = 1 ORDER BY sort DESC, id ASC LIMIT {$limit}");
+        }
 
         // 推荐商品（上架 + 有库存）
+        $order = $this->resolveGoodsOrder($tpl['home_goods_order'] ?? 'sold');
+        $limit = (int) ($tpl['home_goods_limit'] ?? 24);
         $goods = Db::query(
             "SELECT g.*, m.shop_name, c.name as category_name
              FROM jz_goods g
              LEFT JOIN jz_merchant m ON g.merchant_id = m.id
              LEFT JOIN jz_category c ON g.category_id = c.id
              WHERE g.status = 1 AND g.stock > 0
-             ORDER BY g.sold DESC, g.id DESC
-             LIMIT 24"
+             ORDER BY {$order}
+             LIMIT {$limit}"
         );
 
         // 公告
-        $articles = Db::query("SELECT id, title, create_time FROM jz_article WHERE status = 1 ORDER BY id DESC LIMIT 5");
+        $articles = [];
+        if (($tpl['home_show_articles'] ?? '1') === '1') {
+            $articleLimit = (int) ($tpl['home_article_limit'] ?? 5);
+            $articles = Db::query("SELECT id, title, create_time FROM jz_article WHERE status = 1 ORDER BY id DESC LIMIT {$articleLimit}");
+        }
 
         // 首页广告
         $homeBanner = Db::query("SELECT * FROM jz_ad WHERE position = 'home_banner' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 5");
         $homeTop = Db::query("SELECT * FROM jz_ad WHERE position = 'home_top' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 3");
 
-        $this->assign('title', '首页');
+        $title = $tpl['home_seo_title'] ?: site_config('site_name', '鲸商城 Pro');
+
+        $this->assign('title', $title);
+        $this->assign('tpl', $tpl);
         $this->assign('categories', $categories);
         $this->assign('goods', $goods);
         $this->assign('articles', $articles);
@@ -46,14 +97,30 @@ class Index extends Controller
     }
 
     /**
+     * 解析商品排序
+     */
+    private function resolveGoodsOrder($order)
+    {
+        $map = [
+            'sold' => 'g.sold DESC, g.id DESC',
+            'id' => 'g.id DESC',
+            'price_asc' => 'g.price ASC, g.id DESC',
+            'price_desc' => 'g.price DESC, g.id DESC',
+        ];
+        return $map[$order] ?? $map['sold'];
+    }
+
+    /**
      * 分类商品列表 / 购卡页
      */
     public function category()
     {
+        $tpl = $this->getTemplateConfig();
         $categoryId = (int) input('id', 0);
         $keyword = input('keyword', '');
         $page = max(1, (int) input('page', 1));
-        $pageSize = 24;
+        $pageSize = (int) ($tpl['goods_page_size'] ?? 24);
+        $sort = input('sort', $tpl['goods_default_sort'] ?? 'sold');
 
         $where = 'g.status = 1 AND g.stock > 0';
         $params = [];
@@ -81,13 +148,14 @@ class Index extends Controller
         $page = min($page, $totalPages);
         $offset = ($page - 1) * $pageSize;
 
+        $order = $this->resolveGoodsOrder($sort);
         $list = Db::query(
             "SELECT g.*, m.shop_name, c.name as category_name
              FROM jz_goods g
              LEFT JOIN jz_merchant m ON g.merchant_id = m.id
              LEFT JOIN jz_category c ON g.category_id = c.id
              WHERE {$where}
-             ORDER BY g.sold DESC, g.id DESC
+             ORDER BY {$order}
              LIMIT {$offset}, {$pageSize}",
             $params
         );
@@ -100,10 +168,14 @@ class Index extends Controller
         // 分类页广告
         $categoryTop = Db::query("SELECT * FROM jz_ad WHERE position = 'category_top' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 3");
 
-        $this->assign('title', $category ? h($category['name']) : '全部商品');
+        $title = $category ? h($category['name']) : h($tpl['goods_seo_title'] ?? '全部商品');
+
+        $this->assign('title', $title);
+        $this->assign('tpl', $tpl);
         $this->assign('category', $category);
         $this->assign('list', $list);
         $this->assign('keyword', $keyword);
+        $this->assign('sort', $sort);
         $this->assign('page', $page);
         $this->assign('totalPages', $totalPages);
         $this->assign('total', $total);

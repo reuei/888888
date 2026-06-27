@@ -206,6 +206,8 @@ CREATE TABLE `jz_order` (
   `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0待支付 1已支付 2已发货 3已完成 4退款中 5已关闭',
   `risk_flag` tinyint(1) NOT NULL DEFAULT 0 COMMENT '风控标记',
   `client_ip` varchar(50) NOT NULL DEFAULT '',
+  `contact` varchar(100) NOT NULL DEFAULT '' COMMENT '买家联系方式',
+  `deliver_content` text COMMENT '发货内容',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -214,8 +216,27 @@ CREATE TABLE `jz_order` (
   KEY `idx_subsite` (`subsite_id`),
   KEY `idx_status` (`status`),
   KEY `idx_user` (`user_id`),
-  KEY `idx_pay_time` (`pay_time`)
+  KEY `idx_pay_time` (`pay_time`),
+  KEY `idx_contact` (`contact`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表';
+
+-- ----------------------------
+-- 文章公告表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_article`;
+CREATE TABLE `jz_article` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `content` text COMMENT '文章内容',
+  `category` varchar(50) NOT NULL DEFAULT 'notice' COMMENT 'notice-公告 help-帮助',
+  `sort` int(11) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_category` (`category`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文章公告表';
 
 -- ----------------------------
 -- 费率分组表
@@ -346,6 +367,25 @@ CREATE TABLE `jz_user_group` (
   PRIMARY KEY (`id`),
   KEY `idx_level` (`level`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户等级分组表';
+
+-- ----------------------------
+-- 资金流水表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_finance_flow`;
+CREATE TABLE `jz_finance_flow` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `merchant_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '商户ID',
+  `order_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '订单ID',
+  `type` varchar(30) NOT NULL DEFAULT '' COMMENT 'income-收入 refund-退款 fee-手续费 freeze-冻结 unfreeze-解冻',
+  `amount` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '变动金额',
+  `balance` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '变动后余额',
+  `remark` varchar(255) NOT NULL DEFAULT '',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_merchant` (`merchant_id`),
+  KEY `idx_order` (`order_id`),
+  KEY `idx_type` (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='资金流水表';
 
 -- ----------------------------
 -- 初始化默认费率分组

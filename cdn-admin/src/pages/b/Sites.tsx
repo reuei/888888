@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import { useToast } from '../../components/Toast';
 import { sites } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Edit, Trash2, Activity, Plus, Search, CheckCircle } from 'lucide-react';
 
 export default function BSites() {
+  const { show } = useToast();
   const [list, setList] = useState(sites);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -27,6 +29,7 @@ export default function BSites() {
     setList([newSite, ...list]);
     setAddOpen(false);
     setForm({ domain: '', pkg: 'PKG02' });
+    show(`站点 ${newSite.domain} 添加成功`, 'success');
   };
 
   const openEdit = (s: typeof sites[0]) => {
@@ -38,6 +41,7 @@ export default function BSites() {
     if (current) {
       setList(list.map((s) => (s.id === current.id ? { ...s, status: 'running' as const } : s)));
       setCurrent({ ...current, status: 'running' });
+      show(`站点 ${current.domain} CNAME 检测通过`, 'success');
     }
   };
 
@@ -88,10 +92,10 @@ export default function BSites() {
                     <button onClick={() => openEdit(s)} className="p-1.5 rounded hover:bg-gray-100 text-primary" title="编辑">
                       <Edit size={16} />
                     </button>
-                    <button className="p-1.5 rounded hover:bg-gray-100 text-success" title="检测">
+                    <button onClick={() => show(`站点 ${s.domain} 检测正常`, 'success')} className="p-1.5 rounded hover:bg-gray-100 text-success" title="检测">
                       <Activity size={16} />
                     </button>
-                    <button className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
+                    <button onClick={() => show(`站点 ${s.domain} 已删除`, 'warning')} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -140,7 +144,7 @@ export default function BSites() {
         footer={
           <>
             <button onClick={() => setEditOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={() => setEditOpen(false)} className="btn btn-primary">保存</button>
+            <button onClick={() => { setEditOpen(false); show('站点配置保存成功', 'success'); }} className="btn btn-primary">保存</button>
           </>
         }
       >

@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import { useToast } from '../../components/Toast';
 import { packages } from '../../data/mock';
 import { ShoppingCart, Check } from 'lucide-react';
 
 export default function BPackages() {
+  const { show } = useToast();
   const [activeTab, setActiveTab] = useState<'buy' | 'my' | 'renew'>('buy');
   const [buyOpen, setBuyOpen] = useState(false);
   const [selected, setSelected] = useState<typeof packages[0] | null>(null);
@@ -77,7 +79,7 @@ export default function BPackages() {
                   <td>{p.domains}</td>
                   <td>2026-12-31</td>
                   <td><span className="badge badge-success">生效中</span></td>
-                  <td><button className="btn btn-default text-xs">续费</button></td>
+                  <td><button onClick={() => show('已跳转至续费页面', 'info')} className="btn btn-default text-xs">续费</button></td>
                 </tr>
               ))}
             </tbody>
@@ -105,7 +107,7 @@ export default function BPackages() {
               </select>
             </div>
             <div className="text-lg font-bold text-primary">应付：¥49.00</div>
-            <button className="btn btn-primary">立即支付</button>
+            <button onClick={() => show('续费支付成功', 'success')} className="btn btn-primary">立即支付</button>
           </div>
         </div>
       )}
@@ -117,7 +119,7 @@ export default function BPackages() {
         footer={
           <>
             <button onClick={() => setBuyOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={() => setBuyOpen(false)} className="btn btn-primary">立即支付</button>
+            <button onClick={() => { setBuyOpen(false); show(`套餐 ${selected?.name} 购买成功`, 'success'); }} className="btn btn-primary">立即支付</button>
           </>
         }
       >

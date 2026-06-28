@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import { useToast } from '../../components/Toast';
 import { merchants } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { CheckCircle, XCircle, Eye, Plus } from 'lucide-react';
 
 export default function SMerchants() {
+  const { show } = useToast();
   const [list, setList] = useState(merchants);
   const [auditOpen, setAuditOpen] = useState(false);
   const [current, setCurrent] = useState<typeof merchants[0] | null>(null);
@@ -19,6 +21,7 @@ export default function SMerchants() {
     if (!current) return;
     setList(list.map((m) => (m.id === current.id ? { ...m, status: status === 'normal' ? 'normal' : 'banned' } : m)));
     setAuditOpen(false);
+    show(`商户 ${current.shopName} 审核${status === 'normal' ? '通过' : '已驳回'}`, status === 'normal' ? 'success' : 'warning');
   };
 
   return (
@@ -78,11 +81,11 @@ export default function SMerchants() {
                       </button>
                     )}
                     {m.status !== 'banned' ? (
-                      <button className="p-1.5 rounded hover:bg-gray-100 text-danger" title="封禁">
+                      <button onClick={() => show(`商户 ${m.shopName} 已封禁`, 'warning')} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="封禁">
                         <XCircle size={16} />
                       </button>
                     ) : (
-                      <button className="p-1.5 rounded hover:bg-gray-100 text-success" title="解禁">
+                      <button onClick={() => show(`商户 ${m.shopName} 已解禁`, 'success')} className="p-1.5 rounded hover:bg-gray-100 text-success" title="解禁">
                         <Plus size={16} />
                       </button>
                     )}

@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast';
 import { orders } from '../../data/mock';
 import { statusBadge, statusText, formatMoney } from '../../utils/helpers';
 import { Eye, RefreshCcw } from 'lucide-react';
 
 export default function SOrders() {
+  const { show } = useToast();
   const [list] = useState(orders);
 
   return (
@@ -24,8 +26,8 @@ export default function SOrders() {
             <option>已关闭</option>
           </select>
           <div className="flex gap-2">
-            <button className="btn btn-primary">查询</button>
-            <button className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
+            <button onClick={() => show('订单查询完成', 'info')} className="btn btn-primary">查询</button>
+            <button onClick={() => show('筛选条件已重置', 'info')} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
           </div>
         </div>
 

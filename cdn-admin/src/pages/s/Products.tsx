@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import { useToast } from '../../components/Toast';
 import { products } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Edit, Trash2, ArrowUpDown, Plus } from 'lucide-react';
 
 export default function SProducts() {
+  const { show } = useToast();
   const [list, setList] = useState(products);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', type: 'CDN', nodePool: '', priceRange: '' });
 
   const toggleStatus = (id: string) => {
-    setList(list.map((p) => (p.id === id ? { ...p, status: p.status === 'on' ? 'off' : 'on' } : p)));
+    const target = list.find((p) => p.id === id);
+    const nextStatus = target?.status === 'on' ? 'off' : 'on';
+    setList(list.map((p) => (p.id === id ? { ...p, status: nextStatus } : p)));
+    show(`产品 ${target?.name} 已${nextStatus === 'on' ? '上架' : '下架'}`, nextStatus === 'on' ? 'success' : 'warning');
   };
 
   const handleAdd = () => {
@@ -28,6 +33,7 @@ export default function SProducts() {
     ]);
     setModalOpen(false);
     setForm({ name: '', type: 'CDN', nodePool: '', priceRange: '' });
+    show('新产品添加成功', 'success');
   };
 
   return (
@@ -83,7 +89,7 @@ export default function SProducts() {
                     <button onClick={() => toggleStatus(p.id)} className="p-1.5 rounded hover:bg-gray-100 text-warning" title="上/下架">
                       <ArrowUpDown size={16} />
                     </button>
-                    <button className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
+                    <button onClick={() => show(`产品 ${p.name} 已删除`, 'warning')} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
                       <Trash2 size={16} />
                     </button>
                   </div>

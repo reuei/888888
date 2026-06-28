@@ -1,10 +1,12 @@
 import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast';
 import StatCard from '../../components/StatCard';
 import LineChart from '../../components/LineChart';
 import { sStats, trendLabels, trendValues, merchantRank } from '../../data/mock';
 import { Search } from 'lucide-react';
 
 export default function SDashboard() {
+  const { show } = useToast();
   return (
     <div>
       <PageHeader title="数据大屏" breadcrumb={['仪表盘', '数据大屏']} />
@@ -22,8 +24,8 @@ export default function SDashboard() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">近 7 天 / 30 天交易趋势</h3>
             <div className="flex gap-2">
-              <button className="btn btn-primary text-xs">近7天</button>
-              <button className="btn btn-default text-xs">近30天</button>
+              <button onClick={() => show('已切换近7天数据', 'info')} className="btn btn-primary text-xs">近7天</button>
+              <button onClick={() => show('已切换近30天数据', 'info')} className="btn btn-default text-xs">近30天</button>
             </div>
           </div>
           <LineChart
@@ -72,7 +74,7 @@ export default function SDashboard() {
             <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
             <input type="text" placeholder="输入订单号精确检索，回车直达详情" className="input pl-8" />
           </div>
-          <button className="btn btn-primary">搜索</button>
+          <button onClick={() => show('订单搜索功能已触发', 'info')} className="btn btn-primary">搜索</button>
         </div>
       </div>
     </div>

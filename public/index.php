@@ -9,9 +9,14 @@ define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 define('APP_PATH', ROOT_PATH . 'application' . DIRECTORY_SEPARATOR);
 define('RUNTIME_PATH', ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR);
 
-// 错误显示（生产环境建议关闭）
+// 错误处理：生产环境关闭页面报错，写入日志
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+if (!is_dir(RUNTIME_PATH)) {
+    @mkdir(RUNTIME_PATH, 0755, true);
+}
+ini_set('error_log', RUNTIME_PATH . 'error.log');
 
 // 检查是否已安装
 if (!file_exists(APP_PATH . 'config/database.php')) {

@@ -64,6 +64,9 @@ class Route
             $file = APP_PATH . 'controller' . DIRECTORY_SEPARATOR . self::$controller . '.php';
         }
 
+        // 模块级登录权限拦截
+        self::moduleAuthCheck();
+
         if (!is_file($file)) {
             throw new Exception('控制器不存在：' . $file);
         }
@@ -82,6 +85,38 @@ class Route
         }
 
         call_user_func([$instance, $action]);
+    }
+
+    /**
+     * 模块级登录与身份拦截
+     */
+    private static function moduleAuthCheck()
+    {
+        $module = self::$module;
+
+        if ($module === 'admin') {
+            $admin = session('admin_user');
+            if (empty($admin)) {
+                redirect(url('login') . '?type=admin');
+            }
+            // 分站管理员不允许进入总站后台
+            if (in_array($admin['role'] ?? '', ['subsite_super', 'subsite_admin'], true)) {
+                redirect(url('subsite/dashboard'));
+            }
+        }
+
+        if ($module === 'merchant') {
+            if (empty(session('merchant_user'))) {
+                redirect(url('login') . '?type=merchant');
+            }
+        }
+
+        if ($module === 'subsite') {
+            $admin = session('admin_user');
+            if (empty($admin) || $admin['subsite_id'] <= 0 || !in_array($admin['role'] ?? '', ['subsite_super', 'subsite_admin'], true)) {
+                redirect(url('login') . '?type=admin');
+            }
+        }
     }
 
     public static function getController()

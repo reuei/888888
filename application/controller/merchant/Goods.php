@@ -311,4 +311,124 @@ class Merchant_Goods extends Controller
     {
         redirect(url('merchant/card'));
     }
+
+    /**
+     * 货源广场
+     */
+    public function source()
+    {
+        $merchant = session('merchant_user');
+        $keyword = input('keyword', '');
+        $categoryId = input('category_id', '');
+        $page = max(1, (int) input('page', 1));
+        $pageSize = 20;
+
+        $where = 'g.is_source = 1 AND g.status = 1 AND g.merchant_id != ?';
+        $params = [$merchant['id']];
+
+        if ($keyword) {
+            $where .= ' AND g.name LIKE ?';
+            $params[] = '%' . $keyword . '%';
+        }
+        if ($categoryId !== '') {
+            $where .= ' AND g.category_id = ?';
+            $params[] = (int) $categoryId;
+        }
+
+        $count = Db::fetch("SELECT COUNT(*) AS total FROM jz_goods g WHERE {$where}", $params);
+        $total = (int) ($count['total'] ?? 0);
+        $totalPages = max(1, ceil($total / $pageSize));
+        $page = min($page, $totalPages);
+        $offset = ($page - 1) * $pageSize;
+
+        $list = Db::query(
+            "SELECT g.*, c.name AS category_name, m.shop_name
+             FROM jz_goods g
+             LEFT JOIN jz_category c ON g.category_id = c.id
+             LEFT JOIN jz_merchant m ON g.merchant_id = m.id
+             WHERE {$where}
+             ORDER BY g.sold DESC, g.id DESC
+             LIMIT {$offset}, {$pageSize}",
+            $params
+        );
+
+        // 标记已对接的商品
+        $mySources = Db::query(
+            "SELECT source_goods_id FROM jz_goods WHERE merchant_id = ? AND source_goods_id > 0",
+            [$merchant['id']]
+        );
+        $mySourceIds = array_column($mySources, 'source_goods_id');
+
+        $categories = Db::query("SELECT id, name FROM jz_category WHERE status = 1 ORDER BY sort ASC, id ASC");
+
+        $this->assign('title', '货源广场');
+        $this->assign('list', $list);
+        $this->assign('mySourceIds', $mySourceIds);
+        $this->assign('categories', $categories);
+        $this->assign('keyword', $keyword);
+        $this->assign('categoryId', $categoryId);
+        $this->assign('page', $page);
+        $this->assign('totalPages', $totalPages);
+        $this->assign('total', $total);
+        $this->fetch('merchant/goods/source');
+    }
+
+    /**
+     * 对接货源
+     */
+    public function doSource()
+    {
+        $merchant = session('merchant_user');
+        $goodsId = (int) input('goods_id', 0);
+        $price = (float) input('price', 0);
+
+        if (!$goodsId) {
+            json_error('请选择要对接的货源商品');
+        }
+        if ($price <= 0) {
+            json_error('请输入销售售价');
+        }
+
+        $sourceGoods = Db::fetch(
+            "SELECT * FROM jz_goods WHERE id = ? AND is_source = 1 AND status = 1 AND merchant_id != ?",
+            [$goodsId, $merchant['id']]
+        );
+        if (!$sourceGoods) {
+            json_error('货源商品不存在或已下架');
+        }
+
+        // 检查是否已对接
+        $exists = Db::fetch(
+            "SELECT id FROM jz_goods WHERE merchant_id = ? AND source_goods_id = ?",
+            [$merchant['id'], $goodsId]
+        );
+        if ($exists) {
+            json_error('您已对接过该商品，请勿重复对接');
+        }
+
+        // 创建对接商品
+        $data = [
+            'merchant_id' => $merchant['id'],
+            'subsite_id' => $merchant['subsite_id'] ?? 0,
+            'category_id' => $sourceGoods['category_id'],
+            'name' => $sourceGoods['name'],
+            'cover' => $sourceGoods['cover'],
+            'price' => $price,
+            'original_price' => $sourceGoods['price'],
+            'stock' => 0,
+            'sold' => 0,
+            'type' => $sourceGoods['type'],
+            'content' => $sourceGoods['content'],
+            'status' => 0,
+            'is_source' => 0,
+            'source_goods_id' => $sourceGoods['id'],
+            'source_merchant_id' => $sourceGoods['merchant_id'],
+            'source_price' => $sourceGoods['price'],
+            'create_time' => date('Y-m-d H:i:s'),
+        ];
+
+        Db::insert('jz_goods', $data);
+        admin_log('merchant_source_goods', ['merchant_id' => $merchant['id'], 'source_goods_id' => $goodsId]);
+        json_success('货源对接成功，请前往商品列表上架并补充库存');
+    }
 }

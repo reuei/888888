@@ -180,13 +180,18 @@ CREATE TABLE `jz_goods` (
   `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0下架 1上架 2违规下架',
   `reason` varchar(255) NOT NULL DEFAULT '' COMMENT '下架原因',
   `low_stock` int(11) NOT NULL DEFAULT 10 COMMENT '库存预警阈值',
+  `is_source` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否货源商品 0否 1是',
+  `source_goods_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '来源商品ID（货源对接）',
+  `source_merchant_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '货源提供商户ID',
+  `source_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '货源成本价',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_merchant` (`merchant_id`),
   KEY `idx_subsite` (`subsite_id`),
   KEY `idx_category` (`category_id`),
-  KEY `idx_status` (`status`)
+  KEY `idx_status` (`status`),
+  KEY `idx_source` (`is_source`, `source_goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
 
 -- ----------------------------

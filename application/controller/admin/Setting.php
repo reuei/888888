@@ -13,6 +13,7 @@ class Admin_Setting extends Controller
         if (!session('admin_user')) {
             redirect(url('login') . '?type=admin');
         }
+        check_admin_role(['super', 'admin']);
     }
 
     /**

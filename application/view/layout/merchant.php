@@ -11,12 +11,10 @@ $menu = [
         ['name' => '卡密管理', 'url' => 'merchant/goods/card'],
         ['name' => '批量导入', 'url' => 'merchant/goods/import'],
         ['name' => '货源广场', 'url' => 'merchant/goods/source'],
-        ['name' => '代理商品', 'url' => 'merchant/goods/agent'],
     ]],
     ['name' => '订单管理', 'icon' => '≡', 'url' => '#', 'children' => [
         ['name' => '订单列表', 'url' => 'merchant/order'],
         ['name' => '投诉处理', 'url' => 'merchant/order/complaint'],
-        ['name' => '查单', 'url' => 'merchant/order/query'],
     ]],
     ['name' => '客服管理', 'icon' => '☎', 'url' => '#', 'children' => [
         ['name' => '咨询列表', 'url' => 'merchant/chat'],

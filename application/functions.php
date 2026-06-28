@@ -103,6 +103,17 @@ function admin_log($action, $content = '')
 }
 
 /**
+ * 检查当前管理员是否属于指定角色组
+ */
+function check_admin_role($allowedRoles = ['super', 'admin', 'operator'])
+{
+    $admin = session('admin_user');
+    if (empty($admin) || !in_array($admin['role'] ?? '', $allowedRoles, true)) {
+        throw new Exception('无权访问该页面');
+    }
+}
+
+/**
  * 读取站点配置
  */
 function site_config($key = null, $default = null)

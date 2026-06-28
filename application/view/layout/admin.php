@@ -5,7 +5,7 @@ $currentPath = preg_replace('#^public/#', '', $currentPath);
 
 $menu = [
     ['name' => '仪表盘', 'icon' => '◇', 'url' => 'admin/dashboard', 'children' => []],
-    ['name' => '分站管理', 'icon' => '◈', 'url' => '#', 'children' => [
+    ['name' => '分站管理', 'icon' => '◈', 'url' => '#', 'roles' => ['super'], 'children' => [
         ['name' => '分站列表', 'url' => 'admin/subsite'],
         ['name' => '新建分站', 'url' => 'admin/subsite/create'],
         ['name' => '分站监控', 'url' => 'admin/subsite/monitor'],
@@ -13,11 +13,11 @@ $menu = [
     ['name' => '商户管理', 'icon' => '◎', 'url' => '#', 'children' => [
         ['name' => '商户列表', 'url' => 'admin/merchant'],
         ['name' => '入驻审核', 'url' => 'admin/merchant/audit'],
-        ['name' => '邀请码', 'url' => 'admin/merchant/invite'],
+        ['name' => '邀请码', 'url' => 'admin/merchant/invite', 'roles' => ['super', 'admin']],
     ]],
     ['name' => '商品管理', 'icon' => '□', 'url' => '#', 'children' => [
         ['name' => '全平台商品', 'url' => 'admin/goods'],
-        ['name' => '分类管理', 'url' => 'admin/category'],
+        ['name' => '分类管理', 'url' => 'admin/goods/category'],
         ['name' => '禁售目录', 'url' => 'admin/goods/ban'],
     ]],
     ['name' => '订单管理', 'icon' => '≡', 'url' => '#', 'children' => [
@@ -28,22 +28,22 @@ $menu = [
         ['name' => '用户列表', 'url' => 'admin/user'],
         ['name' => '等级分组', 'url' => 'admin/user/group'],
     ]],
-    ['name' => '代理分销', 'icon' => '⧉', 'url' => '#', 'children' => [
+    ['name' => '代理分销', 'icon' => '⧉', 'url' => '#', 'roles' => ['super', 'admin'], 'children' => [
         ['name' => '代理商品', 'url' => 'admin/agent/goods'],
         ['name' => '代理树', 'url' => 'admin/agent/tree'],
         ['name' => '佣金记录', 'url' => 'admin/agent/commission'],
         ['name' => '佣金结算', 'url' => 'admin/agent/settle'],
     ]],
-    ['name' => '财务结算', 'icon' => '¥', 'url' => '#', 'children' => [
+    ['name' => '财务结算', 'icon' => '¥', 'url' => '#', 'roles' => ['super', 'admin'], 'children' => [
         ['name' => '资金流水', 'url' => 'admin/finance/flow'],
         ['name' => '费率分组', 'url' => 'admin/finance/rate'],
         ['name' => '结算打款', 'url' => 'admin/finance/settle'],
     ]],
-    ['name' => '支付网关', 'icon' => '₿', 'url' => '#', 'children' => [
+    ['name' => '支付网关', 'icon' => '₿', 'url' => '#', 'roles' => ['super', 'admin'], 'children' => [
         ['name' => '渠道配置', 'url' => 'admin/payment/channel'],
         ['name' => '风控策略', 'url' => 'admin/payment/risk'],
     ]],
-    ['name' => '模板前端', 'icon' => '◐', 'url' => '#', 'children' => [
+    ['name' => '模板前端', 'icon' => '◐', 'url' => '#', 'roles' => ['super', 'admin'], 'children' => [
         ['name' => '首页模板', 'url' => 'admin/template/home'],
         ['name' => '购卡页模板', 'url' => 'admin/template/goods'],
     ]],
@@ -52,20 +52,45 @@ $menu = [
         ['name' => '发布公告', 'url' => 'admin/article/create'],
     ]],
     ['name' => '广告位', 'icon' => '▣', 'url' => 'admin/ad', 'children' => []],
-    ['name' => '优惠券', 'icon' => '✂', 'url' => 'admin/coupon', 'children' => []],
+    ['name' => '优惠券', 'icon' => '✂', 'url' => 'admin/coupon', 'roles' => ['super', 'admin'], 'children' => []],
     ['name' => '数据统计', 'icon' => '▦', 'url' => '#', 'children' => [
         ['name' => '经营报表', 'url' => 'admin/stat/report'],
         ['name' => '操作日志', 'url' => 'admin/stat/log'],
     ]],
-    ['name' => '系统设置', 'icon' => '⚙', 'url' => '#', 'children' => [
+    ['name' => '系统设置', 'icon' => '⚙', 'url' => '#', 'roles' => ['super', 'admin'], 'children' => [
         ['name' => '站点基础', 'url' => 'admin/setting'],
         ['name' => '邮件系统', 'url' => 'admin/setting/email'],
         ['name' => '短信通知', 'url' => 'admin/setting/sms'],
         ['name' => '文件存储', 'url' => 'admin/setting/storage'],
         ['name' => '安全防护', 'url' => 'admin/setting/security'],
-        ['name' => '管理员账号', 'url' => 'admin/admin'],
+        ['name' => '管理员账号', 'url' => 'admin/admin', 'roles' => ['super']],
     ]]
 ];
+
+// 根据当前管理员角色过滤菜单
+$currentRole = $admin['role'] ?? '';
+$filteredMenu = [];
+foreach ($menu as $item) {
+    $itemRoles = $item['roles'] ?? ['super', 'admin', 'operator'];
+    if (!in_array($currentRole, $itemRoles, true)) {
+        continue;
+    }
+    if (!empty($item['children'])) {
+        $children = [];
+        foreach ($item['children'] as $sub) {
+            $subRoles = $sub['roles'] ?? ['super', 'admin', 'operator'];
+            if (in_array($currentRole, $subRoles, true)) {
+                $children[] = $sub;
+            }
+        }
+        if (empty($children)) {
+            continue;
+        }
+        $item['children'] = $children;
+    }
+    $filteredMenu[] = $item;
+}
+$menu = $filteredMenu;
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">

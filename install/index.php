@@ -22,6 +22,13 @@ if (file_exists($rootPath . 'application/config/database.php')) {
 function checkEnv()
 {
     global $rootPath;
+
+    // 配置文件目录不存在时自动创建
+    $configDir = $rootPath . 'application/config';
+    if (!is_dir($configDir)) {
+        @mkdir($configDir, 0755, true);
+    }
+
     $items = [];
     $items['PHP >= 7.4'] = version_compare(PHP_VERSION, '7.4.0', '>=');
     $items['PDO 扩展'] = extension_loaded('pdo');
@@ -101,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step == 2) {
                 'prefix' => 'jz_',
             ];
             installDatabase($config, $adminUser, $adminPass);
-            $success = '安装成功，请删除 install 目录后 <a href="../public/">点击访问首页</a> 或 <a href="../public/admin/dashboard">进入总站后台</a>';
+            $success = '安装成功，请删除 install 目录后 <a href="/">点击访问首页</a> 或 <a href="/admin/dashboard">进入总站后台</a>';
             $step = 'done';
         } catch (Exception $e) {
             $error = '安装失败：' . $e->getMessage();

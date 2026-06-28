@@ -2,6 +2,7 @@
 /**
  * 简单路由解析器
  * URL 格式：/模块/控制器/操作?参数
+ * 模块目录为小写，控制器类名为首字母大写
  */
 class Route
 {
@@ -29,19 +30,34 @@ class Route
             $segments = array_values($segments);
 
             if (count($segments) >= 3) {
-                self::$module = ucfirst($segments[0]);
+                self::$module = strtolower($segments[0]);
                 self::$controller = ucfirst($segments[1]);
                 self::$action = $segments[2];
             } elseif (count($segments) === 2) {
-                self::$controller = ucfirst($segments[0]);
-                self::$action = $segments[1];
+                $moduleDir = APP_PATH . 'controller' . DIRECTORY_SEPARATOR . strtolower($segments[0]);
+                // 如果存在模块目录，则按模块控制器处理，默认 index 操作
+                if (is_dir($moduleDir)) {
+                    self::$module = strtolower($segments[0]);
+                    self::$controller = ucfirst($segments[1]);
+                    self::$action = 'index';
+                } else {
+                    self::$controller = ucfirst($segments[0]);
+                    self::$action = $segments[1];
+                }
             } elseif (count($segments) === 1) {
-                self::$controller = ucfirst($segments[0]);
+                $moduleDir = APP_PATH . 'controller' . DIRECTORY_SEPARATOR . strtolower($segments[0]);
+                if (is_dir($moduleDir) && is_file($moduleDir . DIRECTORY_SEPARATOR . 'Index.php')) {
+                    self::$module = strtolower($segments[0]);
+                    self::$controller = 'Index';
+                    self::$action = 'index';
+                } else {
+                    self::$controller = ucfirst($segments[0]);
+                }
             }
         }
 
         if (self::$module) {
-            $class = self::$module . '_' . self::$controller;
+            $class = ucfirst(self::$module) . '_' . self::$controller;
             $file = APP_PATH . 'controller' . DIRECTORY_SEPARATOR . self::$module . DIRECTORY_SEPARATOR . self::$controller . '.php';
         } else {
             $class = self::$controller;
@@ -80,6 +96,6 @@ class Route
 
     public static function getModule()
     {
-        return self::$module;
+        return self::$module ? ucfirst(self::$module) : '';
     }
 }

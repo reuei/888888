@@ -407,3 +407,56 @@ function captcha_required($key)
     $config = get_security_config();
     return ($config['security_captcha_' . $key] ?? '0') === '1';
 }
+
+/**
+ * 获取商户费率分组
+ */
+function get_merchant_rate_group($merchantId)
+{
+    static $cache = [];
+    $merchantId = (int) $merchantId;
+    if (isset($cache[$merchantId])) {
+        return $cache[$merchantId];
+    }
+
+    $default = [
+        'rate' => '0.0000',
+        'max_fee' => '0.00',
+    ];
+
+    try {
+        $merchant = Db::fetch("SELECT rate_group_id FROM jz_merchant WHERE id = ?", [$merchantId]);
+        if ($merchant && (int) $merchant['rate_group_id'] > 0) {
+            $group = Db::fetch("SELECT rate, max_fee FROM jz_rate_group WHERE id = ?", [$merchant['rate_group_id']]);
+            if ($group) {
+                $cache[$merchantId] = [
+                    'rate' => $group['rate'],
+                    'max_fee' => $group['max_fee'],
+                ];
+                return $cache[$merchantId];
+            }
+        }
+    } catch (Exception $e) {
+        // 忽略
+    }
+
+    $cache[$merchantId] = $default;
+    return $default;
+}
+
+/**
+ * 计算订单手续费
+ */
+function calculate_order_fee($payAmount, $rateGroup)
+{
+    $rate = (float) ($rateGroup['rate'] ?? 0);
+    $maxFee = (float) ($rateGroup['max_fee'] ?? 0);
+    if ($rate <= 0) {
+        return 0.00;
+    }
+    $fee = round($payAmount * $rate, 2);
+    if ($maxFee > 0 && $fee > $maxFee) {
+        $fee = $maxFee;
+    }
+    return $fee;
+}

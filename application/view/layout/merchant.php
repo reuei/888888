@@ -23,9 +23,9 @@ $menu = [
         ['name' => '回复会话', 'url' => 'merchant/chat/session'],
     ]],
     ['name' => '资金管理', 'icon' => '¥', 'url' => '#', 'children' => [
-        ['name' => '结算记录', 'url' => 'merchant/finance/settle'],
-        ['name' => '待结算金额', 'url' => 'merchant/finance/pending'],
-        ['name' => '流水排行', 'url' => 'merchant/finance/rank'],
+        ['name' => '资金概览', 'url' => 'merchant/finance'],
+        ['name' => '资金流水', 'url' => 'merchant/finance/flow'],
+        ['name' => '结算提现', 'url' => 'merchant/finance/settle'],
     ]],
     ['name' => '店铺设置', 'icon' => '⚙', 'url' => '#', 'children' => [
         ['name' => '店铺信息', 'url' => 'merchant/setting/shop'],

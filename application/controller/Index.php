@@ -1164,6 +1164,46 @@ class Index extends Controller
                 [$cardContent, $payTime, $order['id']]
             );
         }
+
+        // 结算商户收入与手续费
+        if ($order['merchant_id'] > 0) {
+            $rateGroup = get_merchant_rate_group($order['merchant_id']);
+            $fee = calculate_order_fee((float) $order['pay_amount'], $rateGroup);
+            $income = round((float) $order['pay_amount'] - $fee, 2);
+
+            $merchant = Db::fetch("SELECT balance FROM jz_merchant WHERE id = ?", [$order['merchant_id']]);
+            $oldBalance = (float) ($merchant['balance'] ?? 0);
+            $newBalance = round($oldBalance + $income, 2);
+
+            Db::execute(
+                "UPDATE jz_merchant SET balance = ?, update_time = ? WHERE id = ?",
+                [$newBalance, $payTime, $order['merchant_id']]
+            );
+
+            // 资金流水：商户收入
+            Db::insert('jz_finance_flow', [
+                'merchant_id' => $order['merchant_id'],
+                'order_id' => $order['id'],
+                'type' => 'income',
+                'amount' => $income,
+                'balance' => $newBalance,
+                'remark' => '订单收入 ' . $order['order_no'],
+                'create_time' => $payTime,
+            ]);
+
+            // 资金流水：手续费
+            if ($fee > 0) {
+                Db::insert('jz_finance_flow', [
+                    'merchant_id' => $order['merchant_id'],
+                    'order_id' => $order['id'],
+                    'type' => 'fee',
+                    'amount' => $fee,
+                    'balance' => $newBalance,
+                    'remark' => '平台手续费 ' . $order['order_no'],
+                    'create_time' => $payTime,
+                ]);
+            }
+        }
     }
 
     /**

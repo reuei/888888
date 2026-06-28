@@ -37,6 +37,12 @@ class Login extends Controller
             }
             session('admin_user', $user);
             Db::execute("UPDATE jz_admin SET last_login_time = ?, update_time = ? WHERE id = ?", [date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), $user['id']]);
+
+            // 分站超管进入分站后台
+            if (($user['role'] === 'subsite_super' || $user['role'] === 'subsite_admin') && $user['subsite_id'] > 0) {
+                json_success('登录成功', ['redirect' => url('subsite/dashboard')]);
+            }
+
             json_success('登录成功', ['redirect' => url('admin/dashboard')]);
         }
     }

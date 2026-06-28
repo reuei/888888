@@ -1,19 +1,28 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
+import EmptyState from '../../components/EmptyState';
 import { useToast } from '../../components/Toast';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { bOrders, invoices as invoicesData } from '../../data/mock';
 import { formatMoney, statusBadge, statusText, invoiceTypeText } from '../../utils/helpers';
-import { FileText, Plus, Eye } from 'lucide-react';
-import EmptyState from '../../components/EmptyState';
+import { FileText, Plus, Eye, Search, RefreshCcw } from 'lucide-react';
+import type { Invoice } from '../../types';
 
 export default function Invoice() {
   const { show } = useToast();
   const [invoices, setInvoices] = useState(invoicesData);
   const [applyOpen, setApplyOpen] = useState(false);
-  const [detail, setDetail] = useState<typeof invoices[0] | null>(null);
+  const [detail, setDetail] = useState<Invoice | null>(null);
 
-  const paidOrders = bOrders.filter((o) => o.status === 'paid');
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
+
+  const paidOrders = useMemo(() => bOrders.filter((o) => o.status === 'paid'), []);
 
   const [form, setForm] = useState({
     orderId: paidOrders[0]?.id || '',
@@ -24,11 +33,36 @@ export default function Invoice() {
 
   const selectedOrder = paidOrders.find((o) => o.id === form.orderId);
 
+  const filtered = useMemo(() => {
+    const kw = debouncedKeyword.trim().toLowerCase();
+    if (!kw) return invoices;
+    return invoices.filter((inv) =>
+      inv.id.toLowerCase().includes(kw) ||
+      inv.orderId.toLowerCase().includes(kw) ||
+      inv.title.toLowerCase().includes(kw) ||
+      (inv.taxId && inv.taxId.toLowerCase().includes(kw))
+    );
+  }, [invoices, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort({
+    data: filtered,
+    initialKey: 'createdAt',
+    initialDirection: 'desc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  const reset = () => {
+    setKeyword('');
+    setPage(1);
+  };
+
   const handleSubmit = () => {
     if (!selectedOrder || !form.title.trim()) return;
     const now = new Date();
     const createdAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const newInvoice: typeof invoices[0] = {
+    const newInvoice: Invoice = {
       id: `INV${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(invoices.length + 1).padStart(3, '0')}`,
       orderId: selectedOrder.id,
       amount: selectedOrder.amount,
@@ -49,6 +83,7 @@ export default function Invoice() {
     setInvoices([newInvoice, ...invoices]);
     setApplyOpen(false);
     setForm({ orderId: paidOrders[0]?.id || '', type: 'personal', title: '', taxId: '' });
+    setPage(1);
     show(`发票申请 ${newInvoice.id} 提交成功`, 'success');
   };
 
@@ -71,21 +106,35 @@ export default function Invoice() {
       </div>
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              placeholder="搜索发票号 / 订单号 / 抬头 / 税号"
+              className="input pl-8"
+              value={keyword}
+              onChange={(e) => { setKeyword(e.target.value); setPage(1); }}
+            />
+          </div>
+          <button onClick={reset} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>发票号</th>
+              <th><SortableHeader label="发票号" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>关联订单</th>
               <th>发票类型</th>
               <th>发票抬头</th>
-              <th>金额</th>
+              <th><SortableHeader label="金额" sortKey="amount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>状态</th>
-              <th>申请时间</th>
+              <th><SortableHeader label="申请时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {invoices.map((inv) => (
+            {pagedList.map((inv) => (
               <tr key={inv.id}>
                 <td className="font-medium">{inv.id}</td>
                 <td>{inv.orderId}</td>
@@ -110,7 +159,7 @@ export default function Invoice() {
           </tbody>
         </table>
 
-        {invoices.length === 0 && (
+        {sorted.length === 0 && (
           <EmptyState
             title="暂无发票记录"
             description="您还没有申请过发票"
@@ -121,6 +170,10 @@ export default function Invoice() {
               </button>
             }
           />
+        )}
+
+        {sorted.length > 0 && (
+          <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
         )}
       </div>
 

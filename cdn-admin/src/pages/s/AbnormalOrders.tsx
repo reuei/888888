@@ -1,17 +1,49 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
+import SortableHeader from '../../components/SortableHeader';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { orders } from '../../data/mock';
 import { statusBadge, statusText, formatMoney } from '../../utils/helpers';
-import { AlertTriangle, RefreshCcw, RotateCcw } from 'lucide-react';
+import { AlertTriangle, RefreshCcw, RotateCcw, Search, Inbox } from 'lucide-react';
+import type { Order } from '../../types';
 
 export default function SAbnormalOrders() {
-  const [list, setList] = useState(orders.filter((o) => o.status === 'refunded' || o.status === 'closed'));
+  const [list, setList] = useState<Order[]>(orders.filter((o) => o.status === 'refunded' || o.status === 'closed'));
   const [modalOpen, setModalOpen] = useState(false);
-  const [current, setCurrent] = useState<typeof orders[0] | null>(null);
+  const [current, setCurrent] = useState<Order | null>(null);
   const [reason, setReason] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
 
-  const openHandle = (o: typeof orders[0]) => {
+  const filtered = useMemo(() => {
+    const q = debouncedKeyword.toLowerCase();
+    return list.filter((o) => {
+      if (!q) return true;
+      return [o.id, o.buyer, o.merchant, o.product, o.status, o.createdAt].some((v) =>
+        String(v).toLowerCase().includes(q)
+      ) || String(o.amount).includes(q);
+    });
+  }, [list, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort<Order>({
+    data: filtered,
+    initialKey: 'createdAt',
+    initialDirection: 'desc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, sortKey, setPage]);
+
+  const openHandle = (o: Order) => {
     setCurrent(o);
     setReason('');
     setModalOpen(true);
@@ -19,37 +51,65 @@ export default function SAbnormalOrders() {
 
   const updateStatus = (status: 'paid' | 'closed') => {
     if (!current) return;
-    setList(list.map((o) => (o.id === current.id ? { ...o, status } : o)));
+    setList((prev) => prev.map((o) => (o.id === current.id ? { ...o, status } : o)));
     setModalOpen(false);
   };
+
+  const abnormalReason = (status: Order['status']) =>
+    status === 'refunded' ? '用户申请退款' : '支付超时关闭';
 
   return (
     <div>
       <PageHeader title="异常订单处理" breadcrumb={['订单管理', '异常订单处理']} />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="搜索订单号 / 买家 / 商户 / 商品 / 金额 / 状态"
+              className="input pl-8"
+            />
+          </div>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>订单号</th>
-              <th>买家</th>
-              <th>商户</th>
-              <th>商品</th>
-              <th>金额</th>
+              <th>
+                <SortableHeader<keyof Order> label="订单号" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Order> label="买家" sortKey="buyer" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Order> label="商户" sortKey="merchant" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Order> label="商品" sortKey="product" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Order> label="金额" sortKey="amount" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
               <th>异常原因</th>
-              <th>状态</th>
+              <th>
+                <SortableHeader<keyof Order> label="状态" sortKey="status" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {list.map((o) => (
+            {pagedList.map((o) => (
               <tr key={o.id}>
                 <td className="font-medium">{o.id}</td>
                 <td>{o.buyer}</td>
                 <td>{o.merchant}</td>
                 <td>{o.product}</td>
                 <td>¥{formatMoney(o.amount)}</td>
-                <td className="text-text-secondary">{o.status === 'refunded' ? '用户申请退款' : '支付超时关闭'}</td>
+                <td className="text-text-secondary">{abnormalReason(o.status)}</td>
                 <td>
                   <span className={`badge ${statusBadge(o.status)}`}>{statusText(o.status)}</span>
                 </td>
@@ -62,6 +122,12 @@ export default function SAbnormalOrders() {
             ))}
           </tbody>
         </table>
+
+        {pagedList.length === 0 && (
+          <EmptyState title="暂无异常订单" description="没有符合搜索条件的异常订单" icon={<Inbox size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

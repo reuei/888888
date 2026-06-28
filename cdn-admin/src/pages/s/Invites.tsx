@@ -1,14 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
+import EmptyState from '../../components/EmptyState';
 import Modal from '../../components/Modal';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { inviteCodes } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { Plus, Copy, Ban } from 'lucide-react';
+import { Plus, Copy, Ban, Search, Ticket } from 'lucide-react';
 
 export default function SInvites() {
   const [list, setList] = useState(inviteCodes);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
+  const [statusFilter, setStatusFilter] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ maxUses: 100, expiry: '2026-12-31' });
+
+  const filtered = list.filter((i) => {
+    const matchKeyword = !debouncedKeyword || i.code.toLowerCase().includes(debouncedKeyword.toLowerCase());
+    const matchStatus = statusFilter === 'all' || i.status === statusFilter;
+    return matchKeyword && matchStatus;
+  });
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort({ data: filtered, initialKey: 'usedCount', initialDirection: 'desc' });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, statusFilter, setPage]);
 
   const generateCode = () => {
     const code = 'INVITE' + Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -43,19 +66,39 @@ export default function SInvites() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+            <Search size={16} className="text-text-secondary" />
+            <input
+              type="text"
+              placeholder="搜索邀请码"
+              className="input"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+          </div>
+          <select className="input w-32" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">全部状态</option>
+            <option value="active">生效中</option>
+            <option value="expired">已过期</option>
+            <option value="disabled">已禁用</option>
+          </select>
+          <button onClick={() => { setKeyword(''); setStatusFilter('all'); }} className="btn btn-default">重置</button>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>邀请码</th>
-              <th>有效期</th>
-              <th>使用次数上限</th>
-              <th>已使用</th>
+              <th><SortableHeader label="邀请码" sortKey="code" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="有效期" sortKey="expiry" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="使用次数上限" sortKey="maxUses" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="已使用" sortKey="usedCount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>状态</th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {list.map((i) => (
+            {pagedList.map((i) => (
               <tr key={i.id}>
                 <td className="font-medium">{i.code}</td>
                 <td className="text-text-secondary">{i.expiry}</td>
@@ -80,6 +123,12 @@ export default function SInvites() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无邀请码" description="没有符合筛选条件的邀请码" icon={<Ticket size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

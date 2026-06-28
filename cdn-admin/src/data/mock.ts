@@ -1,4 +1,4 @@
-import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, BOrder, Invoice, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord, DailyStat, MerchantStat, UserGrowthStat } from '../types';
+import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, CouponRecord, TemplateItem, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, BOrder, Invoice, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord, DailyStat, MerchantStat, UserGrowthStat } from '../types';
 
 export const sProfile: UserProfile = {
   name: '总站长',
@@ -146,6 +146,38 @@ export const adSlots: AdSlot[] = [
 export const coupons: Coupon[] = [
   { id: 'CO001', batch: 'BATCH0618', type: 'fixed', value: 10, threshold: 50, total: 1000, received: 856, status: 'active' },
   { id: 'CO002', batch: 'BATCHNEW', type: 'percent', value: 20, threshold: 100, total: 500, received: 500, status: 'expired' },
+];
+
+export const couponRecords: CouponRecord[] = [
+  { id: 'CR001', code: 'BATCH0618-001', batch: 'BATCH0618', user: 'user_9527', order: 'O202606280001', usedAt: '2026-06-28 10:25' },
+  { id: 'CR002', code: 'BATCH0618-002', batch: 'BATCH0618', user: 'user_3344', order: 'O202606280002', usedAt: '2026-06-28 09:46' },
+];
+
+export const pcTemplates: TemplateItem[] = [
+  { id: 'PC-01', name: '企业官网风格', type: 'pc' },
+  { id: 'PC-02', name: '科技深蓝风格', type: 'pc' },
+  { id: 'PC-03', name: '极简白风格', type: 'pc' },
+];
+
+export const mobileTemplates: TemplateItem[] = [
+  { id: 'M-01', name: '移动端标准版', type: 'mobile' },
+  { id: 'M-02', name: '移动端深色版', type: 'mobile' },
+  { id: 'M-03', name: '移动端渐变版', type: 'mobile' },
+  { id: 'M-04', name: '移动端卡片版', type: 'mobile' },
+];
+
+export const cardTemplates: TemplateItem[] = [
+  { id: 'CARD-01', name: '经典购卡页', type: 'card' },
+  { id: 'CARD-02', name: '暗色游戏风', type: 'card' },
+  { id: 'CARD-03', name: '清新电商风', type: 'card' },
+  { id: 'CARD-04', name: '极简科技风', type: 'card' },
+  { id: 'CARD-05', name: '促销节日风', type: 'card' },
+  { id: 'CARD-06', name: '会员专享风', type: 'card' },
+  { id: 'CARD-07', name: '直播带货风', type: 'card' },
+  { id: 'CARD-08', name: '企业采购风', type: 'card' },
+  { id: 'CARD-09', name: '教育课程风', type: 'card' },
+  { id: 'CARD-10', name: '云服务风', type: 'card' },
+  { id: 'CARD-11', name: 'DIY 自定义', type: 'card' },
 ];
 
 export const settlementRecords = [

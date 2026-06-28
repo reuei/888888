@@ -1,15 +1,20 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import EmptyState from '../../components/EmptyState';
+import SortableHeader from '../../components/SortableHeader';
 import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { operationLogs } from '../../data/mock';
 import { Search, FileSearch } from 'lucide-react';
+import type { OperationLog } from '../../types';
 
 export default function OperationLogs() {
   const { show } = useToast();
   const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
   const [moduleFilter, setModuleFilter] = useState('');
   const [actionFilter, setActionFilter] = useState('');
 
@@ -17,21 +22,32 @@ export default function OperationLogs() {
   const actions = useMemo(() => Array.from(new Set(operationLogs.map((l) => l.action))), []);
 
   const filtered = useMemo(() => {
+    const q = debouncedKeyword.toLowerCase();
     return operationLogs.filter((l) => {
       const matchKeyword =
-        !keyword ||
-        l.id.toLowerCase().includes(keyword.toLowerCase()) ||
-        l.operator.toLowerCase().includes(keyword.toLowerCase()) ||
-        l.detail.toLowerCase().includes(keyword.toLowerCase()) ||
-        l.ip.includes(keyword);
+        !q ||
+        l.id.toLowerCase().includes(q) ||
+        l.operator.toLowerCase().includes(q) ||
+        l.detail.toLowerCase().includes(q) ||
+        l.ip.includes(q);
       const matchModule = !moduleFilter || l.module === moduleFilter;
       const matchAction = !actionFilter || l.action === actionFilter;
       return matchKeyword && matchModule && matchAction;
     });
-  }, [keyword, moduleFilter, actionFilter]);
+  }, [debouncedKeyword, moduleFilter, actionFilter]);
 
-  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
-  const pagedList = slice(filtered);
+  const { sorted, sortKey, sortDirection, toggle } = useSort<OperationLog>({
+    data: filtered,
+    initialKey: 'createdAt',
+    initialDirection: 'desc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, moduleFilter, actionFilter, sortKey, setPage]);
 
   return (
     <div>
@@ -86,18 +102,32 @@ export default function OperationLogs() {
           </button>
         </div>
 
-        <div className="text-sm text-text-secondary mb-3">共 {filtered.length} 条记录</div>
+        <div className="text-sm text-text-secondary mb-3">共 {sorted.length} 条记录</div>
 
         <table className="table">
           <thead>
             <tr>
-              <th>日志ID</th>
-              <th>操作人</th>
-              <th>模块</th>
-              <th>操作</th>
-              <th>详情</th>
-              <th>IP</th>
-              <th>时间</th>
+              <th>
+                <SortableHeader<keyof OperationLog> label="日志ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof OperationLog> label="操作人" sortKey="operator" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof OperationLog> label="模块" sortKey="module" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof OperationLog> label="操作" sortKey="action" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof OperationLog> label="详情" sortKey="detail" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof OperationLog> label="IP" sortKey="ip" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof OperationLog> label="时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -117,11 +147,11 @@ export default function OperationLogs() {
           </tbody>
         </table>
 
-        {filtered.length === 0 && (
+        {pagedList.length === 0 && (
           <EmptyState title="暂无日志" description="没有符合筛选条件的操作日志" icon={<FileSearch size={24} />} />
         )}
 
-        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

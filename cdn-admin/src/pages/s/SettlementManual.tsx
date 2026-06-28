@@ -1,16 +1,34 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
+import SortableHeader from '../../components/SortableHeader';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { settlementRecords } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
-import { Plus, CheckCircle } from 'lucide-react';
+import { Plus, CheckCircle, Search, Inbox } from 'lucide-react';
+
+interface SettlementRecord {
+  id: string;
+  merchant: string;
+  cycle: string;
+  amount: number;
+  fee: number;
+  status: string;
+  time: string;
+}
 
 export default function SettlementManual() {
-  const [records, setRecords] = useState(settlementRecords);
+  const [records, setRecords] = useState<SettlementRecord[]>(settlementRecords as SettlementRecord[]);
   const [open, setOpen] = useState(false);
   const [merchant, setMerchant] = useState('极速云');
   const [cycle, setCycle] = useState('T+1');
   const [amount, setAmount] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
 
   const merchantOptions = Array.from(new Set(records.map((r) => r.merchant)));
 
@@ -19,13 +37,36 @@ export default function SettlementManual() {
   const statusText = (status: string) =>
     status === 'settled' ? '已结算' : '待处理';
 
+  const filtered = useMemo(() => {
+    const q = debouncedKeyword.toLowerCase();
+    return records.filter((r) => {
+      if (!q) return true;
+      return [r.id, r.merchant, r.cycle, r.status, r.time].some((v) =>
+        String(v).toLowerCase().includes(q)
+      );
+    });
+  }, [records, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort<SettlementRecord>({
+    data: filtered,
+    initialKey: 'time',
+    initialDirection: 'desc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, sortKey, setPage]);
+
   const handleConfirm = () => {
     const value = parseFloat(amount);
     if (!value || value <= 0) return;
     const fee = Math.round(value * 0.01 * 100) / 100;
     const now = new Date();
     const time = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const newRecord = {
+    const newRecord: SettlementRecord = {
       id: `SET${String(records.length + 1).padStart(3, '0')}`,
       merchant,
       cycle,
@@ -52,20 +93,47 @@ export default function SettlementManual() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="搜索结算单号 / 商户 / 周期 / 状态 / 时间"
+              className="input pl-8"
+            />
+          </div>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>结算单号</th>
-              <th>商户</th>
-              <th>周期</th>
-              <th>金额</th>
-              <th>手续费</th>
-              <th>状态</th>
-              <th>时间</th>
+              <th>
+                <SortableHeader<keyof SettlementRecord> label="结算单号" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof SettlementRecord> label="商户" sortKey="merchant" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof SettlementRecord> label="周期" sortKey="cycle" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof SettlementRecord> label="金额" sortKey="amount" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof SettlementRecord> label="手续费" sortKey="fee" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof SettlementRecord> label="状态" sortKey="status" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof SettlementRecord> label="时间" sortKey="time" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
             </tr>
           </thead>
           <tbody>
-            {records.map((r) => (
+            {pagedList.map((r) => (
               <tr key={r.id}>
                 <td className="font-medium">{r.id}</td>
                 <td>{r.merchant}</td>
@@ -82,6 +150,12 @@ export default function SettlementManual() {
             ))}
           </tbody>
         </table>
+
+        {pagedList.length === 0 && (
+          <EmptyState title="暂无结算记录" description="没有符合搜索条件的结算记录" icon={<Inbox size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

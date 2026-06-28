@@ -1,23 +1,55 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
+import SortableHeader from '../../components/SortableHeader';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { complaints } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { Eye } from 'lucide-react';
+import { Eye, Search, Inbox } from 'lucide-react';
+import type { Complaint } from '../../types';
 
 export default function SComplaints() {
-  const [list, setList] = useState(complaints);
+  const [list, setList] = useState<Complaint[]>(complaints);
   const [modalOpen, setModalOpen] = useState(false);
-  const [current, setCurrent] = useState<typeof complaints[0] | null>(null);
+  const [current, setCurrent] = useState<Complaint | null>(null);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
 
-  const openDetail = (c: typeof complaints[0]) => {
+  const filtered = useMemo(() => {
+    const q = debouncedKeyword.toLowerCase();
+    return list.filter((c) => {
+      if (!q) return true;
+      return [c.id, c.orderId, c.plaintiff, c.defendant, c.reason, c.status, c.createdAt].some((v) =>
+        String(v).toLowerCase().includes(q)
+      );
+    });
+  }, [list, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort<Complaint>({
+    data: filtered,
+    initialKey: 'createdAt',
+    initialDirection: 'desc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, sortKey, setPage]);
+
+  const openDetail = (c: Complaint) => {
     setCurrent(c);
     setModalOpen(true);
   };
 
   const handleResolve = (result: 'resolved' | 'rejected') => {
     if (!current) return;
-    setList(list.map((c) => (c.id === current.id ? { ...c, status: result } : c)));
+    setList((prev) => prev.map((c) => (c.id === current.id ? { ...c, status: result } : c)));
     setModalOpen(false);
   };
 
@@ -26,21 +58,48 @@ export default function SComplaints() {
       <PageHeader title="投诉管理" breadcrumb={['订单管理', '投诉管理']} />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="搜索投诉编号 / 订单 / 投诉人 / 被投诉方 / 原因 / 状态"
+              className="input pl-8"
+            />
+          </div>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>投诉编号</th>
-              <th>关联订单</th>
-              <th>投诉人</th>
-              <th>被投诉方</th>
-              <th>投诉原因</th>
-              <th>状态</th>
-              <th>提交时间</th>
+              <th>
+                <SortableHeader<keyof Complaint> label="投诉编号" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Complaint> label="关联订单" sortKey="orderId" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Complaint> label="投诉人" sortKey="plaintiff" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Complaint> label="被投诉方" sortKey="defendant" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Complaint> label="投诉原因" sortKey="reason" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Complaint> label="状态" sortKey="status" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Complaint> label="提交时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {list.map((c) => (
+            {pagedList.map((c) => (
               <tr key={c.id}>
                 <td className="font-medium">{c.id}</td>
                 <td>{c.orderId}</td>
@@ -62,6 +121,12 @@ export default function SComplaints() {
             ))}
           </tbody>
         </table>
+
+        {pagedList.length === 0 && (
+          <EmptyState title="暂无投诉" description="没有符合搜索条件的投诉记录" icon={<Inbox size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

@@ -1,14 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
+import EmptyState from '../../components/EmptyState';
 import Modal from '../../components/Modal';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { luckyNumbers } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
-import { Plus, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, ToggleLeft, ToggleRight, Search, Hash } from 'lucide-react';
 
 export default function LuckyNumbers() {
   const [list, setList] = useState(luckyNumbers);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
+  const [soldFilter, setSoldFilter] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ number: '', price: 0 });
+
+  const filtered = list.filter((n) => {
+    const matchKeyword = !debouncedKeyword || n.number.includes(debouncedKeyword) || n.id.toLowerCase().includes(debouncedKeyword.toLowerCase());
+    const matchSold = soldFilter === 'all' || String(n.sold) === soldFilter;
+    return matchKeyword && matchSold;
+  });
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort({ data: filtered, initialKey: 'price', initialDirection: 'desc' });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, soldFilter, setPage]);
 
   const toggleSold = (id: string) => {
     setList(list.map((n) => (n.id === id ? { ...n, sold: !n.sold } : n)));
@@ -42,18 +65,37 @@ export default function LuckyNumbers() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+            <Search size={16} className="text-text-secondary" />
+            <input
+              type="text"
+              placeholder="搜索编号ID / 靓号"
+              className="input"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+          </div>
+          <select className="input w-32" value={soldFilter} onChange={(e) => setSoldFilter(e.target.value)}>
+            <option value="all">全部状态</option>
+            <option value="false">未售出</option>
+            <option value="true">已售出</option>
+          </select>
+          <button onClick={() => { setKeyword(''); setSoldFilter('all'); }} className="btn btn-default">重置</button>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
               <th>编号ID</th>
-              <th>靓号</th>
-              <th>价格</th>
-              <th>售出状态</th>
+              <th><SortableHeader label="靓号" sortKey="number" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="价格" sortKey="price" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="售出状态" sortKey="sold" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {list.map((n) => (
+            {pagedList.map((n) => (
               <tr key={n.id}>
                 <td className="text-text-secondary">{n.id}</td>
                 <td className="font-medium">{n.number}</td>
@@ -76,6 +118,12 @@ export default function LuckyNumbers() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无靓号" description="没有符合筛选条件的靓号" icon={<Hash size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

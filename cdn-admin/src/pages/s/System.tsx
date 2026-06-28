@@ -1,7 +1,21 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
+import SortableHeader from '../../components/SortableHeader';
 import { useToast } from '../../components/Toast';
-import { Mail, MessageSquare, HardDrive, Clock, Wrench, FileText, Send, Save } from 'lucide-react';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
+import { Mail, MessageSquare, HardDrive, Clock, Wrench, FileText, Send, Save, Search, Inbox } from 'lucide-react';
+
+interface CronJob {
+  id: string;
+  name: string;
+  cron: string;
+  status: 'running' | 'paused';
+  last: string;
+}
 
 export default function SSystem() {
   const [tab, setTab] = useState<'email' | 'sms' | 'wechat' | 'storage' | 'cron' | 'tools' | 'protocol'>('email');
@@ -16,6 +30,42 @@ export default function SSystem() {
     { key: 'tools', label: '系统工具箱', icon: Wrench },
     { key: 'protocol', label: '弹窗协议', icon: FileText },
   ];
+
+  const [cronJobs, setCronJobs] = useState<CronJob[]>([
+    { id: 'C001', name: '自动结算', cron: '0 10 * * *', status: 'running', last: '2026-06-28 10:00' },
+    { id: 'C002', name: '证书自动续期', cron: '0 2 * * *', status: 'running', last: '2026-06-28 02:00' },
+    { id: 'C003', name: '节点健康检测', cron: '*/5 * * * *', status: 'running', last: '2026-06-28 10:55' },
+  ]);
+
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
+
+  const filtered = useMemo(() => {
+    const q = debouncedKeyword.toLowerCase();
+    return cronJobs.filter((c) => {
+      if (!q) return true;
+      return [c.id, c.name, c.cron, c.status, c.last].some((v) => String(v).toLowerCase().includes(q));
+    });
+  }, [cronJobs, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort<CronJob>({
+    data: filtered,
+    initialKey: 'name',
+    initialDirection: 'asc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, sortKey, setPage]);
+
+  const toggleCronStatus = (id: string) => {
+    setCronJobs((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, status: c.status === 'running' ? 'paused' : 'running' } : c))
+    );
+  };
 
   return (
     <div>
@@ -134,30 +184,66 @@ export default function SSystem() {
 
         {tab === 'cron' && (
           <div>
+            <div className="flex flex-wrap gap-3 mb-4">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+                <input
+                  type="text"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  placeholder="搜索任务名称 / Cron / 状态 / 最近执行"
+                  className="input pl-8"
+                />
+              </div>
+            </div>
+
             <table className="table">
               <thead>
                 <tr>
-                  <th>任务名称</th>
-                  <th>Cron 表达式</th>
-                  <th>状态</th>
-                  <th>最近执行</th>
+                  <th>
+                    <SortableHeader<keyof CronJob> label="任务名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof CronJob> label="Cron 表达式" sortKey="cron" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof CronJob> label="状态" sortKey="status" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof CronJob> label="最近执行" sortKey="last" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>操作</th>
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { name: '自动结算', cron: '0 10 * * *', status: 'running', last: '2026-06-28 10:00' },
-                  { name: '证书自动续期', cron: '0 2 * * *', status: 'running', last: '2026-06-28 02:00' },
-                  { name: '节点健康检测', cron: '*/5 * * * *', status: 'running', last: '2026-06-28 10:55' },
-                ].map((c, i) => (
-                  <tr key={i}>
+                {pagedList.map((c) => (
+                  <tr key={c.id}>
                     <td className="font-medium">{c.name}</td>
                     <td className="font-mono text-text-secondary">{c.cron}</td>
-                    <td><span className="badge badge-success">运行中</span></td>
+                    <td>
+                      <span className={`badge ${c.status === 'running' ? 'badge-success' : 'badge-default'}`}>
+                        {c.status === 'running' ? '运行中' : '已暂停'}
+                      </span>
+                    </td>
                     <td className="text-text-secondary">{c.last}</td>
+                    <td>
+                      <button
+                        onClick={() => toggleCronStatus(c.id)}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        {c.status === 'running' ? '暂停' : '启动'}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
+            {pagedList.length === 0 && (
+              <EmptyState title="暂无定时任务" description="没有符合搜索条件的定时任务" icon={<Inbox size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
           </div>
         )}
 

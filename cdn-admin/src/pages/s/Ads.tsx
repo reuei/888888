@@ -1,13 +1,31 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { adSlots } from '../../data/mock';
-import { Plus, Edit, Trash2, Image } from 'lucide-react';
+import { Plus, Edit, Trash2, Image, Search, Megaphone } from 'lucide-react';
 
 export default function SAds() {
   const [list] = useState(adSlots);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
   const [current, setCurrent] = useState<typeof adSlots[0] | null>(null);
+
+  const filtered = list.filter((a) => {
+    const q = debouncedKeyword.trim().toLowerCase();
+    if (!q) return true;
+    return a.name.toLowerCase().includes(q) || a.position.toLowerCase().includes(q);
+  });
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort({ data: filtered, initialKey: 'name' });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
 
   const openConfig = (slot: typeof adSlots[0]) => {
     setCurrent(slot);
@@ -27,10 +45,26 @@ export default function SAds() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              placeholder="搜索广告位 / 展示位置"
+              className="input pl-9 w-full"
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>广告位名称</th>
+              <th><SortableHeader label="广告位名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>展示位置</th>
               <th>尺寸</th>
               <th>状态</th>
@@ -38,7 +72,7 @@ export default function SAds() {
             </tr>
           </thead>
           <tbody>
-            {list.map((a) => (
+            {pagedList.map((a) => (
               <tr key={a.id}>
                 <td className="font-medium">{a.name}</td>
                 <td>{a.position}</td>
@@ -65,6 +99,12 @@ export default function SAds() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无广告位" description="没有符合搜索条件的广告位" icon={<Megaphone size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

@@ -1,12 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
+import EmptyState from '../../components/EmptyState';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { commissionRecords } from '../../data/mock';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Search, Wallet } from 'lucide-react';
 import type { CommissionRecord } from '../../types';
 
 export default function AgentCommission() {
   const [records, setRecords] = useState<CommissionRecord[]>(commissionRecords);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const filtered = records.filter((r) => {
+    const matchKeyword = !debouncedKeyword ||
+      r.agent.toLowerCase().includes(debouncedKeyword.toLowerCase()) ||
+      r.orderId.toLowerCase().includes(debouncedKeyword.toLowerCase()) ||
+      r.id.toLowerCase().includes(debouncedKeyword.toLowerCase());
+    const matchStatus = statusFilter === 'all' || r.status === statusFilter;
+    return matchKeyword && matchStatus;
+  });
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort({ data: filtered, initialKey: 'createdAt', initialDirection: 'desc' });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, statusFilter, setPage]);
 
   const batchSettle = () => {
     setRecords(records.map((r) => (r.status === 'pending' ? { ...r, status: 'settled' as const } : r)));
@@ -35,20 +61,39 @@ export default function AgentCommission() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+            <Search size={16} className="text-text-secondary" />
+            <input
+              type="text"
+              placeholder="搜索记录ID / 代理商 / 订单号"
+              className="input"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+          </div>
+          <select className="input w-32" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">全部状态</option>
+            <option value="pending">待结算</option>
+            <option value="settled">已结算</option>
+          </select>
+          <button onClick={() => { setKeyword(''); setStatusFilter('all'); }} className="btn btn-default">重置</button>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
               <th>记录ID</th>
-              <th>代理商</th>
+              <th><SortableHeader label="代理商" sortKey="agent" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>订单号</th>
-              <th>佣金金额</th>
+              <th><SortableHeader label="佣金金额" sortKey="amount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>状态</th>
-              <th>时间</th>
+              <th><SortableHeader label="时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {records.map((r) => (
+            {pagedList.map((r) => (
               <tr key={r.id}>
                 <td className="text-text-secondary">{r.id}</td>
                 <td>{r.agent}</td>
@@ -71,6 +116,12 @@ export default function AgentCommission() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无佣金记录" description="没有符合筛选条件的佣金记录" icon={<Wallet size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

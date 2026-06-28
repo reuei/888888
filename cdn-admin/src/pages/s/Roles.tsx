@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
+import SortableHeader from '../../components/SortableHeader';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { roles, permissionOptions } from '../../data/mock';
-import { Plus, Edit, Trash2, Shield } from 'lucide-react';
+import { Plus, Edit, Trash2, Shield, Search, Inbox } from 'lucide-react';
 import type { RolePermission } from '../../types';
 
 export default function Roles() {
@@ -12,6 +18,34 @@ export default function Roles() {
   const [editingRole, setEditingRole] = useState<RolePermission | null>(null);
   const [addForm, setAddForm] = useState({ name: '', description: '', permissions: [] as string[] });
   const [editPermissions, setEditPermissions] = useState<string[]>([]);
+
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
+
+  const filtered = useMemo(() => {
+    const q = debouncedKeyword.toLowerCase();
+    return list.filter((r) => {
+      if (!q) return true;
+      return (
+        r.id.toLowerCase().includes(q) ||
+        r.name.toLowerCase().includes(q) ||
+        r.description.toLowerCase().includes(q)
+      );
+    });
+  }, [list, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort<RolePermission>({
+    data: filtered,
+    initialKey: '',
+    initialDirection: 'asc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, sortKey, setPage]);
 
   const togglePermission = (current: string[], key: string) => {
     if (current.includes(key)) {
@@ -66,19 +100,72 @@ export default function Roles() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="搜索角色ID / 名称 / 描述"
+              className="input pl-8"
+            />
+          </div>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>角色ID</th>
-              <th>角色名称</th>
-              <th>描述</th>
-              <th>权限数</th>
-              <th>关联用户数</th>
+              <th>
+                <SortableHeader<keyof RolePermission>
+                  label="角色ID"
+                  sortKey="id"
+                  activeKey={sortKey}
+                  direction={sortDirection}
+                  onSort={toggle}
+                />
+              </th>
+              <th>
+                <SortableHeader<keyof RolePermission>
+                  label="角色名称"
+                  sortKey="name"
+                  activeKey={sortKey}
+                  direction={sortDirection}
+                  onSort={toggle}
+                />
+              </th>
+              <th>
+                <SortableHeader<keyof RolePermission>
+                  label="描述"
+                  sortKey="description"
+                  activeKey={sortKey}
+                  direction={sortDirection}
+                  onSort={toggle}
+                />
+              </th>
+              <th>
+                <SortableHeader<keyof RolePermission>
+                  label="权限数"
+                  sortKey="permissions"
+                  activeKey={sortKey}
+                  direction={sortDirection}
+                  onSort={toggle}
+                />
+              </th>
+              <th>
+                <SortableHeader<keyof RolePermission>
+                  label="关联用户数"
+                  sortKey="userCount"
+                  activeKey={sortKey}
+                  direction={sortDirection}
+                  onSort={toggle}
+                />
+              </th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {list.map((r) => (
+            {pagedList.map((r) => (
               <tr key={r.id}>
                 <td className="text-text-secondary">{r.id}</td>
                 <td className="font-medium">{r.name}</td>
@@ -114,6 +201,12 @@ export default function Roles() {
             ))}
           </tbody>
         </table>
+
+        {pagedList.length === 0 && (
+          <EmptyState title="暂无角色" description="没有符合搜索条件的角色" icon={<Inbox size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
+import SortableHeader from '../../components/SortableHeader';
 import { useToast } from '../../components/Toast';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { backupRecords } from '../../data/mock';
-import { Play, RotateCcw, Trash2, Database, FileArchive, FileText } from 'lucide-react';
+import { Play, RotateCcw, Trash2, Database, FileArchive, FileText, Search, Inbox } from 'lucide-react';
 import type { BackupRecord } from '../../types';
 
 const backupContents = [
@@ -31,6 +37,31 @@ export default function Backup() {
   const [retainCount, setRetainCount] = useState(7);
   const [contents, setContents] = useState<string[]>(['database', 'files']);
   const [runningId, setRunningId] = useState<string | null>(null);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
+
+  const filtered = useMemo(() => {
+    const q = debouncedKeyword.toLowerCase();
+    return records.filter((r) => {
+      if (!q) return true;
+      return [r.id, r.name, r.type, r.status, r.createdAt, r.size].some((v) =>
+        String(v).toLowerCase().includes(q)
+      );
+    });
+  }, [records, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort<BackupRecord>({
+    data: filtered,
+    initialKey: 'createdAt',
+    initialDirection: 'desc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, sortKey, setPage]);
 
   const toggleContent = (key: string) => {
     setContents((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
@@ -144,20 +175,45 @@ export default function Backup() {
 
       <div className="card p-5">
         <h3 className="text-base font-semibold mb-4">备份记录</h3>
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="搜索备份ID / 名称 / 类型 / 状态 / 大小 / 时间"
+              className="input pl-8"
+            />
+          </div>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>备份ID</th>
-              <th>备份名称</th>
-              <th>大小</th>
-              <th>类型</th>
-              <th>状态</th>
-              <th>时间</th>
+              <th>
+                <SortableHeader<keyof BackupRecord> label="备份ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof BackupRecord> label="备份名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof BackupRecord> label="大小" sortKey="size" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof BackupRecord> label="类型" sortKey="type" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof BackupRecord> label="状态" sortKey="status" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof BackupRecord> label="时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {records.map((r) => (
+            {pagedList.map((r) => (
               <tr key={r.id}>
                 <td className="text-text-secondary">{r.id}</td>
                 <td className="font-medium">{r.name}</td>
@@ -195,6 +251,12 @@ export default function Backup() {
             ))}
           </tbody>
         </table>
+
+        {pagedList.length === 0 && (
+          <EmptyState title="暂无备份记录" description="没有符合搜索条件的备份记录" icon={<Inbox size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

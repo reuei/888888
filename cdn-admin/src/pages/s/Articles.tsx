@@ -1,13 +1,35 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { articles } from '../../data/mock';
-import { Plus, Edit, Trash2, Pin } from 'lucide-react';
+import { Plus, Edit, Trash2, Pin, Search, FileText } from 'lucide-react';
 
 export default function SArticles() {
   const [list, setList] = useState(articles);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ title: '', category: '平台公告', content: '', isTop: false, status: 'draft' });
+
+  const filtered = list.filter((a) => {
+    const q = debouncedKeyword.trim().toLowerCase();
+    if (!q) return true;
+    return a.title.toLowerCase().includes(q) || a.category.toLowerCase().includes(q);
+  });
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort({
+    data: filtered,
+    initialKey: 'publishAt',
+    initialDirection: 'desc',
+  });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
 
   const handleAdd = () => {
     setList([
@@ -42,19 +64,35 @@ export default function SArticles() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              placeholder="搜索标题 / 分类"
+              className="input pl-9 w-full"
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>标题</th>
+              <th><SortableHeader label="标题" sortKey="title" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>分类</th>
               <th>置顶</th>
               <th>状态</th>
-              <th>发布时间</th>
+              <th><SortableHeader label="发布时间" sortKey="publishAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {list.map((a) => (
+            {pagedList.map((a) => (
               <tr key={a.id}>
                 <td className="font-medium">{a.title}</td>
                 <td>{a.category}</td>
@@ -83,6 +121,12 @@ export default function SArticles() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无公告" description="没有符合搜索条件的公告" icon={<FileText size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

@@ -1,49 +1,68 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
 import { useToast } from '../../components/Toast';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { sites } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Edit, Trash2, Activity, Plus, Search, CheckCircle, Globe, RefreshCcw } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
-import Pagination from '../../components/Pagination';
-import { usePagination } from '../../hooks/usePagination';
+import type { Site } from '../../types';
 
 export default function BSites() {
   const { show } = useToast();
   const [list, setList] = useState(sites);
   const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
   const [addOpen, setAddOpen] = useState(false);
-
-  const reset = () => setKeyword('');
-
-  const filtered = list.filter((s) => !keyword || s.domain.toLowerCase().includes(keyword.toLowerCase()) || s.id.includes(keyword));
-
-  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
-  const pagedList = slice(filtered);
   const [editOpen, setEditOpen] = useState(false);
-  const [current, setCurrent] = useState<typeof sites[0] | null>(null);
+  const [current, setCurrent] = useState<Site | null>(null);
   const [form, setForm] = useState({ domain: '', pkg: 'PKG02' });
   const [tab, setTab] = useState('cname');
 
+  const filtered = useMemo(() => {
+    const kw = debouncedKeyword.trim().toLowerCase();
+    if (!kw) return list;
+    return list.filter((s) => s.domain.toLowerCase().includes(kw) || s.id.includes(kw));
+  }, [list, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort({
+    data: filtered,
+    initialKey: 'createdAt',
+    initialDirection: 'desc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  const reset = () => {
+    setKeyword('');
+    setPage(1);
+  };
+
   const handleAdd = () => {
-    const newSite = {
+    const newSite: Site = {
       id: String(list.length + 1),
       name: form.domain,
       domain: form.domain,
       template: 'PC-01',
       products: 0,
       nodes: 0,
-      status: 'pending' as const,
+      status: 'pending',
       createdAt: new Date().toISOString().slice(0, 10),
     };
     setList([newSite, ...list]);
     setAddOpen(false);
     setForm({ domain: '', pkg: 'PKG02' });
+    setPage(1);
     show(`站点 ${newSite.domain} 添加成功`, 'success');
   };
 
-  const openEdit = (s: typeof sites[0]) => {
+  const openEdit = (s: Site) => {
     setCurrent(s);
     setEditOpen(true);
   };
@@ -77,7 +96,7 @@ export default function BSites() {
               placeholder="搜索域名 / ID"
               className="input pl-8"
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => { setKeyword(e.target.value); setPage(1); }}
             />
           </div>
           <button className="btn btn-primary">查询</button>
@@ -87,11 +106,12 @@ export default function BSites() {
         <table className="table">
           <thead>
             <tr>
-              <th>站点域名</th>
+              <th><SortableHeader label="站点域名" sortKey="domain" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>CNAME</th>
               <th>源站</th>
               <th>状态</th>
               <th>套餐到期</th>
+              <th><SortableHeader label="创建时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>操作</th>
             </tr>
           </thead>
@@ -105,6 +125,7 @@ export default function BSites() {
                   <span className={`badge ${statusBadge(s.status)}`}>{statusText(s.status)}</span>
                 </td>
                 <td className="text-text-secondary">2026-12-31</td>
+                <td className="text-text-secondary">{s.createdAt}</td>
                 <td>
                   <div className="flex items-center gap-2">
                     <button onClick={() => openEdit(s)} className="p-1.5 rounded hover:bg-gray-100 text-primary" title="编辑">
@@ -123,11 +144,13 @@ export default function BSites() {
           </tbody>
         </table>
 
-        {filtered.length === 0 && (
+        {sorted.length === 0 && (
           <EmptyState title="暂无站点" description="没有符合筛选条件的站点" icon={<Globe size={24} />} />
         )}
 
-        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+        {sorted.length > 0 && (
+          <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+        )}
       </div>
 
       <Modal

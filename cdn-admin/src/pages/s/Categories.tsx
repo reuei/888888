@@ -1,13 +1,34 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import EmptyState from '../../components/EmptyState';
 import { categories } from '../../data/mock';
-import { Edit, Trash2, Plus, GripVertical } from 'lucide-react';
+import { useDebounce } from '../../hooks/useDebounce';
+import { Edit, Trash2, Plus, GripVertical, Search, FolderTree } from 'lucide-react';
 
 export default function SCategories() {
   const [list, setList] = useState(categories);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', parentId: '' });
+
+  const q = debouncedKeyword.trim().toLowerCase();
+  const visibleIds = new Set(
+    q
+      ? list
+          .filter((c) => c.name.toLowerCase().includes(q))
+          .flatMap((c) => {
+            const ids = [c.id];
+            let parentId = c.parentId;
+            while (parentId) {
+              ids.push(parentId);
+              parentId = list.find((x) => x.id === parentId)?.parentId ?? null;
+            }
+            return ids;
+          })
+      : list.map((c) => c.id)
+  );
 
   const handleAdd = () => {
     setList([...list, { id: `C${list.length + 1}`, name: form.name, parentId: form.parentId || null, sort: list.length + 1 }]);
@@ -16,32 +37,35 @@ export default function SCategories() {
   };
 
   const renderTree = (parentId: string | null, level = 0) => {
-    return list
-      .filter((c) => c.parentId === parentId)
-      .sort((a, b) => a.sort - b.sort)
-      .map((c) => (
-        <div key={c.id}>
-          <div
-            className="flex items-center justify-between p-3 border-b border-border hover:bg-gray-50"
-            style={{ paddingLeft: `${level * 24 + 12}px` }}
-          >
-            <div className="flex items-center gap-2">
-              <GripVertical size={14} className="text-text-secondary cursor-move" />
-              <span className="font-medium">{c.name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="p-1.5 rounded hover:bg-gray-100 text-primary" title="编辑">
-                <Edit size={16} />
-              </button>
-              <button className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
-                <Trash2 size={16} />
-              </button>
-            </div>
+    const nodes = list
+      .filter((c) => c.parentId === parentId && visibleIds.has(c.id))
+      .sort((a, b) => a.sort - b.sort);
+
+    return nodes.map((c) => (
+      <div key={c.id}>
+        <div
+          className="flex items-center justify-between p-3 border-b border-border hover:bg-gray-50"
+          style={{ paddingLeft: `${level * 24 + 12}px` }}
+        >
+          <div className="flex items-center gap-2">
+            <GripVertical size={14} className="text-text-secondary cursor-move" />
+            <span className="font-medium">{c.name}</span>
           </div>
-          {renderTree(c.id, level + 1)}
+          <div className="flex items-center gap-2">
+            <button className="p-1.5 rounded hover:bg-gray-100 text-primary" title="编辑">
+              <Edit size={16} />
+            </button>
+            <button className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
+              <Trash2 size={16} />
+            </button>
+          </div>
         </div>
-      ));
+        {renderTree(c.id, level + 1)}
+      </div>
+    ));
   };
+
+  const topNodes = renderTree(null);
 
   return (
     <div>
@@ -56,8 +80,23 @@ export default function SCategories() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              placeholder="搜索分类名称"
+              className="input pl-9 w-full"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+          </div>
+        </div>
+
         <div className="border border-border rounded overflow-hidden">
-          {renderTree(null)}
+          {topNodes.length > 0 ? topNodes : (
+            <EmptyState title="暂无分类" description="没有符合搜索条件的分类" icon={<FolderTree size={24} />} />
+          )}
         </div>
       </div>
 

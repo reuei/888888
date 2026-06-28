@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
-import { sites, products } from '../../data/mock';
+import { sites, products, nodes as mockNodes } from '../../data/mock';
 
 export default function SiteConfig() {
   const [tab, setTab] = useState('basic');
@@ -23,13 +23,6 @@ export default function SiteConfig() {
     { id: 'PC-03', name: '极简白风格', type: '电脑端' },
     { id: 'M-01', name: '移动端标准版', type: '手机端' },
     { id: 'M-02', name: '移动端深色版', type: '手机端' },
-  ];
-
-  const nodes = [
-    { id: 'N001', name: '北京电信-01', region: '华北' },
-    { id: 'N002', name: '上海联通-01', region: '华东' },
-    { id: 'N003', name: '广州移动-01', region: '华南' },
-    { id: 'N004', name: 'Cloudflare-HK', region: '海外' },
   ];
 
   return (
@@ -143,7 +136,7 @@ export default function SiteConfig() {
           <div>
             <div className="mb-4 text-sm text-text-secondary">已启用节点：{selectedNodes.length} 个</div>
             <div className="space-y-2 mb-6">
-              {nodes.map((n) => (
+              {mockNodes.map((n) => (
                 <label key={n.id} className="flex items-center gap-3 p-3 border border-border rounded hover:bg-gray-50 cursor-pointer">
                   <input
                     type="checkbox"

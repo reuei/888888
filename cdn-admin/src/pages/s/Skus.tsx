@@ -1,13 +1,31 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { skus } from '../../data/mock';
-import { Edit, Trash2, Plus } from 'lucide-react';
+import { Edit, Trash2, Plus, Search, Package } from 'lucide-react';
 
 export default function SSkus() {
   const [list, setList] = useState(skus);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', bandwidth: '', flow: '', domains: 1, ccLevel: '基础', price: 0 });
+
+  const filtered = list.filter((s) => {
+    const q = debouncedKeyword.trim().toLowerCase();
+    if (!q) return true;
+    return s.name.toLowerCase().includes(q) || s.ccLevel.toLowerCase().includes(q);
+  });
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort({ data: filtered, initialKey: 'price' });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
 
   const handleAdd = () => {
     setList([
@@ -39,20 +57,36 @@ export default function SSkus() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              placeholder="搜索规格名称 / 防护等级"
+              className="input pl-9 w-full"
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>规格名称</th>
+              <th><SortableHeader label="规格名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>带宽</th>
               <th>流量</th>
-              <th>域名数</th>
+              <th><SortableHeader label="域名数" sortKey="domains" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>CC 防护等级</th>
-              <th>价格</th>
+              <th><SortableHeader label="价格" sortKey="price" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {list.map((s) => (
+            {pagedList.map((s) => (
               <tr key={s.id}>
                 <td className="font-medium">{s.name}</td>
                 <td>{s.bandwidth}</td>
@@ -74,6 +108,12 @@ export default function SSkus() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无规格" description="没有符合搜索条件的套餐规格" icon={<Package size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

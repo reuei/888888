@@ -1,12 +1,42 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
+import EmptyState from '../../components/EmptyState';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { agentProducts } from '../../data/mock';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
-import { Search, Eye } from 'lucide-react';
+import { Search, Eye, Package } from 'lucide-react';
+import type { AgentProduct } from '../../types';
+
+interface AgentProductRow extends AgentProduct {
+  profit: number;
+}
 
 export default function AgentProducts() {
   const [search, setSearch] = useState('');
-  const filtered = agentProducts.filter((p) => p.source.toLowerCase().includes(search.trim().toLowerCase()));
+  const debouncedSearch = useDebounce(search);
+
+  const list = useMemo<AgentProductRow[]>(
+    () => agentProducts.map((p) => ({ ...p, profit: p.retailPrice - p.costPrice })),
+    []
+  );
+
+  const filtered = list.filter((p) => {
+    const keyword = debouncedSearch.trim().toLowerCase();
+    if (!keyword) return true;
+    return p.source.toLowerCase().includes(keyword) || p.name.toLowerCase().includes(keyword) || p.id.toLowerCase().includes(keyword);
+  });
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort({ data: filtered, initialKey: 'profit', initialDirection: 'desc' });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, setPage]);
 
   return (
     <div>
@@ -17,14 +47,14 @@ export default function AgentProducts() {
 
       <div className="card p-5">
         <div className="flex flex-wrap gap-3 mb-4">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+          <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+            <Search size={16} className="text-text-secondary" />
             <input
               type="text"
-              placeholder="搜索代理商名称"
+              placeholder="搜索商品ID / 商品名称 / 代理商"
+              className="input"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="input pl-9"
             />
           </div>
           <button onClick={() => setSearch('')} className="btn btn-default">重置</button>
@@ -34,39 +64,42 @@ export default function AgentProducts() {
           <thead>
             <tr>
               <th>商品ID</th>
-              <th>商品名称</th>
-              <th>代理商</th>
-              <th>成本价</th>
-              <th>零售价</th>
-              <th>利润</th>
+              <th><SortableHeader label="商品名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="代理商" sortKey="source" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="成本价" sortKey="costPrice" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="零售价" sortKey="retailPrice" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="利润" sortKey="profit" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>状态</th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map((p) => {
-              const profit = p.retailPrice - p.costPrice;
-              return (
-                <tr key={p.id}>
-                  <td className="text-text-secondary">{p.id}</td>
-                  <td className="font-medium">{p.name}</td>
-                  <td>{p.source}</td>
-                  <td>¥{formatMoney(p.costPrice)}</td>
-                  <td>¥{formatMoney(p.retailPrice)}</td>
-                  <td className="text-success">¥{formatMoney(profit)}</td>
-                  <td>
-                    <span className={`badge ${statusBadge(p.status)}`}>{statusText(p.status)}</span>
-                  </td>
-                  <td>
-                    <button className="p-1.5 rounded hover:bg-gray-100 text-primary" title="查看">
-                      <Eye size={16} />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+            {pagedList.map((p) => (
+              <tr key={p.id}>
+                <td className="text-text-secondary">{p.id}</td>
+                <td className="font-medium">{p.name}</td>
+                <td>{p.source}</td>
+                <td>¥{formatMoney(p.costPrice)}</td>
+                <td>¥{formatMoney(p.retailPrice)}</td>
+                <td className="text-success">¥{formatMoney(p.profit)}</td>
+                <td>
+                  <span className={`badge ${statusBadge(p.status)}`}>{statusText(p.status)}</span>
+                </td>
+                <td>
+                  <button className="p-1.5 rounded hover:bg-gray-100 text-primary" title="查看">
+                    <Eye size={16} />
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无商品" description="没有符合筛选条件的代理商品" icon={<Package size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

@@ -168,6 +168,21 @@ export interface Coupon {
   status: 'active' | 'expired';
 }
 
+export interface CouponRecord {
+  id: string;
+  code: string;
+  batch: string;
+  user: string;
+  order: string;
+  usedAt: string;
+}
+
+export interface TemplateItem {
+  id: string;
+  name: string;
+  type: 'pc' | 'mobile' | 'card';
+}
+
 export interface User {
   id: string;
   nickname: string;

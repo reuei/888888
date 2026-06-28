@@ -1,39 +1,20 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
-import { Monitor, Smartphone, ShoppingBag, Music, Smartphone as PhoneIcon, Download } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import { usePagination } from '../../hooks/usePagination';
+import { useDebounce } from '../../hooks/useDebounce';
+import { pcTemplates, mobileTemplates, cardTemplates } from '../../data/mock';
+import type { TemplateItem } from '../../types';
+import { Monitor, Smartphone, ShoppingBag, Music, Smartphone as PhoneIcon, Download, Search, Layout } from 'lucide-react';
 
 export default function STemplates() {
   const [activePc, setActivePc] = useState('PC-01');
   const [activeMobile, setActiveMobile] = useState('M-01');
   const [activeCard, setActiveCard] = useState('CARD-01');
   const [autoPlay, setAutoPlay] = useState(false);
-
-  const pcTemplates = [
-    { id: 'PC-01', name: '企业官网风格' },
-    { id: 'PC-02', name: '科技深蓝风格' },
-    { id: 'PC-03', name: '极简白风格' },
-  ];
-
-  const mobileTemplates = [
-    { id: 'M-01', name: '移动端标准版' },
-    { id: 'M-02', name: '移动端深色版' },
-    { id: 'M-03', name: '移动端渐变版' },
-    { id: 'M-04', name: '移动端卡片版' },
-  ];
-
-  const cardTemplates = [
-    { id: 'CARD-01', name: '经典购卡页' },
-    { id: 'CARD-02', name: '暗色游戏风' },
-    { id: 'CARD-03', name: '清新电商风' },
-    { id: 'CARD-04', name: '极简科技风' },
-    { id: 'CARD-05', name: '促销节日风' },
-    { id: 'CARD-06', name: '会员专享风' },
-    { id: 'CARD-07', name: '直播带货风' },
-    { id: 'CARD-08', name: '企业采购风' },
-    { id: 'CARD-09', name: '教育课程风' },
-    { id: 'CARD-10', name: '云服务风' },
-    { id: 'CARD-11', name: 'DIY 自定义' },
-  ];
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
 
   const TemplateCard = ({ id, name, active, onClick }: { id: string; name: string; active: boolean; onClick: () => void }) => (
     <div
@@ -48,36 +29,115 @@ export default function STemplates() {
     </div>
   );
 
+  function TemplateSection({
+    title,
+    icon,
+    templates,
+    activeId,
+    onSelect,
+    pageSize,
+    gridCols,
+  }: {
+    title: string;
+    icon: React.ReactNode;
+    templates: TemplateItem[];
+    activeId: string;
+    onSelect: (id: string) => void;
+    pageSize: number;
+    gridCols: string;
+  }) {
+    const filtered = templates.filter((t) => {
+      const q = debouncedKeyword.trim().toLowerCase();
+      if (!q) return true;
+      return t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q);
+    });
+
+    const { page, pageSize: ps, totalPages, slice, setPage } = usePagination({ total: filtered.length, pageSize });
+    const paged = slice(filtered);
+
+    return (
+      <div className="card p-5">
+        <h3 className="font-semibold mb-4 flex items-center gap-2">{icon} {title}（{filtered.length} 套）</h3>
+        {filtered.length > 0 ? (
+          <>
+            <div className={`grid ${gridCols} gap-4`}>
+              {paged.map((t) => (
+                <TemplateCard key={t.id} id={t.id} name={t.name} active={activeId === t.id} onClick={() => onSelect(t.id)} />
+              ))}
+            </div>
+            <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={ps} onChange={setPage} />
+          </>
+        ) : (
+          <EmptyState title="暂无模板" description="没有符合搜索条件的模板" icon={<Layout size={24} />} />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div>
-      <PageHeader title="模板与前端管理" breadcrumb={['模板与前端管理', '首页模板']} />
+      <PageHeader
+        title="模板与前端管理"
+        breadcrumb={['模板与前端管理', '首页模板']}
+      />
+
+      <div className="card p-5 mb-6">
+        <div className="relative max-w-md">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+          <input
+            type="text"
+            placeholder="搜索模板名称 / ID"
+            className="input pl-9 w-full"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
+        </div>
+      </div>
 
       <div className="space-y-6">
-        <div className="card p-5">
-          <h3 className="font-semibold mb-4 flex items-center gap-2"><Monitor size={18} className="text-primary" /> 电脑端首页模板（3 套）</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pcTemplates.map((t) => (
-              <TemplateCard key={t.id} {...t} active={activePc === t.id} onClick={() => setActivePc(t.id)} />
-            ))}
-          </div>
-        </div>
+        <TemplateSection
+          title="电脑端首页模板"
+          icon={<Monitor size={18} className="text-primary" />}
+          templates={pcTemplates}
+          activeId={activePc}
+          onSelect={setActivePc}
+          pageSize={3}
+          gridCols="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        />
+
+        <TemplateSection
+          title="手机端首页模板"
+          icon={<Smartphone size={18} className="text-primary" />}
+          templates={mobileTemplates}
+          activeId={activeMobile}
+          onSelect={setActiveMobile}
+          pageSize={4}
+          gridCols="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+        />
 
         <div className="card p-5">
-          <h3 className="font-semibold mb-4 flex items-center gap-2"><Smartphone size={18} className="text-primary" /> 手机端首页模板（4 套）</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {mobileTemplates.map((t) => (
-              <TemplateCard key={t.id} {...t} active={activeMobile === t.id} onClick={() => setActiveMobile(t.id)} />
-            ))}
-          </div>
-        </div>
-
-        <div className="card p-5">
-          <h3 className="font-semibold mb-4 flex items-center gap-2"><ShoppingBag size={18} className="text-primary" /> 购卡页模板（11 套 + DIY）</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-            {cardTemplates.map((t) => (
-              <TemplateCard key={t.id} {...t} active={activeCard === t.id} onClick={() => setActiveCard(t.id)} />
-            ))}
-          </div>
+          <h3 className="font-semibold mb-4 flex items-center gap-2"><ShoppingBag size={18} className="text-primary" /> 购卡页模板（{cardTemplates.length} 套 + DIY）</h3>
+          {(() => {
+            const filtered = cardTemplates.filter((t) => {
+              const q = debouncedKeyword.trim().toLowerCase();
+              if (!q) return true;
+              return t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q);
+            });
+            const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length, pageSize: 6 });
+            const paged = slice(filtered);
+            return filtered.length > 0 ? (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                  {paged.map((t) => (
+                    <TemplateCard key={t.id} id={t.id} name={t.name} active={activeCard === t.id} onClick={() => setActiveCard(t.id)} />
+                  ))}
+                </div>
+                <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+              </>
+            ) : (
+              <EmptyState title="暂无模板" description="没有符合搜索条件的模板" icon={<Layout size={24} />} />
+            );
+          })()}
           {activeCard === 'CARD-11' && (
             <div className="mt-4 p-4 border border-border rounded bg-gray-50">
               <h4 className="font-medium mb-3">DIY 自定义</h4>

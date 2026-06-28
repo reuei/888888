@@ -1,14 +1,59 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { coupons } from '../../data/mock';
-import { Plus } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
+import { coupons, couponRecords } from '../../data/mock';
+import { Plus, Search, Ticket, Tag } from 'lucide-react';
 
 export default function SCoupons() {
   const [tab, setTab] = useState<'generate' | 'records' | 'stats'>('generate');
   const [list, setList] = useState(coupons);
+  const [records] = useState(couponRecords);
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ batch: '', type: 'fixed', value: 0, threshold: 0, total: 100, limitPerUser: 1 });
+
+  const filteredCoupons = list.filter((c) => {
+    const q = debouncedKeyword.trim().toLowerCase();
+    if (!q || tab !== 'generate') return true;
+    return c.batch.toLowerCase().includes(q) || c.type.toLowerCase().includes(q);
+  });
+
+  const filteredRecords = records.filter((r) => {
+    const q = debouncedKeyword.trim().toLowerCase();
+    if (!q || tab !== 'records') return true;
+    return (
+      r.code.toLowerCase().includes(q) ||
+      r.user.toLowerCase().includes(q) ||
+      r.order.toLowerCase().includes(q)
+    );
+  });
+
+  const {
+    sorted: sortedCoupons,
+    sortKey: couponSortKey,
+    sortDirection: couponSortDirection,
+    toggle: toggleCouponSort,
+  } = useSort({ data: filteredCoupons, initialKey: 'value' });
+
+  const {
+    sorted: sortedRecords,
+    sortKey: recordSortKey,
+    sortDirection: recordSortDirection,
+    toggle: toggleRecordSort,
+  } = useSort({ data: filteredRecords, initialKey: 'usedAt', initialDirection: 'desc' });
+
+  const couponPagination = usePagination({ total: sortedCoupons.length });
+  const recordPagination = usePagination({ total: sortedRecords.length });
+
+  const pagedCoupons = couponPagination.slice(sortedCoupons);
+  const pagedRecords = recordPagination.slice(sortedRecords);
 
   const handleAdd = () => {
     setList([
@@ -40,7 +85,7 @@ export default function SCoupons() {
         }
       />
 
-      <div className="flex gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6">
         {[
           { key: 'generate', label: '优惠券生成' },
           { key: 'records', label: '发放/核销记录' },
@@ -48,7 +93,10 @@ export default function SCoupons() {
         ].map((t) => (
           <button
             key={t.key}
-            onClick={() => setTab(t.key as any)}
+            onClick={() => {
+              setTab(t.key as any);
+              setKeyword('');
+            }}
             className={`btn text-xs ${tab === t.key ? 'btn-primary' : 'btn-default'}`}
           >
             {t.label}
@@ -56,22 +104,37 @@ export default function SCoupons() {
         ))}
       </div>
 
+      {tab !== 'stats' && (
+        <div className="card p-5 mb-4">
+          <div className="relative max-w-md">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              placeholder={tab === 'generate' ? '搜索批次号' : '搜索券码 / 用户 / 订单'}
+              className="input pl-9 w-full"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+          </div>
+        </div>
+      )}
+
       {tab === 'generate' && (
         <div className="card p-5">
           <table className="table">
             <thead>
               <tr>
-                <th>批次号</th>
+                <th><SortableHeader label="批次号" sortKey="batch" activeKey={couponSortKey} direction={couponSortDirection} onSort={toggleCouponSort} /></th>
                 <th>类型</th>
-                <th>面额 / 折扣</th>
-                <th>使用门槛</th>
-                <th>总量</th>
-                <th>已领取</th>
+                <th><SortableHeader label="面额 / 折扣" sortKey="value" activeKey={couponSortKey} direction={couponSortDirection} onSort={toggleCouponSort} /></th>
+                <th><SortableHeader label="使用门槛" sortKey="threshold" activeKey={couponSortKey} direction={couponSortDirection} onSort={toggleCouponSort} /></th>
+                <th><SortableHeader label="总量" sortKey="total" activeKey={couponSortKey} direction={couponSortDirection} onSort={toggleCouponSort} /></th>
+                <th><SortableHeader label="已领取" sortKey="received" activeKey={couponSortKey} direction={couponSortDirection} onSort={toggleCouponSort} /></th>
                 <th>状态</th>
               </tr>
             </thead>
             <tbody>
-              {list.map((c) => (
+              {pagedCoupons.map((c) => (
                 <tr key={c.id}>
                   <td className="font-medium">{c.batch}</td>
                   <td>{c.type === 'fixed' ? '固定金额' : '百分比折扣'}</td>
@@ -88,6 +151,18 @@ export default function SCoupons() {
               ))}
             </tbody>
           </table>
+
+          {filteredCoupons.length === 0 && (
+            <EmptyState title="暂无优惠券" description="没有符合搜索条件的优惠券批次" icon={<Ticket size={24} />} />
+          )}
+
+          <Pagination
+            page={couponPagination.page}
+            totalPages={couponPagination.totalPages}
+            total={sortedCoupons.length}
+            pageSize={couponPagination.pageSize}
+            onChange={couponPagination.setPage}
+          />
         </div>
       )}
 
@@ -96,26 +171,35 @@ export default function SCoupons() {
           <table className="table">
             <thead>
               <tr>
-                <th>优惠券码</th>
+                <th><SortableHeader label="优惠券码" sortKey="code" activeKey={recordSortKey} direction={recordSortDirection} onSort={toggleRecordSort} /></th>
                 <th>用户</th>
                 <th>关联订单</th>
-                <th>使用时间</th>
+                <th><SortableHeader label="使用时间" sortKey="usedAt" activeKey={recordSortKey} direction={recordSortDirection} onSort={toggleRecordSort} /></th>
               </tr>
             </thead>
             <tbody>
-              {[
-                { code: 'BATCH0618-001', user: 'user_9527', order: 'O202606280001', time: '2026-06-28 10:25' },
-                { code: 'BATCH0618-002', user: 'user_3344', order: 'O202606280002', time: '2026-06-28 09:46' },
-              ].map((r, i) => (
-                <tr key={i}>
+              {pagedRecords.map((r) => (
+                <tr key={r.id}>
                   <td className="font-medium">{r.code}</td>
                   <td>{r.user}</td>
                   <td>{r.order}</td>
-                  <td className="text-text-secondary">{r.time}</td>
+                  <td className="text-text-secondary">{r.usedAt}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          {filteredRecords.length === 0 && (
+            <EmptyState title="暂无核销记录" description="没有符合搜索条件的优惠券记录" icon={<Tag size={24} />} />
+          )}
+
+          <Pagination
+            page={recordPagination.page}
+            totalPages={recordPagination.totalPages}
+            total={sortedRecords.length}
+            pageSize={recordPagination.pageSize}
+            onChange={recordPagination.setPage}
+          />
         </div>
       )}
 

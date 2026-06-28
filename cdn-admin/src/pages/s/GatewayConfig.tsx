@@ -1,15 +1,45 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
+import SortableHeader from '../../components/SortableHeader';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { gateways } from '../../data/mock';
-import { Plus, Trash2, CheckCircle } from 'lucide-react';
+import { Plus, Trash2, CheckCircle, Search, Inbox } from 'lucide-react';
+import type { Gateway } from '../../types';
 
 export default function GatewayConfig() {
-  const [list, setList] = useState(gateways);
+  const [list, setList] = useState<Gateway[]>(gateways);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [channel, setChannel] = useState('alipay');
   const [fee, setFee] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
+
+  const filtered = useMemo(() => {
+    const q = debouncedKeyword.toLowerCase();
+    return list.filter((g) => {
+      if (!q) return true;
+      return [g.id, g.name, g.channel].some((v) => String(v).toLowerCase().includes(q));
+    });
+  }, [list, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort<Gateway>({
+    data: filtered,
+    initialKey: 'id',
+    initialDirection: 'asc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, sortKey, setPage]);
 
   const toggleEnabled = (id: string) => {
     setList((prev) =>
@@ -30,7 +60,7 @@ export default function GatewayConfig() {
   const handleAdd = () => {
     const feeValue = parseFloat(fee);
     if (!name || Number.isNaN(feeValue)) return;
-    const newGateway = {
+    const newGateway: Gateway = {
       id: `GW${String(list.length + 1).padStart(3, '0')}`,
       name,
       channel,
@@ -58,20 +88,45 @@ export default function GatewayConfig() {
       />
 
       <div className="card p-5">
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="搜索网关ID / 名称 / 通道编码"
+              className="input pl-8"
+            />
+          </div>
+        </div>
+
         <table className="table">
           <thead>
             <tr>
-              <th>网关ID</th>
-              <th>网关名称</th>
-              <th>通道编码</th>
-              <th>费率(%)</th>
-              <th>启用状态</th>
-              <th>默认</th>
+              <th>
+                <SortableHeader<keyof Gateway> label="网关ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Gateway> label="网关名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Gateway> label="通道编码" sortKey="channel" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Gateway> label="费率(%)" sortKey="fee" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Gateway> label="启用状态" sortKey="enabled" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
+              <th>
+                <SortableHeader<keyof Gateway> label="默认" sortKey="isDefault" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+              </th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {list.map((g) => (
+            {pagedList.map((g) => (
               <tr key={g.id}>
                 <td className="font-medium">{g.id}</td>
                 <td>{g.name}</td>
@@ -109,6 +164,12 @@ export default function GatewayConfig() {
             ))}
           </tbody>
         </table>
+
+        {pagedList.length === 0 && (
+          <EmptyState title="暂无网关" description="没有符合搜索条件的网关配置" icon={<Inbox size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

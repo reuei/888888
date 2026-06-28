@@ -1,8 +1,22 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
+import SortableHeader from '../../components/SortableHeader';
 import { useToast } from '../../components/Toast';
-import { CreditCard, RefreshCw, Shield } from 'lucide-react';
+import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
+import { CreditCard, RefreshCw, Shield, Search, Inbox } from 'lucide-react';
+
+interface RiskLog {
+  id: string;
+  time: string;
+  order: string;
+  rule: string;
+  result: string;
+}
 
 export default function SPayments() {
   const { show } = useToast();
@@ -18,6 +32,35 @@ export default function SPayments() {
     { key: 'usdt', name: 'USDT 支付', enabled: true },
     { key: 'xinpay', name: '信汇', enabled: false },
   ];
+
+  const [riskLogs] = useState<RiskLog[]>([
+    { id: 'R001', time: '2026-06-28 09:12', order: 'O202606280099', rule: '金额超过单日上限', result: '拦截' },
+    { id: 'R002', time: '2026-06-27 22:30', order: 'O202606270088', rule: '高频下单', result: '人工复核' },
+  ]);
+
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
+
+  const filtered = useMemo(() => {
+    const q = debouncedKeyword.toLowerCase();
+    return riskLogs.filter((r) => {
+      if (!q) return true;
+      return [r.id, r.time, r.order, r.rule, r.result].some((v) => String(v).toLowerCase().includes(q));
+    });
+  }, [riskLogs, debouncedKeyword]);
+
+  const { sorted, sortKey, sortDirection, toggle } = useSort<RiskLog>({
+    data: filtered,
+    initialKey: 'time',
+    initialDirection: 'desc',
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedKeyword, sortKey, setPage]);
 
   const openTest = (name: string) => {
     setCurrentChannel(name);
@@ -125,21 +168,39 @@ export default function SPayments() {
 
           <div className="card p-5 lg:col-span-2">
             <h3 className="font-semibold mb-4">风控日志</h3>
+            <div className="flex flex-wrap gap-3 mb-4">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
+                <input
+                  type="text"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  placeholder="搜索订单号 / 触发规则 / 处理结果 / 时间"
+                  className="input pl-8"
+                />
+              </div>
+            </div>
+
             <table className="table">
               <thead>
                 <tr>
-                  <th>时间</th>
-                  <th>订单号</th>
-                  <th>触发规则</th>
-                  <th>处理结果</th>
+                  <th>
+                    <SortableHeader<keyof RiskLog> label="时间" sortKey="time" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof RiskLog> label="订单号" sortKey="order" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof RiskLog> label="触发规则" sortKey="rule" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof RiskLog> label="处理结果" sortKey="result" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { time: '2026-06-28 09:12', order: 'O202606280099', rule: '金额超过单日上限', result: '拦截' },
-                  { time: '2026-06-27 22:30', order: 'O202606270088', rule: '高频下单', result: '人工复核' },
-                ].map((r, i) => (
-                  <tr key={i}>
+                {pagedList.map((r) => (
+                  <tr key={r.id}>
                     <td className="text-text-secondary">{r.time}</td>
                     <td>{r.order}</td>
                     <td>{r.rule}</td>
@@ -148,6 +209,12 @@ export default function SPayments() {
                 ))}
               </tbody>
             </table>
+
+            {pagedList.length === 0 && (
+              <EmptyState title="暂无风控日志" description="没有符合搜索条件的风控记录" icon={<Inbox size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
           </div>
         </div>
       )}

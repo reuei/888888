@@ -6,7 +6,7 @@ import { formatMoney, statusBadge, statusText, invoiceTypeText } from '../../uti
 import { FileText, Plus, Eye } from 'lucide-react';
 
 export default function Invoice() {
-  const [invoices] = useState(invoicesData);
+  const [invoices, setInvoices] = useState(invoicesData);
   const [applyOpen, setApplyOpen] = useState(false);
   const [detail, setDetail] = useState<typeof invoices[0] | null>(null);
 
@@ -22,6 +22,28 @@ export default function Invoice() {
   const selectedOrder = paidOrders.find((o) => o.id === form.orderId);
 
   const handleSubmit = () => {
+    if (!selectedOrder || !form.title.trim()) return;
+    const now = new Date();
+    const createdAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const newInvoice: typeof invoices[0] = {
+      id: `INV${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(invoices.length + 1).padStart(3, '0')}`,
+      orderId: selectedOrder.id,
+      amount: selectedOrder.amount,
+      status: 'pending',
+      type: form.type,
+      title: form.title.trim(),
+      taxId: form.type === 'company' ? form.taxId.trim() || undefined : undefined,
+      items: [
+        {
+          name: `${selectedOrder.product}（${selectedOrder.period}）`,
+          quantity: 1,
+          unitPrice: selectedOrder.amount,
+          amount: selectedOrder.amount,
+        },
+      ],
+      createdAt,
+    };
+    setInvoices([newInvoice, ...invoices]);
     setApplyOpen(false);
     setForm({ orderId: paidOrders[0]?.id || '', type: 'personal', title: '', taxId: '' });
   };

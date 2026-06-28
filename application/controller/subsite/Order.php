@@ -219,6 +219,7 @@ class Subsite_Order extends Controller
             "UPDATE jz_order SET status = 2, update_time = ? WHERE id = ?",
             [date('Y-m-d H:i:s'), $id]
         );
+        admin_log('subsite_order_deliver', ['id' => $id, 'subsite_id' => $subsiteId]);
         json_success('发货成功');
     }
 
@@ -249,6 +250,7 @@ class Subsite_Order extends Controller
             "UPDATE jz_order SET status = 4, update_time = ? WHERE id = ?",
             [date('Y-m-d H:i:s'), $id]
         );
+        admin_log('subsite_order_refund', ['id' => $id, 'subsite_id' => $subsiteId, 'reason' => $reason]);
         json_success('已标记退款中');
     }
 
@@ -278,6 +280,7 @@ class Subsite_Order extends Controller
             "UPDATE jz_order SET status = 5, update_time = ? WHERE id = ?",
             [date('Y-m-d H:i:s'), $id]
         );
+        admin_log('subsite_order_close', ['id' => $id, 'subsite_id' => $subsiteId]);
         json_success('订单已关闭');
     }
 
@@ -359,6 +362,7 @@ class Subsite_Order extends Controller
             "UPDATE jz_complaint SET status = ?, result = ?, remark = ?, handle_time = ?, update_time = ? WHERE id = ?",
             [1, $result, $remark, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), $id]
         );
+        admin_log('subsite_complaint_handle', ['id' => $id, 'subsite_id' => $subsiteId, 'order_id' => $complaint['order_id'], 'result' => $result]);
         json_success('投诉已处理');
     }
 }

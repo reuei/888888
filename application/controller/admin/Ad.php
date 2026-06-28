@@ -95,10 +95,12 @@ class Admin_Ad extends Controller
 
         if ($id) {
             Db::update('jz_ad', $data, 'id = ?', [$id]);
+            admin_log('ad_update', ['id' => $id, 'title' => $title, 'position' => $position]);
             json_success('广告更新成功');
         } else {
             $data['create_time'] = date('Y-m-d H:i:s');
-            Db::insert('jz_ad', $data);
+            $newId = Db::insert('jz_ad', $data);
+            admin_log('ad_create', ['id' => $newId, 'title' => $title, 'position' => $position]);
             json_success('广告添加成功');
         }
     }
@@ -110,6 +112,7 @@ class Admin_Ad extends Controller
             json_error('参数错误');
         }
         Db::execute("DELETE FROM jz_ad WHERE id = ?", [$id]);
+        admin_log('ad_delete', ['id' => $id]);
         json_success('广告已删除');
     }
 
@@ -121,6 +124,7 @@ class Admin_Ad extends Controller
             json_error('参数错误');
         }
         Db::execute("UPDATE jz_ad SET status = ? WHERE id = ?", [$status, $id]);
+        admin_log('ad_status', ['id' => $id, 'status' => $status]);
         json_success('状态更新成功');
     }
 }

@@ -127,6 +127,7 @@ class Admin_Merchant extends Controller
             "UPDATE jz_merchant SET status = 1, audit_remark = ?, audit_time = ?, open_time = ?, update_time = ? WHERE id = ?",
             [$remark, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), $id]
         );
+        admin_log('merchant_audit_pass', ['id' => $id, 'remark' => $remark]);
         json_success('审核通过');
     }
 
@@ -153,6 +154,7 @@ class Admin_Merchant extends Controller
             "UPDATE jz_merchant SET status = 2, audit_remark = ?, audit_time = ?, update_time = ? WHERE id = ?",
             [$remark, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), $id]
         );
+        admin_log('merchant_audit_reject', ['id' => $id, 'remark' => $remark]);
         json_success('已驳回');
     }
 
@@ -179,6 +181,7 @@ class Admin_Merchant extends Controller
             "UPDATE jz_merchant SET audit_remark = ?, update_time = ? WHERE id = ?",
             [$remark, date('Y-m-d H:i:s'), $id]
         );
+        admin_log('merchant_audit_remark', ['id' => $id, 'remark' => $remark]);
         json_success('备注已保存');
     }
 
@@ -252,6 +255,7 @@ class Admin_Merchant extends Controller
         }
 
         $codes = [];
+        admin_log('invite_code_create', ['quantity' => $quantity, 'subsite_id' => $subsiteId, 'rate_group_id' => $rateGroupId]);
         for ($i = 0; $i < $quantity; $i++) {
             $code = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 12));
             // 确保唯一
@@ -289,6 +293,7 @@ class Admin_Merchant extends Controller
             "UPDATE jz_invite_code SET status = ?, update_time = ? WHERE id = ?",
             [$status ? 1 : 0, date('Y-m-d H:i:s'), $id]
         );
+        admin_log('invite_code_toggle', ['id' => $id, 'status' => $status ? 1 : 0]);
         json_success('状态更新成功');
     }
 
@@ -319,6 +324,7 @@ class Admin_Merchant extends Controller
             Db::execute("UPDATE jz_goods SET status = 0 WHERE merchant_id = ? AND status = 1", [$id]);
         }
 
+        admin_log('merchant_toggle_status', ['id' => $id, 'status' => $status, 'remark' => $remark]);
         json_success('商户状态已更新');
     }
 
@@ -332,6 +338,7 @@ class Admin_Merchant extends Controller
             json_error('参数错误');
         }
         $affected = Db::execute("UPDATE jz_goods SET status = 0 WHERE merchant_id = ? AND status = 1", [$id]);
+        admin_log('merchant_force_offline', ['id' => $id, 'affected' => $affected]);
         json_success('操作成功，已下线 ' . $affected . ' 个商品');
     }
 
@@ -361,6 +368,7 @@ class Admin_Merchant extends Controller
                 "UPDATE jz_merchant SET balance = balance - ?, frozen_balance = frozen_balance + ?, update_time = ? WHERE id = ?",
                 [$amount, $amount, date('Y-m-d H:i:s'), $id]
             );
+            admin_log('merchant_freeze_funds', ['id' => $id, 'action' => 'freeze', 'amount' => $amount]);
             json_success('已冻结 ' . $amount . ' 元');
         } else {
             if ($merchant['frozen_balance'] < $amount) {
@@ -370,6 +378,7 @@ class Admin_Merchant extends Controller
                 "UPDATE jz_merchant SET balance = balance + ?, frozen_balance = frozen_balance - ?, update_time = ? WHERE id = ?",
                 [$amount, $amount, date('Y-m-d H:i:s'), $id]
             );
+            admin_log('merchant_freeze_funds', ['id' => $id, 'action' => 'unfreeze', 'amount' => $amount]);
             json_success('已解冻 ' . $amount . ' 元');
         }
     }

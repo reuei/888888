@@ -83,6 +83,26 @@ function generate_token($length = 32)
 }
 
 /**
+ * 记录管理员操作日志
+ */
+function admin_log($action, $content = '')
+{
+    try {
+        $admin = session('admin_user') ?? [];
+        Db::insert('jz_admin_log', [
+            'admin_id' => $admin['id'] ?? 0,
+            'admin_name' => $admin['username'] ?? '',
+            'action' => $action,
+            'content' => is_array($content) || is_object($content) ? json_encode($content, JSON_UNESCAPED_UNICODE) : (string) $content,
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+    } catch (Exception $e) {
+        // 忽略日志写入失败，避免影响主流程
+    }
+}
+
+/**
  * 读取站点配置
  */
 function site_config($key = null, $default = null)

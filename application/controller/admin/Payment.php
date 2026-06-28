@@ -110,10 +110,12 @@ class Admin_Payment extends Controller
 
         if ($id) {
             Db::update('jz_payment_channel', $data, 'id = ?', [$id]);
+            admin_log('payment_channel_update', ['id' => $id, 'code' => $code, 'name' => $name]);
             json_success('渠道更新成功');
         } else {
             $data['create_time'] = date('Y-m-d H:i:s');
-            Db::insert('jz_payment_channel', $data);
+            $newId = Db::insert('jz_payment_channel', $data);
+            admin_log('payment_channel_create', ['id' => $newId, 'code' => $code, 'name' => $name]);
             json_success('渠道添加成功');
         }
     }
@@ -125,6 +127,7 @@ class Admin_Payment extends Controller
             json_error('参数错误');
         }
         Db::execute("DELETE FROM jz_payment_channel WHERE id = ?", [$id]);
+        admin_log('payment_channel_delete', ['id' => $id]);
         json_success('渠道已删除');
     }
 
@@ -136,6 +139,7 @@ class Admin_Payment extends Controller
             json_error('参数错误');
         }
         Db::execute("UPDATE jz_payment_channel SET status = ? WHERE id = ?", [$status, $id]);
+        admin_log('payment_channel_status', ['id' => $id, 'status' => $status]);
         json_success('状态更新成功');
     }
 
@@ -189,6 +193,7 @@ class Admin_Payment extends Controller
             );
         }
 
+        admin_log('risk_save', ['keys' => array_keys($fields)]);
         json_success('风控策略保存成功');
     }
 }

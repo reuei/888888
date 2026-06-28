@@ -95,6 +95,7 @@ class Admin_User extends Controller
             "UPDATE jz_user SET status = ?, update_time = ? WHERE id = ?",
             [$status, date('Y-m-d H:i:s'), $id]
         );
+        admin_log('user_toggle_status', ['id' => $id, 'status' => $status]);
         json_success($status ? '已启用' : '已禁用');
     }
 
@@ -171,10 +172,12 @@ class Admin_User extends Controller
 
         if ($id) {
             Db::update('jz_user_group', $data, 'id = ?', [$id]);
+            admin_log('user_group_update', ['id' => $id, 'name' => $name]);
             json_success('分组更新成功');
         } else {
             $data['create_time'] = date('Y-m-d H:i:s');
-            Db::insert('jz_user_group', $data);
+            $newId = Db::insert('jz_user_group', $data);
+            admin_log('user_group_create', ['id' => $newId, 'name' => $name]);
             json_success('分组添加成功');
         }
     }
@@ -195,6 +198,7 @@ class Admin_User extends Controller
         }
 
         Db::execute("DELETE FROM jz_user_group WHERE id = ?", [$id]);
+        admin_log('user_group_delete', ['id' => $id]);
         json_success('分组已删除');
     }
 }

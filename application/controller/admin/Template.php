@@ -48,6 +48,7 @@ class Admin_Template extends Controller
             );
         }
 
+        admin_log('template_save', ['group' => $group, 'keys' => array_keys($data)]);
         json_success('配置保存成功');
     }
 

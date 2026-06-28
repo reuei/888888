@@ -224,6 +224,14 @@ class Subsite_Finance extends Controller
             );
         }
 
+        admin_log('subsite_settlement_update', [
+            'id' => $id,
+            'subsite_id' => $subsiteId,
+            'settle_no' => $settlement['settle_no'],
+            'merchant_id' => $settlement['merchant_id'],
+            'status' => $status,
+            'remark' => $remark,
+        ]);
         json_success('状态更新成功');
     }
 }

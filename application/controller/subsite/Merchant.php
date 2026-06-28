@@ -144,6 +144,7 @@ class Subsite_Merchant extends Controller
             "UPDATE jz_merchant SET status = 1, audit_remark = ?, audit_time = ?, open_time = ?, update_time = ? WHERE id = ?",
             [$remark, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), $id]
         );
+        admin_log('subsite_merchant_audit_pass', ['id' => $id, 'subsite_id' => $subsiteId, 'remark' => $remark]);
         json_success('审核通过');
     }
 
@@ -174,6 +175,7 @@ class Subsite_Merchant extends Controller
             "UPDATE jz_merchant SET status = 2, audit_remark = ?, audit_time = ?, update_time = ? WHERE id = ?",
             [$remark, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), $id]
         );
+        admin_log('subsite_merchant_audit_reject', ['id' => $id, 'subsite_id' => $subsiteId, 'remark' => $remark]);
         json_success('已驳回');
     }
 
@@ -204,6 +206,7 @@ class Subsite_Merchant extends Controller
             "UPDATE jz_merchant SET audit_remark = ?, update_time = ? WHERE id = ?",
             [$remark, date('Y-m-d H:i:s'), $id]
         );
+        admin_log('subsite_merchant_audit_remark', ['id' => $id, 'subsite_id' => $subsiteId, 'remark' => $remark]);
         json_success('备注已保存');
     }
 
@@ -237,6 +240,7 @@ class Subsite_Merchant extends Controller
             Db::execute("UPDATE jz_goods SET status = 0 WHERE merchant_id = ? AND status = 1", [$id]);
         }
 
+        admin_log('subsite_merchant_toggle_status', ['id' => $id, 'subsite_id' => $subsiteId, 'status' => $status, 'remark' => $remark]);
         json_success('商户状态已更新');
     }
 
@@ -260,6 +264,7 @@ class Subsite_Merchant extends Controller
         }
 
         $affected = Db::execute("UPDATE jz_goods SET status = 0 WHERE merchant_id = ? AND status = 1", [$id]);
+        admin_log('subsite_merchant_force_offline', ['id' => $id, 'subsite_id' => $subsiteId, 'affected' => $affected]);
         json_success('操作成功，已下线 ' . $affected . ' 个商品');
     }
 
@@ -293,6 +298,7 @@ class Subsite_Merchant extends Controller
                 "UPDATE jz_merchant SET balance = balance - ?, frozen_balance = frozen_balance + ?, update_time = ? WHERE id = ?",
                 [$amount, $amount, date('Y-m-d H:i:s'), $id]
             );
+            admin_log('subsite_merchant_freeze_funds', ['id' => $id, 'subsite_id' => $subsiteId, 'action' => 'freeze', 'amount' => $amount]);
             json_success('已冻结 ' . $amount . ' 元');
         } else {
             if ($merchant['frozen_balance'] < $amount) {
@@ -302,6 +308,7 @@ class Subsite_Merchant extends Controller
                 "UPDATE jz_merchant SET balance = balance + ?, frozen_balance = frozen_balance - ?, update_time = ? WHERE id = ?",
                 [$amount, $amount, date('Y-m-d H:i:s'), $id]
             );
+            admin_log('subsite_merchant_freeze_funds', ['id' => $id, 'subsite_id' => $subsiteId, 'action' => 'unfreeze', 'amount' => $amount]);
             json_success('已解冻 ' . $amount . ' 元');
         }
     }

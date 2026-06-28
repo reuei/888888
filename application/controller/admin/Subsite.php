@@ -144,6 +144,7 @@ class Admin_Subsite extends Controller
             Db::execute("UPDATE jz_admin SET subsite_id = ? WHERE id = ?", [$subsiteId, $adminId]);
 
             $pdo->commit();
+            admin_log('subsite_create', ['id' => $subsiteId, 'name' => $name, 'domain_prefix' => $domainPrefix, 'admin' => $adminUser]);
             json_success('分站创建成功', ['redirect' => url('admin/subsite')]);
         } catch (Exception $e) {
             $pdo->rollBack();
@@ -283,6 +284,7 @@ class Admin_Subsite extends Controller
             "UPDATE jz_admin SET password = ?, update_time = ? WHERE id = ?",
             [password_hash($newPass, PASSWORD_DEFAULT), date('Y-m-d H:i:s'), $subsite['admin_id']]
         );
+        admin_log('subsite_reset_password', ['subsite_id' => $id, 'admin_id' => $subsite['admin_id']]);
         json_success('密码重置成功');
     }
 
@@ -308,6 +310,7 @@ class Admin_Subsite extends Controller
             Db::execute("UPDATE jz_goods SET status = 0 WHERE subsite_id = ? AND status = 1", [$id]);
         }
 
+        admin_log('subsite_toggle_status', ['id' => $id, 'status' => $status]);
         json_success('状态更新成功');
     }
 
@@ -331,6 +334,7 @@ class Admin_Subsite extends Controller
             "UPDATE jz_admin SET two_factor = ?, update_time = ? WHERE id = ?",
             [$enabled ? 1 : 0, date('Y-m-d H:i:s'), $subsite['admin_id']]
         );
+        admin_log('subsite_toggle_2fa', ['subsite_id' => $id, 'admin_id' => $subsite['admin_id'], 'enabled' => $enabled ? 1 : 0]);
         json_success('二次认证设置已更新');
     }
 }

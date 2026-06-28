@@ -236,6 +236,7 @@ class Subsite_Goods extends Controller
             "UPDATE jz_goods SET status = ?, update_time = ? WHERE id = ?",
             [$status, date('Y-m-d H:i:s'), $id]
         );
+        admin_log('subsite_goods_toggle_status', ['id' => $id, 'subsite_id' => $subsiteId, 'status' => $status]);
         json_success($status == 1 ? '已上架' : '已下架');
     }
 
@@ -257,6 +258,7 @@ class Subsite_Goods extends Controller
             "UPDATE jz_goods SET status = 0, reason = ?, update_time = ? WHERE id IN ({$in}) AND subsite_id = ?",
             [$reason, date('Y-m-d H:i:s'), $subsiteId]
         );
+        admin_log('subsite_goods_batch_offline', ['ids' => $ids, 'subsite_id' => $subsiteId, 'reason' => $reason, 'affected' => $affected]);
         json_success('批量下架成功，共 ' . $affected . ' 个商品');
     }
 }

@@ -132,10 +132,12 @@ class Admin_Coupon extends Controller
 
         if ($id) {
             Db::update('jz_coupon', $data, 'id = ?', [$id]);
+            admin_log('coupon_update', ['id' => $id, 'name' => $name, 'type' => $type]);
             json_success('优惠券更新成功');
         } else {
             $data['create_time'] = date('Y-m-d H:i:s');
-            Db::insert('jz_coupon', $data);
+            $newId = Db::insert('jz_coupon', $data);
+            admin_log('coupon_create', ['id' => $newId, 'name' => $name, 'type' => $type]);
             json_success('优惠券创建成功');
         }
     }
@@ -152,6 +154,7 @@ class Admin_Coupon extends Controller
         }
 
         Db::execute("UPDATE jz_coupon SET status = ? WHERE id = ?", [$status, $id]);
+        admin_log('coupon_toggle_status', ['id' => $id, 'status' => $status]);
         json_success($status == 1 ? '已启用' : '已禁用');
     }
 
@@ -166,6 +169,7 @@ class Admin_Coupon extends Controller
         }
 
         Db::execute("DELETE FROM jz_coupon WHERE id = ?", [$id]);
+        admin_log('coupon_delete', ['id' => $id]);
         json_success('已删除');
     }
 

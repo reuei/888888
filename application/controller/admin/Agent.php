@@ -106,10 +106,12 @@ class Admin_Agent extends Controller
 
         if ($id) {
             Db::update('jz_agent_goods', $data, 'id = ?', [$id]);
+            admin_log('agent_goods_update', ['id' => $id, 'goods_id' => $goodsId]);
             json_success('代理商品更新成功');
         } else {
             $data['create_time'] = date('Y-m-d H:i:s');
-            Db::insert('jz_agent_goods', $data);
+            $newId = Db::insert('jz_agent_goods', $data);
+            admin_log('agent_goods_create', ['id' => $newId, 'goods_id' => $goodsId]);
             json_success('代理商品添加成功');
         }
     }
@@ -126,6 +128,7 @@ class Admin_Agent extends Controller
         }
 
         Db::execute("UPDATE jz_agent_goods SET status = ? WHERE id = ?", [$status, $id]);
+        admin_log('agent_goods_toggle', ['id' => $id, 'status' => $status]);
         json_success($status == 1 ? '已启用' : '已禁用');
     }
 
@@ -140,6 +143,7 @@ class Admin_Agent extends Controller
         }
 
         Db::execute("DELETE FROM jz_agent_goods WHERE id = ?", [$id]);
+        admin_log('agent_goods_delete', ['id' => $id]);
         json_success('已删除');
     }
 
@@ -296,6 +300,7 @@ class Admin_Agent extends Controller
             [$amount, $amount, $userId]
         );
 
+        admin_log('agent_settle_create', ['settle_no' => $settleNo, 'user_id' => $userId, 'amount' => $amount]);
         json_success('结算单创建成功');
     }
 
@@ -341,6 +346,7 @@ class Admin_Agent extends Controller
             );
         }
 
+        admin_log('agent_settle_pay', ['id' => $id, 'settle_no' => $settle['settle_no'], 'user_id' => $settle['user_id'], 'status' => $status]);
         $labels = [1 => '已标记处理中', 2 => '打款成功', 3 => '已驳回'];
         json_success($labels[$status]);
     }

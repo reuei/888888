@@ -150,6 +150,7 @@ class Admin_Goods extends Controller
             [$status, $reason, date('Y-m-d H:i:s'), $id]
         );
 
+        admin_log('goods_toggle_status', ['id' => $id, 'status' => $status, 'reason' => $reason]);
         $labels = [0 => '已下架', 1 => '已上架', 2 => '已违规下架'];
         json_success($labels[$status]);
     }
@@ -171,6 +172,7 @@ class Admin_Goods extends Controller
             "UPDATE jz_goods SET status = 0, reason = ?, update_time = ? WHERE id IN ({$in})",
             [$reason, date('Y-m-d H:i:s')]
         );
+        admin_log('goods_batch_offline', ['ids' => $ids, 'reason' => $reason, 'affected' => $affected]);
         json_success('批量下架成功，共 ' . $affected . ' 个商品');
     }
 
@@ -232,10 +234,12 @@ class Admin_Goods extends Controller
 
         if ($id) {
             Db::update('jz_category', $data, 'id = ?', [$id]);
+            admin_log('category_update', ['id' => $id, 'name' => $name]);
             json_success('分类更新成功');
         } else {
             $data['create_time'] = date('Y-m-d H:i:s');
-            Db::insert('jz_category', $data);
+            $newId = Db::insert('jz_category', $data);
+            admin_log('category_create', ['id' => $newId, 'name' => $name]);
             json_success('分类添加成功');
         }
     }
@@ -261,6 +265,7 @@ class Admin_Goods extends Controller
         }
 
         Db::execute("DELETE FROM jz_category WHERE id = ?", [$id]);
+        admin_log('category_delete', ['id' => $id]);
         json_success('分类已删除');
     }
 
@@ -300,12 +305,13 @@ class Admin_Goods extends Controller
             json_error('该关键词已存在');
         }
 
-        Db::insert('jz_banned_keyword', [
+        $newId = Db::insert('jz_banned_keyword', [
             'keyword' => $keyword,
             'type' => $type,
             'status' => 1,
             'create_time' => date('Y-m-d H:i:s'),
         ]);
+        admin_log('ban_keyword_create', ['id' => $newId, 'keyword' => $keyword, 'type' => $type]);
         json_success('已添加');
     }
 
@@ -319,6 +325,7 @@ class Admin_Goods extends Controller
             json_error('参数错误');
         }
         Db::execute("DELETE FROM jz_banned_keyword WHERE id = ?", [$id]);
+        admin_log('ban_keyword_delete', ['id' => $id]);
         json_success('已删除');
     }
 }

@@ -124,10 +124,12 @@ class Admin_Finance extends Controller
 
         if ($id) {
             Db::update('jz_rate_group', $data, 'id = ?', [$id]);
+            admin_log('rate_group_update', ['id' => $id, 'name' => $name]);
             json_success('费率分组更新成功');
         } else {
             $data['create_time'] = date('Y-m-d H:i:s');
-            Db::insert('jz_rate_group', $data);
+            $newId = Db::insert('jz_rate_group', $data);
+            admin_log('rate_group_create', ['id' => $newId, 'name' => $name]);
             json_success('费率分组添加成功');
         }
     }
@@ -148,6 +150,7 @@ class Admin_Finance extends Controller
         }
 
         Db::execute("DELETE FROM jz_rate_group WHERE id = ?", [$id]);
+        admin_log('rate_group_delete', ['id' => $id]);
         json_success('费率分组已删除');
     }
 
@@ -243,6 +246,13 @@ class Admin_Finance extends Controller
             );
         }
 
+        admin_log('settlement_update', [
+            'id' => $id,
+            'settle_no' => $settlement['settle_no'],
+            'merchant_id' => $settlement['merchant_id'],
+            'status' => $status,
+            'remark' => $remark,
+        ]);
         json_success('状态更新成功');
     }
 }

@@ -51,6 +51,7 @@ class Admin_Setting extends Controller
             );
         }
 
+        admin_log('setting_save', ['group' => $group, 'keys' => array_keys($data)]);
         json_success('配置保存成功');
     }
 

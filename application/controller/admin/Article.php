@@ -98,10 +98,12 @@ class Admin_Article extends Controller
 
         if ($id) {
             Db::update('jz_article', $data, 'id = ?', [$id]);
+            admin_log('article_update', ['id' => $id, 'title' => $title, 'category' => $category]);
             json_success('文章更新成功');
         } else {
             $data['create_time'] = date('Y-m-d H:i:s');
-            Db::insert('jz_article', $data);
+            $newId = Db::insert('jz_article', $data);
+            admin_log('article_create', ['id' => $newId, 'title' => $title, 'category' => $category]);
             json_success('文章发布成功');
         }
     }
@@ -113,6 +115,7 @@ class Admin_Article extends Controller
             json_error('参数错误');
         }
         Db::execute("DELETE FROM jz_article WHERE id = ?", [$id]);
+        admin_log('article_delete', ['id' => $id]);
         json_success('文章已删除');
     }
 
@@ -124,6 +127,7 @@ class Admin_Article extends Controller
             json_error('参数错误');
         }
         Db::execute("UPDATE jz_article SET status = ? WHERE id = ?", [$status, $id]);
+        admin_log('article_status', ['id' => $id, 'status' => $status]);
         json_success('状态更新成功');
     }
 }

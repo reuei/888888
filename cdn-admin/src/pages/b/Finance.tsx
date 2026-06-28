@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import { useToast } from '../../components/Toast';
-import { financeRecords } from '../../data/mock';
+import { financeRecords, settlementRecords } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
-import { ArrowDownLeft, ArrowUpRight, Minus, Wallet } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Minus, Wallet, Receipt } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 
 export default function BFinance() {
   const [activeTab, setActiveTab] = useState<'detail' | 'settlement' | 'withdraw'>('detail');
   const { show } = useToast();
+
+  const detailPagination = usePagination({ total: financeRecords.length });
+  const settlementPagination = usePagination({ total: settlementRecords.length });
 
   const typeIcon = (type: string) => {
     switch (type) {
@@ -62,27 +68,39 @@ export default function BFinance() {
               </tr>
             </thead>
             <tbody>
-              {financeRecords.map((f) => (
-                <tr key={f.id}>
-                  <td className="font-medium">{f.id}</td>
-                  <td>
-                    <div className="flex items-center gap-1.5">
-                      {typeIcon(f.type)}
-                      <span>{typeText(f.type)}</span>
-                    </div>
-                  </td>
-                  <td className={f.amount > 0 ? 'text-success' : 'text-danger'}>
-                    {f.amount > 0 ? '+' : ''}¥{formatMoney(Math.abs(f.amount))}
-                  </td>
-                  <td>¥{formatMoney(f.balance)}</td>
-                  <td>{f.desc}</td>
-                  <td className="text-text-secondary">{f.createdAt}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              {detailPagination.slice(financeRecords).map((f) => (
+                  <tr key={f.id}>
+                    <td className="font-medium">{f.id}</td>
+                    <td>
+                      <div className="flex items-center gap-1.5">
+                        {typeIcon(f.type)}
+                        <span>{typeText(f.type)}</span>
+                      </div>
+                    </td>
+                    <td className={f.amount > 0 ? 'text-success' : 'text-danger'}>
+                      {f.amount > 0 ? '+' : ''}¥{formatMoney(Math.abs(f.amount))}
+                    </td>
+                    <td>¥{formatMoney(f.balance)}</td>
+                    <td>{f.desc}</td>
+                    <td className="text-text-secondary">{f.createdAt}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {financeRecords.length === 0 && (
+              <EmptyState title="暂无资金明细" description="当前没有资金流水记录" icon={<Receipt size={24} />} />
+            )}
+
+            <Pagination
+              page={detailPagination.page}
+              totalPages={detailPagination.totalPages}
+              total={financeRecords.length}
+              pageSize={detailPagination.pageSize}
+              onChange={detailPagination.setPage}
+            />
+          </div>
+        )}
 
       {activeTab === 'settlement' && (
         <div className="card p-5">
@@ -98,23 +116,36 @@ export default function BFinance() {
               </tr>
             </thead>
             <tbody>
-              {[
-                { no: 'S20260627001', cycle: 'T+1', amount: 4820.00, fee: 48.20, status: '已结算', time: '2026-06-28 10:00' },
-                { no: 'S20260626001', cycle: 'T+1', amount: 3150.50, fee: 31.51, status: '已结算', time: '2026-06-27 10:00' },
-              ].map((s, i) => (
-                <tr key={i}>
-                  <td className="font-medium">{s.no}</td>
-                  <td>{s.cycle}</td>
-                  <td>¥{formatMoney(s.amount)}</td>
-                  <td>¥{formatMoney(s.fee)}</td>
-                  <td><span className="badge badge-success">{s.status}</span></td>
-                  <td className="text-text-secondary">{s.time}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              {settlementPagination.slice(settlementRecords).map((s) => (
+                  <tr key={s.id}>
+                    <td className="font-medium">{s.id}</td>
+                    <td>{s.cycle}</td>
+                    <td>¥{formatMoney(s.amount)}</td>
+                    <td>¥{formatMoney(s.fee)}</td>
+                    <td>
+                      <span className={`badge ${s.status === 'settled' ? 'badge-success' : 'badge-warning'}`}>
+                        {s.status === 'settled' ? '已结算' : '待处理'}
+                      </span>
+                    </td>
+                    <td className="text-text-secondary">{s.time}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {settlementRecords.length === 0 && (
+              <EmptyState title="暂无结算记录" description="当前没有结算打款记录" icon={<Receipt size={24} />} />
+            )}
+
+            <Pagination
+              page={settlementPagination.page}
+              totalPages={settlementPagination.totalPages}
+              total={settlementRecords.length}
+              pageSize={settlementPagination.pageSize}
+              onChange={settlementPagination.setPage}
+            />
+          </div>
+        )}
 
       {activeTab === 'withdraw' && (
         <div className="card p-5 max-w-lg">

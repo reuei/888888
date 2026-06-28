@@ -5,11 +5,17 @@ import { financeRecords, settlementRecords } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
 import { trendLabels, trendValues } from '../../data/mock';
 import LineChart from '../../components/LineChart';
-import { Plus, CheckCircle } from 'lucide-react';
+import { Plus, CheckCircle, Receipt } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 
 export default function SFinance() {
   const [tab, setTab] = useState<'overview' | 'rates' | 'settlement'>('overview');
   const [settleOpen, setSettleOpen] = useState(false);
+
+  const overviewPagination = usePagination({ total: financeRecords.length });
+  const settlementPagination = usePagination({ total: settlementRecords.length });
 
   const typeText = (type: string) => {
     const map: Record<string, string> = { income: '收入', expense: '支出', frozen: '冻结', withdraw: '提现' };
@@ -70,7 +76,7 @@ export default function SFinance() {
                 </tr>
               </thead>
               <tbody>
-                {financeRecords.map((f) => (
+                {overviewPagination.slice(financeRecords).map((f) => (
                   <tr key={f.id}>
                     <td className="font-medium">{f.id}</td>
                     <td>{typeText(f.type)}</td>
@@ -83,6 +89,18 @@ export default function SFinance() {
                 ))}
               </tbody>
             </table>
+
+            {financeRecords.length === 0 && (
+              <EmptyState title="暂无资金明细" description="当前没有资金流水记录" icon={<Receipt size={24} />} />
+            )}
+
+            <Pagination
+              page={overviewPagination.page}
+              totalPages={overviewPagination.totalPages}
+              total={financeRecords.length}
+              pageSize={overviewPagination.pageSize}
+              onChange={overviewPagination.setPage}
+            />
           </div>
         </>
       )}
@@ -156,7 +174,7 @@ export default function SFinance() {
               </tr>
             </thead>
             <tbody>
-              {settlementRecords.map((s) => (
+              {settlementPagination.slice(settlementRecords).map((s) => (
                 <tr key={s.id}>
                   <td className="font-medium">{s.id}</td>
                   <td>{s.merchant}</td>
@@ -173,6 +191,18 @@ export default function SFinance() {
               ))}
             </tbody>
           </table>
+
+          {settlementRecords.length === 0 && (
+            <EmptyState title="暂无结算记录" description="当前没有结算打款记录" icon={<Receipt size={24} />} />
+          )}
+
+          <Pagination
+            page={settlementPagination.page}
+            totalPages={settlementPagination.totalPages}
+            total={settlementRecords.length}
+            pageSize={settlementPagination.pageSize}
+            onChange={settlementPagination.setPage}
+          />
         </div>
       )}
 

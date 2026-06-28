@@ -136,3 +136,65 @@ function site_config($key = null, $default = null)
 
     return $config[$key] ?? $default;
 }
+
+/**
+ * 识别当前访问的分站
+ * 优先级：URL 参数 subsite > 二级域名前缀 > session 缓存
+ * 返回分站数组，未识别返回 null
+ */
+function current_subsite()
+{
+    static $subsite = false;
+    if ($subsite !== false) {
+        return $subsite;
+    }
+
+    // 显式返回总站
+    if (input('clear_subsite', '') === '1') {
+        clear_current_subsite();
+        $subsite = null;
+        return $subsite;
+    }
+
+    // 调试/指定分站
+    $subsiteParam = input('subsite', '');
+    if ($subsiteParam) {
+        $subsite = Db::fetch("SELECT * FROM jz_subsite WHERE domain_prefix = ? AND status = 1", [$subsiteParam]);
+        if ($subsite) {
+            session('current_subsite', $subsite);
+            return $subsite;
+        }
+    }
+
+    // 通过二级域名识别，例如 sub1.example.com
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $mainHost = $_SERVER['SERVER_NAME'] ?? $host;
+    if ($host && $mainHost && $host !== $mainHost && strpos($host, $mainHost) !== false) {
+        $prefix = trim(str_replace('.' . $mainHost, '', $host), '.');
+        if ($prefix && $prefix !== 'www') {
+            $subsite = Db::fetch("SELECT * FROM jz_subsite WHERE domain_prefix = ? AND status = 1", [$prefix]);
+            if ($subsite) {
+                session('current_subsite', $subsite);
+                return $subsite;
+            }
+        }
+    }
+
+    // 尝试从 session 恢复
+    $sessionSubsite = session('current_subsite');
+    if ($sessionSubsite && is_array($sessionSubsite)) {
+        $subsite = $sessionSubsite;
+        return $subsite;
+    }
+
+    $subsite = null;
+    return $subsite;
+}
+
+/**
+ * 清空当前分站缓存（用于总站页面）
+ */
+function clear_current_subsite()
+{
+    unset($_SESSION['current_subsite']);
+}

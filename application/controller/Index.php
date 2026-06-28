@@ -4,10 +4,34 @@
  */
 class Index extends Controller
 {
+    protected $subsite = null;
+
     public function __construct()
     {
         parent::__construct();
         $this->setLayout('layout/main');
+        $this->subsite = current_subsite();
+        $this->assign('currentSubsite', $this->subsite);
+    }
+
+    /**
+     * 获取当前分站 ID
+     */
+    protected function getSubsiteId()
+    {
+        return $this->subsite ? (int) $this->subsite['id'] : 0;
+    }
+
+    /**
+     * 获取分站过滤条件
+     */
+    protected function getSubsiteWhere($alias = 'g')
+    {
+        $subsiteId = $this->getSubsiteId();
+        if ($subsiteId > 0) {
+            return " AND {$alias}.subsite_id = {$subsiteId}";
+        }
+        return '';
     }
 
     /**
@@ -63,12 +87,13 @@ class Index extends Controller
         // 推荐商品（上架 + 有库存）
         $order = $this->resolveGoodsOrder($tpl['home_goods_order'] ?? 'sold');
         $limit = (int) ($tpl['home_goods_limit'] ?? 24);
+        $subsiteWhere = $this->getSubsiteWhere('g');
         $goods = Db::query(
             "SELECT g.*, m.shop_name, c.name as category_name
              FROM jz_goods g
              LEFT JOIN jz_merchant m ON g.merchant_id = m.id
              LEFT JOIN jz_category c ON g.category_id = c.id
-             WHERE g.status = 1 AND g.stock > 0
+             WHERE g.status = 1 AND g.stock > 0{$subsiteWhere}
              ORDER BY {$order}
              LIMIT {$limit}"
         );
@@ -85,6 +110,9 @@ class Index extends Controller
         $homeTop = Db::query("SELECT * FROM jz_ad WHERE position = 'home_top' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 3");
 
         $title = $tpl['home_seo_title'] ?: site_config('site_name', '鲸商城 Pro');
+        if ($this->subsite) {
+            $title = $this->subsite['name'] . ' - ' . $title;
+        }
 
         $this->assign('title', $title);
         $this->assign('tpl', $tpl);
@@ -124,6 +152,12 @@ class Index extends Controller
 
         $where = 'g.status = 1 AND g.stock > 0';
         $params = [];
+
+        $subsiteId = $this->getSubsiteId();
+        if ($subsiteId > 0) {
+            $where .= ' AND g.subsite_id = ?';
+            $params[] = $subsiteId;
+        }
 
         if ($categoryId) {
             // 支持父分类下所有子分类
@@ -189,13 +223,21 @@ class Index extends Controller
     public function goods()
     {
         $id = (int) input('id', 0);
+        $subsiteId = $this->getSubsiteId();
+        $params = [$id];
+        $where = 'g.id = ? AND g.status = 1';
+        if ($subsiteId > 0) {
+            $where .= ' AND g.subsite_id = ?';
+            $params[] = $subsiteId;
+        }
+
         $goods = Db::fetch(
             "SELECT g.*, m.shop_name, m.id as merchant_id, c.name as category_name
              FROM jz_goods g
              LEFT JOIN jz_merchant m ON g.merchant_id = m.id
              LEFT JOIN jz_category c ON g.category_id = c.id
-             WHERE g.id = ? AND g.status = 1",
-            [$id]
+             WHERE {$where}",
+            $params
         );
 
         if (!$goods) {
@@ -203,11 +245,17 @@ class Index extends Controller
         }
 
         // 同类推荐
+        $recParams = [$goods['category_id'], $id];
+        $recWhere = 'category_id = ? AND status = 1 AND id != ?';
+        if ($subsiteId > 0) {
+            $recWhere .= ' AND subsite_id = ?';
+            $recParams[] = $subsiteId;
+        }
         $recommend = Db::query(
             "SELECT id, name, cover, price, stock, sold FROM jz_goods
-             WHERE category_id = ? AND status = 1 AND id != ?
+             WHERE {$recWhere}
              ORDER BY sold DESC LIMIT 6",
-            [$goods['category_id'], $id]
+            $recParams
         );
 
         // 商品详情页广告
@@ -462,6 +510,12 @@ class Index extends Controller
             json_error('商品不存在或已下架');
         }
 
+        // 分站访问时校验商品归属
+        $subsiteId = $this->getSubsiteId();
+        if ($subsiteId > 0 && (int) $goods['subsite_id'] !== $subsiteId) {
+            json_error('当前分站暂无该商品');
+        }
+
         // 风控配置
         $risk = $this->getRiskConfig();
 
@@ -641,8 +695,18 @@ class Index extends Controller
             redirect(url('index/order', ['no' => $orderNo]));
         }
 
-        // 可用支付渠道
-        $channels = Db::query("SELECT * FROM jz_payment_channel WHERE status = 1 ORDER BY sort ASC");
+        // 可用支付渠道：全局 + 当前分站
+        $subsiteId = $this->getSubsiteId();
+        if ($subsiteId > 0) {
+            $channels = Db::query(
+                "SELECT * FROM jz_payment_channel
+                 WHERE status = 1 AND (scope = 'global' OR (scope = 'subsite' AND scope_id = ?))
+                 ORDER BY sort ASC",
+                [$subsiteId]
+            );
+        } else {
+            $channels = Db::query("SELECT * FROM jz_payment_channel WHERE status = 1 AND scope = 'global' ORDER BY sort ASC");
+        }
         if (empty($channels)) {
             // 默认给一个模拟渠道
             $channels = [
@@ -670,7 +734,16 @@ class Index extends Controller
             json_error('订单不存在或已支付');
         }
 
-        $channel = Db::fetch("SELECT * FROM jz_payment_channel WHERE code = ? AND status = 1", [$channelCode]);
+        $subsiteId = $this->getSubsiteId();
+        if ($subsiteId > 0) {
+            $channel = Db::fetch(
+                "SELECT * FROM jz_payment_channel
+                 WHERE code = ? AND status = 1 AND (scope = 'global' OR (scope = 'subsite' AND scope_id = ?))",
+                [$channelCode, $subsiteId]
+            );
+        } else {
+            $channel = Db::fetch("SELECT * FROM jz_payment_channel WHERE code = ? AND status = 1 AND scope = 'global'", [$channelCode]);
+        }
         $config = $channel ? json_decode($channel['config'] ?: '{}', true) : [];
 
         // 配置了真实支付网关时，返回跳转参数
@@ -744,13 +817,20 @@ class Index extends Controller
         $orderNo = input('no', '');
         $order = null;
         $queryMode = false;
+        $subsiteId = $this->getSubsiteId();
 
         if ($orderNo) {
+            $where = 'o.order_no = ?';
+            $params = [$orderNo];
+            if ($subsiteId > 0) {
+                $where .= ' AND o.subsite_id = ?';
+                $params[] = $subsiteId;
+            }
             $order = Db::fetch(
                 "SELECT o.*, m.shop_name FROM jz_order o
                  LEFT JOIN jz_merchant m ON o.merchant_id = m.id
-                 WHERE o.order_no = ?",
-                [$orderNo]
+                 WHERE {$where}",
+                $params
             );
         } else {
             $queryMode = true;
@@ -770,6 +850,7 @@ class Index extends Controller
     {
         $orderNo = input('order_no', '');
         $contact = input('contact', '');
+        $subsiteId = $this->getSubsiteId();
 
         if (!$orderNo && !$contact) {
             json_error('请输入订单号或联系方式');
@@ -777,6 +858,10 @@ class Index extends Controller
 
         $where = '1=1';
         $params = [];
+        if ($subsiteId > 0) {
+            $where .= ' AND subsite_id = ?';
+            $params[] = $subsiteId;
+        }
         if ($orderNo) {
             $where .= ' AND order_no = ?';
             $params[] = $orderNo;
@@ -806,14 +891,21 @@ class Index extends Controller
         if ($contact) {
             $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
             if ($user) {
+                $subsiteId = $this->getSubsiteId();
+                $where = 'user_id = ?';
+                $params = [$user['id']];
+                if ($subsiteId > 0) {
+                    $where .= ' AND subsite_id = ?';
+                    $params[] = $subsiteId;
+                }
                 $stats = Db::fetch(
                     "SELECT
                         COUNT(*) AS total_orders,
                         IFNULL(SUM(CASE WHEN status >= 1 THEN pay_amount ELSE 0 END), 0) AS total_pay,
                         COUNT(CASE WHEN status = 0 THEN 1 END) AS unpaid_orders,
                         COUNT(CASE WHEN status = 2 THEN 1 END) AS delivered_orders
-                     FROM jz_order WHERE user_id = ?",
-                    [$user['id']]
+                     FROM jz_order WHERE {$where}",
+                    $params
                 );
             }
         }
@@ -878,8 +970,13 @@ class Index extends Controller
         $page = max(1, (int) input('page', 1));
         $pageSize = 10;
 
+        $subsiteId = $this->getSubsiteId();
         $where = 'o.user_id = ?';
         $params = [$user['id']];
+        if ($subsiteId > 0) {
+            $where .= ' AND o.subsite_id = ?';
+            $params[] = $subsiteId;
+        }
         if ($status !== '') {
             $where .= ' AND o.status = ?';
             $params[] = (int) $status;

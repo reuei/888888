@@ -184,6 +184,39 @@
             background: #475569;
             border-radius: 2px;
         }
+        .subsite-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: #1E3A8A;
+            color: #fff;
+            padding: 6px 24px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 101;
+        }
+        .subsite-bar .subsite-name { font-weight: 600; }
+        .subsite-bar .subsite-desc { opacity: 0.8; }
+        .subsite-bar .subsite-back {
+            margin-left: auto;
+            color: #BFDBFE;
+        }
+        body.has-subsite .topbar { top: 32px; }
+        body.has-subsite .mobile-drawer { top: 88px; }
+        body.has-subsite .container { padding-top: 120px; }
+        .subsite-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #EFF6FF;
+            color: #2563EB;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
         .mobile-drawer {
             display: none;
             position: fixed;
@@ -217,7 +250,14 @@
         }
     </style>
 </head>
-<body>
+<body class="<?php echo !empty($currentSubsite) ? 'has-subsite' : ''; ?>">
+    <?php if (!empty($currentSubsite)): ?>
+    <div class="subsite-bar">
+        <span class="subsite-name"><?php echo h($currentSubsite['name']); ?></span>
+        <span class="subsite-desc">分站首页</span>
+        <a href="<?php echo base_url(); ?>?clear_subsite=1" class="subsite-back">返回总站</a>
+    </div>
+    <?php endif; ?>
     <div class="topbar">
         <div class="topbar-left">
             <a href="<?php echo url('/'); ?>" class="logo">
@@ -227,6 +267,9 @@
                 <?php echo h(site_config('site_name')); ?>
                 <?php endif; ?>
             </a>
+            <?php if (!empty($currentSubsite)): ?>
+            <span class="subsite-tag"><?php echo h($currentSubsite['name']); ?></span>
+            <?php endif; ?>
             <form class="search-box" method="get" action="<?php echo url('index/category'); ?>">
                 <input type="text" name="keyword" placeholder="搜索商品" value="<?php echo h($_GET['keyword'] ?? ''); ?>">
                 <button type="submit" class="btn">搜索</button>

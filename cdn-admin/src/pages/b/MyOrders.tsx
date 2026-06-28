@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import type { BOrder } from '../../types';
 import { bOrders } from '../../data/mock';
 import { formatMoney, statusBadge, orderStatusText } from '../../utils/helpers';
 import { Eye, FileText, RefreshCcw } from 'lucide-react';
@@ -8,6 +9,30 @@ import { Eye, FileText, RefreshCcw } from 'lucide-react';
 export default function MyOrders() {
   const [list] = useState(bOrders);
   const [detail, setDetail] = useState<typeof bOrders[0] | null>(null);
+  const [keyword, setKeyword] = useState('');
+  const [productKeyword, setProductKeyword] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | BOrder['status']>('all');
+
+  const statusOptions: { value: 'all' | BOrder['status']; label: string }[] = [
+    { value: 'all', label: '全部状态' },
+    { value: 'pending', label: '待支付' },
+    { value: 'paid', label: '已支付' },
+    { value: 'refunded', label: '已退款' },
+    { value: 'cancelled', label: '已取消' },
+  ];
+
+  const filtered = list.filter((o) => {
+    const matchId = o.id.toLowerCase().includes(keyword.trim().toLowerCase());
+    const matchProduct = o.product.toLowerCase().includes(productKeyword.trim().toLowerCase());
+    const matchStatus = statusFilter === 'all' || o.status === statusFilter;
+    return matchId && matchProduct && matchStatus;
+  });
+
+  const reset = () => {
+    setKeyword('');
+    setProductKeyword('');
+    setStatusFilter('all');
+  };
 
   return (
     <div>
@@ -15,19 +40,33 @@ export default function MyOrders() {
 
       <div className="card p-5">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
-          <input type="text" placeholder="订单号" className="input" />
-          <input type="text" placeholder="商品名称" className="input" />
-          <select className="input">
-            <option>全部状态</option>
-            <option>待支付</option>
-            <option>已支付</option>
-            <option>已退款</option>
-            <option>已取消</option>
+          <input
+            type="text"
+            placeholder="订单号"
+            className="input"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="商品名称"
+            className="input"
+            value={productKeyword}
+            onChange={(e) => setProductKeyword(e.target.value)}
+          />
+          <select
+            className="input"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as 'all' | BOrder['status'])}
+          >
+            {statusOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
           </select>
           <input type="date" className="input" />
           <div className="flex gap-2">
             <button className="btn btn-primary">查询</button>
-            <button className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
+            <button onClick={reset} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
           </div>
         </div>
 
@@ -45,7 +84,7 @@ export default function MyOrders() {
             </tr>
           </thead>
           <tbody>
-            {list.map((o) => (
+            {filtered.map((o) => (
               <tr key={o.id}>
                 <td className="font-medium">{o.id}</td>
                 <td>{o.product}</td>
@@ -78,7 +117,7 @@ export default function MyOrders() {
         </table>
 
         <div className="flex items-center justify-between mt-4 text-sm text-text-secondary">
-          <div>共 {list.length} 条</div>
+          <div>共 {filtered.length} 条</div>
           <div className="flex items-center gap-2">
             <button className="btn btn-default text-xs">上一页</button>
             <button className="btn btn-primary text-xs">1</button>

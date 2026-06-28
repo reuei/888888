@@ -1,7 +1,8 @@
 import PageHeader from '../../components/PageHeader';
 import StatCard from '../../components/StatCard';
 import LineChart from '../../components/LineChart';
-import { bStats, trendLabels, bTrendValues1, bTrendValues2, bTrendValues3 } from '../../data/mock';
+import { bStats, trendLabels, bTrendValues1, bTrendValues2, bTrendValues3, bOrders } from '../../data/mock';
+import { formatMoney, orderStatusText } from '../../utils/helpers';
 import { AlertTriangle, ShoppingCart } from 'lucide-react';
 
 export default function BDashboard() {
@@ -39,19 +40,15 @@ export default function BDashboard() {
             <ShoppingCart size={18} className="text-primary" /> 最近订单
           </h3>
           <div className="space-y-3 text-sm">
-            {[
-              { no: 'O202606280001', product: '企业高防CDN', amount: 299.00, time: '10:23' },
-              { no: 'O202606280002', product: '标准版套餐', amount: 49.00, time: '09:45' },
-              { no: 'O202606270088', product: '全球加速Pro', amount: 199.00, time: '昨天' },
-            ].map((o, i) => (
-              <div key={i} className="flex items-center justify-between border-b border-border pb-2 last:border-0">
+            {bOrders.slice(0, 5).map((o) => (
+              <div key={o.id} className="flex items-center justify-between border-b border-border pb-2 last:border-0">
                 <div>
-                  <div className="font-medium">{o.no}</div>
+                  <div className="font-medium">{o.id}</div>
                   <div className="text-text-secondary text-xs">{o.product}</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-medium text-success">+¥{o.amount.toFixed(2)}</div>
-                  <div className="text-text-secondary text-xs">{o.time}</div>
+                  <div className="font-medium text-success">+¥{formatMoney(o.amount)}</div>
+                  <div className="text-text-secondary text-xs">{orderStatusText(o.status)} · {o.createdAt.split(' ')[1]}</div>
                 </div>
               </div>
             ))}

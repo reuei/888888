@@ -4,7 +4,8 @@ import Modal from '../../components/Modal';
 import { useToast } from '../../components/Toast';
 import { myPackages as myPackagesData, packages } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
-import { CreditCard, CheckCircle } from 'lucide-react';
+import { CreditCard, CheckCircle, PackageX } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
 
 const periods = [1, 3, 6, 12];
 
@@ -33,6 +34,18 @@ export default function Renew() {
     <div>
       <PageHeader title="套餐续费" breadcrumb={['套餐管理', '套餐续费']} />
 
+      {activePackages.length === 0 ? (
+        <EmptyState
+          title="暂无生效套餐"
+          description="您当前没有可续费的生效套餐，请先订购套餐"
+          icon={<PackageX size={24} />}
+          action={
+            <button onClick={() => window.location.href = '/b/packages'} className="btn btn-primary text-xs flex items-center gap-1">
+              前往订购套餐
+            </button>
+          }
+        />
+      ) : (
       <div className="card p-5 max-w-lg">
         <div className="space-y-4">
           <div>
@@ -42,9 +55,6 @@ export default function Renew() {
               onChange={(e) => setSelectedId(e.target.value)}
               className="input"
             >
-              {activePackages.length === 0 && (
-                <option value="">暂无生效套餐</option>
-              )}
               {activePackages.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}（到期 {p.expireAt}）
@@ -81,6 +91,7 @@ export default function Renew() {
           </button>
         </div>
       </div>
+      )}
 
       <Modal
         open={payOpen}

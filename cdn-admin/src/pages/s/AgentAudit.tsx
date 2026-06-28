@@ -3,7 +3,8 @@ import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import { agentProducts } from '../../data/mock';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, PackageSearch } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
 import type { AgentProduct } from '../../types';
 
 export default function AgentAudit() {
@@ -58,8 +59,8 @@ export default function AgentAudit() {
             ))}
             {pendingList.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center text-text-secondary py-8">
-                  暂无待审核商品
+                <td colSpan={7}>
+                  <EmptyState title="暂无待审核商品" description="当前没有需要审核的代理商品" icon={<PackageSearch size={24} />} />
                 </td>
               </tr>
             )}

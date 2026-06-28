@@ -6,6 +6,7 @@ import type { BOrder } from '../../types';
 import { bOrders } from '../../data/mock';
 import { formatMoney, statusBadge, orderStatusText } from '../../utils/helpers';
 import { Eye, FileText, RefreshCcw } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
 
 export default function MyOrders() {
   const { show } = useToast();
@@ -117,6 +118,10 @@ export default function MyOrders() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无订单" description="没有符合筛选条件的订单" />
+        )}
 
         <div className="flex items-center justify-between mt-4 text-sm text-text-secondary">
           <div>共 {filtered.length} 条</div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
+import EmptyState from '../components/EmptyState';
 import { notifications as initialNotifications } from '../data/mock';
 import { Check, Trash2, Bell } from 'lucide-react';
 
@@ -83,10 +84,7 @@ export default function Notifications({ role }: NotificationsProps) {
         </div>
 
         {filtered.length === 0 ? (
-          <div className="py-16 text-center text-text-secondary">
-            <Bell size={40} className="mx-auto mb-3 opacity-30" />
-            <div>暂无通知</div>
-          </div>
+          <EmptyState title="暂无通知" description="当前没有符合条件的通知消息" icon={<Bell size={24} />} />
         ) : (
           <div className="space-y-3">
             {filtered.map((n) => (

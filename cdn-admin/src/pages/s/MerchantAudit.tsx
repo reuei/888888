@@ -3,7 +3,8 @@ import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import { merchants } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { CheckCircle, XCircle, Eye } from 'lucide-react';
+import { CheckCircle, XCircle, Eye, Store } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
 
 export default function SMerchantAudit() {
   const [list, setList] = useState(merchants.filter((m) => m.status === 'pending'));
@@ -71,7 +72,9 @@ export default function SMerchantAudit() {
             ))}
             {list.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center text-text-secondary py-8">暂无待审核商户</td>
+                <td colSpan={6}>
+                  <EmptyState title="暂无待审核商户" description="当前没有需要审核的入驻商户" icon={<Store size={24} />} />
+                </td>
               </tr>
             )}
           </tbody>

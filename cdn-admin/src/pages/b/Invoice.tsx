@@ -5,6 +5,7 @@ import { useToast } from '../../components/Toast';
 import { bOrders, invoices as invoicesData } from '../../data/mock';
 import { formatMoney, statusBadge, statusText, invoiceTypeText } from '../../utils/helpers';
 import { FileText, Plus, Eye } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
 
 export default function Invoice() {
   const { show } = useToast();
@@ -110,10 +111,16 @@ export default function Invoice() {
         </table>
 
         {invoices.length === 0 && (
-          <div className="py-12 text-center text-sm text-text-secondary">
-            <FileText size={40} className="mx-auto mb-2 opacity-30" />
-            暂无发票记录
-          </div>
+          <EmptyState
+            title="暂无发票记录"
+            description="您还没有申请过发票"
+            icon={<FileText size={24} />}
+            action={
+              <button onClick={() => setApplyOpen(true)} className="btn btn-primary text-xs flex items-center gap-1">
+                <Plus size={14} /> 申请发票
+              </button>
+            }
+          />
         )}
       </div>
 

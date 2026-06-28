@@ -73,7 +73,7 @@
             <div class="body">
                 <div>
                     <div class="name"><?php echo h($item['goods_name']); ?></div>
-                    <div class="meta"><?php echo $item['shop_name'] ?: '官方店铺'; ?> · <?php echo $item['create_time']; ?></div>
+                    <div class="meta"><?php echo h($item['shop_name'] ?: '官方店铺'); ?> · <?php echo h($item['create_time']); ?></div>
                 </div>
                 <div class="amount">¥<?php echo $item['pay_amount']; ?></div>
             </div>

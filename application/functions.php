@@ -496,8 +496,41 @@ function upload_file($field, $subDir = '', $allowedExt = ['jpg', 'jpeg', 'png', 
         return ['code' => 1, 'msg' => '文件大小不能超过5MB'];
     }
 
+    // MIME 校验
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($file['tmp_name']);
+    $extMimeMap = [
+        'jpg' => ['image/jpeg'],
+        'jpeg' => ['image/jpeg'],
+        'png' => ['image/png'],
+        'gif' => ['image/gif'],
+    ];
+    if (isset($extMimeMap[$ext]) && !in_array($mime, $extMimeMap[$ext], true)) {
+        return ['code' => 1, 'msg' => '文件类型与扩展名不符'];
+    }
+
+    // 图片内容校验
+    if (isset($extMimeMap[$ext]) && !getimagesize($file['tmp_name'])) {
+        return ['code' => 1, 'msg' => '图片文件内容异常'];
+    }
+
+    // 子目录防路径遍历
+    $safeSubDir = '';
+    if ($subDir) {
+        $parts = explode('/', trim(str_replace('\\', '/', $subDir), '/'));
+        $safeParts = [];
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if ($part === '' || $part === '.' || $part === '..') {
+                continue;
+            }
+            $safeParts[] = $part;
+        }
+        $safeSubDir = implode(DIRECTORY_SEPARATOR, $safeParts);
+    }
+
     $uploadRoot = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
-    $targetDir = $uploadRoot . ($subDir ? trim($subDir, '/') . DIRECTORY_SEPARATOR : '');
+    $targetDir = $uploadRoot . ($safeSubDir ? $safeSubDir . DIRECTORY_SEPARATOR : '');
     if (!is_dir($targetDir)) {
         @mkdir($targetDir, 0755, true);
     }
@@ -508,6 +541,6 @@ function upload_file($field, $subDir = '', $allowedExt = ['jpg', 'jpeg', 'png', 
         return ['code' => 1, 'msg' => '文件保存失败'];
     }
 
-    $relative = 'uploads/' . ($subDir ? trim($subDir, '/') . '/' : '') . $filename;
+    $relative = 'uploads/' . ($safeSubDir ? str_replace('\\', '/', $safeSubDir) . '/' : '') . $filename;
     return ['code' => 0, 'path' => $relative, 'url' => base_url($relative)];
 }

@@ -9,6 +9,12 @@ define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 define('APP_PATH', ROOT_PATH . 'application' . DIRECTORY_SEPARATOR);
 define('RUNTIME_PATH', ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR);
 
+// 基础安全响应头
+header('X-Frame-Options: SAMEORIGIN');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header('X-XSS-Protection: 1; mode=block');
+
 // 错误处理：生产环境关闭页面报错，写入日志
 error_reporting(E_ALL);
 ini_set('display_errors', '0');

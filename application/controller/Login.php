@@ -48,6 +48,7 @@ class Login extends Controller
                 json_error('账号或密码错误');
             }
             session('merchant_user', $user);
+            session_regenerate_id(true);
             $ip = get_client_ip();
             Db::execute("UPDATE jz_merchant SET last_login_time = ?, last_login_ip = ?, update_time = ? WHERE id = ?", [date('Y-m-d H:i:s'), $ip, date('Y-m-d H:i:s'), $user['id']]);
             record_login_attempt($username, $type, true);
@@ -59,6 +60,7 @@ class Login extends Controller
                 json_error('账号或密码错误');
             }
             session('admin_user', $user);
+            session_regenerate_id(true);
             $ip = get_client_ip();
             Db::execute("UPDATE jz_admin SET last_login_time = ?, last_login_ip = ?, update_time = ? WHERE id = ?", [date('Y-m-d H:i:s'), $ip, date('Y-m-d H:i:s'), $user['id']]);
             record_login_attempt($username, $type, true);

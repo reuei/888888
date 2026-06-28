@@ -58,7 +58,11 @@ class Db
     public static function insert($table, $data)
     {
         $keys = array_keys($data);
+        $keys = array_map(function ($k) {
+            return str_replace('`', '``', $k);
+        }, $keys);
         $fields = implode('`, `', $keys);
+        $table = str_replace('`', '``', $table);
         $placeholders = implode(', ', array_fill(0, count($keys), '?'));
         $sql = "INSERT INTO `{$table}` (`{$fields}`) VALUES ({$placeholders})";
         self::execute($sql, array_values($data));
@@ -67,8 +71,10 @@ class Db
 
     public static function update($table, $data, $where, $whereParams = [])
     {
+        $table = str_replace('`', '``', $table);
         $sets = [];
         foreach ($data as $k => $v) {
+            $k = str_replace('`', '``', $k);
             $sets[] = "`{$k}` = ?";
         }
         $sql = "UPDATE `{$table}` SET " . implode(', ', $sets) . " WHERE {$where}";
@@ -77,6 +83,7 @@ class Db
 
     public static function delete($table, $where, $whereParams = [])
     {
+        $table = str_replace('`', '``', $table);
         $sql = "DELETE FROM `{$table}` WHERE {$where}";
         return self::execute($sql, $whereParams);
     }

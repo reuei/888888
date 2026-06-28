@@ -68,6 +68,9 @@
             <span class="tag tag-green">库存 <?php echo $goods['stock']; ?></span>
             <span class="tag">已售 <?php echo $goods['sold']; ?></span>
             <span class="tag">店铺：<?php echo h($goods['shop_name'] ?? '官方'); ?></span>
+            <?php if (!empty($goods['merchant_id'])): ?>
+            <a href="<?php echo url('chat', ['merchant_id' => $goods['merchant_id']]); ?>" class="tag tag-orange" style="text-decoration: none;">联系客服</a>
+            <?php endif; ?>
         </div>
 
         <div class="goods-desc">

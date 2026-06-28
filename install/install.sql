@@ -638,6 +638,7 @@ CREATE TABLE `jz_chat_session` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `merchant_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '商户ID',
   `user_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '用户ID（0为游客）',
+  `user_fingerprint` varchar(32) NOT NULL DEFAULT '' COMMENT '浏览器指纹',
   `user_name` varchar(50) NOT NULL DEFAULT '' COMMENT '访客昵称',
   `contact` varchar(100) NOT NULL DEFAULT '' COMMENT '联系方式',
   `last_message` varchar(500) NOT NULL DEFAULT '' COMMENT '最后一条消息摘要',

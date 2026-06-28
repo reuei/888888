@@ -238,6 +238,25 @@
             font-size: 14px;
         }
         .mobile-drawer a:last-child { border-bottom: none; }
+        .chat-float {
+            position: fixed;
+            right: 24px;
+            bottom: 80px;
+            width: 56px;
+            height: 56px;
+            background: #10B981;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            cursor: pointer;
+            z-index: 90;
+            font-size: 24px;
+            text-decoration: none;
+        }
+        .chat-float:hover { background: #059669; }
         @media (max-width: 768px) {
             .topbar { padding: 0 16px; }
             .topbar-left { gap: 12px; }
@@ -305,6 +324,7 @@
     <div class="footer">
         <?php echo h(site_config('copyright', '鲸商城 Pro v1.0.0')); ?> | <?php echo h(site_config('icp') ?: ''); ?><?php echo site_config('icp') ? ' | ' : ''; ?>客服：<?php echo h(site_config('contact') ?: '-'); ?>
     </div>
+    <a href="<?php echo url('chat'); ?>" class="chat-float" title="在线客服">💬</a>
     <script>
     (function() {
         const btn = document.getElementById('mobileMenuBtn');

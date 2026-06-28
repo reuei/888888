@@ -4,12 +4,23 @@ import Modal from '../../components/Modal';
 import { useToast } from '../../components/Toast';
 import { sites } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { Edit, Trash2, Activity, Plus, Search, CheckCircle } from 'lucide-react';
+import { Edit, Trash2, Activity, Plus, Search, CheckCircle, Globe, RefreshCcw } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 
 export default function BSites() {
   const { show } = useToast();
   const [list, setList] = useState(sites);
+  const [keyword, setKeyword] = useState('');
   const [addOpen, setAddOpen] = useState(false);
+
+  const reset = () => setKeyword('');
+
+  const filtered = list.filter((s) => !keyword || s.domain.toLowerCase().includes(keyword.toLowerCase()) || s.id.includes(keyword));
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
+  const pagedList = slice(filtered);
   const [editOpen, setEditOpen] = useState(false);
   const [current, setCurrent] = useState<typeof sites[0] | null>(null);
   const [form, setForm] = useState({ domain: '', pkg: 'PKG02' });
@@ -61,9 +72,16 @@ export default function BSites() {
         <div className="flex flex-wrap gap-3 mb-4">
           <div className="relative flex-1 min-w-[200px]">
             <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
-            <input type="text" placeholder="搜索域名" className="input pl-8" />
+            <input
+              type="text"
+              placeholder="搜索域名 / ID"
+              className="input pl-8"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
           </div>
           <button className="btn btn-primary">查询</button>
+          <button onClick={reset} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
         </div>
 
         <table className="table">
@@ -78,7 +96,7 @@ export default function BSites() {
             </tr>
           </thead>
           <tbody>
-            {list.map((s) => (
+            {pagedList.map((s) => (
               <tr key={s.id}>
                 <td className="font-medium">{s.domain}</td>
                 <td className="text-text-secondary">{s.status === 'running' ? `${s.domain}.cdn.dns` : '-'}</td>
@@ -104,6 +122,12 @@ export default function BSites() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无站点" description="没有符合筛选条件的站点" icon={<Globe size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

@@ -4,13 +4,32 @@ import Modal from '../../components/Modal';
 import { useToast } from '../../components/Toast';
 import { merchants } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { CheckCircle, XCircle, Eye, Plus } from 'lucide-react';
+import { CheckCircle, XCircle, Eye, Plus, Store, RefreshCcw } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 
 export default function SMerchants() {
   const { show } = useToast();
   const [list, setList] = useState(merchants);
+  const [keyword, setKeyword] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [auditOpen, setAuditOpen] = useState(false);
   const [current, setCurrent] = useState<typeof merchants[0] | null>(null);
+
+  const filtered = list.filter((m) => {
+    const matchKeyword = !keyword || m.shopName.includes(keyword) || m.phone.includes(keyword) || m.id.includes(keyword);
+    const matchStatus = statusFilter === 'all' || m.status === statusFilter;
+    return matchKeyword && matchStatus;
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
+  const pagedList = slice(filtered);
+
+  const reset = () => {
+    setKeyword('');
+    setStatusFilter('all');
+  };
 
   const handleAudit = (m: typeof merchants[0]) => {
     setCurrent(m);
@@ -30,14 +49,21 @@ export default function SMerchants() {
 
       <div className="card p-5">
         <div className="flex flex-wrap gap-3 mb-4">
-          <input type="text" placeholder="搜索店铺名 / 手机号" className="input flex-1 min-w-[200px]" />
-          <select className="input w-32">
-            <option>全部状态</option>
-            <option>正常</option>
-            <option>待审核</option>
-            <option>已封禁</option>
+          <input
+            type="text"
+            placeholder="搜索店铺名 / 手机号 / ID"
+            className="input flex-1 min-w-[200px]"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
+          <select className="input w-32" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">全部状态</option>
+            <option value="normal">正常</option>
+            <option value="pending">待审核</option>
+            <option value="banned">已封禁</option>
           </select>
           <button className="btn btn-primary">查询</button>
+          <button onClick={reset} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
         </div>
 
         <table className="table">
@@ -53,7 +79,7 @@ export default function SMerchants() {
             </tr>
           </thead>
           <tbody>
-            {list.map((m) => (
+            {pagedList.map((m) => (
               <tr key={m.id}>
                 <td>
                   <div className="flex items-center gap-3">
@@ -95,6 +121,12 @@ export default function SMerchants() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无商户" description="没有符合筛选条件的商户" icon={<Store size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

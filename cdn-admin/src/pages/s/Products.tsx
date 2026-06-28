@@ -4,13 +4,32 @@ import Modal from '../../components/Modal';
 import { useToast } from '../../components/Toast';
 import { products } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { Edit, Trash2, ArrowUpDown, Plus } from 'lucide-react';
+import { Edit, Trash2, ArrowUpDown, Plus, PackageSearch, RefreshCcw } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
+import Pagination from '../../components/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 
 export default function SProducts() {
   const { show } = useToast();
   const [list, setList] = useState(products);
+  const [keyword, setKeyword] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', type: 'CDN', nodePool: '', priceRange: '' });
+
+  const filtered = list.filter((p) => {
+    const matchKeyword = !keyword || p.name.toLowerCase().includes(keyword.toLowerCase()) || p.id.toLowerCase().includes(keyword.toLowerCase());
+    const matchType = typeFilter === 'all' || p.type === typeFilter;
+    return matchKeyword && matchType;
+  });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
+  const pagedList = slice(filtered);
+
+  const reset = () => {
+    setKeyword('');
+    setTypeFilter('all');
+  };
 
   const toggleStatus = (id: string) => {
     const target = list.find((p) => p.id === id);
@@ -50,14 +69,21 @@ export default function SProducts() {
 
       <div className="card p-5">
         <div className="flex flex-wrap gap-3 mb-4">
-          <input type="text" placeholder="产品名称" className="input flex-1 min-w-[200px]" />
-          <select className="input w-32">
-            <option>全部类型</option>
-            <option>CDN</option>
-            <option>高防CDN</option>
-            <option>游戏盾</option>
+          <input
+            type="text"
+            placeholder="产品名称 / ID"
+            className="input flex-1 min-w-[200px]"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
+          <select className="input w-32" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+            <option value="all">全部类型</option>
+            <option value="CDN">CDN</option>
+            <option value="高防CDN">高防CDN</option>
+            <option value="游戏盾">游戏盾</option>
           </select>
           <button className="btn btn-primary">查询</button>
+          <button onClick={reset} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
         </div>
 
         <table className="table">
@@ -72,7 +98,7 @@ export default function SProducts() {
             </tr>
           </thead>
           <tbody>
-            {list.map((p) => (
+            {pagedList.map((p) => (
               <tr key={p.id}>
                 <td className="font-medium">{p.name}</td>
                 <td>{p.type}</td>
@@ -98,6 +124,12 @@ export default function SProducts() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无产品" description="没有符合筛选条件的产品" icon={<PackageSearch size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

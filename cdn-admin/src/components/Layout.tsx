@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import type { Role } from '../types';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { ToastProvider } from './Toast';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface LayoutProps {
   role: Role;
@@ -12,21 +13,18 @@ interface LayoutProps {
 }
 
 export default function Layout({ role, children, onSwitchRole, onLogout }: LayoutProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [dark, setDark] = useState(() => {
+  const [collapsed, setCollapsed] = useLocalStorage('sidebar-collapsed', false);
+  const [mobileOpen, setMobileOpen] = useLocalStorage('sidebar-mobile-open', false);
+  const [dark, setDark] = useLocalStorage('theme', () => {
     if (typeof window === 'undefined') return false;
-    return localStorage.getItem('theme') === 'dark' ||
-      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   useEffect(() => {
     if (dark) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
     }
   }, [dark]);
 

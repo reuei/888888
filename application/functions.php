@@ -460,3 +460,43 @@ function calculate_order_fee($payAmount, $rateGroup)
     }
     return $fee;
 }
+
+/**
+ * 上传文件到 public/uploads
+ * @param string $field 表单文件字段名
+ * @param string $subDir 子目录，如 merchant/auth
+ * @param array $allowedExt 允许扩展名白名单
+ * @return array ['code'=>0, 'path'=>'相对路径', 'url'=>'访问URL'] / ['code'=>1, 'msg'=>'错误信息']
+ */
+function upload_file($field, $subDir = '', $allowedExt = ['jpg', 'jpeg', 'png', 'gif'])
+{
+    if (empty($_FILES[$field]) || $_FILES[$field]['error'] !== UPLOAD_ERR_OK) {
+        return ['code' => 1, 'msg' => '文件上传失败'];
+    }
+
+    $file = $_FILES[$field];
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowedExt, true)) {
+        return ['code' => 1, 'msg' => '不支持的文件格式'];
+    }
+
+    $maxSize = 5 * 1024 * 1024;
+    if ($file['size'] > $maxSize) {
+        return ['code' => 1, 'msg' => '文件大小不能超过5MB'];
+    }
+
+    $uploadRoot = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
+    $targetDir = $uploadRoot . ($subDir ? trim($subDir, '/') . DIRECTORY_SEPARATOR : '');
+    if (!is_dir($targetDir)) {
+        @mkdir($targetDir, 0755, true);
+    }
+
+    $filename = date('Ymd') . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+    $targetPath = $targetDir . $filename;
+    if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+        return ['code' => 1, 'msg' => '文件保存失败'];
+    }
+
+    $relative = 'uploads/' . ($subDir ? trim($subDir, '/') . '/' : '') . $filename;
+    return ['code' => 0, 'path' => $relative, 'url' => base_url($relative)];
+}

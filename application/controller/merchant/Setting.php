@@ -39,6 +39,85 @@ class Merchant_Setting extends Controller
     }
 
     /**
+     * 实名认证
+     */
+    public function auth()
+    {
+        $merchant = Db::fetch("SELECT real_name, id_card_no, id_card_front, id_card_back, auth_status, auth_remark, auth_time FROM jz_merchant WHERE id = ?", [$this->getMerchantId()]);
+
+        $statusMap = [
+            0 => ['text' => '未认证', 'class' => 'tag-orange'],
+            1 => ['text' => '待审核', 'class' => 'tag-blue'],
+            2 => ['text' => '已认证', 'class' => 'tag-green'],
+            3 => ['text' => '已驳回', 'class' => 'tag-red'],
+        ];
+        $merchant['auth_status_text'] = $statusMap[$merchant['auth_status'] ?? 0]['text'] ?? '未知';
+        $merchant['auth_status_class'] = $statusMap[$merchant['auth_status'] ?? 0]['class'] ?? 'tag-orange';
+
+        $this->assign('title', '实名认证');
+        $this->assign('merchant', $merchant);
+        $this->fetch('merchant/setting/auth');
+    }
+
+    /**
+     * 保存实名认证
+     */
+    public function saveAuth()
+    {
+        $merchantId = $this->getMerchantId();
+        $merchant = Db::fetch("SELECT auth_status FROM jz_merchant WHERE id = ?", [$merchantId]);
+        if (!$merchant) {
+            json_error('商户不存在');
+        }
+        if ((int) $merchant['auth_status'] === 2) {
+            json_error('实名认证已通过，无需重复提交');
+        }
+        if ((int) $merchant['auth_status'] === 1) {
+            json_error('实名认证正在审核中，请勿重复提交');
+        }
+
+        $realName = trim(input('real_name', ''));
+        $idCardNo = trim(input('id_card_no', ''));
+
+        if (!$realName || mb_strlen($realName) < 2 || mb_strlen($realName) > 20) {
+            json_error('真实姓名格式错误');
+        }
+        if (!$idCardNo || !preg_match('/^\d{17}[\dXx]$/', $idCardNo)) {
+            json_error('身份证号格式错误');
+        }
+
+        // 上传身份证图片
+        $front = !empty($_FILES['id_card_front']) && $_FILES['id_card_front']['error'] === UPLOAD_ERR_OK
+            ? upload_file('id_card_front', 'merchant/auth')
+            : ['code' => 1, 'msg' => '请上传身份证正面'];
+        if ($front['code'] !== 0) {
+            json_error('身份证正面：' . $front['msg']);
+        }
+
+        $back = !empty($_FILES['id_card_back']) && $_FILES['id_card_back']['error'] === UPLOAD_ERR_OK
+            ? upload_file('id_card_back', 'merchant/auth')
+            : ['code' => 1, 'msg' => '请上传身份证反面'];
+        if ($back['code'] !== 0) {
+            json_error('身份证反面：' . $back['msg']);
+        }
+
+        $data = [
+            'real_name' => $realName,
+            'id_card_no' => $idCardNo,
+            'id_card_front' => $front['path'],
+            'id_card_back' => $back['path'],
+            'auth_status' => 1,
+            'auth_remark' => '',
+            'auth_time' => null,
+            'update_time' => date('Y-m-d H:i:s'),
+        ];
+
+        Db::update('jz_merchant', $data, 'id = ?', [$merchantId]);
+        admin_log('merchant_auth_submit', ['merchant_id' => $merchantId, 'real_name' => $realName]);
+        json_success('实名认证资料已提交，请等待审核');
+    }
+
+    /**
      * 保存设置
      */
     public function save()

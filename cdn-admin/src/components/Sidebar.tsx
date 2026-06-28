@@ -45,7 +45,7 @@ const iconMap: Record<string, React.ReactNode> = {
   GitBranch: <GitBranch size={16} />,
 };
 
-const sMenu = [
+export const sMenu = [
   { key: '/s/dashboard', label: '仪表盘', icon: 'LayoutDashboard' },
   {
     key: '/s/sites',
@@ -132,7 +132,7 @@ const sMenu = [
   { key: '/s/system', label: '系统设置', icon: 'Settings' },
 ];
 
-const bMenu = [
+export const bMenu = [
   { key: '/b/dashboard', label: '仪表盘', icon: 'LayoutDashboard' },
   {
     key: '/b/sites',

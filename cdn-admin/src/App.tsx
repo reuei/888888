@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import type { Role } from './types';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import NotFound from './pages/NotFound';
+import Notifications from './pages/Notifications';
 
 
 // S-side pages
@@ -105,7 +107,9 @@ function App() {
               <Route path="/s/alipay-export" element={<SAlipayExport />} />
               <Route path="/s/gateway-config" element={<SGatewayConfig />} />
               <Route path="/s/system" element={<SSystem />} />
-              <Route path="*" element={<Navigate to="/s/dashboard" replace />} />
+              <Route path="/s/notifications" element={<Notifications role="s" />} />
+              <Route path="/" element={<Navigate to="/s/dashboard" replace />} />
+              <Route path="*" element={<NotFound />} />
             </>
           ) : (
             <>
@@ -118,7 +122,9 @@ function App() {
               <Route path="/b/whitelist" element={<BWhitelist />} />
               <Route path="/b/finance" element={<BFinance />} />
               <Route path="/b/settings" element={<BSettings />} />
-              <Route path="*" element={<Navigate to="/b/dashboard" replace />} />
+              <Route path="/b/notifications" element={<Notifications role="b" />} />
+              <Route path="/" element={<Navigate to="/b/dashboard" replace />} />
+              <Route path="*" element={<NotFound />} />
             </>
           )}
         </Routes>

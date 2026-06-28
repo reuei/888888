@@ -1,4 +1,4 @@
-import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage } from '../types';
+import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, Notification } from '../types';
 
 export const sProfile: UserProfile = {
   name: '总站长',
@@ -218,5 +218,13 @@ export const myPackages: MyPackage[] = [
   { id: 'MP001', name: '标准版', flow: '500GB', bandwidth: '50Mbps', domains: 3, expireAt: '2026-12-31', status: 'active' },
   { id: 'MP002', name: '专业版', flow: '2TB', bandwidth: '200Mbps', domains: 10, expireAt: '2027-01-15', status: 'active' },
   { id: 'MP003', name: '入门版', flow: '100GB', bandwidth: '10Mbps', domains: 1, expireAt: '2026-05-31', status: 'expired' },
+];
+
+export const notifications: Notification[] = [
+  { id: 'NT001', title: '新商户入驻待审核', content: '商户「云盾科技」提交入驻申请，请及时处理。', type: 'system', read: false, createdAt: '2026-06-28 11:20', link: '/s/merchant-audit' },
+  { id: 'NT002', title: '域名过白申请被驳回', content: '您提交的 api.game-c.com 过白申请已被驳回，原因：资料不完整。', type: 'alert', read: false, createdAt: '2026-06-28 10:05', link: '/b/whitelist' },
+  { id: 'NT003', title: '收到新订单 O202606280001', content: '用户 user_9527 购买了企业高防CDN，金额 ¥299.00。', type: 'order', read: true, createdAt: '2026-06-28 10:23', link: '/s/orders' },
+  { id: 'NT004', title: '结算单 SET001 已打款', content: '您的 T+1 结算单 ¥4820.00 已通过支付宝打款。', type: 'finance', read: true, createdAt: '2026-06-28 09:30', link: '/b/finance' },
+  { id: 'NT005', title: '节点池高防B 延迟告警', content: '节点池高防B 平均延迟超过 200ms，请关注。', type: 'alert', read: true, createdAt: '2026-06-27 22:15', link: '/s/nodes' },
 ];
 

@@ -252,3 +252,13 @@ export interface MyPackage {
   expireAt: string;
   status: 'active' | 'expired' | 'pending';
 }
+
+export interface Notification {
+  id: string;
+  title: string;
+  content: string;
+  type: 'system' | 'order' | 'alert' | 'finance';
+  read: boolean;
+  createdAt: string;
+  link?: string;
+}

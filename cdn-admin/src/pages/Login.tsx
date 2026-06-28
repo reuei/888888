@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Role } from '../types';
-import { Shield, Store } from 'lucide-react';
+import { Shield, Store, AlertCircle } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (role: Role) => void;
@@ -8,6 +8,38 @@ interface LoginProps {
 
 export default function Login({ onLogin }: LoginProps) {
   const [role, setRole] = useState<Role>('s');
+  const [account, setAccount] = useState('admin');
+  const [password, setPassword] = useState('123456');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleRoleChange = (r: Role) => {
+    setRole(r);
+    setAccount(r === 's' ? 'admin' : 'merchant');
+    setPassword('123456');
+    setError('');
+  };
+
+  const handleSubmit = () => {
+    if (!account.trim()) {
+      setError('请输入账号');
+      return;
+    }
+    if (!password.trim()) {
+      setError('请输入密码');
+      return;
+    }
+    if (password.length < 6) {
+      setError('密码长度不能少于 6 位');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      onLogin(role);
+    }, 500);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg p-4">
@@ -22,7 +54,7 @@ export default function Login({ onLogin }: LoginProps) {
 
         <div className="flex gap-2 mb-6">
           <button
-            onClick={() => setRole('s')}
+            onClick={() => handleRoleChange('s')}
             className={`flex-1 py-2 rounded text-sm font-medium border flex items-center justify-center gap-2 ${
               role === 's' ? 'bg-primary text-white border-primary' : 'bg-white text-text border-border'
             }`}
@@ -30,7 +62,7 @@ export default function Login({ onLogin }: LoginProps) {
             <Shield size={16} /> S 端总站长
           </button>
           <button
-            onClick={() => setRole('b')}
+            onClick={() => handleRoleChange('b')}
             className={`flex-1 py-2 rounded text-sm font-medium border flex items-center justify-center gap-2 ${
               role === 'b' ? 'bg-primary text-white border-primary' : 'bg-white text-text border-border'
             }`}
@@ -40,13 +72,32 @@ export default function Login({ onLogin }: LoginProps) {
         </div>
 
         <div className="space-y-4">
+          {error && (
+            <div className="flex items-center gap-2 text-sm text-danger bg-danger/5 px-3 py-2 rounded">
+              <AlertCircle size={16} />
+              {error}
+            </div>
+          )}
           <div>
             <label className="block text-sm mb-1">账号</label>
-            <input className="input" placeholder="请输入账号" defaultValue={role === 's' ? 'admin' : 'merchant'} />
+            <input
+              className="input"
+              placeholder="请输入账号"
+              value={account}
+              onChange={(e) => setAccount(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+            />
           </div>
           <div>
             <label className="block text-sm mb-1">密码</label>
-            <input type="password" className="input" placeholder="请输入密码" defaultValue="123456" />
+            <input
+              type="password"
+              className="input"
+              placeholder="请输入密码"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+            />
           </div>
           <div className="flex items-center justify-between text-sm">
             <label className="flex items-center gap-1.5 text-text-secondary">
@@ -54,8 +105,12 @@ export default function Login({ onLogin }: LoginProps) {
             </label>
             <a href="#" className="text-primary">忘记密码？</a>
           </div>
-          <button onClick={() => onLogin(role)} className="btn btn-primary w-full">
-            登录
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="btn btn-primary w-full disabled:opacity-70"
+          >
+            {loading ? '登录中...' : '登录'}
           </button>
         </div>
       </div>

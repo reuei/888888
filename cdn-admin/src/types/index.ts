@@ -262,3 +262,39 @@ export interface Notification {
   createdAt: string;
   link?: string;
 }
+
+export interface OperationLog {
+  id: string;
+  operator: string;
+  module: string;
+  action: string;
+  detail: string;
+  ip: string;
+  createdAt: string;
+}
+
+export interface RolePermission {
+  id: string;
+  name: string;
+  description: string;
+  permissions: string[];
+  userCount: number;
+}
+
+export interface ApiDoc {
+  id: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  path: string;
+  name: string;
+  desc: string;
+  group: string;
+}
+
+export interface BackupRecord {
+  id: string;
+  name: string;
+  size: string;
+  type: 'manual' | 'auto';
+  status: 'success' | 'running' | 'failed';
+  createdAt: string;
+}

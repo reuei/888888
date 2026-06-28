@@ -1,4 +1,4 @@
-import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, Notification } from '../types';
+import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord } from '../types';
 
 export const sProfile: UserProfile = {
   name: '总站长',
@@ -226,5 +226,56 @@ export const notifications: Notification[] = [
   { id: 'NT003', title: '收到新订单 O202606280001', content: '用户 user_9527 购买了企业高防CDN，金额 ¥299.00。', type: 'order', read: true, createdAt: '2026-06-28 10:23', link: '/s/orders' },
   { id: 'NT004', title: '结算单 SET001 已打款', content: '您的 T+1 结算单 ¥4820.00 已通过支付宝打款。', type: 'finance', read: true, createdAt: '2026-06-28 09:30', link: '/b/finance' },
   { id: 'NT005', title: '节点池高防B 延迟告警', content: '节点池高防B 平均延迟超过 200ms，请关注。', type: 'alert', read: true, createdAt: '2026-06-27 22:15', link: '/s/nodes' },
+];
+
+export const operationLogs: OperationLog[] = [
+  { id: 'L001', operator: 'admin', module: '商户管理', action: '审核通过', detail: '通过商户「云盾科技」入驻申请', ip: '192.168.1.10', createdAt: '2026-06-28 11:20:05' },
+  { id: 'L002', operator: 'admin', module: '商品管理', action: '下架商品', detail: '下架商品「游戏盾专业版」', ip: '192.168.1.10', createdAt: '2026-06-28 10:15:33' },
+  { id: 'L003', operator: 'admin', module: '财务管理', action: '手动结算', detail: '为「极速云」发起手动结算 ¥4820.00', ip: '192.168.1.12', createdAt: '2026-06-28 09:50:18' },
+  { id: 'L004', operator: 'admin', module: '系统设置', action: '修改费率', detail: '修改默认分组费率为 2.0%', ip: '192.168.1.10', createdAt: '2026-06-27 16:40:22' },
+];
+
+export const roles: RolePermission[] = [
+  { id: 'R001', name: '超级管理员', description: '拥有全部权限', permissions: ['*'], userCount: 1 },
+  { id: 'R002', name: '运营专员', description: '负责商户、订单、用户日常运营', permissions: ['merchants', 'orders', 'users', 'complaints'], userCount: 3 },
+  { id: 'R003', name: '财务人员', description: '负责结算、对账、网关配置', permissions: ['finance', 'settlement', 'payments'], userCount: 2 },
+  { id: 'R004', name: '客服', description: '处理投诉、过白、实名审核', permissions: ['complaints', 'whitelist', 'user-realname'], userCount: 4 },
+];
+
+export const permissionOptions = [
+  { key: 'dashboard', label: '仪表盘' },
+  { key: 'sites', label: '站点管理' },
+  { key: 'merchants', label: '商户管理' },
+  { key: 'products', label: '商品管理' },
+  { key: 'orders', label: '订单管理' },
+  { key: 'users', label: '会员/用户管理' },
+  { key: 'agents', label: '代理/分销管理' },
+  { key: 'finance', label: '财务管理' },
+  { key: 'payments', label: '支付网关管理' },
+  { key: 'templates', label: '模板与前端管理' },
+  { key: 'articles', label: '文章/公告管理' },
+  { key: 'ads', label: '广告位管理' },
+  { key: 'coupons', label: '优惠券/营销管理' },
+  { key: 'system', label: '系统设置' },
+  { key: 'operation-logs', label: '操作日志' },
+  { key: 'roles', label: '权限角色管理' },
+];
+
+export const apiDocs: ApiDoc[] = [
+  { id: 'A001', method: 'POST', path: '/api/v1/sites', name: '创建站点', desc: '创建新的 CDN 站点', group: '站点' },
+  { id: 'A002', method: 'GET', path: '/api/v1/sites', name: '站点列表', desc: '获取当前商户的站点列表', group: '站点' },
+  { id: 'A003', method: 'PUT', path: '/api/v1/sites/:id', name: '更新站点', desc: '更新站点配置', group: '站点' },
+  { id: 'A004', method: 'DELETE', path: '/api/v1/sites/:id', name: '删除站点', desc: '删除指定站点', group: '站点' },
+  { id: 'A005', method: 'POST', path: '/api/v1/orders', name: '创建订单', desc: '创建套餐购买订单', group: '订单' },
+  { id: 'A006', method: 'GET', path: '/api/v1/orders', name: '订单列表', desc: '获取订单列表', group: '订单' },
+  { id: 'A007', method: 'POST', path: '/api/v1/whitelist', name: '过白申请', desc: '提交域名过白申请', group: '过白' },
+  { id: 'A008', method: 'GET', path: '/api/v1/finance/records', name: '资金流水', desc: '获取资金流水记录', group: '财务' },
+];
+
+export const backupRecords: BackupRecord[] = [
+  { id: 'B001', name: '全量备份-20260628-020000', size: '1.2GB', type: 'auto', status: 'success', createdAt: '2026-06-28 02:00:00' },
+  { id: 'B002', name: '数据库备份-20260627-020000', size: '860MB', type: 'auto', status: 'success', createdAt: '2026-06-27 02:00:00' },
+  { id: 'B003', name: '手动备份-20260626', size: '1.1GB', type: 'manual', status: 'success', createdAt: '2026-06-26 15:30:00' },
+  { id: 'B004', name: '全量备份-20260625-020000', size: '1.0GB', type: 'auto', status: 'failed', createdAt: '2026-06-25 02:00:00' },
 ];
 

@@ -42,6 +42,10 @@ import SSettlementManual from './pages/s/SettlementManual';
 import SSettlementAuto from './pages/s/SettlementAuto';
 import SAlipayExport from './pages/s/AlipayExport';
 import SGatewayConfig from './pages/s/GatewayConfig';
+import SOperationLogs from './pages/s/OperationLogs';
+import SApiDocs from './pages/s/ApiDocs';
+import SRoles from './pages/s/Roles';
+import SBackup from './pages/s/Backup';
 import SSystem from './pages/s/System';
 
 // B-side pages
@@ -106,6 +110,10 @@ function App() {
               <Route path="/s/settlement-auto" element={<SSettlementAuto />} />
               <Route path="/s/alipay-export" element={<SAlipayExport />} />
               <Route path="/s/gateway-config" element={<SGatewayConfig />} />
+              <Route path="/s/operation-logs" element={<SOperationLogs />} />
+              <Route path="/s/api-docs" element={<SApiDocs />} />
+              <Route path="/s/roles" element={<SRoles />} />
+              <Route path="/s/backup" element={<SBackup />} />
               <Route path="/s/system" element={<SSystem />} />
               <Route path="/s/notifications" element={<Notifications role="s" />} />
               <Route path="/" element={<Navigate to="/s/dashboard" replace />} />

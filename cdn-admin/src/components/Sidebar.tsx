@@ -21,6 +21,10 @@ import {
   UserCog,
   UserCircle,
   GitBranch,
+  ClipboardList,
+  FileCode,
+  ShieldCheck,
+  Database,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -43,6 +47,10 @@ const iconMap: Record<string, React.ReactNode> = {
   UserCog: <UserCog size={16} />,
   UserCircle: <UserCircle size={16} />,
   GitBranch: <GitBranch size={16} />,
+  ClipboardList: <ClipboardList size={16} />,
+  FileCode: <FileCode size={16} />,
+  ShieldCheck: <ShieldCheck size={16} />,
+  Database: <Database size={16} />,
 };
 
 export const sMenu = [
@@ -129,6 +137,17 @@ export const sMenu = [
   { key: '/s/articles', label: '文章/公告管理', icon: 'FileText' },
   { key: '/s/ads', label: '广告位管理', icon: 'Image' },
   { key: '/s/coupons', label: '优惠券/营销管理', icon: 'Ticket' },
+  {
+    key: '/s/operation-logs',
+    label: '系统运维',
+    icon: 'ClipboardList',
+    children: [
+      { key: '/s/operation-logs', label: '操作日志' },
+      { key: '/s/api-docs', label: 'API 文档' },
+      { key: '/s/roles', label: '权限角色管理' },
+      { key: '/s/backup', label: '数据备份' },
+    ],
+  },
   { key: '/s/system', label: '系统设置', icon: 'Settings' },
 ];
 

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
 import EmptyState from '../../components/EmptyState';
 import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
 import { users } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Search, Ban, CheckCircle, Users as UsersIcon } from 'lucide-react';
@@ -22,8 +24,9 @@ export default function Users() {
     return matchKeyword && matchStatus;
   });
 
-  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
-  const pagedList = slice(filtered);
+  const { sorted, sortKey, sortDirection, toggle } = useSort({ data: filtered, initialKey: 'registerAt', initialDirection: 'desc' });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
 
   return (
     <div>
@@ -52,12 +55,12 @@ export default function Users() {
         <table className="table">
           <thead>
             <tr>
-              <th>用户ID</th>
-              <th>昵称</th>
+              <th><SortableHeader label="用户ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+              <th><SortableHeader label="昵称" sortKey="nickname" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>手机号</th>
               <th>等级</th>
               <th>分组</th>
-              <th>注册时间</th>
+              <th><SortableHeader label="注册时间" sortKey="registerAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>状态</th>
               <th>操作</th>
             </tr>

@@ -2,8 +2,10 @@ import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
 import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
 import type { BOrder } from '../../types';
 import { bOrders } from '../../data/mock';
 import { formatMoney, statusBadge, orderStatusText } from '../../utils/helpers';
@@ -33,8 +35,9 @@ export default function MyOrders() {
     return matchId && matchProduct && matchStatus;
   });
 
-  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
-  const pagedList = slice(filtered);
+  const { sorted, sortKey, sortDirection, toggle } = useSort({ data: filtered, initialKey: 'createdAt', initialDirection: 'desc' });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
 
   const reset = () => {
     setKeyword('');
@@ -81,13 +84,13 @@ export default function MyOrders() {
         <table className="table">
           <thead>
             <tr>
-              <th>订单号</th>
+              <th><SortableHeader label="订单号" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>商品</th>
               <th>套餐ID</th>
               <th>周期</th>
-              <th>金额</th>
+              <th><SortableHeader label="金额" sortKey="amount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>状态</th>
-              <th>下单时间</th>
+              <th><SortableHeader label="下单时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>操作</th>
             </tr>
           </thead>

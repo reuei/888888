@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
+import SortableHeader from '../../components/SortableHeader';
 import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
+import { useSort } from '../../hooks/useSort';
 import { orders } from '../../data/mock';
 import { statusBadge, statusText, formatMoney } from '../../utils/helpers';
 import { Eye, RefreshCcw } from 'lucide-react';
@@ -10,8 +12,9 @@ import { Eye, RefreshCcw } from 'lucide-react';
 export default function SOrders() {
   const { show } = useToast();
   const [list] = useState(orders);
-  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: list.length });
-  const pagedList = slice(list);
+  const { sorted, sortKey, sortDirection, toggle } = useSort({ data: list, initialKey: 'createdAt', initialDirection: 'desc' });
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
+  const pagedList = slice(sorted);
 
   return (
     <div>
@@ -38,13 +41,13 @@ export default function SOrders() {
         <table className="table">
           <thead>
             <tr>
-              <th>订单号</th>
+              <th><SortableHeader label="订单号" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>买家</th>
               <th>商户</th>
               <th>商品</th>
-              <th>金额</th>
+              <th><SortableHeader label="金额" sortKey="amount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>状态</th>
-              <th>下单时间</th>
+              <th><SortableHeader label="下单时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
               <th>操作</th>
             </tr>
           </thead>

@@ -535,11 +535,27 @@ class Index extends Controller
             $payAmount = max(0.01, $payAmount);
         }
 
+        // 根据联系方式查找或创建用户
+        $userId = 0;
+        if ($contact) {
+            $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+            if (!$user) {
+                $userId = Db::insert('jz_user', [
+                    'nickname' => $contact,
+                    'mobile' => $contact,
+                    'password' => password_hash_custom(substr(md5(uniqid()), 0, 8)),
+                    'create_time' => date('Y-m-d H:i:s'),
+                ]);
+            } else {
+                $userId = $user['id'];
+            }
+        }
+
         $orderNo = 'JZ' . date('YmdHis') . mt_rand(1000, 9999);
 
         $orderId = Db::insert('jz_order', [
             'order_no' => $orderNo,
-            'user_id' => 0,
+            'user_id' => $userId,
             'merchant_id' => $goods['merchant_id'],
             'subsite_id' => $goods['subsite_id'],
             'goods_id' => $goods['id'],
@@ -642,57 +658,66 @@ class Index extends Controller
     }
 
     /**
-     * 执行支付（Ajax / 模拟）
+     * 执行支付（Ajax / 跳转真实网关）
      */
     public function doPay()
     {
         $orderNo = input('order_no', '');
-        $channel = input('channel', 'alipay');
+        $channelCode = input('channel', 'alipay');
 
         $order = Db::fetch("SELECT * FROM jz_order WHERE order_no = ? AND status = 0", [$orderNo]);
         if (!$order) {
             json_error('订单不存在或已支付');
         }
 
-        $payTime = date('Y-m-d H:i:s');
+        $channel = Db::fetch("SELECT * FROM jz_payment_channel WHERE code = ? AND status = 1", [$channelCode]);
+        $config = $channel ? json_decode($channel['config'] ?: '{}', true) : [];
 
-        Db::execute(
-            "UPDATE jz_order SET status = 1, pay_channel = ?, pay_time = ?, update_time = ? WHERE id = ?",
-            [$channel, $payTime, $payTime, $order['id']]
-        );
-
-        // 卡密类自动发货
-        if ($order['quantity'] > 0) {
-            $cards = Db::query(
-                "SELECT * FROM jz_card WHERE goods_id = ? AND status = 0 ORDER BY id ASC LIMIT ?",
-                [$order['goods_id'], (int) $order['quantity']]
-            );
-
-            $cardIds = array_column($cards, 'id');
-            $cardContent = implode("\n", array_column($cards, 'content'));
-
-            if (!empty($cardIds)) {
-                $placeholders = implode(',', array_fill(0, count($cardIds), '?'));
-                Db::execute(
-                    "UPDATE jz_card SET status = 1, order_id = ?, sale_time = ? WHERE id IN ({$placeholders})",
-                    array_merge([$order['order_no'], $payTime], $cardIds)
-                );
-            }
-
-            // 增加销量
-            Db::execute(
-                "UPDATE jz_goods SET sold = sold + ? WHERE id = ?",
-                [$order['quantity'], $order['goods_id']]
-            );
-
-            // 保存发货内容到订单（便于查询）
-            Db::execute(
-                "UPDATE jz_order SET deliver_content = ?, status = 2, update_time = ? WHERE id = ?",
-                [$cardContent, $payTime, $order['id']]
-            );
+        // 配置了真实支付网关时，返回跳转参数
+        if (!empty($config['gateway_url'])) {
+            $payParams = $this->buildPayParams($order, $channelCode, $config);
+            json_success('请完成支付', [
+                'type' => 'redirect',
+                'gateway' => $config['gateway_url'],
+                'params' => $payParams,
+            ]);
         }
 
+        // 否则本地模拟支付完成
+        $this->completeOrder($order, $channelCode);
+
         json_success('支付成功', ['redirect' => url('index/order', ['no' => $orderNo])]);
+    }
+
+    /**
+     * 构建真实支付请求参数（通用签名）
+     */
+    private function buildPayParams($order, $channelCode, $config)
+    {
+        $timestamp = time();
+        $params = [
+            'channel' => $channelCode,
+            'order_no' => $order['order_no'],
+            'amount' => (string) $order['pay_amount'],
+            'goods_name' => $order['goods_name'],
+            'notify_url' => base_url('index/notify?channel=' . $channelCode),
+            'return_url' => base_url('index/order?no=' . $order['order_no']),
+            'timestamp' => $timestamp,
+        ];
+
+        // 添加商户在配置中声明的扩展参数
+        foreach (['app_id', 'mch_id', 'extra'] as $key) {
+            if (!empty($config[$key])) {
+                $params[$key] = $config[$key];
+            }
+        }
+
+        // 签名
+        ksort($params);
+        $signKey = $config['sign_key'] ?? '';
+        $params['sign'] = strtoupper(md5(http_build_query($params) . '&key=' . $signKey));
+
+        return $params;
     }
 
     /**
@@ -767,5 +792,280 @@ class Index extends Controller
         }
 
         json_success('查询成功', ['redirect' => url('index/order', ['no' => $order['order_no']])]);
+    }
+
+    /**
+     * 个人中心首页
+     */
+    public function user()
+    {
+        $contact = $this->getCurrentContact();
+        $user = null;
+        $stats = [];
+
+        if ($contact) {
+            $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+            if ($user) {
+                $stats = Db::fetch(
+                    "SELECT
+                        COUNT(*) AS total_orders,
+                        IFNULL(SUM(CASE WHEN status >= 1 THEN pay_amount ELSE 0 END), 0) AS total_pay,
+                        COUNT(CASE WHEN status = 0 THEN 1 END) AS unpaid_orders,
+                        COUNT(CASE WHEN status = 2 THEN 1 END) AS delivered_orders
+                     FROM jz_order WHERE user_id = ?",
+                    [$user['id']]
+                );
+            }
+        }
+
+        $this->assign('title', '个人中心');
+        $this->assign('contact', $contact);
+        $this->assign('user', $user);
+        $this->assign('stats', $stats);
+        $this->fetch('index/user');
+    }
+
+    /**
+     * 用户登录/查询（按联系方式）
+     */
+    public function userLogin()
+    {
+        $contact = trim(input('contact', ''));
+        if (!$contact) {
+            json_error('请填写联系方式');
+        }
+
+        $user = Db::fetch("SELECT id FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+        if (!$user) {
+            // 未下单过的用户也允许进入个人中心
+            Db::insert('jz_user', [
+                'nickname' => $contact,
+                'mobile' => $contact,
+                'password' => password_hash_custom(substr(md5(uniqid()), 0, 8)),
+                'create_time' => date('Y-m-d H:i:s'),
+            ]);
+        }
+
+        session('user_contact', $contact);
+        json_success('登录成功', ['redirect' => url('index/user')]);
+    }
+
+    /**
+     * 用户退出
+     */
+    public function userLogout()
+    {
+        unset($_SESSION['user_contact']);
+        redirect(url('index/user'));
+    }
+
+    /**
+     * 用户订单列表
+     */
+    public function userOrders()
+    {
+        $contact = $this->getCurrentContact();
+        if (!$contact) {
+            redirect(url('index/user'));
+        }
+
+        $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+        if (!$user) {
+            redirect(url('index/user'));
+        }
+
+        $status = input('status', '');
+        $page = max(1, (int) input('page', 1));
+        $pageSize = 10;
+
+        $where = 'o.user_id = ?';
+        $params = [$user['id']];
+        if ($status !== '') {
+            $where .= ' AND o.status = ?';
+            $params[] = (int) $status;
+        }
+
+        $count = Db::fetch("SELECT COUNT(*) AS total FROM jz_order o WHERE {$where}", $params);
+        $total = (int) ($count['total'] ?? 0);
+        $totalPages = max(1, ceil($total / $pageSize));
+        $page = min($page, $totalPages);
+        $offset = ($page - 1) * $pageSize;
+
+        $list = Db::query(
+            "SELECT o.*, m.shop_name FROM jz_order o
+             LEFT JOIN jz_merchant m ON o.merchant_id = m.id
+             WHERE {$where}
+             ORDER BY o.id DESC
+             LIMIT {$offset}, {$pageSize}",
+            $params
+        );
+
+        $this->assign('title', '我的订单');
+        $this->assign('list', $list);
+        $this->assign('status', $status);
+        $this->assign('page', $page);
+        $this->assign('totalPages', $totalPages);
+        $this->assign('total', $total);
+        $this->fetch('index/user_orders');
+    }
+
+    /**
+     * 用户优惠券列表
+     */
+    public function userCoupons()
+    {
+        $contact = $this->getCurrentContact();
+        if (!$contact) {
+            redirect(url('index/user'));
+        }
+
+        $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+        if (!$user) {
+            redirect(url('index/user'));
+        }
+
+        $this->expireUserCoupons();
+
+        $status = input('status', '');
+        $where = 'uc.user_id = ?';
+        $params = [$user['id']];
+        if ($status !== '') {
+            $where .= ' AND uc.status = ?';
+            $params[] = (int) $status;
+        }
+
+        $list = Db::query(
+            "SELECT uc.*, c.name AS coupon_name, c.scope, c.scope_id
+             FROM jz_user_coupon uc
+             LEFT JOIN jz_coupon c ON uc.coupon_id = c.id
+             WHERE {$where}
+             ORDER BY uc.id DESC",
+            $params
+        );
+
+        $this->assign('title', '我的优惠券');
+        $this->assign('list', $list);
+        $this->assign('status', $status);
+        $this->fetch('index/user_coupons');
+    }
+
+    /**
+     * 获取当前联系方式
+     */
+    private function getCurrentContact()
+    {
+        return trim(session('user_contact') ?? '');
+    }
+
+    /**
+     * 支付异步回调（通用签名验证）
+     * 外部通道将订单号、金额、时间戳、签名 POST 到 /index/notify?channel=xxx
+     */
+    public function notify()
+    {
+        $channelCode = input('channel', '');
+        $orderNo = input('order_no', '');
+        $amount = input('amount', '');
+        $timestamp = input('timestamp', '');
+        $sign = input('sign', '');
+
+        if (!$channelCode || !$orderNo || !$amount || !$timestamp || !$sign) {
+            echo 'FAIL: 参数缺失';
+            exit;
+        }
+
+        $channel = Db::fetch("SELECT * FROM jz_payment_channel WHERE code = ? AND status = 1", [$channelCode]);
+        if (!$channel) {
+            echo 'FAIL: 通道不存在';
+            exit;
+        }
+
+        $config = json_decode($channel['config'] ?: '{}', true);
+        $signKey = $config['sign_key'] ?? '';
+        if (!$signKey) {
+            echo 'FAIL: 通道未配置密钥';
+            exit;
+        }
+
+        // 5 分钟时差校验
+        if (abs(time() - (int) $timestamp) > 300) {
+            echo 'FAIL: 请求超时';
+            exit;
+        }
+
+        // 验证签名
+        $params = [
+            'channel' => $channelCode,
+            'order_no' => $orderNo,
+            'amount' => $amount,
+            'timestamp' => $timestamp,
+        ];
+        ksort($params);
+        $expectedSign = strtoupper(md5(http_build_query($params) . '&key=' . $signKey));
+        if ($sign !== $expectedSign) {
+            echo 'FAIL: 签名错误';
+            exit;
+        }
+
+        $order = Db::fetch("SELECT * FROM jz_order WHERE order_no = ? AND status = 0", [$orderNo]);
+        if (!$order) {
+            echo 'SUCCESS';
+            exit;
+        }
+
+        // 金额允许 0.01 元误差（随机化金额场景）
+        $notifyAmount = round((float) $amount, 2);
+        $orderAmount = round((float) $order['pay_amount'], 2);
+        if (abs($notifyAmount - $orderAmount) > 0.01) {
+            echo 'FAIL: 金额不匹配';
+            exit;
+        }
+
+        $this->completeOrder($order, $channelCode);
+
+        echo 'SUCCESS';
+        exit;
+    }
+
+    /**
+     * 完成订单支付并自动发货
+     */
+    private function completeOrder($order, $channelCode)
+    {
+        $payTime = date('Y-m-d H:i:s');
+
+        Db::execute(
+            "UPDATE jz_order SET status = 1, pay_channel = ?, pay_time = ?, update_time = ? WHERE id = ? AND status = 0",
+            [$channelCode, $payTime, $payTime, $order['id']]
+        );
+
+        // 卡密类自动发货
+        if ($order['quantity'] > 0) {
+            $cards = Db::query(
+                "SELECT * FROM jz_card WHERE goods_id = ? AND status = 0 ORDER BY id ASC LIMIT ?",
+                [$order['goods_id'], (int) $order['quantity']]
+            );
+
+            $cardIds = array_column($cards, 'id');
+            $cardContent = implode("\n", array_column($cards, 'content'));
+
+            if (!empty($cardIds)) {
+                $placeholders = implode(',', array_fill(0, count($cardIds), '?'));
+                Db::execute(
+                    "UPDATE jz_card SET status = 1, order_id = ?, sale_time = ? WHERE id IN ({$placeholders})",
+                    array_merge([$order['order_no'], $payTime], $cardIds)
+                );
+            }
+
+            Db::execute(
+                "UPDATE jz_goods SET sold = sold + ? WHERE id = ?",
+                [$order['quantity'], $order['goods_id']]
+            );
+
+            Db::execute(
+                "UPDATE jz_order SET deliver_content = ?, status = 2, update_time = ? WHERE id = ?",
+                [$cardContent, $payTime, $order['id']]
+            );
+        }
     }
 }

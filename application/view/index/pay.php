@@ -84,8 +84,36 @@ document.getElementById('payBtn').addEventListener('click', async () => {
     try {
         const res = await fetch('<?php echo url('index/doPay'); ?>', { method: 'POST', body: form });
         const data = await res.json();
+        if (data.code !== 0) {
+            alert(data.msg);
+            return;
+        }
+        // 真实支付网关跳转
+        if (data.data.type === 'redirect' && data.data.gateway) {
+            const f = document.createElement('form');
+            f.method = 'POST';
+            f.action = data.data.gateway;
+            f.target = '_blank';
+            for (const [k, v] of Object.entries(data.data.params || {})) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = k;
+                input.value = v;
+                f.appendChild(input);
+            }
+            document.body.appendChild(f);
+            f.submit();
+            document.body.removeChild(f);
+            // 提示用户在新窗口完成支付后手动返回
+            setTimeout(() => {
+                if (confirm('支付完成后请点击确定返回订单详情')) {
+                    location.href = data.data.params.return_url || '<?php echo url('index/order', ['no' => $order['order_no']]); ?>';
+                }
+            }, 1500);
+            return;
+        }
         alert(data.msg);
-        if (data.code === 0 && data.data.redirect) {
+        if (data.data.redirect) {
             location.href = data.data.redirect;
         }
     } catch (err) {

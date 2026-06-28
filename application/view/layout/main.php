@@ -168,10 +168,52 @@
         }
         .form-group input:focus, .form-group textarea:focus { border-color: #2563EB; }
         .empty-tip { text-align: center; padding: 60px 20px; color: #64748B; }
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .mobile-menu-btn span {
+            display: block;
+            height: 2px;
+            background: #475569;
+            border-radius: 2px;
+        }
+        .mobile-drawer {
+            display: none;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-bottom: 1px solid #E2E8F0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            z-index: 99;
+            flex-direction: column;
+            padding: 8px 16px;
+        }
+        .mobile-drawer.open { display: flex; }
+        .mobile-drawer a {
+            padding: 12px 8px;
+            border-bottom: 1px solid #F1F5F9;
+            color: #475569;
+            font-size: 14px;
+        }
+        .mobile-drawer a:last-child { border-bottom: none; }
         @media (max-width: 768px) {
+            .topbar { padding: 0 16px; }
             .topbar-left { gap: 12px; }
-            .topbar-links a { margin-left: 12px; }
+            .topbar-links { display: none; }
             .search-box { display: none; }
+            .mobile-menu-btn { display: flex; }
+            .container { padding: 88px 16px 24px; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+            .goods-cover { height: 110px; }
         }
     </style>
 </head>
@@ -194,9 +236,23 @@
             <a href="<?php echo url('index/category'); ?>">购卡中心</a>
             <a href="<?php echo url('index/coupon'); ?>">领券中心</a>
             <a href="<?php echo url('index/order'); ?>">查询订单</a>
+            <a href="<?php echo url('index/user'); ?>">个人中心</a>
             <a href="<?php echo url('login'); ?>?type=admin">总站后台</a>
             <a href="<?php echo url('login'); ?>?type=merchant">商户后台</a>
         </div>
+        <div class="mobile-menu-btn" id="mobileMenuBtn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <a href="<?php echo url('index/category'); ?>">购卡中心</a>
+        <a href="<?php echo url('index/coupon'); ?>">领券中心</a>
+        <a href="<?php echo url('index/order'); ?>">查询订单</a>
+        <a href="<?php echo url('index/user'); ?>">个人中心</a>
+        <a href="<?php echo url('login'); ?>?type=admin">总站后台</a>
+        <a href="<?php echo url('login'); ?>?type=merchant">商户后台</a>
     </div>
     <div class="container">
         <?php echo $__content__ ?? ''; ?>
@@ -204,5 +260,20 @@
     <div class="footer">
         <?php echo h(site_config('copyright', '鲸商城 Pro v1.0.0')); ?> | <?php echo h(site_config('icp') ?: ''); ?><?php echo site_config('icp') ? ' | ' : ''; ?>客服：<?php echo h(site_config('contact') ?: '-'); ?>
     </div>
+    <script>
+    (function() {
+        const btn = document.getElementById('mobileMenuBtn');
+        const drawer = document.getElementById('mobileDrawer');
+        if (!btn || !drawer) return;
+        btn.addEventListener('click', () => {
+            drawer.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (!btn.contains(e.target) && !drawer.contains(e.target)) {
+                drawer.classList.remove('open');
+            }
+        });
+    })();
+    </script>
 </body>
 </html>

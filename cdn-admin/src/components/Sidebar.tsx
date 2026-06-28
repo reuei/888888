@@ -56,6 +56,16 @@ const iconMap: Record<string, React.ReactNode> = {
 export const sMenu = [
   { key: '/s/dashboard', label: '仪表盘', icon: 'LayoutDashboard' },
   {
+    key: '/s/transaction-stats',
+    label: '数据报表',
+    icon: 'BarChart3',
+    children: [
+      { key: '/s/transaction-stats', label: '交易统计' },
+      { key: '/s/user-growth', label: '用户增长' },
+      { key: '/s/merchant-analysis', label: '商户分析' },
+    ],
+  },
+  {
     key: '/s/sites',
     label: '站点管理',
     icon: 'Globe',

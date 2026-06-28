@@ -9,6 +9,9 @@ import Notifications from './pages/Notifications';
 
 // S-side pages
 import SDashboard from './pages/s/Dashboard';
+import STransactionStats from './pages/s/TransactionStats';
+import SUserGrowth from './pages/s/UserGrowth';
+import SMerchantAnalysis from './pages/s/MerchantAnalysis';
 import SSites from './pages/s/Sites';
 import SiteConfig from './pages/s/SiteConfig';
 import SMerchants from './pages/s/Merchants';
@@ -77,6 +80,9 @@ function App() {
           {role === 's' ? (
             <>
               <Route path="/s/dashboard" element={<SDashboard />} />
+              <Route path="/s/transaction-stats" element={<STransactionStats />} />
+              <Route path="/s/user-growth" element={<SUserGrowth />} />
+              <Route path="/s/merchant-analysis" element={<SMerchantAnalysis />} />
               <Route path="/s/sites" element={<SSites />} />
               <Route path="/s/site-config" element={<SiteConfig />} />
               <Route path="/s/merchants" element={<SMerchants />} />

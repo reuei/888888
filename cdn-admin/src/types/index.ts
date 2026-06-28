@@ -298,3 +298,26 @@ export interface BackupRecord {
   status: 'success' | 'running' | 'failed';
   createdAt: string;
 }
+
+export interface DailyStat {
+  date: string;
+  revenue: number;
+  orders: number;
+  users: number;
+  merchants: number;
+}
+
+export interface MerchantStat {
+  merchant: string;
+  revenue: number;
+  orders: number;
+  avgOrderValue: number;
+  growth: number;
+}
+
+export interface UserGrowthStat {
+  date: string;
+  newUsers: number;
+  activeUsers: number;
+  paidUsers: number;
+}

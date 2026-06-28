@@ -1,4 +1,4 @@
-import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord } from '../types';
+import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord, DailyStat, MerchantStat, UserGrowthStat } from '../types';
 
 export const sProfile: UserProfile = {
   name: '总站长',
@@ -277,5 +277,33 @@ export const backupRecords: BackupRecord[] = [
   { id: 'B002', name: '数据库备份-20260627-020000', size: '860MB', type: 'auto', status: 'success', createdAt: '2026-06-27 02:00:00' },
   { id: 'B003', name: '手动备份-20260626', size: '1.1GB', type: 'manual', status: 'success', createdAt: '2026-06-26 15:30:00' },
   { id: 'B004', name: '全量备份-20260625-020000', size: '1.0GB', type: 'auto', status: 'failed', createdAt: '2026-06-25 02:00:00' },
+];
+
+export const dailyStats: DailyStat[] = [
+  { date: '06-22', revenue: 18200, orders: 420, users: 320, merchants: 12 },
+  { date: '06-23', revenue: 21500, orders: 510, users: 380, merchants: 15 },
+  { date: '06-24', revenue: 19800, orders: 460, users: 290, merchants: 10 },
+  { date: '06-25', revenue: 24300, orders: 580, users: 450, merchants: 18 },
+  { date: '06-26', revenue: 22100, orders: 520, users: 410, merchants: 14 },
+  { date: '06-27', revenue: 28900, orders: 680, users: 520, merchants: 22 },
+  { date: '06-28', revenue: 26400, orders: 610, users: 480, merchants: 19 },
+];
+
+export const merchantStats: MerchantStat[] = [
+  { merchant: '极速云', revenue: 482900, orders: 1250, avgOrderValue: 386.32, growth: 12.5 },
+  { merchant: '蓝海防护', revenue: 391200, orders: 980, avgOrderValue: 399.18, growth: 8.3 },
+  { merchant: '站点卫士', revenue: 284500, orders: 720, avgOrderValue: 395.14, growth: -2.1 },
+  { merchant: '云盾科技', revenue: 198300, orders: 510, avgOrderValue: 388.82, growth: 5.7 },
+  { merchant: '安全链', revenue: 165000, orders: 420, avgOrderValue: 392.86, growth: 15.2 },
+];
+
+export const userGrowthStats: UserGrowthStat[] = [
+  { date: '06-22', newUsers: 120, activeUsers: 4520, paidUsers: 380 },
+  { date: '06-23', newUsers: 132, activeUsers: 4610, paidUsers: 395 },
+  { date: '06-24', newUsers: 101, activeUsers: 4580, paidUsers: 402 },
+  { date: '06-25', newUsers: 134, activeUsers: 4720, paidUsers: 418 },
+  { date: '06-26', newUsers: 90, activeUsers: 4690, paidUsers: 410 },
+  { date: '06-27', newUsers: 230, activeUsers: 4920, paidUsers: 450 },
+  { date: '06-28', newUsers: 210, activeUsers: 5100, paidUsers: 465 },
 ];
 

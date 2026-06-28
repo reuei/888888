@@ -118,6 +118,75 @@ class Merchant_Setting extends Controller
     }
 
     /**
+     * 自定义支付
+     */
+    public function payment()
+    {
+        $fields = 'pay_type, pay_alipay_qr, pay_wechat_qr, pay_alipay_account, pay_wechat_account, pay_api_url, pay_api_key, pay_api_secret';
+        $merchant = Db::fetch("SELECT {$fields} FROM jz_merchant WHERE id = ?", [$this->getMerchantId()]);
+
+        $this->assign('title', '自定义支付');
+        $this->assign('merchant', $merchant);
+        $this->fetch('merchant/setting/payment');
+    }
+
+    /**
+     * 保存自定义支付
+     */
+    public function savePayment()
+    {
+        $merchantId = $this->getMerchantId();
+        $payType = (int) input('pay_type', 0);
+
+        $data = [
+            'pay_type' => in_array($payType, [0, 1, 2], true) ? $payType : 0,
+            'update_time' => date('Y-m-d H:i:s'),
+        ];
+
+        if ($data['pay_type'] === 1) {
+            $data['pay_alipay_account'] = trim(input('pay_alipay_account', ''));
+            $data['pay_wechat_account'] = trim(input('pay_wechat_account', ''));
+
+            // 上传收款二维码
+            if (!empty($_FILES['pay_alipay_qr']) && $_FILES['pay_alipay_qr']['error'] === UPLOAD_ERR_OK) {
+                $res = upload_file('pay_alipay_qr', 'merchant/payment');
+                if ($res['code'] !== 0) {
+                    json_error('支付宝二维码：' . $res['msg']);
+                }
+                $data['pay_alipay_qr'] = $res['path'];
+            }
+            if (!empty($_FILES['pay_wechat_qr']) && $_FILES['pay_wechat_qr']['error'] === UPLOAD_ERR_OK) {
+                $res = upload_file('pay_wechat_qr', 'merchant/payment');
+                if ($res['code'] !== 0) {
+                    json_error('微信二维码：' . $res['msg']);
+                }
+                $data['pay_wechat_qr'] = $res['path'];
+            }
+
+            if (!$data['pay_alipay_qr'] && !$data['pay_wechat_qr']) {
+                json_error('请至少上传一种个人收款二维码');
+            }
+        }
+
+        if ($data['pay_type'] === 2) {
+            $data['pay_api_url'] = trim(input('pay_api_url', ''));
+            $data['pay_api_key'] = trim(input('pay_api_key', ''));
+            $data['pay_api_secret'] = trim(input('pay_api_secret', ''));
+
+            if (!$data['pay_api_url'] || !filter_var($data['pay_api_url'], FILTER_VALIDATE_URL)) {
+                json_error('请输入有效的第三方接口地址');
+            }
+            if (!$data['pay_api_key']) {
+                json_error('第三方接口 KEY 不能为空');
+            }
+        }
+
+        Db::update('jz_merchant', $data, 'id = ?', [$merchantId]);
+        admin_log('merchant_payment_update', ['merchant_id' => $merchantId, 'pay_type' => $data['pay_type']]);
+        json_success('支付配置保存成功');
+    }
+
+    /**
      * 保存设置
      */
     public function save()

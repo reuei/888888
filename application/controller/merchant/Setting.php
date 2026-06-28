@@ -246,6 +246,61 @@ class Merchant_Setting extends Controller
     }
 
     /**
+     * 子域名
+     */
+    public function domain()
+    {
+        $merchant = Db::fetch("SELECT domain_prefix, domain_status, shop_id FROM jz_merchant WHERE id = ?", [$this->getMerchantId()]);
+
+        $statusMap = [
+            0 => ['text' => '未设置', 'class' => 'tag-orange'],
+            1 => ['text' => '已启用', 'class' => 'tag-green'],
+            2 => ['text' => '审核中', 'class' => 'tag-blue'],
+        ];
+        $merchant['domain_status_text'] = $statusMap[$merchant['domain_status'] ?? 0]['text'] ?? '未知';
+        $merchant['domain_status_class'] = $statusMap[$merchant['domain_status'] ?? 0]['class'] ?? 'tag-orange';
+
+        $this->assign('title', '子域名');
+        $this->assign('merchant', $merchant);
+        $this->fetch('merchant/setting/domain');
+    }
+
+    /**
+     * 保存子域名
+     */
+    public function saveDomain()
+    {
+        $merchantId = $this->getMerchantId();
+        $prefix = strtolower(trim(input('domain_prefix', '')));
+
+        if (!$prefix) {
+            json_error('子域名前缀不能为空');
+        }
+        if (!preg_match('/^[a-z0-9][a-z0-9\-]{1,28}[a-z0-9]$/', $prefix)) {
+            json_error('子域名前缀只能包含2-30位字母、数字和连字符，且不能以连字符开头或结尾');
+        }
+        if (in_array($prefix, ['www', 'admin', 'merchant', 'api', 'static', 'mail', 'ftp', 'login', 'install'], true)) {
+            json_error('该子域名前缀已被系统保留');
+        }
+
+        // 检查唯一性
+        $exists = Db::fetch("SELECT id FROM jz_merchant WHERE domain_prefix = ? AND id != ?", [$prefix, $merchantId]);
+        if ($exists) {
+            json_error('该子域名前缀已被其他商户使用');
+        }
+
+        $data = [
+            'domain_prefix' => $prefix,
+            'domain_status' => 2,
+            'update_time' => date('Y-m-d H:i:s'),
+        ];
+
+        Db::update('jz_merchant', $data, 'id = ?', [$merchantId]);
+        admin_log('merchant_domain_apply', ['merchant_id' => $merchantId, 'domain_prefix' => $prefix]);
+        json_success('子域名申请已提交，请等待审核');
+    }
+
+    /**
      * 保存设置
      */
     public function save()

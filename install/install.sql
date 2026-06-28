@@ -78,6 +78,8 @@ CREATE TABLE `jz_merchant` (
   `guide_bg_image` varchar(255) NOT NULL DEFAULT '' COMMENT '引导页背景图',
   `guide_button_text` varchar(50) NOT NULL DEFAULT '立即进入' COMMENT '引导页按钮文字',
   `guide_button_link` varchar(255) NOT NULL DEFAULT '' COMMENT '引导页按钮链接',
+  `domain_prefix` varchar(50) NOT NULL DEFAULT '' COMMENT '子域名前缀',
+  `domain_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '子域名状态 0未设置 1已启用 2审核中',
   `deposit` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '保证金',
   `balance` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '可用余额',
   `frozen_balance` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '冻结余额',

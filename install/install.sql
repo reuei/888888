@@ -631,6 +631,45 @@ CREATE TABLE `jz_ip_blacklist` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='IP 黑名单表';
 
 -- ----------------------------
+-- 客服会话表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_chat_session`;
+CREATE TABLE `jz_chat_session` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `merchant_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '商户ID',
+  `user_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '用户ID（0为游客）',
+  `user_name` varchar(50) NOT NULL DEFAULT '' COMMENT '访客昵称',
+  `contact` varchar(100) NOT NULL DEFAULT '' COMMENT '联系方式',
+  `last_message` varchar(500) NOT NULL DEFAULT '' COMMENT '最后一条消息摘要',
+  `unread_count` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '商户未读消息数',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0已关闭 1进行中',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_merchant` (`merchant_id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_update_time` (`update_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='客服会话表';
+
+-- ----------------------------
+-- 客服消息表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_chat_message`;
+CREATE TABLE `jz_chat_message` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `session_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '会话ID',
+  `sender_type` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0游客 1商户 2系统',
+  `content` text COMMENT '消息内容',
+  `is_read` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0未读 1已读',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_session` (`session_id`),
+  KEY `idx_sender` (`sender_type`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='客服消息表';
+
+-- ----------------------------
 -- 初始化默认费率分组
 -- ----------------------------
 INSERT INTO `jz_rate_group` (`name`, `rate`, `max_fee`, `cost_rate`, `is_default`) VALUES

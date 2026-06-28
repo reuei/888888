@@ -1165,4 +1165,128 @@ class Index extends Controller
             );
         }
     }
+
+    /**
+     * 商户入驻申请页
+     */
+    public function merchantJoin()
+    {
+        $inviteCode = input('invite_code', '');
+        $subsiteId = $this->getSubsiteId();
+
+        // 当前分站信息，以及非分站访问时的可选分站列表
+        $currentSubsite = $this->subsite;
+        $subsites = [];
+        if (!$currentSubsite) {
+            $subsites = Db::query("SELECT id, name, domain_prefix FROM jz_subsite WHERE status = 1 ORDER BY id DESC");
+        }
+
+        $this->assign('title', '商户入驻');
+        $this->assign('inviteCode', $inviteCode);
+        $this->assign('subsiteId', $subsiteId);
+        $this->assign('currentSubsite', $currentSubsite);
+        $this->assign('subsites', $subsites);
+        $this->fetch('index/merchant_join');
+    }
+
+    /**
+     * 提交商户入驻申请
+     */
+    public function doMerchantJoin()
+    {
+        $username = trim(input('username', ''));
+        $password = input('password', '');
+        $passwordConfirm = input('password_confirm', '');
+        $shopName = trim(input('shop_name', ''));
+        $mobile = trim(input('mobile', ''));
+        $inviteCodeStr = trim(input('invite_code', ''));
+        $subsiteId = (int) input('subsite_id', $this->getSubsiteId());
+
+        if (!$username || !$password || !$shopName || !$mobile) {
+            json_error('请填写完整信息');
+        }
+        if (!preg_match('/^[a-zA-Z0-9_]{4,20}$/', $username)) {
+            json_error('账号为 4-20 位字母/数字/下划线');
+        }
+        if (strlen($password) < 6) {
+            json_error('密码长度不能少于 6 位');
+        }
+        if ($password !== $passwordConfirm) {
+            json_error('两次输入密码不一致');
+        }
+        if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
+            json_error('请输入正确的手机号');
+        }
+
+        // 账号唯一性
+        $exists = Db::fetch("SELECT id FROM jz_merchant WHERE username = ?", [$username]);
+        if ($exists) {
+            json_error('该账号已被注册');
+        }
+
+        // 邀请码校验
+        $inviteCodeId = 0;
+        $rateGroupId = 0;
+        if ($inviteCodeStr) {
+            $invite = Db::fetch(
+                "SELECT * FROM jz_invite_code WHERE code = ? AND status = 1 AND (subsite_id = 0 OR subsite_id = ?)",
+                [$inviteCodeStr, $subsiteId]
+            );
+            if (!$invite) {
+                json_error('邀请码无效');
+            }
+            if ($invite['expire_time'] && $invite['expire_time'] < date('Y-m-d H:i:s')) {
+                json_error('邀请码已过期');
+            }
+            if ($invite['max_uses'] > 0 && (int) $invite['used_count'] >= (int) $invite['max_uses']) {
+                json_error('邀请码使用次数已达上限');
+            }
+            $inviteCodeId = $invite['id'];
+            $rateGroupId = (int) $invite['rate_group_id'];
+        }
+
+        // 分站校验
+        if ($subsiteId > 0) {
+            $subsite = Db::fetch("SELECT id FROM jz_subsite WHERE id = ? AND status = 1", [$subsiteId]);
+            if (!$subsite) {
+                json_error('所选分站不存在或已关闭');
+            }
+        }
+
+        // 生成唯一店铺ID
+        $shopId = $this->generateShopId();
+
+        $merchantId = Db::insert('jz_merchant', [
+            'username' => $username,
+            'password' => password_hash_custom($password),
+            'shop_name' => $shopName,
+            'shop_id' => $shopId,
+            'subsite_id' => $subsiteId,
+            'mobile' => $mobile,
+            'rate_group_id' => $rateGroupId,
+            'status' => 0,
+            'invite_code_id' => $inviteCodeId,
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+
+        // 更新邀请码使用次数
+        if ($inviteCodeId > 0) {
+            Db::execute("UPDATE jz_invite_code SET used_count = used_count + 1 WHERE id = ?", [$inviteCodeId]);
+        }
+
+        json_success('入驻申请已提交，请等待审核', ['redirect' => url('index/merchantJoin')]);
+    }
+
+    /**
+     * 生成唯一店铺ID
+     */
+    private function generateShopId()
+    {
+        $prefix = 'S' . date('Ymd');
+        do {
+            $shopId = $prefix . strtoupper(substr(uniqid(), -6)) . mt_rand(10, 99);
+            $exists = Db::fetch("SELECT id FROM jz_merchant WHERE shop_id = ?", [$shopId]);
+        } while ($exists);
+        return $shopId;
+    }
 }

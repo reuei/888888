@@ -280,6 +280,7 @@
             <a href="<?php echo url('index/coupon'); ?>">领券中心</a>
             <a href="<?php echo url('index/order'); ?>">查询订单</a>
             <a href="<?php echo url('index/user'); ?>">个人中心</a>
+            <a href="<?php echo url('index/merchantJoin'); ?>">商户入驻</a>
             <a href="<?php echo url('login'); ?>?type=admin">总站后台</a>
             <a href="<?php echo url('login'); ?>?type=merchant">商户后台</a>
         </div>
@@ -294,6 +295,7 @@
         <a href="<?php echo url('index/coupon'); ?>">领券中心</a>
         <a href="<?php echo url('index/order'); ?>">查询订单</a>
         <a href="<?php echo url('index/user'); ?>">个人中心</a>
+        <a href="<?php echo url('index/merchantJoin'); ?>">商户入驻</a>
         <a href="<?php echo url('login'); ?>?type=admin">总站后台</a>
         <a href="<?php echo url('login'); ?>?type=merchant">商户后台</a>
     </div>

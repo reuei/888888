@@ -36,6 +36,7 @@ function flattenMenu(menu: typeof sMenu): SearchItem[] {
 export default function SearchModal({ open, role, onClose }: SearchModalProps) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
   const menu = role === 's' ? sMenu : bMenu;
   const items = useMemo(() => flattenMenu(menu), [menu]);
 
@@ -48,6 +49,10 @@ export default function SearchModal({ open, role, onClose }: SearchModalProps) {
     );
   }, [query, items]);
 
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [query, results.length]);
+
   const handleSelect = (path: string) => {
     navigate(path);
     setQuery('');
@@ -55,8 +60,30 @@ export default function SearchModal({ open, role, onClose }: SearchModalProps) {
   };
 
   useEffect(() => {
-    if (!open) setQuery('');
+    if (!open) {
+      setQuery('');
+      setActiveIndex(0);
+    }
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (results.length === 0) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev + 1) % results.length);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev - 1 + results.length) % results.length);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSelect(results[activeIndex].path);
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [open, results, activeIndex]);
 
   if (!open) return null;
 
@@ -85,11 +112,14 @@ export default function SearchModal({ open, role, onClose }: SearchModalProps) {
               未找到匹配的页面
             </div>
           ) : (
-            results.map((item) => (
+            results.map((item, index) => (
               <button
                 key={item.key}
                 onClick={() => handleSelect(item.path)}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-black/5 dark:hover:bg-white/5"
+                onMouseMove={() => setActiveIndex(index)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left ${
+                  index === activeIndex ? 'bg-primary/10' : 'hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
               >
                 <FileText size={16} className="text-text-secondary" />
                 <div>

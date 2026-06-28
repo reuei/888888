@@ -12,11 +12,11 @@ export default function Modal({ open, title, onClose, children, footer }: ModalP
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="bg-card rounded border border-border w-full max-w-lg mx-4 max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 modal-overlay">
+      <div className="bg-card rounded border border-border w-full max-w-lg mx-4 max-h-[90vh] flex flex-col modal-content shadow-lg">
         <div className="flex items-center justify-between px-4 h-12 border-b border-border">
           <h3 className="font-semibold">{title}</h3>
-          <button onClick={onClose} className="p-1 rounded hover:bg-gray-100 text-text-secondary">
+          <button onClick={onClose} className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary">
             <X size={18} />
           </button>
         </div>

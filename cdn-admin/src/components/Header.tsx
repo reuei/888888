@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Menu, Bell, Search, LogOut, RefreshCcw, Check, Settings } from 'lucide-react';
+import { Menu, Bell, Search, LogOut, RefreshCcw, Check, Settings, Sun, Moon } from 'lucide-react';
 import type { Role } from '../types';
 import { sProfile, bProfile, notifications as initialNotifications } from '../data/mock';
 import SearchModal from './SearchModal';
@@ -8,7 +8,10 @@ import SearchModal from './SearchModal';
 interface HeaderProps {
   role: Role;
   collapsed: boolean;
+  dark: boolean;
   onToggle: () => void;
+  onMobileToggle: () => void;
+  onThemeToggle: () => void;
   onSwitchRole: () => void;
   onLogout: () => void;
 }
@@ -20,7 +23,15 @@ const typeColor: Record<string, string> = {
   finance: 'bg-warning',
 };
 
-export default function Header({ role, onToggle, onSwitchRole, onLogout }: HeaderProps) {
+export default function Header({
+  role,
+  dark,
+  onToggle,
+  onMobileToggle,
+  onThemeToggle,
+  onSwitchRole,
+  onLogout,
+}: HeaderProps) {
   const profile = role === 's' ? sProfile : bProfile;
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
@@ -75,15 +86,24 @@ export default function Header({ role, onToggle, onSwitchRole, onLogout }: Heade
     <>
       <header className="h-12 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-3">
-          <button onClick={onToggle} className="p-1.5 rounded hover:bg-gray-100 text-text-secondary">
+          <button
+            onClick={onMobileToggle}
+            className="md:hidden p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+          >
+            <Menu size={18} />
+          </button>
+          <button
+            onClick={onToggle}
+            className="hidden md:block p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+          >
             <Menu size={18} />
           </button>
           <span className="font-semibold text-primary">CDN 防护加速平台</span>
           {role === 'b' && profile.shopName && (
-            <span className="text-sm text-text-secondary ml-2">| {profile.shopName}</span>
+            <span className="text-sm text-text-secondary ml-2 hidden sm:inline">| {profile.shopName}</span>
           )}
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <button
             onClick={() => setSearchOpen(true)}
             className="hidden md:flex items-center gap-2 h-8 px-3 rounded border border-border text-xs text-text-secondary hover:border-primary hover:text-primary transition-colors"
@@ -91,14 +111,14 @@ export default function Header({ role, onToggle, onSwitchRole, onLogout }: Heade
             <Search size={14} /> 全站搜索 <span className="text-[10px] opacity-60">⌘K</span>
           </button>
           {role === 'b' && (
-            <div className="text-sm">
+            <div className="text-sm hidden sm:block">
               余额：<span className="text-danger font-medium">¥{profile.balance.toLocaleString('zh-CN')}</span>
             </div>
           )}
           <div className="relative" ref={notifyRef}>
             <button
               onClick={() => setNotifyOpen((v) => !v)}
-              className="relative p-1.5 rounded hover:bg-gray-100 text-text-secondary"
+              className="relative p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
             >
               <Bell size={18} />
               {unreadCount > 0 && (
@@ -121,7 +141,7 @@ export default function Header({ role, onToggle, onSwitchRole, onLogout }: Heade
                       <div
                         key={n.id}
                         onClick={() => handleNotifyClick(n)}
-                        className={`px-4 py-3 border-b border-border last:border-0 cursor-pointer hover:bg-gray-50 ${n.read ? 'opacity-70' : ''}`}
+                        className={`px-4 py-3 border-b border-border last:border-0 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 ${n.read ? 'opacity-70' : ''}`}
                       >
                         <div className="flex items-start gap-2">
                           <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${typeColor[n.type]}`}></span>
@@ -136,7 +156,7 @@ export default function Header({ role, onToggle, onSwitchRole, onLogout }: Heade
                                 e.stopPropagation();
                                 markRead(n.id);
                               }}
-                              className="p-1 rounded hover:bg-gray-100 text-success"
+                              className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 text-success"
                               title="标记已读"
                             >
                               <Check size={12} />
@@ -159,18 +179,37 @@ export default function Header({ role, onToggle, onSwitchRole, onLogout }: Heade
               </div>
             )}
           </div>
-          <button onClick={onSwitchRole} className="p-1.5 rounded hover:bg-gray-100 text-text-secondary" title="切换角色">
+          <button
+            onClick={onThemeToggle}
+            className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+            title={dark ? '切换亮色' : '切换暗色'}
+          >
+            {dark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+          <button
+            onClick={onSwitchRole}
+            className="hidden sm:flex p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+            title="切换角色"
+          >
             <RefreshCcw size={16} />
           </button>
-          <div className="flex items-center gap-2 pl-3 border-l border-border">
+          <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-border">
             <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-medium">
               {profile.avatar}
             </div>
-            <span className="text-sm hidden sm:inline">{profile.name}</span>
-            <Link to={`/${role}/settings`} className="p-1.5 rounded hover:bg-gray-100 text-text-secondary" title="设置">
+            <span className="text-sm hidden lg:inline">{profile.name}</span>
+            <Link
+              to={`/${role}/settings`}
+              className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+              title="设置"
+            >
               <Settings size={16} />
             </Link>
-            <button onClick={onLogout} className="p-1.5 rounded hover:bg-gray-100 text-text-secondary" title="退出">
+            <button
+              onClick={onLogout}
+              className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+              title="退出"
+            >
               <LogOut size={16} />
             </button>
           </div>

@@ -61,9 +61,9 @@ export default function SearchModal({ open, role, onClose }: SearchModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/30" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/30 modal-overlay" onClick={onClose}>
       <div
-        className="bg-card rounded border border-border w-full max-w-lg mx-4 flex flex-col shadow-lg"
+        className="bg-card rounded border border-border w-full max-w-lg mx-4 flex flex-col shadow-lg modal-content"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 px-4 h-12 border-b border-border">
@@ -89,7 +89,7 @@ export default function SearchModal({ open, role, onClose }: SearchModalProps) {
               <button
                 key={item.key}
                 onClick={() => handleSelect(item.path)}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-gray-50"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-black/5 dark:hover:bg-white/5"
               >
                 <FileText size={16} className="text-text-secondary" />
                 <div>

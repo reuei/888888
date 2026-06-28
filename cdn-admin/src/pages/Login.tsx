@@ -56,7 +56,7 @@ export default function Login({ onLogin }: LoginProps) {
           <button
             onClick={() => handleRoleChange('s')}
             className={`flex-1 py-2 rounded text-sm font-medium border flex items-center justify-center gap-2 ${
-              role === 's' ? 'bg-primary text-white border-primary' : 'bg-white text-text border-border'
+              role === 's' ? 'bg-primary text-white border-primary' : 'bg-card text-text border-border'
             }`}
           >
             <Shield size={16} /> S 端总站长
@@ -64,7 +64,7 @@ export default function Login({ onLogin }: LoginProps) {
           <button
             onClick={() => handleRoleChange('b')}
             className={`flex-1 py-2 rounded text-sm font-medium border flex items-center justify-center gap-2 ${
-              role === 'b' ? 'bg-primary text-white border-primary' : 'bg-white text-text border-border'
+              role === 'b' ? 'bg-primary text-white border-primary' : 'bg-card text-text border-border'
             }`}
           >
             <Store size={16} /> B 端商户

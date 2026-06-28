@@ -180,9 +180,10 @@ export const bMenu = [
 interface SidebarProps {
   role: Role;
   collapsed: boolean;
+  onNavigate?: () => void;
 }
 
-export default function Sidebar({ role, collapsed }: SidebarProps) {
+export default function Sidebar({ role, collapsed, onNavigate }: SidebarProps) {
   const menu = role === 's' ? sMenu : bMenu;
   const location = useLocation();
   const [openKeys, setOpenKeys] = useState<string[]>(() =>
@@ -195,7 +196,7 @@ export default function Sidebar({ role, collapsed }: SidebarProps) {
 
   return (
     <aside
-      className={`${collapsed ? 'w-16' : 'w-56'} bg-card border-r border-border flex flex-col shrink-0 transition-all duration-200`}
+      className={`${collapsed ? 'w-16' : 'w-56'} bg-card border-r border-border flex flex-col shrink-0 transition-all duration-200 h-full`}
     >
       <div className="h-12 flex items-center justify-center border-b border-border font-bold text-primary">
         {collapsed ? 'C' : 'CDN 平台'}
@@ -211,9 +212,10 @@ export default function Sidebar({ role, collapsed }: SidebarProps) {
               <NavLink
                 key={item.key}
                 to={item.key}
+                onClick={onNavigate}
                 className={({ isActive }) =>
-                  `flex items-center justify-center h-10 mx-2 rounded mb-1 ${
-                    isActive ? 'bg-primary text-white' : 'text-text-secondary hover:bg-gray-100'
+                  `flex items-center justify-center h-10 mx-2 rounded mb-1 transition-colors ${
+                    isActive ? 'bg-primary text-white' : 'text-text-secondary hover:bg-black/5 dark:hover:bg-white/10'
                   }`
                 }
                 title={item.label}
@@ -229,8 +231,8 @@ export default function Sidebar({ role, collapsed }: SidebarProps) {
                 <>
                   <button
                     onClick={() => toggle(item.key)}
-                    className={`w-full flex items-center justify-between px-4 h-9 text-sm ${
-                      isActive ? 'text-primary font-medium' : 'text-text-secondary hover:text-text'
+                    className={`w-full flex items-center justify-between px-4 h-9 text-sm transition-colors ${
+                      isActive ? 'text-primary font-medium' : 'text-text-secondary hover:text-text hover:bg-black/5 dark:hover:bg-white/10'
                     }`}
                   >
                     <span className="flex items-center gap-3">
@@ -245,9 +247,10 @@ export default function Sidebar({ role, collapsed }: SidebarProps) {
                         <NavLink
                           key={child.key}
                           to={child.key}
+                          onClick={onNavigate}
                           className={({ isActive }) =>
-                            `block py-2 px-3 text-sm rounded mb-0.5 ${
-                              isActive ? 'bg-primary/10 text-primary font-medium' : 'text-text-secondary hover:bg-gray-50'
+                            `block py-2 px-3 text-sm rounded mb-0.5 transition-colors ${
+                              isActive ? 'bg-primary/10 text-primary font-medium' : 'text-text-secondary hover:bg-black/5 dark:hover:bg-white/10'
                             }`
                           }
                         >
@@ -260,9 +263,10 @@ export default function Sidebar({ role, collapsed }: SidebarProps) {
               ) : (
                 <NavLink
                   to={item.key}
+                  onClick={onNavigate}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 h-9 text-sm ${
-                      isActive ? 'bg-primary text-white rounded mx-2' : 'text-text-secondary hover:text-text hover:bg-gray-50 rounded mx-2'
+                    `flex items-center gap-3 px-4 h-9 text-sm transition-colors ${
+                      isActive ? 'bg-primary text-white rounded mx-2' : 'text-text-secondary hover:text-text hover:bg-black/5 dark:hover:bg-white/10 rounded mx-2'
                     }`
                   }
                 >

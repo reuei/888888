@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import { useToast } from '../../components/Toast';
 import type { BOrder } from '../../types';
 import { bOrders } from '../../data/mock';
 import { formatMoney, statusBadge, orderStatusText } from '../../utils/helpers';
 import { Eye, FileText, RefreshCcw } from 'lucide-react';
 
 export default function MyOrders() {
+  const { show } = useToast();
   const [list] = useState(bOrders);
   const [detail, setDetail] = useState<typeof bOrders[0] | null>(null);
   const [keyword, setKeyword] = useState('');
@@ -65,8 +67,8 @@ export default function MyOrders() {
           </select>
           <input type="date" className="input" />
           <div className="flex gap-2">
-            <button className="btn btn-primary">查询</button>
-            <button onClick={reset} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
+            <button onClick={() => show('查询完成', 'info')} className="btn btn-primary">查询</button>
+            <button onClick={() => { reset(); show('筛选条件已重置', 'info'); }} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
           </div>
         </div>
 

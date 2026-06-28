@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import { useToast } from '../../components/Toast';
 import { CreditCard, RefreshCw, Shield } from 'lucide-react';
 
 export default function SPayments() {
+  const { show } = useToast();
   const [tab, setTab] = useState<'channels' | 'risk'>('channels');
   const [testOpen, setTestOpen] = useState(false);
   const [currentChannel, setCurrentChannel] = useState('');
@@ -20,6 +22,7 @@ export default function SPayments() {
   const openTest = (name: string) => {
     setCurrentChannel(name);
     setTestOpen(true);
+    show(`${name} 连接测试成功`, 'success');
   };
 
   return (
@@ -95,7 +98,7 @@ export default function SPayments() {
                 <label className="block text-sm mb-1">单笔最大金额（元）</label>
                 <input type="number" className="input" defaultValue="50000" />
               </div>
-              <button className="btn btn-primary">保存</button>
+              <button onClick={() => show('单笔限额配置保存成功', 'success')} className="btn btn-primary">保存</button>
             </div>
           </div>
 
@@ -116,7 +119,7 @@ export default function SPayments() {
                   <input type="number" className="input" defaultValue="0.99" />
                 </div>
               </div>
-              <button className="btn btn-primary">保存</button>
+              <button onClick={() => show('金额随机化配置保存成功', 'success')} className="btn btn-primary">保存</button>
             </div>
           </div>
 

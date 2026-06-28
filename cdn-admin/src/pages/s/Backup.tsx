@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast';
 import { backupRecords } from '../../data/mock';
 import { Play, RotateCcw, Trash2, Database, FileArchive, FileText } from 'lucide-react';
 import type { BackupRecord } from '../../types';
@@ -23,6 +24,7 @@ const statusTextMap: Record<BackupRecord['status'], string> = {
 };
 
 export default function Backup() {
+  const { show } = useToast();
   const [records, setRecords] = useState<BackupRecord[]>(backupRecords);
   const [autoBackup, setAutoBackup] = useState(true);
   const [cycle, setCycle] = useState('daily');
@@ -35,6 +37,7 @@ export default function Backup() {
   };
 
   const handleBackupNow = () => {
+    show('备份任务已启动', 'info');
     const now = new Date();
     const id = `B${String(records.length + 1).padStart(3, '0')}`;
     const name = `手动备份-${now.toISOString().slice(0, 10).replace(/-/g, '')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
@@ -61,16 +64,17 @@ export default function Backup() {
         prev.map((r) => (r.id === id ? { ...r, status: 'success', size: '1.1GB' } : r))
       );
       setRunningId(null);
+      show('备份任务执行成功', 'success');
     }, 1500);
   };
 
   const handleRestore = (id: string) => {
-    // eslint-disable-next-line no-console
-    console.log('Restore backup:', id);
+    show(`备份 ${id} 恢复任务已提交`, 'success');
   };
 
   const handleDelete = (id: string) => {
     setRecords((prev) => prev.filter((r) => r.id !== id));
+    show('备份记录已删除', 'warning');
   };
 
   return (

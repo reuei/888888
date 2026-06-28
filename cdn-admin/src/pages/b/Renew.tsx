@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import { useToast } from '../../components/Toast';
 import { myPackages as myPackagesData, packages } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
 import { CreditCard, CheckCircle } from 'lucide-react';
@@ -8,6 +9,7 @@ import { CreditCard, CheckCircle } from 'lucide-react';
 const periods = [1, 3, 6, 12];
 
 export default function Renew() {
+  const { show } = useToast();
   const activePackages = useMemo(
     () => myPackagesData.filter((p) => p.status === 'active'),
     []
@@ -24,6 +26,7 @@ export default function Renew() {
 
   const handlePay = () => {
     setPayOpen(false);
+    show('套餐续费支付成功', 'success');
   };
 
   return (

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast';
 import { financeRecords } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
 import { ArrowDownLeft, ArrowUpRight, Minus, Wallet } from 'lucide-react';
 
 export default function BFinance() {
   const [activeTab, setActiveTab] = useState<'detail' | 'settlement' | 'withdraw'>('detail');
+  const { show } = useToast();
 
   const typeIcon = (type: string) => {
     switch (type) {
@@ -133,7 +135,7 @@ export default function BFinance() {
               <label className="block text-sm mb-1">提现密码</label>
               <input type="password" className="input" placeholder="请输入提现密码" />
             </div>
-            <button className="btn btn-primary">提交提现申请</button>
+            <button onClick={() => show('提现申请已提交，等待审核', 'success')} className="btn btn-primary">提交提现申请</button>
           </div>
         </div>
       )}

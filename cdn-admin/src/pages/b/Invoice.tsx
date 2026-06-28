@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import { useToast } from '../../components/Toast';
 import { bOrders, invoices as invoicesData } from '../../data/mock';
 import { formatMoney, statusBadge, statusText, invoiceTypeText } from '../../utils/helpers';
 import { FileText, Plus, Eye } from 'lucide-react';
 
 export default function Invoice() {
+  const { show } = useToast();
   const [invoices, setInvoices] = useState(invoicesData);
   const [applyOpen, setApplyOpen] = useState(false);
   const [detail, setDetail] = useState<typeof invoices[0] | null>(null);
@@ -46,6 +48,7 @@ export default function Invoice() {
     setInvoices([newInvoice, ...invoices]);
     setApplyOpen(false);
     setForm({ orderId: paidOrders[0]?.id || '', type: 'personal', title: '', taxId: '' });
+    show(`发票申请 ${newInvoice.id} 提交成功`, 'success');
   };
 
   return (

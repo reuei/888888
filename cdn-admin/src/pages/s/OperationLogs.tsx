@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react';
 import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast';
 import { operationLogs } from '../../data/mock';
 import { Search } from 'lucide-react';
 
 export default function OperationLogs() {
+  const { show } = useToast();
   const [keyword, setKeyword] = useState('');
   const [moduleFilter, setModuleFilter] = useState('');
   const [actionFilter, setActionFilter] = useState('');
@@ -70,6 +72,7 @@ export default function OperationLogs() {
               setKeyword('');
               setModuleFilter('');
               setActionFilter('');
+              show('筛选条件已重置', 'info');
             }}
             className="btn btn-default"
           >

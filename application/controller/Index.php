@@ -1218,6 +1218,16 @@ class Index extends Controller
             json_error('请输入正确的手机号');
         }
 
+        // IP 黑名单
+        if (is_ip_blacklisted()) {
+            json_error('当前 IP 已被限制访问');
+        }
+
+        // 验证码校验
+        if (captcha_required('join') && !captcha_verify(input('captcha', ''), 'join')) {
+            json_error('验证码错误');
+        }
+
         // 账号唯一性
         $exists = Db::fetch("SELECT id FROM jz_merchant WHERE username = ?", [$username]);
         if ($exists) {

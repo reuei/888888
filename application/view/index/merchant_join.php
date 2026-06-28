@@ -100,6 +100,16 @@
             <input type="text" name="invite_code" value="<?php echo h($inviteCode); ?>" placeholder="如有邀请码请填写">
         </div>
 
+        <?php if (captcha_required('join')): ?>
+        <div class="form-group">
+            <label>验证码</label>
+            <div class="captcha-row" style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" name="captcha" placeholder="请输入验证码" maxlength="4" required style="flex: 1;">
+                <img src="<?php echo url('login/captcha', ['key' => 'join']); ?>" alt="验证码" id="joinCaptchaImg" title="点击刷新" style="height: 40px; border-radius: 6px; cursor: pointer; border: 1px solid #CBD5E1;">
+            </div>
+        </div>
+        <?php endif; ?>
+
         <button type="submit" class="btn btn-lg btn-block" id="submitBtn">提交入驻申请</button>
         <div style="text-align: center; margin-top: 16px;">
             <span style="color: #64748B; font-size: 13px;">已有账号？</span>
@@ -110,6 +120,16 @@
 </div>
 
 <script>
+const joinCaptchaImg = document.getElementById('joinCaptchaImg');
+function refreshJoinCaptcha() {
+    if (joinCaptchaImg) {
+        joinCaptchaImg.src = '<?php echo url('login/captcha', ['key' => 'join']); ?>&' + Date.now();
+    }
+}
+if (joinCaptchaImg) {
+    joinCaptchaImg.addEventListener('click', refreshJoinCaptcha);
+}
+
 document.getElementById('merchantJoinForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
@@ -123,9 +143,11 @@ document.getElementById('merchantJoinForm')?.addEventListener('submit', async (e
             location.href = '<?php echo url('index/merchantJoin'); ?>?success=1';
         } else {
             alert(data.msg);
+            refreshJoinCaptcha();
         }
     } catch (err) {
         alert('请求失败');
+        refreshJoinCaptcha();
     } finally {
         btn.disabled = false;
         btn.textContent = '提交入驻申请';

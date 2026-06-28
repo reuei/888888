@@ -62,7 +62,7 @@ $menu = [
         ['name' => '邮件系统', 'url' => 'admin/setting/email'],
         ['name' => '短信通知', 'url' => 'admin/setting/sms'],
         ['name' => '文件存储', 'url' => 'admin/setting/storage'],
-        ['name' => '二次认证', 'url' => 'admin/setting/security'],
+        ['name' => '安全防护', 'url' => 'admin/setting/security'],
     ]]
 ];
 ?>

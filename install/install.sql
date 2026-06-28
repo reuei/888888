@@ -67,6 +67,7 @@ CREATE TABLE `jz_merchant` (
   `invite_code_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '使用的邀请码ID（0为自助注册）',
   `open_time` datetime DEFAULT NULL COMMENT '开店时间',
   `last_login_time` datetime DEFAULT NULL,
+  `last_login_ip` varchar(50) NOT NULL DEFAULT '',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -567,6 +568,42 @@ CREATE TABLE `jz_user_coupon` (
   KEY `idx_coupon` (`coupon_id`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户优惠券表';
+
+-- ----------------------------
+-- 登录日志表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_login_log`;
+CREATE TABLE `jz_login_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL DEFAULT '' COMMENT '登录账号',
+  `type` varchar(20) NOT NULL DEFAULT 'admin' COMMENT '登录类型 admin/merchant/user',
+  `ip` varchar(50) NOT NULL DEFAULT '' COMMENT '登录IP',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0失败 1成功',
+  `remark` varchar(255) NOT NULL DEFAULT '',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_username` (`username`),
+  KEY `idx_ip` (`ip`),
+  KEY `idx_status` (`status`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='登录日志表';
+
+-- ----------------------------
+-- IP 黑名单表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_ip_blacklist`;
+CREATE TABLE `jz_ip_blacklist` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ip` varchar(50) NOT NULL DEFAULT '' COMMENT 'IP 或 IP 段，如 192.168.1.1 或 192.168.1.%',
+  `reason` varchar(255) NOT NULL DEFAULT '' COMMENT '封禁原因',
+  `expire_time` datetime DEFAULT NULL COMMENT '过期时间（NULL 为永久）',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_ip` (`ip`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='IP 黑名单表';
 
 -- ----------------------------
 -- 初始化默认费率分组

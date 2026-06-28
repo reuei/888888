@@ -132,7 +132,7 @@ class Admin_Setting extends Controller
     }
 
     /**
-     * 二次认证
+     * 安全防护
      */
     public function security()
     {
@@ -141,11 +141,90 @@ class Admin_Setting extends Controller
             'security_merchant_2fa' => '0',
             'security_login_fail_limit' => '5',
             'security_login_lock_minutes' => '30',
+            'security_captcha_login' => '0',
+            'security_captcha_join' => '0',
         ];
         $config = $this->getConfig($keys);
 
-        $this->assign('title', '二次认证');
+        $blacklist = Db::query("SELECT * FROM jz_ip_blacklist ORDER BY id DESC LIMIT 100");
+
+        $this->assign('title', '安全防护');
         $this->assign('config', $config);
+        $this->assign('blacklist', $blacklist);
         $this->fetch('admin/setting/security');
+    }
+
+    /**
+     * IP 黑名单保存
+     */
+    public function ipBlacklistSave()
+    {
+        $id = (int) input('id', 0);
+        $ip = trim(input('ip', ''));
+        $reason = trim(input('reason', ''));
+        $expireTime = input('expire_time', '');
+        $status = (int) input('status', 1);
+
+        if (!$ip) {
+            json_error('请输入 IP 或 IP 段');
+        }
+        if (!preg_match('/^[0-9a-zA-Z.*:%\/_-]+$/', $ip)) {
+            json_error('IP 格式不合法');
+        }
+
+        $data = [
+            'ip' => $ip,
+            'reason' => $reason,
+            'status' => $status ? 1 : 0,
+        ];
+        $data['expire_time'] = $expireTime ? str_replace('T', ' ', $expireTime) : null;
+
+        if ($id > 0) {
+            Db::execute(
+                "UPDATE jz_ip_blacklist SET ip = ?, reason = ?, expire_time = ?, status = ?, update_time = NOW() WHERE id = ?",
+                [$data['ip'], $data['reason'], $data['expire_time'], $data['status'], $id]
+            );
+            admin_log('ip_blacklist_update', ['id' => $id, 'ip' => $ip]);
+        } else {
+            $data['create_time'] = date('Y-m-d H:i:s');
+            Db::insert('jz_ip_blacklist', $data);
+            admin_log('ip_blacklist_create', ['ip' => $ip]);
+        }
+
+        json_success('保存成功');
+    }
+
+    /**
+     * IP 黑名单删除
+     */
+    public function ipBlacklistDelete()
+    {
+        $id = (int) input('id', 0);
+        if ($id <= 0) {
+            json_error('参数错误');
+        }
+
+        $item = Db::fetch("SELECT ip FROM jz_ip_blacklist WHERE id = ?", [$id]);
+        Db::execute("DELETE FROM jz_ip_blacklist WHERE id = ?", [$id]);
+        admin_log('ip_blacklist_delete', ['id' => $id, 'ip' => $item['ip'] ?? '']);
+        json_success('删除成功');
+    }
+
+    /**
+     * IP 黑名单状态切换
+     */
+    public function ipBlacklistToggle()
+    {
+        $id = (int) input('id', 0);
+        if ($id <= 0) {
+            json_error('参数错误');
+        }
+
+        Db::execute(
+            "UPDATE jz_ip_blacklist SET status = IF(status = 1, 0, 1), update_time = NOW() WHERE id = ?",
+            [$id]
+        );
+        admin_log('ip_blacklist_toggle', ['id' => $id]);
+        json_success('状态切换成功');
     }
 }

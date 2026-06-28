@@ -54,6 +54,9 @@
             font-size: 14px;
         }
         input:focus { outline: none; border-color: #2563EB; }
+        .captcha-row { display: flex; gap: 10px; align-items: center; }
+        .captcha-row input { flex: 1; }
+        .captcha-row img { height: 40px; border-radius: 6px; cursor: pointer; border: 1px solid #CBD5E1; }
         .btn {
             width: 100%;
             padding: 11px;
@@ -107,6 +110,15 @@
                 <label>密码</label>
                 <input type="password" name="password" placeholder="请输入密码" required>
             </div>
+            <?php if (captcha_required('login')): ?>
+            <div class="form-group">
+                <label>验证码</label>
+                <div class="captcha-row">
+                    <input type="text" name="captcha" placeholder="请输入验证码" maxlength="4" required>
+                    <img src="<?php echo url('login/captcha'); ?>" alt="验证码" id="captchaImg" title="点击刷新">
+                </div>
+            </div>
+            <?php endif; ?>
             <button type="submit" class="btn" id="submitBtn">登录</button>
         </form>
         <a href="<?php echo url('/'); ?>" class="back-link">返回首页</a>
@@ -130,6 +142,13 @@
                 alertBox.style.display = 'none';
             });
         });
+
+        const captchaImg = document.getElementById('captchaImg');
+        if (captchaImg) {
+            captchaImg.addEventListener('click', () => {
+                captchaImg.src = '<?php echo url('login/captcha'); ?>?' + Date.now();
+            });
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();

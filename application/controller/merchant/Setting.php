@@ -187,6 +187,65 @@ class Merchant_Setting extends Controller
     }
 
     /**
+     * 引导页
+     */
+    public function guide()
+    {
+        $fields = 'guide_status, guide_title, guide_content, guide_bg_image, guide_button_text, guide_button_link';
+        $merchant = Db::fetch("SELECT {$fields} FROM jz_merchant WHERE id = ?", [$this->getMerchantId()]);
+
+        $this->assign('title', '引导页');
+        $this->assign('merchant', $merchant);
+        $this->fetch('merchant/setting/guide');
+    }
+
+    /**
+     * 保存引导页
+     */
+    public function saveGuide()
+    {
+        $merchantId = $this->getMerchantId();
+        $guideStatus = (int) input('guide_status', 0);
+        $guideTitle = trim(input('guide_title', ''));
+        $guideContent = trim(input('guide_content', ''));
+        $guideButtonText = trim(input('guide_button_text', '立即进入'));
+        $guideButtonLink = trim(input('guide_button_link', ''));
+
+        if ($guideStatus === 1) {
+            if (!$guideTitle) {
+                json_error('引导页标题不能为空');
+            }
+            if (!$guideContent) {
+                json_error('引导页内容不能为空');
+            }
+            if (!$guideButtonText) {
+                json_error('按钮文字不能为空');
+            }
+        }
+
+        $data = [
+            'guide_status' => $guideStatus ? 1 : 0,
+            'guide_title' => $guideTitle,
+            'guide_content' => $guideContent,
+            'guide_button_text' => $guideButtonText,
+            'guide_button_link' => $guideButtonLink,
+            'update_time' => date('Y-m-d H:i:s'),
+        ];
+
+        if (!empty($_FILES['guide_bg_image']) && $_FILES['guide_bg_image']['error'] === UPLOAD_ERR_OK) {
+            $res = upload_file('guide_bg_image', 'merchant/guide');
+            if ($res['code'] !== 0) {
+                json_error('背景图：' . $res['msg']);
+            }
+            $data['guide_bg_image'] = $res['path'];
+        }
+
+        Db::update('jz_merchant', $data, 'id = ?', [$merchantId]);
+        admin_log('merchant_guide_update', ['merchant_id' => $merchantId, 'guide_status' => $data['guide_status']]);
+        json_success('引导页配置保存成功');
+    }
+
+    /**
      * 保存设置
      */
     public function save()

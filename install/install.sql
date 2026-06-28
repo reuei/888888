@@ -134,6 +134,8 @@ CREATE TABLE `jz_user` (
   `level` int(11) unsigned NOT NULL DEFAULT 1,
   `group_id` int(11) unsigned NOT NULL DEFAULT 0,
   `balance` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `points` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '积分余额',
+  `growth_value` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '成长值',
   `status` tinyint(1) NOT NULL DEFAULT 1,
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -676,10 +678,104 @@ CREATE TABLE `jz_chat_message` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='客服消息表';
 
 -- ----------------------------
+-- 积分规则表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_points_rule`;
+CREATE TABLE `jz_points_rule` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '规则名称',
+  `type` varchar(30) NOT NULL DEFAULT '' COMMENT 'register-注册 login-登录 order-下单 review-评价 invite-邀请',
+  `points` int(11) NOT NULL DEFAULT 0 COMMENT '奖励积分（负数为扣减）',
+  `growth_value` int(11) NOT NULL DEFAULT 0 COMMENT '奖励成长值',
+  `limit_type` varchar(20) NOT NULL DEFAULT 'day' COMMENT '限制周期 day-每日 week-每周 month-每月 once-一次性 total-累计',
+  `limit_count` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '周期内限制次数（0为不限）',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `sort` int(11) NOT NULL DEFAULT 0,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_type` (`type`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='积分规则表';
+
+-- ----------------------------
+-- 积分流水表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_points_log`;
+CREATE TABLE `jz_points_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL DEFAULT 0,
+  `type` varchar(30) NOT NULL DEFAULT '' COMMENT 'register login order review invite redeem system',
+  `points` int(11) NOT NULL DEFAULT 0 COMMENT '变动积分（正为增加，负为扣减）',
+  `before_points` int(11) unsigned NOT NULL DEFAULT 0,
+  `after_points` int(11) unsigned NOT NULL DEFAULT 0,
+  `remark` varchar(255) NOT NULL DEFAULT '',
+  `related_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '关联订单/记录ID',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_type` (`type`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='积分流水表';
+
+-- ----------------------------
+-- 积分商品表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_points_goods`;
+CREATE TABLE `jz_points_goods` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL DEFAULT '' COMMENT '商品标题',
+  `image` varchar(255) NOT NULL DEFAULT '' COMMENT '商品图片',
+  `description` text COMMENT '商品详情',
+  `points` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '兑换积分',
+  `stock` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '库存',
+  `sold` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '已兑换数量',
+  `sort` int(11) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0下架 1上架',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_sort` (`sort`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='积分商品表';
+
+-- ----------------------------
+-- 积分兑换订单表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_points_order`;
+CREATE TABLE `jz_points_order` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `order_no` varchar(50) NOT NULL DEFAULT '' COMMENT '兑换单号',
+  `user_id` int(11) unsigned NOT NULL DEFAULT 0,
+  `points_goods_id` int(11) unsigned NOT NULL DEFAULT 0,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `points` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '消耗积分',
+  `quantity` int(11) unsigned NOT NULL DEFAULT 1,
+  `deliver_content` text COMMENT '发放内容（卡密/优惠券/实物地址）',
+  `contact` varchar(100) NOT NULL DEFAULT '' COMMENT '联系方式/收货地址',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0待处理 1已发放 2已取消',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_order_no` (`order_no`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='积分兑换订单表';
+
+-- ----------------------------
 -- 初始化默认费率分组
 -- ----------------------------
 INSERT INTO `jz_rate_group` (`name`, `rate`, `max_fee`, `cost_rate`, `is_default`) VALUES
 ('默认分组', '0.0200', '50.00', '0.0060', 1),
 ('VIP 分组', '0.0100', '30.00', '0.0060', 0);
+
+-- ----------------------------
+-- 初始化默认积分规则
+-- ----------------------------
+INSERT INTO `jz_points_rule` (`name`, `type`, `points`, `growth_value`, `limit_type`, `limit_count`, `status`, `sort`) VALUES
+('新用户注册', 'register', 100, 50, 'once', 1, 1, 1),
+('每日登录', 'login', 5, 2, 'day', 1, 1, 2),
+('下单奖励', 'order', 10, 10, 'day', 10, 1, 3),
+('邀请好友', 'invite', 50, 30, 'day', 5, 1, 4);
 
 SET FOREIGN_KEY_CHECKS = 1;

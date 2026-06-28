@@ -53,6 +53,12 @@ $menu = [
     ]],
     ['name' => '广告位', 'icon' => '▣', 'url' => 'admin/ad', 'children' => []],
     ['name' => '优惠券', 'icon' => '✂', 'url' => 'admin/coupon', 'roles' => ['super', 'admin'], 'children' => []],
+    ['name' => '积分商城', 'icon' => '★', 'url' => '#', 'roles' => ['super', 'admin'], 'children' => [
+        ['name' => '积分规则', 'url' => 'admin/points'],
+        ['name' => '积分商品', 'url' => 'admin/points/goods'],
+        ['name' => '兑换订单', 'url' => 'admin/points/order'],
+        ['name' => '积分流水', 'url' => 'admin/points/log'],
+    ]],
     ['name' => '数据统计', 'icon' => '▦', 'url' => '#', 'children' => [
         ['name' => '经营报表', 'url' => 'admin/stat/report'],
         ['name' => '操作日志', 'url' => 'admin/stat/log'],

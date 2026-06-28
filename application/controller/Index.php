@@ -930,12 +930,15 @@ class Index extends Controller
         $user = Db::fetch("SELECT id FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
         if (!$user) {
             // 未下单过的用户也允许进入个人中心
-            Db::insert('jz_user', [
+            $userId = Db::insert('jz_user', [
                 'nickname' => $contact,
                 'mobile' => $contact,
                 'password' => password_hash_custom(substr(md5(uniqid()), 0, 8)),
                 'create_time' => date('Y-m-d H:i:s'),
             ]);
+            award_points($userId, 'register');
+        } else {
+            award_points($user['id'], 'login');
         }
 
         session('user_contact', $contact);
@@ -1204,6 +1207,11 @@ class Index extends Controller
                 ]);
             }
         }
+
+        // 用户下单积分奖励
+        if ($order['user_id'] > 0) {
+            award_points($order['user_id'], 'order', $order['id'], '订单支付 ' . $order['order_no']);
+        }
     }
 
     /**
@@ -1338,5 +1346,184 @@ class Index extends Controller
             $exists = Db::fetch("SELECT id FROM jz_merchant WHERE shop_id = ?", [$shopId]);
         } while ($exists);
         return $shopId;
+    }
+
+    /**
+     * 积分中心
+     */
+    public function pointsCenter()
+    {
+        $contact = $this->getCurrentContact();
+        $user = null;
+        $logs = [];
+        if ($contact) {
+            $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+            if ($user) {
+                $logs = Db::query(
+                    "SELECT * FROM jz_points_log WHERE user_id = ? ORDER BY id DESC LIMIT 20",
+                    [$user['id']]
+                );
+            }
+        }
+
+        $goods = Db::query(
+            "SELECT * FROM jz_points_goods WHERE status = 1 ORDER BY sort ASC, id DESC LIMIT 12"
+        );
+
+        $typeMap = [
+            'register' => '注册',
+            'login' => '登录',
+            'order' => '下单',
+            'review' => '评价',
+            'invite' => '邀请',
+            'redeem' => '兑换',
+            'system' => '系统',
+        ];
+
+        $this->assign('title', '积分中心');
+        $this->assign('user', $user);
+        $this->assign('goods', $goods);
+        $this->assign('logs', $logs);
+        $this->assign('typeMap', $typeMap);
+        $this->fetch('index/points_center');
+    }
+
+    /**
+     * 积分商品详情
+     */
+    public function pointsGoods()
+    {
+        $id = (int) input('id', 0);
+        if (!$id) {
+            redirect(url('index/pointsCenter'));
+        }
+
+        $goods = Db::fetch("SELECT * FROM jz_points_goods WHERE id = ? AND status = 1", [$id]);
+        if (!$goods) {
+            redirect(url('index/pointsCenter'));
+        }
+
+        $contact = $this->getCurrentContact();
+        $user = null;
+        if ($contact) {
+            $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+        }
+
+        $this->assign('title', h($goods['title']));
+        $this->assign('goods', $goods);
+        $this->assign('user', $user);
+        $this->fetch('index/points_goods');
+    }
+
+    /**
+     * 兑换积分商品
+     */
+    public function pointsRedeem()
+    {
+        $contact = $this->getCurrentContact();
+        if (!$contact) {
+            json_error('请先登录');
+        }
+
+        $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+        if (!$user) {
+            json_error('用户不存在');
+        }
+
+        $goodsId = (int) input('goods_id', 0);
+        $quantity = max(1, (int) input('quantity', 1));
+        $contactInfo = input('contact', '');
+
+        $goods = Db::fetch("SELECT * FROM jz_points_goods WHERE id = ? AND status = 1", [$goodsId]);
+        if (!$goods) {
+            json_error('商品不存在或已下架');
+        }
+        if ($goods['stock'] < $quantity) {
+            json_error('库存不足');
+        }
+
+        $needPoints = (int) $goods['points'] * $quantity;
+        if ((int) $user['points'] < $needPoints) {
+            json_error('积分不足');
+        }
+
+        $orderNo = generate_points_order_no();
+        $afterPoints = (int) $user['points'] - $needPoints;
+
+        Db::execute("UPDATE jz_user SET points = ? WHERE id = ?", [$afterPoints, $user['id']]);
+        Db::execute("UPDATE jz_points_goods SET stock = stock - ?, sold = sold + ? WHERE id = ?", [$quantity, $quantity, $goodsId]);
+
+        Db::insert('jz_points_order', [
+            'order_no' => $orderNo,
+            'user_id' => $user['id'],
+            'points_goods_id' => $goodsId,
+            'title' => $goods['title'],
+            'points' => $needPoints,
+            'quantity' => $quantity,
+            'contact' => $contactInfo,
+            'status' => 0,
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+
+        Db::insert('jz_points_log', [
+            'user_id' => $user['id'],
+            'type' => 'redeem',
+            'points' => -$needPoints,
+            'before_points' => (int) $user['points'],
+            'after_points' => $afterPoints,
+            'remark' => '兑换：' . $goods['title'],
+            'related_id' => $goodsId,
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+
+        json_success('兑换成功，请等待发放', ['order_no' => $orderNo]);
+    }
+
+    /**
+     * 积分流水
+     */
+    public function pointsLog()
+    {
+        $contact = $this->getCurrentContact();
+        if (!$contact) {
+            redirect(url('index/user'));
+        }
+
+        $user = Db::fetch("SELECT * FROM jz_user WHERE mobile = ? OR nickname = ? LIMIT 1", [$contact, $contact]);
+        if (!$user) {
+            redirect(url('index/user'));
+        }
+
+        $page = max(1, (int) input('page', 1));
+        $pageSize = 20;
+
+        $count = Db::fetch("SELECT COUNT(*) AS total FROM jz_points_log WHERE user_id = ?", [$user['id']]);
+        $total = (int) ($count['total'] ?? 0);
+        $totalPages = max(1, ceil($total / $pageSize));
+        $page = min($page, $totalPages);
+        $offset = ($page - 1) * $pageSize;
+
+        $list = Db::query(
+            "SELECT * FROM jz_points_log WHERE user_id = ? ORDER BY id DESC LIMIT {$offset}, {$pageSize}",
+            [$user['id']]
+        );
+
+        $typeMap = [
+            'register' => '注册',
+            'login' => '登录',
+            'order' => '下单',
+            'review' => '评价',
+            'invite' => '邀请',
+            'redeem' => '兑换',
+            'system' => '系统',
+        ];
+
+        $this->assign('title', '积分明细');
+        $this->assign('list', $list);
+        $this->assign('typeMap', $typeMap);
+        $this->assign('page', $page);
+        $this->assign('totalPages', $totalPages);
+        $this->assign('total', $total);
+        $this->fetch('index/points_log');
     }
 }

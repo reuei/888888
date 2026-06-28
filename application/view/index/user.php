@@ -82,8 +82,10 @@
     <div class="user-info">
         <h2><?php echo h($contact); ?></h2>
         <p>注册时间：<?php echo $user['create_time']; ?> · 余额：¥<?php echo number_format($user['balance'] ?? 0, 2); ?></p>
+        <p>积分：<?php echo number_format($user['points'] ?? 0); ?> · 成长值：<?php echo number_format($user['growth_value'] ?? 0); ?></p>
     </div>
     <div style="margin-left: auto;">
+        <a href="<?php echo url('index/pointsCenter'); ?>" class="btn" style="background: rgba(255,255,255,0.2); border-color: transparent; margin-right:8px;">积分中心</a>
         <a href="<?php echo url('index/userLogout'); ?>" class="btn" style="background: rgba(255,255,255,0.2); border-color: transparent;">退出</a>
     </div>
 </div>

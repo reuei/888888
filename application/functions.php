@@ -544,3 +544,99 @@ function upload_file($field, $subDir = '', $allowedExt = ['jpg', 'jpeg', 'png', 
     $relative = 'uploads/' . ($safeSubDir ? str_replace('\\', '/', $safeSubDir) . '/' : '') . $filename;
     return ['code' => 0, 'path' => $relative, 'url' => base_url($relative)];
 }
+
+/**
+ * 发放积分与成长值
+ * @param int $userId 用户ID
+ * @param string $type 规则类型 register/login/order/review/invite/system
+ * @param int $relatedId 关联ID
+ * @param string $remark 备注
+ * @return array ['code'=>0, 'msg'=>''] / ['code'=>1, 'msg'=>'']
+ */
+function award_points($userId, $type, $relatedId = 0, $remark = '')
+{
+    $userId = (int) $userId;
+    if ($userId <= 0) {
+        return ['code' => 1, 'msg' => '用户不存在'];
+    }
+
+    $rule = Db::fetch("SELECT * FROM jz_points_rule WHERE type = ? AND status = 1 ORDER BY sort ASC, id ASC LIMIT 1", [$type]);
+    if (!$rule) {
+        return ['code' => 1, 'msg' => '未启用对应积分规则'];
+    }
+
+    $points = (int) $rule['points'];
+    $growthValue = (int) $rule['growth_value'];
+    if ($points === 0 && $growthValue === 0) {
+        return ['code' => 1, 'msg' => '无积分或成长值奖励'];
+    }
+
+    // 周期限制检查
+    $limitCount = (int) $rule['limit_count'];
+    if ($limitCount > 0) {
+        $startTime = null;
+        switch ($rule['limit_type']) {
+            case 'day':
+                $startTime = date('Y-m-d 00:00:00');
+                break;
+            case 'week':
+                $startTime = date('Y-m-d 00:00:00', strtotime('monday this week'));
+                break;
+            case 'month':
+                $startTime = date('Y-m-01 00:00:00');
+                break;
+            case 'once':
+                $count = Db::fetch("SELECT COUNT(*) AS total FROM jz_points_log WHERE user_id = ? AND type = ?", [$userId, $type]);
+                if (($count['total'] ?? 0) >= 1) {
+                    return ['code' => 1, 'msg' => '该奖励已领取'];
+                }
+                break;
+        }
+        if ($startTime) {
+            $count = Db::fetch(
+                "SELECT COUNT(*) AS total FROM jz_points_log WHERE user_id = ? AND type = ? AND create_time >= ?",
+                [$userId, $type, $startTime]
+            );
+            if (($count['total'] ?? 0) >= $limitCount) {
+                return ['code' => 1, 'msg' => '本周期内奖励次数已达上限'];
+            }
+        }
+    }
+
+    $user = Db::fetch("SELECT points, growth_value FROM jz_user WHERE id = ? FOR UPDATE", [$userId]);
+    if (!$user) {
+        return ['code' => 1, 'msg' => '用户不存在'];
+    }
+
+    $beforePoints = (int) $user['points'];
+    $afterPoints = max(0, $beforePoints + $points);
+    $newGrowth = (int) $user['growth_value'] + $growthValue;
+
+    Db::execute(
+        "UPDATE jz_user SET points = ?, growth_value = ? WHERE id = ?",
+        [$afterPoints, $newGrowth, $userId]
+    );
+
+    if ($points != 0) {
+        Db::insert('jz_points_log', [
+            'user_id' => $userId,
+            'type' => $type,
+            'points' => $points,
+            'before_points' => $beforePoints,
+            'after_points' => $afterPoints,
+            'remark' => $remark ?: $rule['name'],
+            'related_id' => $relatedId,
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    return ['code' => 0, 'msg' => '积分发放成功', 'points' => $points, 'growth_value' => $growthValue];
+}
+
+/**
+ * 生成唯一兑换单号
+ */
+function generate_points_order_no()
+{
+    return 'PT' . date('YmdHis') . random_int(100000, 999999);
+}

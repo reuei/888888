@@ -28,8 +28,8 @@ $menu = [
         ['name' => '结算提现', 'url' => 'merchant/finance/settle'],
     ]],
     ['name' => '店铺设置', 'icon' => '⚙', 'url' => '#', 'children' => [
-        ['name' => '店铺信息', 'url' => 'merchant/setting/shop'],
-        ['name' => '第三方登录', 'url' => 'merchant/setting/oauth'],
+        ['name' => '店铺信息', 'url' => 'merchant/setting'],
+        ['name' => '修改密码', 'url' => 'merchant/setting/password'],
         ['name' => '实名认证', 'url' => 'merchant/setting/auth'],
         ['name' => '自定义支付', 'url' => 'merchant/setting/payment'],
         ['name' => '引导页', 'url' => 'merchant/setting/guide'],

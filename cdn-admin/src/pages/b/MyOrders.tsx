@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
+import Pagination from '../../components/Pagination';
 import { useToast } from '../../components/Toast';
+import { usePagination } from '../../hooks/usePagination';
 import type { BOrder } from '../../types';
 import { bOrders } from '../../data/mock';
 import { formatMoney, statusBadge, orderStatusText } from '../../utils/helpers';
@@ -30,6 +32,9 @@ export default function MyOrders() {
     const matchStatus = statusFilter === 'all' || o.status === statusFilter;
     return matchId && matchProduct && matchStatus;
   });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
+  const pagedList = slice(filtered);
 
   const reset = () => {
     setKeyword('');
@@ -87,7 +92,7 @@ export default function MyOrders() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((o) => (
+            {pagedList.map((o) => (
               <tr key={o.id}>
                 <td className="font-medium">{o.id}</td>
                 <td>{o.product}</td>
@@ -123,14 +128,7 @@ export default function MyOrders() {
           <EmptyState title="暂无订单" description="没有符合筛选条件的订单" />
         )}
 
-        <div className="flex items-center justify-between mt-4 text-sm text-text-secondary">
-          <div>共 {filtered.length} 条</div>
-          <div className="flex items-center gap-2">
-            <button className="btn btn-default text-xs">上一页</button>
-            <button className="btn btn-primary text-xs">1</button>
-            <button className="btn btn-default text-xs">下一页</button>
-          </div>
-        </div>
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

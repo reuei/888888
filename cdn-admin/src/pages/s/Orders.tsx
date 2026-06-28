@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import Pagination from '../../components/Pagination';
 import { useToast } from '../../components/Toast';
+import { usePagination } from '../../hooks/usePagination';
 import { orders } from '../../data/mock';
 import { statusBadge, statusText, formatMoney } from '../../utils/helpers';
 import { Eye, RefreshCcw } from 'lucide-react';
@@ -8,6 +10,8 @@ import { Eye, RefreshCcw } from 'lucide-react';
 export default function SOrders() {
   const { show } = useToast();
   const [list] = useState(orders);
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: list.length });
+  const pagedList = slice(list);
 
   return (
     <div>
@@ -45,7 +49,7 @@ export default function SOrders() {
             </tr>
           </thead>
           <tbody>
-            {list.map((o) => (
+            {pagedList.map((o) => (
               <tr key={o.id}>
                 <td className="font-medium">{o.id}</td>
                 <td>{o.buyer}</td>
@@ -66,14 +70,7 @@ export default function SOrders() {
           </tbody>
         </table>
 
-        <div className="flex items-center justify-between mt-4 text-sm text-text-secondary">
-          <div>共 {list.length} 条</div>
-          <div className="flex items-center gap-2">
-            <button className="btn btn-default text-xs">上一页</button>
-            <button className="btn btn-primary text-xs">1</button>
-            <button className="btn btn-default text-xs">下一页</button>
-          </div>
-        </div>
+        <Pagination page={page} totalPages={totalPages} total={list.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

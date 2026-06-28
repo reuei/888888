@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import LineChart from '../../components/LineChart';
+import Pagination from '../../components/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 import { dailyStats } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
 import { Download, Calendar } from 'lucide-react';
@@ -12,6 +14,9 @@ export default function TransactionStats() {
   const totalRevenue = dailyStats.reduce((sum, d) => sum + d.revenue, 0);
   const totalOrders = dailyStats.reduce((sum, d) => sum + d.orders, 0);
   const today = dailyStats[dailyStats.length - 1];
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: dailyStats.length });
+  const pagedStats = slice(dailyStats);
 
   const statCards = [
     { title: '总交易额', value: `¥${formatMoney(totalRevenue)}`, color: 'text-primary' },
@@ -91,7 +96,7 @@ export default function TransactionStats() {
               </tr>
             </thead>
             <tbody>
-              {dailyStats.map((d) => (
+              {pagedStats.map((d) => (
                 <tr key={d.date}>
                   <td className="font-medium">{d.date}</td>
                   <td>¥{formatMoney(d.revenue)}</td>
@@ -103,14 +108,7 @@ export default function TransactionStats() {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-between mt-4 text-sm text-text-secondary">
-          <div>共 {dailyStats.length} 条</div>
-          <div className="flex items-center gap-2">
-            <button className="btn btn-default text-xs">上一页</button>
-            <button className="btn btn-primary text-xs">1</button>
-            <button className="btn btn-default text-xs">下一页</button>
-          </div>
-        </div>
+        <Pagination page={page} totalPages={totalPages} total={dailyStats.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

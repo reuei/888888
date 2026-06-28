@@ -1,8 +1,11 @@
 import { useState, useMemo } from 'react';
 import PageHeader from '../../components/PageHeader';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
 import { useToast } from '../../components/Toast';
+import { usePagination } from '../../hooks/usePagination';
 import { operationLogs } from '../../data/mock';
-import { Search } from 'lucide-react';
+import { Search, FileSearch } from 'lucide-react';
 
 export default function OperationLogs() {
   const { show } = useToast();
@@ -26,6 +29,9 @@ export default function OperationLogs() {
       return matchKeyword && matchModule && matchAction;
     });
   }, [keyword, moduleFilter, actionFilter]);
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
+  const pagedList = slice(filtered);
 
   return (
     <div>
@@ -95,7 +101,7 @@ export default function OperationLogs() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((l) => (
+            {pagedList.map((l) => (
               <tr key={l.id}>
                 <td className="text-text-secondary">{l.id}</td>
                 <td className="font-medium">{l.operator}</td>
@@ -110,6 +116,12 @@ export default function OperationLogs() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无日志" description="没有符合筛选条件的操作日志" icon={<FileSearch size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

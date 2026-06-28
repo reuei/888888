@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import Pagination from '../../components/Pagination';
+import EmptyState from '../../components/EmptyState';
+import { usePagination } from '../../hooks/usePagination';
 import { users } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { Search, Ban, CheckCircle } from 'lucide-react';
+import { Search, Ban, CheckCircle, Users as UsersIcon } from 'lucide-react';
 
 export default function Users() {
   const [list, setList] = useState(users);
@@ -18,6 +21,9 @@ export default function Users() {
     const matchStatus = statusFilter === 'all' || u.status === statusFilter;
     return matchKeyword && matchStatus;
   });
+
+  const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
+  const pagedList = slice(filtered);
 
   return (
     <div>
@@ -57,7 +63,7 @@ export default function Users() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((u) => (
+            {pagedList.map((u) => (
               <tr key={u.id}>
                 <td className="text-text-secondary">{u.id}</td>
                 <td className="font-medium">{u.nickname}</td>
@@ -93,6 +99,12 @@ export default function Users() {
             ))}
           </tbody>
         </table>
+
+        {filtered.length === 0 && (
+          <EmptyState title="暂无用户" description="没有符合筛选条件的用户" icon={<UsersIcon size={24} />} />
+        )}
+
+        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

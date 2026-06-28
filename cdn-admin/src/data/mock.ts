@@ -1,4 +1,4 @@
-import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile } from '../types';
+import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon } from '../types';
 
 export const sProfile: UserProfile = {
   name: '总站长',
@@ -95,3 +95,62 @@ export const financeRecords: FinanceRecord[] = [
   { id: 'F003', type: 'expense', amount: -299.00, balance: 16551.65, desc: '套餐续费', createdAt: '2026-06-26 09:12' },
   { id: 'F004', type: 'frozen', amount: -200.00, balance: 16850.65, desc: '异常订单冻结', createdAt: '2026-06-25 14:33' },
 ];
+
+export const categories: Category[] = [
+  { id: 'C1', name: 'CDN 加速', parentId: null, sort: 1 },
+  { id: 'C2', name: '高防 CDN', parentId: null, sort: 2 },
+  { id: 'C3', name: '游戏盾', parentId: null, sort: 3 },
+  { id: 'C4', name: '全球加速', parentId: null, sort: 4 },
+  { id: 'C5', name: '企业级', parentId: 'C1', sort: 1 },
+];
+
+export const nodes: Node[] = [
+  { id: 'N001', name: '北京电信-01', ip: '1.1.1.1', region: '华北', isp: '电信', type: '自建', health: 'healthy', enabled: true, latency: 12, uptime: '99.99%' },
+  { id: 'N002', name: '上海联通-01', ip: '2.2.2.2', region: '华东', isp: '联通', type: '自建', health: 'healthy', enabled: true, latency: 15, uptime: '99.95%' },
+  { id: 'N003', name: '广州移动-01', ip: '3.3.3.3', region: '华南', isp: '移动', type: '公开节点', health: 'warning', enabled: true, latency: 45, uptime: '98.50%' },
+  { id: 'N004', name: 'Cloudflare-HK', ip: 'cf-hk.example.com', region: '海外', isp: 'BGP', type: 'Cloudflare', health: 'healthy', enabled: true, latency: 28, uptime: '99.90%' },
+  { id: 'N005', name: '成都电信-01', ip: '4.4.4.4', region: '西南', isp: '电信', type: '自建', health: 'offline', enabled: false, latency: 0, uptime: '0.00%' },
+];
+
+export const skus: Sku[] = [
+  { id: 'S001', name: '入门版', bandwidth: '10Mbps', flow: '100GB/月', domains: 1, ccLevel: '基础', price: 9.90 },
+  { id: 'S002', name: '标准版', bandwidth: '50Mbps', flow: '500GB/月', domains: 3, ccLevel: '标准', price: 49.00 },
+  { id: 'S003', name: '专业版', bandwidth: '200Mbps', flow: '2TB/月', domains: 10, ccLevel: '高级', price: 199.00 },
+  { id: 'S004', name: '企业版', bandwidth: '1Gbps', flow: '10TB/月', domains: 50, ccLevel: '企业', price: 999.00 },
+];
+
+export const complaints: Complaint[] = [
+  { id: 'CP001', orderId: 'O202606280003', plaintiff: 'user_7788', defendant: '站点卫士', reason: '未到账', status: 'pending', createdAt: '2026-06-28 09:00' },
+  { id: 'CP002', orderId: 'O202606270056', plaintiff: 'user_3344', defendant: '蓝海防护', reason: '商品与描述不符', status: 'resolved', createdAt: '2026-06-27 14:20' },
+  { id: 'CP003', orderId: 'O202606260012', plaintiff: 'user_9527', defendant: '极速云', reason: '无法访问', status: 'rejected', createdAt: '2026-06-26 11:30' },
+];
+
+export const inviteCodes: InviteCode[] = [
+  { id: 'I001', code: 'INVITE2026A', maxUses: 100, usedCount: 32, expiry: '2026-12-31', status: 'active' },
+  { id: 'I002', code: 'VIP888', maxUses: 50, usedCount: 50, expiry: '2026-06-01', status: 'expired' },
+  { id: 'I003', code: 'TEST001', maxUses: 10, usedCount: 2, expiry: '2026-12-31', status: 'disabled' },
+];
+
+export const articles: Article[] = [
+  { id: 'A001', title: '平台六一八活动公告', category: '平台公告', isTop: true, status: 'published', publishAt: '2026-06-18 10:00' },
+  { id: 'A002', title: '关于调整结算周期的通知', category: '结算公告', isTop: false, status: 'published', publishAt: '2026-06-20 16:00' },
+  { id: 'A003', title: '新手入驻指南', category: '帮助文档', isTop: false, status: 'draft', publishAt: '-' },
+];
+
+export const adSlots: AdSlot[] = [
+  { id: 'AD001', name: 'PC 首页轮播', position: '电脑端首页顶部', size: '1920x400', status: 'on' },
+  { id: 'AD002', name: '购卡页横幅', position: '购卡页中部', size: '1200x200', status: 'on' },
+  { id: 'AD003', name: 'APP 启动页', position: 'APP 启动页', size: '750x1334', status: 'off' },
+];
+
+export const coupons: Coupon[] = [
+  { id: 'CO001', batch: 'BATCH0618', type: 'fixed', value: 10, threshold: 50, total: 1000, received: 856, status: 'active' },
+  { id: 'CO002', batch: 'BATCHNEW', type: 'percent', value: 20, threshold: 100, total: 500, received: 500, status: 'expired' },
+];
+
+export const settlementRecords = [
+  { id: 'SET001', merchant: '极速云', cycle: 'T+1', amount: 4820.00, fee: 48.20, status: 'settled', time: '2026-06-28 10:00' },
+  { id: 'SET002', merchant: '蓝海防护', cycle: 'T+1', amount: 3150.50, fee: 31.51, status: 'settled', time: '2026-06-27 10:00' },
+  { id: 'SET003', merchant: '站点卫士', cycle: 'T+7', amount: 1200.00, fee: 12.00, status: 'pending', time: '2026-06-28 09:00' },
+];
+

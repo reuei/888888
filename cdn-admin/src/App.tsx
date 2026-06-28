@@ -8,9 +8,24 @@ import Placeholder from './pages/Placeholder';
 // S-side pages
 import SDashboard from './pages/s/Dashboard';
 import SSites from './pages/s/Sites';
+import SiteConfig from './pages/s/SiteConfig';
 import SMerchants from './pages/s/Merchants';
+import SMerchantAudit from './pages/s/MerchantAudit';
+import SInvites from './pages/s/Invites';
 import SProducts from './pages/s/Products';
+import SCategories from './pages/s/Categories';
+import SNodes from './pages/s/Nodes';
+import SSkus from './pages/s/Skus';
 import SOrders from './pages/s/Orders';
+import SComplaints from './pages/s/Complaints';
+import SAbnormalOrders from './pages/s/AbnormalOrders';
+import SFinance from './pages/s/SFinance';
+import SPayments from './pages/s/Payments';
+import STemplates from './pages/s/Templates';
+import SArticles from './pages/s/Articles';
+import SAds from './pages/s/Ads';
+import SCoupons from './pages/s/Coupons';
+import SSystem from './pages/s/System';
 
 // B-side pages
 import BDashboard from './pages/b/Dashboard';
@@ -39,24 +54,24 @@ function App() {
             <>
               <Route path="/s/dashboard" element={<SDashboard />} />
               <Route path="/s/sites" element={<SSites />} />
-              <Route path="/s/site-config" element={<Placeholder title="站点配置" breadcrumb={['站点管理', '站点配置']} />} />
+              <Route path="/s/site-config" element={<SiteConfig />} />
               <Route path="/s/merchants" element={<SMerchants />} />
-              <Route path="/s/merchant-audit" element={<Placeholder title="商户审核" breadcrumb={['商户管理', '商户审核']} />} />
-              <Route path="/s/invites" element={<Placeholder title="邀请码管理" breadcrumb={['商户管理', '邀请码管理']} />} />
+              <Route path="/s/merchant-audit" element={<SMerchantAudit />} />
+              <Route path="/s/invites" element={<SInvites />} />
               <Route path="/s/products" element={<SProducts />} />
-              <Route path="/s/categories" element={<Placeholder title="产品分类" breadcrumb={['商品管理', '产品分类']} />} />
-              <Route path="/s/nodes" element={<Placeholder title="CDN节点管理" breadcrumb={['商品管理', 'CDN节点管理']} />} />
-              <Route path="/s/skus" element={<Placeholder title="套餐规格管理" breadcrumb={['商品管理', '套餐规格管理']} />} />
+              <Route path="/s/categories" element={<SCategories />} />
+              <Route path="/s/nodes" element={<SNodes />} />
+              <Route path="/s/skus" element={<SSkus />} />
               <Route path="/s/orders" element={<SOrders />} />
-              <Route path="/s/complaints" element={<Placeholder title="投诉管理" breadcrumb={['订单管理', '投诉管理']} />} />
-              <Route path="/s/abnormal-orders" element={<Placeholder title="异常订单处理" breadcrumb={['订单管理', '异常订单处理']} />} />
-              <Route path="/s/finance" element={<Placeholder title="财务管理" breadcrumb={['财务管理', '资金流水总览']} />} />
-              <Route path="/s/payments" element={<Placeholder title="支付网关管理" breadcrumb={['支付网关管理', '渠道对接']} />} />
-              <Route path="/s/templates" element={<Placeholder title="模板与前端管理" breadcrumb={['模板与前端管理', '首页模板']} />} />
-              <Route path="/s/articles" element={<Placeholder title="文章/公告管理" breadcrumb={['文章/公告管理', '平台公告']} />} />
-              <Route path="/s/ads" element={<Placeholder title="广告位管理" breadcrumb={['广告位管理', '广告位列表']} />} />
-              <Route path="/s/coupons" element={<Placeholder title="优惠券/营销管理" breadcrumb={['优惠券/营销管理', '优惠券生成']} />} />
-              <Route path="/s/system" element={<Placeholder title="系统设置" breadcrumb={['系统设置', '邮件系统']} />} />
+              <Route path="/s/complaints" element={<SComplaints />} />
+              <Route path="/s/abnormal-orders" element={<SAbnormalOrders />} />
+              <Route path="/s/finance" element={<SFinance />} />
+              <Route path="/s/payments" element={<SPayments />} />
+              <Route path="/s/templates" element={<STemplates />} />
+              <Route path="/s/articles" element={<SArticles />} />
+              <Route path="/s/ads" element={<SAds />} />
+              <Route path="/s/coupons" element={<SCoupons />} />
+              <Route path="/s/system" element={<SSystem />} />
               <Route path="*" element={<Navigate to="/s/dashboard" replace />} />
             </>
           ) : (

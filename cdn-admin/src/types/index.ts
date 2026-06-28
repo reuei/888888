@@ -90,3 +90,80 @@ export interface UserProfile {
   balance: number;
   shopName?: string;
 }
+
+export interface Category {
+  id: string;
+  name: string;
+  parentId: string | null;
+  sort: number;
+}
+
+export interface Node {
+  id: string;
+  name: string;
+  ip: string;
+  region: string;
+  isp: string;
+  type: 'Cloudflare' | '自建' | '公开节点';
+  health: 'healthy' | 'warning' | 'offline';
+  enabled: boolean;
+  latency: number;
+  uptime: string;
+}
+
+export interface Sku {
+  id: string;
+  name: string;
+  bandwidth: string;
+  flow: string;
+  domains: number;
+  ccLevel: string;
+  price: number;
+}
+
+export interface Complaint {
+  id: string;
+  orderId: string;
+  plaintiff: string;
+  defendant: string;
+  reason: string;
+  status: 'pending' | 'resolved' | 'rejected';
+  createdAt: string;
+}
+
+export interface InviteCode {
+  id: string;
+  code: string;
+  maxUses: number;
+  usedCount: number;
+  expiry: string;
+  status: 'active' | 'expired' | 'disabled';
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  category: string;
+  isTop: boolean;
+  status: 'published' | 'draft';
+  publishAt: string;
+}
+
+export interface AdSlot {
+  id: string;
+  name: string;
+  position: string;
+  size: string;
+  status: 'on' | 'off';
+}
+
+export interface Coupon {
+  id: string;
+  batch: string;
+  type: 'fixed' | 'percent';
+  value: number;
+  threshold: number;
+  total: number;
+  received: number;
+  status: 'active' | 'expired';
+}

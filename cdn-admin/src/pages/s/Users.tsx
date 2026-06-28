@@ -5,6 +5,7 @@ import SortableHeader from '../../components/SortableHeader';
 import EmptyState from '../../components/EmptyState';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import { users } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Search, Ban, CheckCircle, Users as UsersIcon } from 'lucide-react';
@@ -12,6 +13,7 @@ import { Search, Ban, CheckCircle, Users as UsersIcon } from 'lucide-react';
 export default function Users() {
   const [list, setList] = useState(users);
   const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
   const [statusFilter, setStatusFilter] = useState('all');
 
   const toggleStatus = (id: string) => {
@@ -19,7 +21,7 @@ export default function Users() {
   };
 
   const filtered = list.filter((u) => {
-    const matchKeyword = u.nickname.includes(keyword) || u.phone.includes(keyword) || u.id.includes(keyword);
+    const matchKeyword = !debouncedKeyword || u.nickname.includes(debouncedKeyword) || u.phone.includes(debouncedKeyword) || u.id.includes(debouncedKeyword);
     const matchStatus = statusFilter === 'all' || u.status === statusFilter;
     return matchKeyword && matchStatus;
   });

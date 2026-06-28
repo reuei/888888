@@ -6,6 +6,7 @@ import SortableHeader from '../../components/SortableHeader';
 import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
+import { useDebounce } from '../../hooks/useDebounce';
 import type { BOrder } from '../../types';
 import { bOrders } from '../../data/mock';
 import { formatMoney, statusBadge, orderStatusText } from '../../utils/helpers';
@@ -17,7 +18,9 @@ export default function MyOrders() {
   const [list] = useState(bOrders);
   const [detail, setDetail] = useState<typeof bOrders[0] | null>(null);
   const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword);
   const [productKeyword, setProductKeyword] = useState('');
+  const debouncedProductKeyword = useDebounce(productKeyword);
   const [statusFilter, setStatusFilter] = useState<'all' | BOrder['status']>('all');
 
   const statusOptions: { value: 'all' | BOrder['status']; label: string }[] = [
@@ -29,8 +32,8 @@ export default function MyOrders() {
   ];
 
   const filtered = list.filter((o) => {
-    const matchId = o.id.toLowerCase().includes(keyword.trim().toLowerCase());
-    const matchProduct = o.product.toLowerCase().includes(productKeyword.trim().toLowerCase());
+    const matchId = !debouncedKeyword || o.id.toLowerCase().includes(debouncedKeyword.trim().toLowerCase());
+    const matchProduct = !debouncedProductKeyword || o.product.toLowerCase().includes(debouncedProductKeyword.trim().toLowerCase());
     const matchStatus = statusFilter === 'all' || o.status === statusFilter;
     return matchId && matchProduct && matchStatus;
   });

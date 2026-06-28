@@ -61,6 +61,8 @@ import Renew from './pages/b/Renew';
 import BWhitelist from './pages/b/Whitelist';
 import BFinance from './pages/b/Finance';
 import BSettings from './pages/b/Settings';
+import BOrders from './pages/b/MyOrders';
+import BInvoice from './pages/b/Invoice';
 
 function App() {
   const [role, setRole] = useState<Role | null>(null);
@@ -133,6 +135,8 @@ function App() {
               <Route path="/b/packages" element={<BPackages />} />
               <Route path="/b/my-packages" element={<MyPackages />} />
               <Route path="/b/renew" element={<Renew />} />
+              <Route path="/b/orders" element={<BOrders />} />
+              <Route path="/b/invoice" element={<BInvoice />} />
               <Route path="/b/whitelist" element={<BWhitelist />} />
               <Route path="/b/finance" element={<BFinance />} />
               <Route path="/b/settings" element={<BSettings />} />

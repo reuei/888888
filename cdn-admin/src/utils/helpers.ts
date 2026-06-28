@@ -9,6 +9,7 @@ export function statusBadge(status: string) {
     case 'on':
     case 'paid':
     case 'approved':
+    case 'issued':
       return 'badge-success';
     case 'pending':
       return 'badge-warning';
@@ -18,6 +19,7 @@ export function statusBadge(status: string) {
     case 'refunded':
     case 'rejected':
     case 'closed':
+    case 'cancelled':
       return 'badge-danger';
     default:
       return 'badge-default';
@@ -38,6 +40,22 @@ export function statusText(status: string) {
     closed: '已关闭',
     approved: '已通过',
     rejected: '已驳回',
+    cancelled: '已取消',
+    issued: '已开票',
   };
   return map[status] || status;
+}
+
+export function orderStatusText(status: string) {
+  const map: Record<string, string> = {
+    pending: '待支付',
+    paid: '已支付',
+    cancelled: '已取消',
+    refunded: '已退款',
+  };
+  return map[status] || status;
+}
+
+export function invoiceTypeText(type: string) {
+  return type === 'company' ? '企业发票' : '个人发票';
 }

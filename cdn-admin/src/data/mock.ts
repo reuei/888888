@@ -1,4 +1,4 @@
-import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord, DailyStat, MerchantStat, UserGrowthStat } from '../types';
+import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, BOrder, Invoice, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord, DailyStat, MerchantStat, UserGrowthStat } from '../types';
 
 export const sProfile: UserProfile = {
   name: '总站长',
@@ -218,6 +218,40 @@ export const myPackages: MyPackage[] = [
   { id: 'MP001', name: '标准版', flow: '500GB', bandwidth: '50Mbps', domains: 3, expireAt: '2026-12-31', status: 'active' },
   { id: 'MP002', name: '专业版', flow: '2TB', bandwidth: '200Mbps', domains: 10, expireAt: '2027-01-15', status: 'active' },
   { id: 'MP003', name: '入门版', flow: '100GB', bandwidth: '10Mbps', domains: 1, expireAt: '2026-05-31', status: 'expired' },
+];
+
+export const bOrders: BOrder[] = [
+  { id: 'O202606280001', product: '企业高防CDN', amount: 299.00, status: 'paid', createdAt: '2026-06-28 10:23', paidAt: '2026-06-28 10:25', packageId: 'PKG03', period: '1个月' },
+  { id: 'O202606270088', product: '全球加速Pro', amount: 199.00, status: 'paid', createdAt: '2026-06-27 15:40', paidAt: '2026-06-27 15:42', packageId: 'PKG02', period: '1个月' },
+  { id: 'O202606260056', product: '标准版套餐', amount: 49.00, status: 'refunded', createdAt: '2026-06-26 09:15', paidAt: '2026-06-26 09:16', packageId: 'PKG01', period: '1个月' },
+  { id: 'O202606250042', product: '专业版套餐', amount: 199.00, status: 'paid', createdAt: '2026-06-25 14:30', paidAt: '2026-06-25 14:32', packageId: 'PKG02', period: '3个月' },
+  { id: 'O202606240031', product: '入门版套餐', amount: 9.90, status: 'pending', createdAt: '2026-06-24 11:10', packageId: 'PKG01', period: '1个月' },
+  { id: 'O202606230028', product: '企业版套餐', amount: 999.00, status: 'cancelled', createdAt: '2026-06-23 16:50', packageId: 'PKG04', period: '1个月' },
+];
+
+export const invoices: Invoice[] = [
+  {
+    id: 'INV20260628001',
+    orderId: 'O202606280001',
+    amount: 299.00,
+    status: 'issued',
+    type: 'company',
+    title: '云盾科技有限公司',
+    taxId: '91310101MA1G812345',
+    items: [{ name: '企业高防CDN（1个月）', quantity: 1, unitPrice: 299.00, amount: 299.00 }],
+    createdAt: '2026-06-28 10:30',
+    issuedAt: '2026-06-28 10:35',
+  },
+  {
+    id: 'INV20260627001',
+    orderId: 'O202606270088',
+    amount: 199.00,
+    status: 'pending',
+    type: 'personal',
+    title: '张三',
+    items: [{ name: '全球加速Pro（1个月）', quantity: 1, unitPrice: 199.00, amount: 199.00 }],
+    createdAt: '2026-06-27 16:00',
+  },
 ];
 
 export const notifications: Notification[] = [

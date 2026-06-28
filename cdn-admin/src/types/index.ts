@@ -253,6 +253,37 @@ export interface MyPackage {
   status: 'active' | 'expired' | 'pending';
 }
 
+export interface BOrder {
+  id: string;
+  product: string;
+  amount: number;
+  status: 'pending' | 'paid' | 'cancelled' | 'refunded';
+  createdAt: string;
+  paidAt?: string;
+  packageId: string;
+  period: string;
+}
+
+export interface InvoiceItem {
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+}
+
+export interface Invoice {
+  id: string;
+  orderId: string;
+  amount: number;
+  status: 'pending' | 'issued' | 'cancelled';
+  type: 'personal' | 'company';
+  title: string;
+  taxId?: string;
+  items: InvoiceItem[];
+  createdAt: string;
+  issuedAt?: string;
+}
+
 export interface Notification {
   id: string;
   title: string;

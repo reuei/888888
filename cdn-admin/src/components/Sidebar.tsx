@@ -182,6 +182,15 @@ export const bMenu = [
       { key: '/b/renew', label: '套餐续费' },
     ],
   },
+  {
+    key: '/b/orders',
+    label: '订单管理',
+    icon: 'ShoppingCart',
+    children: [
+      { key: '/b/orders', label: '我的订单' },
+      { key: '/b/invoice', label: '发票申请' },
+    ],
+  },
   { key: '/b/whitelist', label: '域名过白管理', icon: 'Shield' },
   { key: '/b/finance', label: '财务管理', icon: 'Wallet' },
   { key: '/b/settings', label: '个人设置', icon: 'UserCog' },

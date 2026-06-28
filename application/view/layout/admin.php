@@ -63,6 +63,7 @@ $menu = [
         ['name' => '短信通知', 'url' => 'admin/setting/sms'],
         ['name' => '文件存储', 'url' => 'admin/setting/storage'],
         ['name' => '安全防护', 'url' => 'admin/setting/security'],
+        ['name' => '管理员账号', 'url' => 'admin/admin'],
     ]]
 ];
 ?>
@@ -240,6 +241,7 @@ $menu = [
                 <?php if ($item['children']): ?>
                 <div class="submenu">
                     <?php foreach ($item['children'] as $sub): ?>
+                    <?php if (($sub['url'] ?? '') === 'admin/admin' && ($admin['role'] ?? '') !== 'super') continue; ?>
                     <a href="<?php echo url($sub['url']); ?>" class="<?php echo strpos($currentPath, $sub['url']) === 0 ? 'active' : ''; ?>"><?php echo $sub['name']; ?></a>
                     <?php endforeach; ?>
                 </div>

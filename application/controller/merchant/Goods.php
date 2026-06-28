@@ -113,6 +113,19 @@ class Merchant_Goods extends Controller
         $cover = input('cover', '');
         $status = (int) input('status', 1);
 
+        // 秒杀
+        $isSeckill = (int) input('is_seckill', 0);
+        $seckillPrice = (float) input('seckill_price', 0);
+        $seckillStart = input('seckill_start', '');
+        $seckillEnd = input('seckill_end', '');
+        $seckillStock = (int) input('seckill_stock', 0);
+
+        // 限时折扣
+        $isDiscount = (int) input('is_discount', 0);
+        $discountPrice = (float) input('discount_price', 0);
+        $discountStart = input('discount_start', '');
+        $discountEnd = input('discount_end', '');
+
         if (!$name) {
             json_error('请输入商品名称');
         }
@@ -137,6 +150,15 @@ class Merchant_Goods extends Controller
             'content' => $content,
             'cover' => $cover,
             'status' => $status,
+            'is_seckill' => $isSeckill ? 1 : 0,
+            'seckill_price' => $isSeckill ? $seckillPrice : 0,
+            'seckill_start' => $isSeckill && $seckillStart ? $seckillStart : null,
+            'seckill_end' => $isSeckill && $seckillEnd ? $seckillEnd : null,
+            'seckill_stock' => $isSeckill ? max(0, $seckillStock) : 0,
+            'is_discount' => $isDiscount ? 1 : 0,
+            'discount_price' => $isDiscount ? $discountPrice : 0,
+            'discount_start' => $isDiscount && $discountStart ? $discountStart : null,
+            'discount_end' => $isDiscount && $discountEnd ? $discountEnd : null,
         ];
 
         if ($id) {

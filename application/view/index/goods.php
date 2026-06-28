@@ -60,12 +60,21 @@
             <?php endif; ?>
         </div>
     </div>
-    <div>
-        <div class="goods-title"><?php echo h($goods['name']); ?></div>
-        <div class="goods-price-large">¥<?php echo $goods['price']; ?></div>
+    <div>        <div class="goods-title"><?php echo h($goods['name']); ?></div>
+        <div class="goods-price-large">
+            ¥<?php echo number_format($effective['price'], 2); ?>
+            <?php if ($effective['activity'] !== 'none'): ?>
+            <span style="font-size:14px; color:#94A3B8; text-decoration:line-through; margin-left:8px;">¥<?php echo number_format($effective['original_price'], 2); ?></span>
+            <span class="tag tag-red" style="margin-left:8px;"><?php echo $effective['label']; ?></span>
+            <?php endif; ?>
+        </div>
         <div class="goods-tags">
             <span class="tag tag-blue"><?php echo h($goods['category_name'] ?? '默认分类'); ?></span>
+            <?php if ($effective['activity'] === 'seckill'): ?>
+            <span class="tag tag-green">秒杀库存 <?php echo max(0, (int)$goods['seckill_stock'] - (int)$goods['seckill_sold']); ?></span>
+            <?php else: ?>
             <span class="tag tag-green">库存 <?php echo $goods['stock']; ?></span>
+            <?php endif; ?>
             <span class="tag">已售 <?php echo $goods['sold']; ?></span>
             <span class="tag">店铺：<?php echo h($goods['shop_name'] ?? '官方'); ?></span>
             <?php if (!empty($goods['merchant_id'])): ?>
@@ -81,7 +90,12 @@
             <input type="hidden" name="goods_id" value="<?php echo $goods['id']; ?>">
             <div class="quantity-row">
                 <label style="font-weight:500;">购买数量</label>
-                <input type="number" name="quantity" id="quantity" value="1" min="1" max="<?php echo $goods['stock']; ?>">
+                <?php
+                $maxQty = $effective['activity'] === 'seckill'
+                    ? max(1, (int)$goods['seckill_stock'] - (int)$goods['seckill_sold'])
+                    : $goods['stock'];
+                ?>
+                <input type="number" name="quantity" id="quantity" value="1" min="1" max="<?php echo $maxQty; ?>">
             </div>
             <div class="form-group">
                 <label>联系方式（用于查询订单）</label>

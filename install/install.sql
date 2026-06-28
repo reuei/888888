@@ -186,6 +186,16 @@ CREATE TABLE `jz_goods` (
   `source_goods_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '来源商品ID（货源对接）',
   `source_merchant_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '货源提供商户ID',
   `source_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '货源成本价',
+  `is_seckill` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否秒杀 0否 1是',
+  `seckill_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '秒杀价',
+  `seckill_start` datetime DEFAULT NULL COMMENT '秒杀开始时间',
+  `seckill_end` datetime DEFAULT NULL COMMENT '秒杀结束时间',
+  `seckill_stock` int(11) NOT NULL DEFAULT 0 COMMENT '秒杀库存',
+  `seckill_sold` int(11) NOT NULL DEFAULT 0 COMMENT '秒杀已售',
+  `is_discount` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否限时折扣 0否 1是',
+  `discount_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '折扣价',
+  `discount_start` datetime DEFAULT NULL COMMENT '折扣开始时间',
+  `discount_end` datetime DEFAULT NULL COMMENT '折扣结束时间',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -777,5 +787,28 @@ INSERT INTO `jz_points_rule` (`name`, `type`, `points`, `growth_value`, `limit_t
 ('每日登录', 'login', 5, 2, 'day', 1, 1, 2),
 ('下单奖励', 'order', 10, 10, 'day', 10, 1, 3),
 ('邀请好友', 'invite', 50, 30, 'day', 5, 1, 4);
+
+-- ----------------------------
+-- 数据备份表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_backup`;
+CREATE TABLE `jz_backup` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL DEFAULT '' COMMENT '备份名称',
+  `filename` varchar(255) NOT NULL DEFAULT '' COMMENT '备份文件名',
+  `file_size` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '文件大小（字节）',
+  `file_md5` varchar(32) NOT NULL DEFAULT '' COMMENT '文件MD5',
+  `type` tinyint(1) NOT NULL DEFAULT 1 COMMENT '类型 1手动备份 2自动备份',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '状态 0正常 1已恢复 2已删除',
+  `operator_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '操作人ID',
+  `operator_name` varchar(50) NOT NULL DEFAULT '' COMMENT '操作人账号',
+  `remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_type` (`type`),
+  KEY `idx_status` (`status`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='数据备份表';
 
 SET FOREIGN_KEY_CHECKS = 1;

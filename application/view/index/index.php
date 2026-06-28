@@ -105,21 +105,27 @@
 <?php if (empty($goods)): ?>
 <div class="card empty-tip"><?php echo h($tpl['goods_empty_tip'] ?? '暂无上架商品'); ?></div>
 <?php else: ?>
-<div class="grid">
-    <?php foreach ($goods as $item): ?>
+<div class="grid">    <?php foreach ($goods as $item): ?>
+    <?php $eff = goods_effective_price($item); ?>
     <div class="goods-card">
         <a href="<?php echo url('index/goods', ['id' => $item['id']]); ?>">
-            <div class="goods-cover">
+            <div class="goods-cover" style="position:relative;">
                 <?php if ($item['cover']): ?>
                 <img src="<?php echo h($item['cover']); ?>" alt="<?php echo h($item['name']); ?>">
                 <?php else: ?>
                 暂无图片
                 <?php endif; ?>
+                <?php if ($eff['activity'] !== 'none'): ?>
+                <span style="position:absolute; top:8px; left:8px; background:#EF4444; color:#fff; font-size:12px; padding:2px 8px; border-radius:4px;"><?php echo $eff['label']; ?></span>
+                <?php endif; ?>
             </div>
             <div class="goods-info">
                 <div class="goods-name"><?php echo h($item['name']); ?></div>
                 <div class="goods-meta">
-                    <span class="goods-price">¥<?php echo $item['price']; ?></span>
+                    <span class="goods-price">¥<?php echo number_format($eff['price'], 2); ?></span>
+                    <?php if ($eff['activity'] !== 'none'): ?>
+                    <span style="font-size:12px; color:#94A3B8; text-decoration:line-through;">¥<?php echo number_format($eff['original_price'], 2); ?></span>
+                    <?php endif; ?>
                     <?php if (($tpl['goods_show_sold'] ?? '1') === '1'): ?>
                     <span class="goods-sold">已售 <?php echo $item['sold']; ?></span>
                     <?php endif; ?>
@@ -127,7 +133,7 @@
                 <?php if (($tpl['goods_show_stock'] ?? '1') === '1' || ($tpl['goods_show_merchant'] ?? '1') === '1'): ?>
                 <div style="font-size: 12px; color: #94A3B8; margin-top: 6px;">
                     <?php if (($tpl['goods_show_stock'] ?? '1') === '1'): ?>
-                    <span>库存 <?php echo $item['stock']; ?></span>
+                    <span>库存 <?php echo $eff['activity'] === 'seckill' ? max(0, (int)$item['seckill_stock'] - (int)$item['seckill_sold']) : $item['stock']; ?></span>
                     <?php endif; ?>
                     <?php if (($tpl['goods_show_merchant'] ?? '1') === '1'): ?>
                     <span><?php echo ($tpl['goods_show_stock'] ?? '1') === '1' ? ' | ' : ''; ?><?php echo h($item['shop_name'] ?? '-'); ?></span>

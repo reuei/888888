@@ -65,6 +65,50 @@
             <label>商品说明</label>
             <textarea name="content" rows="6" placeholder="填写商品介绍、使用说明等"><?php echo h($goods['content'] ?? ''); ?></textarea>
         </div>
+        <div class="card" style="margin-bottom: 16px; background: #FEF2F2; border-color: #FECACA;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:600; margin-bottom:12px;">
+                <input type="checkbox" name="is_seckill" value="1" <?php echo (isset($goods['is_seckill']) && $goods['is_seckill']) ? 'checked' : ''; ?>> 开启秒杀
+            </label>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width:140px;">
+                    <label>秒杀价（元）</label>
+                    <input type="number" step="0.01" min="0" name="seckill_price" value="<?php echo $goods['seckill_price'] ?? ''; ?>">
+                </div>
+                <div class="form-group" style="flex: 1; min-width:140px;">
+                    <label>秒杀库存</label>
+                    <input type="number" min="0" name="seckill_stock" value="<?php echo $goods['seckill_stock'] ?? '0'; ?>">
+                </div>
+                <div class="form-group" style="flex: 1; min-width:180px;">
+                    <label>开始时间</label>
+                    <input type="datetime-local" name="seckill_start" value="<?php echo !empty($goods['seckill_start']) ? date('Y-m-d\TH:i', strtotime($goods['seckill_start'])) : ''; ?>">
+                </div>
+                <div class="form-group" style="flex: 1; min-width:180px;">
+                    <label>结束时间</label>
+                    <input type="datetime-local" name="seckill_end" value="<?php echo !empty($goods['seckill_end']) ? date('Y-m-d\TH:i', strtotime($goods['seckill_end'])) : ''; ?>">
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 16px; background: #FFFBEB; border-color: #FDE68A;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:600; margin-bottom:12px;">
+                <input type="checkbox" name="is_discount" value="1" <?php echo (isset($goods['is_discount']) && $goods['is_discount']) ? 'checked' : ''; ?>> 开启限时折扣
+            </label>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width:140px;">
+                    <label>折扣价（元）</label>
+                    <input type="number" step="0.01" min="0" name="discount_price" value="<?php echo $goods['discount_price'] ?? ''; ?>">
+                </div>
+                <div class="form-group" style="flex: 1; min-width:180px;">
+                    <label>开始时间</label>
+                    <input type="datetime-local" name="discount_start" value="<?php echo !empty($goods['discount_start']) ? date('Y-m-d\TH:i', strtotime($goods['discount_start'])) : ''; ?>">
+                </div>
+                <div class="form-group" style="flex: 1; min-width:180px;">
+                    <label>结束时间</label>
+                    <input type="datetime-local" name="discount_end" value="<?php echo !empty($goods['discount_end']) ? date('Y-m-d\TH:i', strtotime($goods['discount_end'])) : ''; ?>">
+                </div>
+            </div>
+        </div>
+
         <div class="form-group">
             <label>状态</label>
             <select name="status">

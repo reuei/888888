@@ -150,7 +150,7 @@ class Index extends Controller
         $pageSize = (int) ($tpl['goods_page_size'] ?? 24);
         $sort = input('sort', $tpl['goods_default_sort'] ?? 'sold');
 
-        $where = 'g.status = 1 AND g.stock > 0';
+        $where = 'g.status = 1 AND (g.stock > 0 OR (g.is_seckill = 1 AND g.seckill_stock > g.seckill_sold))';
         $params = [];
 
         $subsiteId = $this->getSubsiteId();
@@ -252,7 +252,7 @@ class Index extends Controller
             $recParams[] = $subsiteId;
         }
         $recommend = Db::query(
-            "SELECT id, name, cover, price, stock, sold FROM jz_goods
+            "SELECT id, name, cover, price, stock, sold, is_seckill, seckill_price, seckill_start, seckill_end, seckill_stock, seckill_sold, is_discount, discount_price, discount_start, discount_end FROM jz_goods
              WHERE {$recWhere}
              ORDER BY sold DESC LIMIT 6",
             $recParams
@@ -261,8 +261,10 @@ class Index extends Controller
         // 商品详情页广告
         $goodsBottom = Db::query("SELECT * FROM jz_ad WHERE position = 'goods_bottom' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 3");
 
+        $effective = goods_effective_price($goods);
         $this->assign('title', h($goods['name']));
         $this->assign('goods', $goods);
+        $this->assign('effective', $effective);
         $this->assign('recommend', $recommend);
         $this->assign('goodsBottom', $goodsBottom);
         $this->fetch('index/goods');
@@ -510,6 +512,10 @@ class Index extends Controller
             json_error('商品不存在或已下架');
         }
 
+        $effective = goods_effective_price($goods);
+        $unitPrice = $effective['price'];
+        $isSeckill = $effective['activity'] === 'seckill';
+
         // 分站访问时校验商品归属
         $subsiteId = $this->getSubsiteId();
         if ($subsiteId > 0 && (int) $goods['subsite_id'] !== $subsiteId) {
@@ -537,7 +543,7 @@ class Index extends Controller
         }
 
         // 金额校验
-        $totalAmount = round($goods['price'] * $quantity, 2);
+        $totalAmount = round($unitPrice * $quantity, 2);
         $minAmount = (float) ($risk['min_amount'] ?? 0.01);
         $maxAmount = (float) ($risk['max_amount'] ?? 50000);
         if ($totalAmount < $minAmount) {
@@ -561,8 +567,13 @@ class Index extends Controller
             }
         }
 
-        // 卡密类商品校验库存
-        if ($goods['type'] == 1 && $goods['stock'] < $quantity) {
+        // 库存校验
+        if ($isSeckill) {
+            $seckillAvailable = (int) $goods['seckill_stock'] - (int) $goods['seckill_sold'];
+            if ($seckillAvailable < $quantity) {
+                json_error('秒杀库存不足，当前剩余 ' . $seckillAvailable);
+            }
+        } elseif ($goods['type'] == 1 && $goods['stock'] < $quantity) {
             json_error('库存不足，当前剩余 ' . $goods['stock']);
         }
 
@@ -615,7 +626,7 @@ class Index extends Controller
             'goods_id' => $goods['id'],
             'goods_name' => $goods['name'],
             'quantity' => $quantity,
-            'price' => $goods['price'],
+            'price' => $unitPrice,
             'total_amount' => $totalAmount,
             'pay_amount' => $payAmount,
             'coupon_code' => $couponCode,
@@ -638,7 +649,12 @@ class Index extends Controller
         }
 
         // 扣减库存（下单即冻结库存，支付后发货）
-        if ($goods['type'] == 1) {
+        if ($isSeckill) {
+            Db::execute(
+                "UPDATE jz_goods SET seckill_sold = seckill_sold + ? WHERE id = ? AND seckill_stock - seckill_sold >= ?",
+                [$quantity, $goodsId, $quantity]
+            );
+        } elseif ($goods['type'] == 1) {
             Db::execute("UPDATE jz_goods SET stock = stock - ? WHERE id = ? AND stock >= ?", [$quantity, $goodsId, $quantity]);
         }
 

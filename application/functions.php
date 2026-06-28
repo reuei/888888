@@ -640,3 +640,455 @@ function generate_points_order_no()
 {
     return 'PT' . date('YmdHis') . random_int(100000, 999999);
 }
+
+/**
+ * 获取商品当前生效价格与活动信息
+ * @param array $goods 商品数组
+ * @return array ['price'=>现价, 'original_price'=>原价, 'activity'=>'none/seckill/discount', 'label'=>'标签']
+ */
+function goods_effective_price(array $goods)
+{
+    $now = time();
+    $price = (float) $goods['price'];
+    $originalPrice = (float) ($goods['original_price'] ?: $goods['price']);
+
+    // 秒杀优先
+    if (!empty($goods['is_seckill']) && !empty($goods['seckill_price'])) {
+        $start = !empty($goods['seckill_start']) ? strtotime($goods['seckill_start']) : 0;
+        $end = !empty($goods['seckill_end']) ? strtotime($goods['seckill_end']) : PHP_INT_MAX;
+        if ($start <= $now && $now <= $end && (int) $goods['seckill_stock'] > (int) $goods['seckill_sold']) {
+            return [
+                'price' => (float) $goods['seckill_price'],
+                'original_price' => $price,
+                'activity' => 'seckill',
+                'label' => '秒杀',
+            ];
+        }
+    }
+
+    // 限时折扣
+    if (!empty($goods['is_discount']) && !empty($goods['discount_price'])) {
+        $start = !empty($goods['discount_start']) ? strtotime($goods['discount_start']) : 0;
+        $end = !empty($goods['discount_end']) ? strtotime($goods['discount_end']) : PHP_INT_MAX;
+        if ($start <= $now && $now <= $end) {
+            return [
+                'price' => (float) $goods['discount_price'],
+                'original_price' => $price,
+                'activity' => 'discount',
+                'label' => '限时折扣',
+            ];
+        }
+    }
+
+    return [
+        'price' => $price,
+        'original_price' => $originalPrice,
+        'activity' => 'none',
+        'label' => '',
+    ];
+}
+
+/**
+ * 检查商品是否处于秒杀活动中
+ */
+function goods_in_seckill(array $goods)
+{
+    $info = goods_effective_price($goods);
+    return $info['activity'] === 'seckill';
+}
+
+/**
+ * 获取备份文件存储目录
+ */
+function backup_storage_path()
+{
+    $path = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'backup' . DIRECTORY_SEPARATOR;
+    if (!is_dir($path)) {
+        @mkdir($path, 0750, true);
+    }
+    return $path;
+}
+
+/**
+ * 生成备份文件名
+ */
+function backup_generate_filename()
+{
+    return date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.sql';
+}
+
+/**
+ * 获取当前数据库所有表名
+ */
+function backup_get_tables()
+{
+    $rows = Db::query("SHOW TABLES");
+    $tables = [];
+    foreach ($rows as $row) {
+        $tables[] = array_values($row)[0];
+    }
+    return $tables;
+}
+
+/**
+ * 对字符串进行 SQL 转义（用于生成 INSERT 语句）
+ */
+function backup_sql_escape($value)
+{
+    if ($value === null) {
+        return 'NULL';
+    }
+    return "'" . str_replace(["\\", "'", "\n", "\r"], ["\\\\", "\\'", "\\n", "\\r"], $value) . "'";
+}
+
+/**
+ * 创建数据库备份
+ * @param string $name 备份名称
+ * @param int $type 1手动 2自动
+ * @param string $remark 备注
+ * @return array ['code'=>0, 'msg'=>'', 'id'=>备份ID, 'path'=>'']
+ */
+function backup_database($name, $type = 1, $remark = '')
+{
+    $dbConfig = Config::get('database');
+    if (empty($dbConfig)) {
+        return ['code' => 1, 'msg' => '数据库配置不存在'];
+    }
+
+    $backupPath = backup_storage_path();
+    if (!is_dir($backupPath) || !is_writable($backupPath)) {
+        return ['code' => 1, 'msg' => '备份目录不可写：' . $backupPath];
+    }
+
+    $filename = backup_generate_filename();
+    $filepath = $backupPath . $filename;
+
+    // 优先尝试 mysqldump
+    $usedMysqldump = false;
+    $mysqldump = function_exists('shell_exec') ? @shell_exec('which mysqldump 2>/dev/null') : '';
+    $mysqldump = $mysqldump ? trim($mysqldump) : '';
+
+    if ($mysqldump && function_exists('shell_exec') && function_exists('escapeshellarg')) {
+        $cmd = sprintf(
+            '%s --host=%s --port=%d --user=%s --password=%s --single-transaction --skip-lock-tables --set-charset --default-character-set=%s %s > %s',
+            $mysqldump,
+            escapeshellarg($dbConfig['hostname']),
+            (int) ($dbConfig['hostport'] ?? 3306),
+            escapeshellarg($dbConfig['username']),
+            escapeshellarg($dbConfig['password']),
+            escapeshellarg($dbConfig['charset'] ?? 'utf8mb4'),
+            escapeshellarg($dbConfig['database']),
+            escapeshellarg($filepath)
+        );
+        @shell_exec($cmd);
+        if (is_file($filepath) && filesize($filepath) > 0) {
+            $usedMysqldump = true;
+        }
+    }
+
+    if (empty($usedMysqldump)) {
+        // PHP 兜底备份
+        $result = backup_database_php($filepath);
+        if ($result['code'] !== 0) {
+            return $result;
+        }
+    }
+
+    if (!is_file($filepath) || filesize($filepath) <= 0) {
+        return ['code' => 1, 'msg' => '备份文件生成失败或为空'];
+    }
+
+    $fileSize = filesize($filepath);
+    $fileMd5 = md5_file($filepath);
+    $admin = session('admin_user') ?? [];
+
+    $backupId = Db::insert('jz_backup', [
+        'name' => $name ?: date('Y-m-d H:i:s 备份'),
+        'filename' => $filename,
+        'file_size' => $fileSize,
+        'file_md5' => $fileMd5,
+        'type' => in_array($type, [1, 2], true) ? $type : 1,
+        'status' => 0,
+        'operator_id' => $admin['id'] ?? 0,
+        'operator_name' => $admin['username'] ?? '',
+        'remark' => $remark,
+        'create_time' => date('Y-m-d H:i:s'),
+    ]);
+
+    return [
+        'code' => 0,
+        'msg' => '备份成功',
+        'id' => $backupId,
+        'path' => $filepath,
+        'size' => $fileSize,
+        'md5' => $fileMd5,
+    ];
+}
+
+/**
+ * 使用 PHP 生成数据库备份文件
+ */
+function backup_database_php($filepath)
+{
+    try {
+        $fp = @fopen($filepath, 'w');
+        if (!$fp) {
+            return ['code' => 1, 'msg' => '无法创建备份文件'];
+        }
+
+        $dbConfig = Config::get('database');
+        $database = $dbConfig['database'];
+
+        fwrite($fp, "-- 鲸商城 Pro 数据库备份\n");
+        fwrite($fp, "-- 生成时间：" . date('Y-m-d H:i:s') . "\n");
+        fwrite($fp, "-- 数据库：{$database}\n");
+        fwrite($fp, "SET NAMES utf8mb4;\n");
+        fwrite($fp, "SET FOREIGN_KEY_CHECKS = 0;\n\n");
+
+        $tables = backup_get_tables();
+        foreach ($tables as $table) {
+            // DROP TABLE
+            fwrite($fp, "DROP TABLE IF EXISTS `{$table}`;\n");
+
+            // CREATE TABLE
+            $create = Db::fetch("SHOW CREATE TABLE `{$table}`");
+            $createSql = $create['Create Table'] ?? '';
+            if ($createSql) {
+                fwrite($fp, $createSql . ";\n\n");
+            }
+
+            // INSERT DATA
+            $columns = Db::query("SHOW COLUMNS FROM `{$table}`");
+            $columnNames = array_map(function ($c) {
+                return '`' . $c['Field'] . '`';
+            }, $columns);
+            $columnStr = implode(', ', $columnNames);
+
+            $offset = 0;
+            $batchSize = 100;
+            do {
+                $rows = Db::query("SELECT * FROM `{$table}` LIMIT {$offset}, {$batchSize}");
+                if (empty($rows)) {
+                    break;
+                }
+
+                $valuesList = [];
+                foreach ($rows as $row) {
+                    $values = [];
+                    foreach ($row as $val) {
+                        $values[] = backup_sql_escape($val);
+                    }
+                    $valuesList[] = '(' . implode(', ', $values) . ')';
+                }
+
+                if (!empty($valuesList)) {
+                    fwrite($fp, "INSERT INTO `{$table}` ({$columnStr}) VALUES \n");
+                    fwrite($fp, implode(",\n", $valuesList) . ";\n\n");
+                }
+
+                $offset += $batchSize;
+            } while (count($rows) === $batchSize);
+        }
+
+        fwrite($fp, "SET FOREIGN_KEY_CHECKS = 1;\n");
+        fclose($fp);
+
+        return ['code' => 0, 'msg' => '备份成功'];
+    } catch (Exception $e) {
+        if (isset($fp) && $fp) {
+            @fclose($fp);
+        }
+        @unlink($filepath);
+        return ['code' => 1, 'msg' => '备份失败：' . $e->getMessage()];
+    }
+}
+
+/**
+ * 将 SQL 文件拆分为可执行语句数组
+ */
+function backup_split_sql($sql)
+{
+    $sql = trim($sql);
+    if ($sql === '') {
+        return [];
+    }
+
+    // 移除单行注释
+    $sql = preg_replace('/--[^\n]*\n/', "\n", $sql);
+    // 移除多行注释
+    $sql = preg_replace('/\/\*[\s\S]*?\*\//', '', $sql);
+
+    $statements = [];
+    $current = '';
+    $len = strlen($sql);
+    $inString = false;
+    $stringChar = '';
+
+    for ($i = 0; $i < $len; $i++) {
+        $char = $sql[$i];
+        $current .= $char;
+
+        if ($inString) {
+            if ($char === '\\' && $i + 1 < $len) {
+                $current .= $sql[++$i];
+            } elseif ($char === $stringChar) {
+                $inString = false;
+                $stringChar = '';
+            }
+        } else {
+            if ($char === "'" || $char === '"' || $char === '`') {
+                $inString = true;
+                $stringChar = $char;
+            } elseif ($char === ';') {
+                $statements[] = trim($current);
+                $current = '';
+            }
+        }
+    }
+
+    if (trim($current) !== '') {
+        $statements[] = trim($current);
+    }
+
+    return array_values(array_filter($statements, function ($s) {
+        return trim($s) !== '';
+    }));
+}
+
+/**
+ * 从备份文件恢复数据库
+ * @param int $backupId 备份记录ID
+ * @return array ['code'=>0, 'msg'=>'']
+ */
+function backup_restore($backupId)
+{
+    $backupId = (int) $backupId;
+    if ($backupId <= 0) {
+        return ['code' => 1, 'msg' => '参数错误'];
+    }
+
+    $record = Db::fetch("SELECT * FROM jz_backup WHERE id = ? AND status = 0", [$backupId]);
+    if (!$record) {
+        return ['code' => 1, 'msg' => '备份记录不存在或已被恢复/删除'];
+    }
+
+    $backupPath = backup_storage_path();
+    $filepath = $backupPath . $record['filename'];
+    if (!is_file($filepath)) {
+        return ['code' => 1, 'msg' => '备份文件不存在：' . $record['filename']];
+    }
+
+    $md5 = md5_file($filepath);
+    if ($md5 !== $record['file_md5']) {
+        return ['code' => 1, 'msg' => '备份文件校验失败，可能被篡改'];
+    }
+
+    $sql = @file_get_contents($filepath);
+    if ($sql === false) {
+        return ['code' => 1, 'msg' => '无法读取备份文件'];
+    }
+
+    try {
+        $pdo = Db::getPdo();
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
+        $pdo->exec("SET NAMES utf8mb4");
+
+        $statements = backup_split_sql($sql);
+        foreach ($statements as $stmt) {
+            $stmt = trim($stmt);
+            if ($stmt === '' || stripos($stmt, 'SET FOREIGN_KEY_CHECKS') === 0 || stripos($stmt, 'SET NAMES') === 0) {
+                continue;
+            }
+            $pdo->exec($stmt);
+        }
+
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
+
+        Db::update('jz_backup', ['status' => 1], 'id = ?', [$backupId]);
+
+        $admin = session('admin_user') ?? [];
+        admin_log('backup_restore', [
+            'id' => $backupId,
+            'filename' => $record['filename'],
+            'admin_id' => $admin['id'] ?? 0,
+        ]);
+
+        return ['code' => 0, 'msg' => '数据库恢复成功'];
+    } catch (Exception $e) {
+        return ['code' => 1, 'msg' => '恢复失败：' . $e->getMessage()];
+    }
+}
+
+/**
+ * 删除备份文件及记录
+ * @param int $backupId 备份记录ID
+ * @return array ['code'=>0, 'msg'=>'']
+ */
+function backup_delete($backupId)
+{
+    $backupId = (int) $backupId;
+    if ($backupId <= 0) {
+        return ['code' => 1, 'msg' => '参数错误'];
+    }
+
+    $record = Db::fetch("SELECT * FROM jz_backup WHERE id = ?", [$backupId]);
+    if (!$record) {
+        return ['code' => 1, 'msg' => '备份记录不存在'];
+    }
+
+    $backupPath = backup_storage_path();
+    $filepath = $backupPath . $record['filename'];
+    if (is_file($filepath)) {
+        @unlink($filepath);
+    }
+
+    Db::update('jz_backup', ['status' => 2], 'id = ?', [$backupId]);
+
+    $admin = session('admin_user') ?? [];
+    admin_log('backup_delete', [
+        'id' => $backupId,
+        'filename' => $record['filename'],
+        'admin_id' => $admin['id'] ?? 0,
+    ]);
+
+    return ['code' => 0, 'msg' => '删除成功'];
+}
+
+/**
+ * 格式化文件大小
+ */
+function format_size($size)
+{
+    $units = ['B', 'KB', 'MB', 'GB'];
+    $unitIndex = 0;
+    $size = max(0, (int) $size);
+    while ($size >= 1024 && $unitIndex < count($units) - 1) {
+        $size /= 1024;
+        $unitIndex++;
+    }
+    return round($size, 2) . ' ' . $units[$unitIndex];
+}
+
+/**
+ * 获取自动备份接口密钥
+ */
+function backup_get_cron_key()
+{
+    try {
+        $row = Db::fetch("SELECT cfg_value FROM jz_config WHERE cfg_key = 'base_backup_cron_key'");
+        if ($row && !empty($row['cfg_value'])) {
+            return $row['cfg_value'];
+        }
+
+        $key = generate_token(32);
+        Db::insert('jz_config', [
+            'cfg_key' => 'base_backup_cron_key',
+            'cfg_value' => $key,
+            'cfg_group' => 'base',
+            'description' => '自动备份接口密钥',
+        ]);
+        return $key;
+    } catch (Exception $e) {
+        return '';
+    }
+}

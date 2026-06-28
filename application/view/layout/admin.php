@@ -69,6 +69,7 @@ $menu = [
         ['name' => '短信通知', 'url' => 'admin/setting/sms'],
         ['name' => '文件存储', 'url' => 'admin/setting/storage'],
         ['name' => '安全防护', 'url' => 'admin/setting/security'],
+        ['name' => '数据备份', 'url' => 'admin/backup', 'roles' => ['super', 'admin']],
         ['name' => '管理员账号', 'url' => 'admin/admin', 'roles' => ['super']],
     ]]
 ];

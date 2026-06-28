@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast';
 import { Mail, MessageSquare, HardDrive, Clock, Wrench, FileText, Send, Save } from 'lucide-react';
 
 export default function SSystem() {
   const [tab, setTab] = useState<'email' | 'sms' | 'wechat' | 'storage' | 'cron' | 'tools' | 'protocol'>('email');
+  const { show } = useToast();
 
   const sections = [
     { key: 'email', label: '邮件系统', icon: Mail },
@@ -51,8 +53,8 @@ export default function SSystem() {
               <input type="password" className="input" defaultValue="********" />
             </div>
             <div className="flex gap-2">
-              <button className="btn btn-primary flex items-center gap-1"><Save size={16} /> 保存</button>
-              <button className="btn btn-default flex items-center gap-1"><Send size={16} /> 测试发送</button>
+              <button onClick={() => show('邮件配置保存成功', 'success')} className="btn btn-primary flex items-center gap-1"><Save size={16} /> 保存</button>
+              <button onClick={() => show('测试邮件已发送', 'info')} className="btn btn-default flex items-center gap-1"><Send size={16} /> 测试发送</button>
             </div>
           </div>
         )}
@@ -76,7 +78,7 @@ export default function SSystem() {
                 <input className="input" placeholder="签名" />
               </div>
             </div>
-            <button className="btn btn-primary">保存</button>
+            <button onClick={() => show('短信配置保存成功', 'success')} className="btn btn-primary">保存</button>
           </div>
         )}
 
@@ -98,7 +100,7 @@ export default function SSystem() {
               <label className="block text-sm mb-1">跳转链接</label>
               <input className="input" placeholder="https://..." />
             </div>
-            <button className="btn btn-primary">保存</button>
+            <button onClick={() => show('微信公众号配置保存成功', 'success')} className="btn btn-primary">保存</button>
           </div>
         )}
 
@@ -126,7 +128,7 @@ export default function SSystem() {
                 <input className="input" placeholder="Endpoint" />
               </div>
             </div>
-            <button className="btn btn-primary">保存</button>
+            <button onClick={() => show('文件存储配置保存成功', 'success')} className="btn btn-primary">保存</button>
           </div>
         )}
 
@@ -170,7 +172,7 @@ export default function SSystem() {
               <div key={i} className="card p-4">
                 <h4 className="font-medium mb-1">{t.name}</h4>
                 <p className="text-xs text-text-secondary mb-3">{t.desc}</p>
-                <button className="btn btn-primary text-xs w-full">执行</button>
+                <button onClick={() => show(`${t.name}执行成功`, 'success')} className="btn btn-primary text-xs w-full">执行</button>
               </div>
             ))}
           </div>
@@ -186,7 +188,7 @@ export default function SSystem() {
               <input type="checkbox" id="force" defaultChecked className="w-4 h-4" />
               <label htmlFor="force" className="text-sm">强制勾选后才能购买</label>
             </div>
-            <button className="btn btn-primary">保存</button>
+            <button onClick={() => show('弹窗协议保存成功', 'success')} className="btn btn-primary">保存</button>
           </div>
         )}
       </div>

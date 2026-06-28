@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast';
 import { User, Lock, Phone, Mail, CreditCard, MessageCircle } from 'lucide-react';
 
 export default function BSettings() {
   const [tab, setTab] = useState('profile');
+  const { show } = useToast();
 
   return (
     <div>
@@ -60,7 +62,7 @@ export default function BSettings() {
                 <button className="btn btn-default text-xs"><Mail size={14} /> 修改</button>
               </div>
             </div>
-            <button className="btn btn-primary">保存</button>
+            <button onClick={() => show('个人信息保存成功', 'success')} className="btn btn-primary">保存</button>
           </div>
         )}
 
@@ -75,7 +77,7 @@ export default function BSettings() {
                   <div className="font-medium">{item.name}登录</div>
                   <div className="text-xs text-text-secondary">{item.bound ? '已绑定' : '未绑定'}</div>
                 </div>
-                <button className={`btn text-xs ${item.bound ? 'btn-default' : 'btn-primary'}`}>
+                <button onClick={() => show(`${item.name}${item.bound ? '解绑' : '绑定'}成功`, item.bound ? 'warning' : 'success')} className={`btn text-xs ${item.bound ? 'btn-default' : 'btn-primary'}`}>
                   {item.bound ? '解绑' : '绑定'}
                 </button>
               </div>
@@ -98,7 +100,7 @@ export default function BSettings() {
               <div className="h-32 bg-gray-100 rounded flex items-center justify-center text-xs text-text-secondary">身份证反面</div>
             </div>
             <div className="text-xs text-text-secondary">当前状态：<span className="text-warning">待审核</span></div>
-            <button className="btn btn-primary">提交实名认证</button>
+            <button onClick={() => show('实名认证提交成功，等待审核', 'success')} className="btn btn-primary">提交实名认证</button>
           </div>
         )}
 
@@ -121,8 +123,8 @@ export default function BSettings() {
               <input className="input" placeholder="https://yourdomain.com/callback" />
             </div>
             <div className="flex gap-2">
-              <button className="btn btn-default">测试连通性</button>
-              <button className="btn btn-primary">保存</button>
+              <button onClick={() => show('连通性测试通过', 'success')} className="btn btn-default">测试连通性</button>
+              <button onClick={() => show('自定义支付配置保存成功', 'success')} className="btn btn-primary">保存</button>
             </div>
           </div>
         )}

@@ -1,4 +1,4 @@
-import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon } from '../types';
+import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage } from '../types';
 
 export const sProfile: UserProfile = {
   name: '总站长',
@@ -152,5 +152,71 @@ export const settlementRecords = [
   { id: 'SET001', merchant: '极速云', cycle: 'T+1', amount: 4820.00, fee: 48.20, status: 'settled', time: '2026-06-28 10:00' },
   { id: 'SET002', merchant: '蓝海防护', cycle: 'T+1', amount: 3150.50, fee: 31.51, status: 'settled', time: '2026-06-27 10:00' },
   { id: 'SET003', merchant: '站点卫士', cycle: 'T+7', amount: 1200.00, fee: 12.00, status: 'pending', time: '2026-06-28 09:00' },
+];
+
+export const users: User[] = [
+  { id: 'U001', nickname: 'user_9527', phone: '138****1234', level: 'VIP1', group: '默认分组', registerAt: '2026-01-10', status: 'normal' },
+  { id: 'U002', nickname: 'user_3344', phone: '139****5678', level: '普通会员', group: '默认分组', registerAt: '2026-02-15', status: 'normal' },
+  { id: 'U003', nickname: 'user_7788', phone: '137****9012', level: 'VIP2', group: '高价值用户', registerAt: '2026-03-20', status: 'banned' },
+  { id: 'U004', nickname: 'user_1122', phone: '136****3456', level: '普通会员', group: '默认分组', registerAt: '2026-04-12', status: 'normal' },
+];
+
+export const userGroups: UserGroup[] = [
+  { id: 'G1', name: '默认分组', userCount: 4820 },
+  { id: 'G2', name: '高价值用户', userCount: 356 },
+  { id: 'G3', name: '渠道引流用户', userCount: 128 },
+];
+
+export const userLevels: UserLevel[] = [
+  { id: 'L1', name: '普通会员', minAmount: 0, discount: 1.0 },
+  { id: 'L2', name: 'VIP1', minAmount: 500, discount: 0.95 },
+  { id: 'L3', name: 'VIP2', minAmount: 2000, discount: 0.88 },
+  { id: 'L4', name: 'VIP3', minAmount: 5000, discount: 0.8 },
+];
+
+export const luckyNumbers: LuckyNumber[] = [
+  { id: 'N001', number: '888888', price: 88.00, sold: false },
+  { id: 'N002', number: '666666', price: 66.00, sold: true },
+  { id: 'N003', number: '168888', price: 48.00, sold: false },
+  { id: 'N004', number: '5201314', price: 128.00, sold: false },
+  { id: 'N005', number: '999999', price: 99.00, sold: false },
+];
+
+export const realnameRecords: RealnameRecord[] = [
+  { id: 'R001', userId: 'U001', name: '张三', idCard: '11010119900101****', phone: '138****1234', status: 'approved', submittedAt: '2026-06-20 10:00' },
+  { id: 'R002', userId: 'U002', name: '李四', idCard: '31010119900202****', phone: '139****5678', status: 'pending', submittedAt: '2026-06-27 14:30' },
+  { id: 'R003', userId: 'U003', name: '王五', idCard: '44010119900303****', phone: '137****9012', status: 'rejected', submittedAt: '2026-06-25 09:15' },
+];
+
+export const agents: Agent[] = [
+  { id: 'A001', name: '总代理-老李', parent: null, level: 1, commission: 15 },
+  { id: 'A002', name: '一级代理-小张', parent: 'A001', level: 2, commission: 10 },
+  { id: 'A003', name: '二级代理-阿强', parent: 'A002', level: 3, commission: 8 },
+  { id: 'A004', name: '一级代理-小美', parent: 'A001', level: 2, commission: 10 },
+];
+
+export const agentProducts: AgentProduct[] = [
+  { id: 'AP001', name: '基础CDN加速-代理版', source: '极速云', costPrice: 8.00, retailPrice: 12.00, status: 'on' },
+  { id: 'AP002', name: '企业高防CDN-代理版', source: '蓝海防护', costPrice: 250.00, retailPrice: 299.00, status: 'on' },
+  { id: 'AP003', name: '全球加速Pro-代理版', source: '站点卫士', costPrice: 180.00, retailPrice: 199.00, status: 'pending' },
+];
+
+export const commissionRecords: CommissionRecord[] = [
+  { id: 'C001', agent: '一级代理-小张', orderId: 'O202606280001', amount: 29.90, status: 'settled', createdAt: '2026-06-28 10:30' },
+  { id: 'C002', agent: '二级代理-阿强', orderId: 'O202606280002', amount: 5.90, status: 'pending', createdAt: '2026-06-28 09:50' },
+  { id: 'C003', agent: '一级代理-小美', orderId: 'O202606270056', amount: 19.90, status: 'settled', createdAt: '2026-06-27 15:00' },
+];
+
+export const gateways: Gateway[] = [
+  { id: 'GW001', name: '支付宝官方', channel: 'alipay', fee: 0.6, enabled: true, isDefault: true },
+  { id: 'GW002', name: '微信支付商户号', channel: 'wxpay', fee: 0.6, enabled: true, isDefault: false },
+  { id: 'GW003', name: '易支付-通道A', channel: 'epay', fee: 2.0, enabled: true, isDefault: false },
+  { id: 'GW004', name: 'USDT-TRC20', channel: 'usdt', fee: 1.0, enabled: false, isDefault: false },
+];
+
+export const myPackages: MyPackage[] = [
+  { id: 'MP001', name: '标准版', flow: '500GB', bandwidth: '50Mbps', domains: 3, expireAt: '2026-12-31', status: 'active' },
+  { id: 'MP002', name: '专业版', flow: '2TB', bandwidth: '200Mbps', domains: 10, expireAt: '2027-01-15', status: 'active' },
+  { id: 'MP003', name: '入门版', flow: '100GB', bandwidth: '10Mbps', domains: 1, expireAt: '2026-05-31', status: 'expired' },
 ];
 

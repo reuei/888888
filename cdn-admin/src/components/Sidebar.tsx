@@ -19,6 +19,8 @@ import {
   BarChart3,
   Wallet,
   UserCog,
+  UserCircle,
+  GitBranch,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -39,6 +41,8 @@ const iconMap: Record<string, React.ReactNode> = {
   BarChart3: <BarChart3 size={16} />,
   Wallet: <Wallet size={16} />,
   UserCog: <UserCog size={16} />,
+  UserCircle: <UserCircle size={16} />,
+  GitBranch: <GitBranch size={16} />,
 };
 
 const sMenu = [
@@ -83,7 +87,43 @@ const sMenu = [
       { key: '/s/abnormal-orders', label: '异常订单处理' },
     ],
   },
-  { key: '/s/finance', label: '财务管理', icon: 'Wallet' },
+  {
+    key: '/s/users',
+    label: '会员/用户管理',
+    icon: 'UserCircle',
+    children: [
+      { key: '/s/users', label: '用户列表' },
+      { key: '/s/user-groups', label: '用户分组' },
+      { key: '/s/user-levels', label: '用户等级' },
+      { key: '/s/lucky-numbers', label: '自助选号' },
+      { key: '/s/user-realname', label: '用户实名审核' },
+      { key: '/s/user-rank', label: '用户流水排行' },
+    ],
+  },
+  {
+    key: '/s/agents',
+    label: '代理/分销管理',
+    icon: 'GitBranch',
+    children: [
+      { key: '/s/agent-dock', label: '代理商品对接' },
+      { key: '/s/agent-products', label: '下级代理商品' },
+      { key: '/s/agent-tree', label: '代理关系树' },
+      { key: '/s/agent-commission', label: '佣金结算' },
+      { key: '/s/agent-audit', label: '代理商品审核' },
+    ],
+  },
+  {
+    key: '/s/finance',
+    label: '财务管理',
+    icon: 'Wallet',
+    children: [
+      { key: '/s/finance', label: '资金流水总览' },
+      { key: '/s/settlement-manual', label: '手动结算' },
+      { key: '/s/settlement-auto', label: '自动结算' },
+      { key: '/s/alipay-export', label: '支付宝打款导出' },
+      { key: '/s/gateway-config', label: '网关配置' },
+    ],
+  },
   { key: '/s/payments', label: '支付网关管理', icon: 'CreditCard' },
   { key: '/s/templates', label: '模板与前端管理', icon: 'Monitor' },
   { key: '/s/articles', label: '文章/公告管理', icon: 'FileText' },

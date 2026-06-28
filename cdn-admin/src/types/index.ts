@@ -167,3 +167,88 @@ export interface Coupon {
   received: number;
   status: 'active' | 'expired';
 }
+
+export interface User {
+  id: string;
+  nickname: string;
+  phone: string;
+  level: string;
+  group: string;
+  registerAt: string;
+  status: 'normal' | 'banned';
+}
+
+export interface UserGroup {
+  id: string;
+  name: string;
+  userCount: number;
+}
+
+export interface UserLevel {
+  id: string;
+  name: string;
+  minAmount: number;
+  discount: number;
+}
+
+export interface LuckyNumber {
+  id: string;
+  number: string;
+  price: number;
+  sold: boolean;
+}
+
+export interface Agent {
+  id: string;
+  name: string;
+  parent: string | null;
+  level: number;
+  commission: number;
+}
+
+export interface AgentProduct {
+  id: string;
+  name: string;
+  source: string;
+  costPrice: number;
+  retailPrice: number;
+  status: 'on' | 'off' | 'pending';
+}
+
+export interface CommissionRecord {
+  id: string;
+  agent: string;
+  orderId: string;
+  amount: number;
+  status: 'settled' | 'pending';
+  createdAt: string;
+}
+
+export interface RealnameRecord {
+  id: string;
+  userId: string;
+  name: string;
+  idCard: string;
+  phone: string;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: string;
+}
+
+export interface Gateway {
+  id: string;
+  name: string;
+  channel: string;
+  fee: number;
+  enabled: boolean;
+  isDefault: boolean;
+}
+
+export interface MyPackage {
+  id: string;
+  name: string;
+  flow: string;
+  bandwidth: string;
+  domains: number;
+  expireAt: string;
+  status: 'active' | 'expired' | 'pending';
+}

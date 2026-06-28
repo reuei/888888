@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import type { Role } from './types';
 import Layout from './components/Layout';
 import Login from './pages/Login';
-import Placeholder from './pages/Placeholder';
+
 
 // S-side pages
 import SDashboard from './pages/s/Dashboard';
@@ -25,12 +25,30 @@ import STemplates from './pages/s/Templates';
 import SArticles from './pages/s/Articles';
 import SAds from './pages/s/Ads';
 import SCoupons from './pages/s/Coupons';
+import SUsers from './pages/s/Users';
+import SUserGroups from './pages/s/UserGroups';
+import SUserLevels from './pages/s/UserLevels';
+import SLuckyNumbers from './pages/s/LuckyNumbers';
+import SUserRealname from './pages/s/UserRealname';
+import SUserRank from './pages/s/UserRank';
+import SAgentDock from './pages/s/AgentDock';
+import SAgentProducts from './pages/s/AgentProducts';
+import SAgentTree from './pages/s/AgentTree';
+import SAgentCommission from './pages/s/AgentCommission';
+import SAgentAudit from './pages/s/AgentAudit';
+import SSettlementManual from './pages/s/SettlementManual';
+import SSettlementAuto from './pages/s/SettlementAuto';
+import SAlipayExport from './pages/s/AlipayExport';
+import SGatewayConfig from './pages/s/GatewayConfig';
 import SSystem from './pages/s/System';
 
 // B-side pages
 import BDashboard from './pages/b/Dashboard';
 import BSites from './pages/b/Sites';
+import AddSite from './pages/b/AddSite';
 import BPackages from './pages/b/Packages';
+import MyPackages from './pages/b/MyPackages';
+import Renew from './pages/b/Renew';
 import BWhitelist from './pages/b/Whitelist';
 import BFinance from './pages/b/Finance';
 import BSettings from './pages/b/Settings';
@@ -71,6 +89,21 @@ function App() {
               <Route path="/s/articles" element={<SArticles />} />
               <Route path="/s/ads" element={<SAds />} />
               <Route path="/s/coupons" element={<SCoupons />} />
+              <Route path="/s/users" element={<SUsers />} />
+              <Route path="/s/user-groups" element={<SUserGroups />} />
+              <Route path="/s/user-levels" element={<SUserLevels />} />
+              <Route path="/s/lucky-numbers" element={<SLuckyNumbers />} />
+              <Route path="/s/user-realname" element={<SUserRealname />} />
+              <Route path="/s/user-rank" element={<SUserRank />} />
+              <Route path="/s/agent-dock" element={<SAgentDock />} />
+              <Route path="/s/agent-products" element={<SAgentProducts />} />
+              <Route path="/s/agent-tree" element={<SAgentTree />} />
+              <Route path="/s/agent-commission" element={<SAgentCommission />} />
+              <Route path="/s/agent-audit" element={<SAgentAudit />} />
+              <Route path="/s/settlement-manual" element={<SSettlementManual />} />
+              <Route path="/s/settlement-auto" element={<SSettlementAuto />} />
+              <Route path="/s/alipay-export" element={<SAlipayExport />} />
+              <Route path="/s/gateway-config" element={<SGatewayConfig />} />
               <Route path="/s/system" element={<SSystem />} />
               <Route path="*" element={<Navigate to="/s/dashboard" replace />} />
             </>
@@ -78,10 +111,10 @@ function App() {
             <>
               <Route path="/b/dashboard" element={<BDashboard />} />
               <Route path="/b/sites" element={<BSites />} />
-              <Route path="/b/add-site" element={<Placeholder title="添加站点" breadcrumb={['站点管理', '添加站点']} />} />
+              <Route path="/b/add-site" element={<AddSite />} />
               <Route path="/b/packages" element={<BPackages />} />
-              <Route path="/b/my-packages" element={<BPackages />} />
-              <Route path="/b/renew" element={<BPackages />} />
+              <Route path="/b/my-packages" element={<MyPackages />} />
+              <Route path="/b/renew" element={<Renew />} />
               <Route path="/b/whitelist" element={<BWhitelist />} />
               <Route path="/b/finance" element={<BFinance />} />
               <Route path="/b/settings" element={<BSettings />} />

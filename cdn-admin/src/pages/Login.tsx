@@ -14,6 +14,7 @@ export default function Login({ onLogin }: LoginProps) {
   const [password, setPassword] = useState('123456');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [remember, setRemember] = useState(true);
 
   const handleRoleChange = (r: Role) => {
     setRole(r);
@@ -39,6 +40,9 @@ export default function Login({ onLogin }: LoginProps) {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      if (!remember) {
+        localStorage.removeItem('role');
+      }
       onLogin(role);
     }, 500);
   };
@@ -121,10 +125,14 @@ export default function Login({ onLogin }: LoginProps) {
             />
           </div>
           <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-1.5 text-text-secondary">
-              <input type="checkbox" defaultChecked /> 记住我
+            <label className="flex items-center gap-1.5 text-text-secondary cursor-pointer">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              /> 记住我
             </label>
-            <a href="#" className="text-primary">忘记密码？</a>
+            <button onClick={() => alert('请联系管理员重置密码')} className="text-primary">忘记密码？</button>
           </div>
           <button
             onClick={handleSubmit}

@@ -67,11 +67,25 @@ const BOrders = lazy(() => import('./pages/b/MyOrders'));
 const BInvoice = lazy(() => import('./pages/b/Invoice'));
 
 function App() {
-  const [role, setRole] = useState<Role | null>(null);
+  const [role, setRole] = useState<Role | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const saved = localStorage.getItem('role') as Role | null;
+    return saved === 's' || saved === 'b' ? saved : null;
+  });
 
-  const handleLogin = (r: Role) => setRole(r);
-  const handleLogout = () => setRole(null);
-  const handleSwitchRole = () => setRole(role === 's' ? 'b' : 's');
+  const handleLogin = (r: Role) => {
+    localStorage.setItem('role', r);
+    setRole(r);
+  };
+  const handleLogout = () => {
+    localStorage.removeItem('role');
+    setRole(null);
+  };
+  const handleSwitchRole = () => {
+    const next = role === 's' ? 'b' : 's';
+    localStorage.setItem('role', next);
+    setRole(next);
+  };
 
   if (!role) {
     return (

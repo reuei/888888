@@ -1,21 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import EmptyState from '../../components/EmptyState';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
+import Loading from '../../components/Loading';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { articles } from '../../data/mock';
+import { useToast } from '../../components/Toast';
+import * as api from '../../services/api';
+import type { Article } from '../../types';
 import { Plus, Edit, Trash2, Pin, Search, FileText } from 'lucide-react';
 
 export default function SArticles() {
-  const [list, setList] = useState(articles);
+  const { show } = useToast();
+  const [list, setList] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ title: '', category: '平台公告', content: '', isTop: false, status: 'draft' });
+
+  const load = async () => {
+    setLoading(true);
+    const data = await api.fetchArticles();
+    setList(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const filtered = list.filter((a) => {
     const q = debouncedKeyword.trim().toLowerCase();
@@ -31,25 +47,34 @@ export default function SArticles() {
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
   const pagedList = slice(sorted);
 
-  const handleAdd = () => {
-    setList([
-      {
-        id: `A00${list.length + 1}`,
-        title: form.title,
-        category: form.category,
-        isTop: form.isTop,
-        status: form.status as 'published' | 'draft',
-        publishAt: form.status === 'published' ? new Date().toLocaleString('zh-CN') : '-',
-      },
-      ...list,
-    ]);
+  const handleAdd = async () => {
+    await api.createArticle({
+      title: form.title,
+      category: form.category,
+      isTop: form.isTop,
+      status: form.status as 'published' | 'draft',
+    });
+    await load();
+    show('公告发布成功', 'success');
     setModalOpen(false);
     setForm({ title: '', category: '平台公告', content: '', isTop: false, status: 'draft' });
   };
 
-  const toggleTop = (id: string) => {
-    setList(list.map((a) => (a.id === id ? { ...a, isTop: !a.isTop } : a)));
+  const handleDelete = async (id: string) => {
+    if (!confirm('确定删除该公告吗？')) return;
+    await api.deleteArticle(id);
+    await load();
+    show('公告已删除', 'info');
   };
+
+  const toggleTop = async (id: string) => {
+    const target = list.find((a) => a.id === id);
+    if (!target) return;
+    await api.updateArticle(id, { isTop: !target.isTop });
+    await load();
+  };
+
+  if (loading) return <Loading />;
 
   return (
     <div>
@@ -112,7 +137,7 @@ export default function SArticles() {
                     <button className="p-1.5 rounded hover:bg-gray-100 text-primary" title="编辑">
                       <Edit size={16} />
                     </button>
-                    <button className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
+                    <button onClick={() => handleDelete(a.id)} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
                       <Trash2 size={16} />
                     </button>
                   </div>

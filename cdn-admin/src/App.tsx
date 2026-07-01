@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 import Loading from './components/Loading';
 import Login from './pages/Login';
+import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import Notifications from './pages/Notifications';
 
@@ -73,7 +74,17 @@ function App() {
   const handleSwitchRole = () => setRole(role === 's' ? 'b' : 's');
 
   if (!role) {
-    return <Login onLogin={handleLogin} />;
+    return (
+      <ErrorBoundary>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </ErrorBoundary>
+    );
   }
 
   return (

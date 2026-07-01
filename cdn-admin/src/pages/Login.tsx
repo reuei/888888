@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Role } from '../types';
-import { Shield, Store, AlertCircle } from 'lucide-react';
+import { Shield, Store, AlertCircle, Globe, ArrowLeft } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (role: Role) => void;
 }
 
 export default function Login({ onLogin }: LoginProps) {
+  const navigate = useNavigate();
   const [role, setRole] = useState<Role>('s');
   const [account, setAccount] = useState('admin');
   const [password, setPassword] = useState('123456');
@@ -42,15 +44,34 @@ export default function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-4">
-      <div className="card p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-primary text-white rounded flex items-center justify-center mx-auto mb-4">
-            <Shield size={28} />
-          </div>
-          <h1 className="text-2xl font-bold">CDN 防护加速平台</h1>
-          <p className="text-sm text-text-secondary mt-1">企业级 CDN 防护加速后台</p>
+    <div className="min-h-screen flex flex-col bg-bg">
+      <header className="border-b border-border bg-bg/80 backdrop-blur">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <button onClick={() => navigate('/')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
+              <Globe size={18} />
+            </div>
+            <span className="text-lg font-bold">CloudShield CDN</span>
+          </button>
         </div>
+      </header>
+
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="card p-8 w-full max-w-md relative">
+          <button
+            onClick={() => navigate('/')}
+            className="absolute top-4 left-4 flex items-center gap-1 text-xs text-text-secondary hover:text-primary transition-colors"
+          >
+            <ArrowLeft size={14} /> 返回首页
+          </button>
+
+          <div className="text-center mb-8 mt-4">
+            <div className="w-14 h-14 bg-primary text-white rounded flex items-center justify-center mx-auto mb-4">
+              <Shield size={28} />
+            </div>
+            <h1 className="text-2xl font-bold">CDN 防护加速平台</h1>
+            <p className="text-sm text-text-secondary mt-1">企业级 CDN 防护加速后台</p>
+          </div>
 
         <div className="flex gap-2 mb-6">
           <button
@@ -115,5 +136,6 @@ export default function Login({ onLogin }: LoginProps) {
         </div>
       </div>
     </div>
+  </div>
   );
 }

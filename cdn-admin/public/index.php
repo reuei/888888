@@ -7,6 +7,15 @@
  * .htaccess 会把所有前端路由重定向到本文件，再由 HashRouter 接管。
  */
 
+$configFile = __DIR__ . '/api/config.php';
+$lockFile = __DIR__ . '/api/install.lock';
+
+// 未安装时自动跳转到安装向导
+if (!file_exists($configFile) || !file_exists($lockFile)) {
+    header('Location: ./install.php');
+    exit;
+}
+
 $htmlFile = __DIR__ . '/index.html';
 
 if (!file_exists($htmlFile)) {

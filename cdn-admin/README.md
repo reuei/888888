@@ -28,11 +28,11 @@ npm run build
 
 构建产物输出到 `dist/` 目录。
 
-## 部署到 PHP 虚拟主机
+## 部署到 PHP 虚拟主机（带安装程序）
 
-本项目已改造为可直接部署到支持 PHP 的 Apache/Nginx 虚拟主机，无需 Node.js 运行环境。
+本项目已改造为可直接部署到支持 PHP 的 Apache/Nginx 虚拟主机，**无需 Node.js 运行环境，也无需命令行操作**。
 
-### 1. 构建
+### 1. 本地构建（仅需一次）
 
 在本地或支持 Node.js 的环境中执行：
 
@@ -41,12 +41,13 @@ npm install
 npm run build
 ```
 
-### 2. 上传
+### 2. 上传到虚拟主机
 
-将 `dist/` 目录内的所有文件上传到虚拟主机站点根目录（或子目录）。
+将 `dist/` 目录内的**所有文件**上传到虚拟主机站点根目录（或子目录）。
 
 ```text
 dist/
+├── install.php        # Web 安装向导
 ├── index.php          # PHP 入口
 ├── index.html         # 静态入口（备用）
 ├── .htaccess          # Apache 重写规则
@@ -54,35 +55,75 @@ dist/
 │   ├── index.php      # REST API 入口
 │   ├── health.php     # 健康检查
 │   └── data/
-│       ├── default.json   # 初始空数据结构
-│       └── data.json      # 运行时自动生成的数据文件（首次请求后创建）
+│       ├── default.json    # 初始空数据结构
+│       └── data.json       # 安装后生成的数据文件
+├── install/
+│   └── data-demo.php     # 演示数据集
 └── assets/            # 前端静态资源
 ```
 
-### 3. 目录权限
+### 3. 运行安装向导
 
-确保 `dist/api/data/` 目录可写，PHP 需要在该目录创建 `data.json`：
+在浏览器中访问：
 
-```bash
-chmod -R 755 dist/api/data
-# 如需要，可设置为 775 或 777（请根据主机安全策略调整）
+```
+https://你的域名/install.php
 ```
 
-### 4. 访问
+按向导完成三步：
+
+1. **环境检测**：自动检查 PHP 版本、JSON 扩展、目录可写权限。
+2. **初始化配置**：设置管理员账号密码，选择是否导入演示数据。
+3. **安装完成**：点击"进入平台"即可开始使用。
+
+安装完成后，系统会生成：
+
+- `api/config.php` — 站点配置文件
+- `api/install.lock` — 安装锁文件
+- `api/data/data.json` — 运行时数据文件
+
+### 4. 目录权限
+
+如果环境检测提示目录不可写，请将以下目录权限设置为 `755` 或 `777`：
+
+```text
+api/
+api/data/
+```
+
+### 5. 访问
 
 - 首页：`https://你的域名/` 或 `https://你的域名/#/`
 - S 端后台：`https://你的域名/#/s/dashboard`
 - B 端后台：`https://你的域名/#/b/dashboard`
 
-由于使用 HashRouter，所有前端路由都通过 URL hash 实现，因此无需服务器端路由配置即可在普通 PHP 虚拟主机上运行。
+默认登录账号：
 
-### 5. 数据说明
+- S 端：安装时设置的管理员账号
+- B 端：`merchant` / `123456`（演示数据中的商户账号）
 
-- 部署后首次访问时，`api/data/data.json` 会自动从 `api/data/default.json` 初始化。
-- 默认 `default.json` 为空数据，您可以通过界面进行增删改查操作，数据会持久化到服务器 JSON 文件。
-- 如需预置演示数据，可将包含完整数据的 JSON 文件替换 `dist/api/data/default.json`，然后删除已生成的 `dist/api/data/data.json` 使其重新初始化。
+### 6. 安全提示
 
-### 6. Nginx 配置（如使用 Nginx）
+安装完成后，建议通过 FTP/文件管理器删除或重命名：
+
+```text
+install.php
+install/
+```
+
+以防止安装程序被重复执行。
+
+### 7. 重新安装
+
+如需重新安装，删除以下文件后刷新页面：
+
+```text
+api/config.php
+api/install.lock
+api/data/data.json
+```
+
+### 8. Nginx 配置（如使用 Nginx）
 
 如果使用 Nginx 而非 Apache，请添加类似配置：
 

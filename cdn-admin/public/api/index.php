@@ -24,6 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// 未安装时拒绝 API 请求
+$configFile = dirname(__DIR__) . '/api/config.php';
+$lockFile = dirname(__DIR__) . '/api/install.lock';
+if (!file_exists($configFile) || !file_exists($lockFile)) {
+    http_response_code(403);
+    echo json_encode(['error' => 'System not installed. Please run install.php first.']);
+    exit;
+}
+
 $dataDir = __DIR__ . '/data';
 $dataFile = $dataDir . '/data.json';
 $defaultFile = $dataDir . '/default.json';

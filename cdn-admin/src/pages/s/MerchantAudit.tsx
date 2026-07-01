@@ -1,27 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { merchants } from '../../data/mock';
+import { useToast } from '../../components/Toast';
+import { fetchMerchants, updateMerchant } from '../../services/api';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { CheckCircle, XCircle, Eye, Store } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
+import type { Merchant } from '../../types';
 
 export default function SMerchantAudit() {
-  const [list, setList] = useState(merchants.filter((m) => m.status === 'pending'));
+  const { show } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [list, setList] = useState<Merchant[]>([]);
   const [auditOpen, setAuditOpen] = useState(false);
-  const [current, setCurrent] = useState<typeof merchants[0] | null>(null);
+  const [current, setCurrent] = useState<Merchant | null>(null);
   const [reason, setReason] = useState('');
 
-  const openAudit = (m: typeof merchants[0]) => {
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchMerchants();
+    setList(data.filter((m) => m.status === 'pending'));
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const openAudit = (m: Merchant) => {
     setCurrent(m);
     setReason('');
     setAuditOpen(true);
   };
 
-  const updateStatus = (_status: 'normal' | 'banned') => {
-    if (!current) return;
-    setList(list.filter((m) => m.id !== current.id));
+  const updateStatus = async (status: 'normal' | 'banned') => {
+    if (!current || loading) return;
+    await updateMerchant(current.id, { status });
+    await load();
     setAuditOpen(false);
+    show(`商户 ${current.shopName} 审核${status === 'normal' ? '通过' : '已驳回'}`, status === 'normal' ? 'success' : 'warning');
   };
 
   return (
@@ -70,7 +87,14 @@ export default function SMerchantAudit() {
                 </td>
               </tr>
             ))}
-            {list.length === 0 && (
+            {loading && (
+              <tr>
+                <td colSpan={6}>
+                  <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>
+                </td>
+              </tr>
+            )}
+            {!loading && list.length === 0 && (
               <tr>
                 <td colSpan={6}>
                   <EmptyState title="暂无待审核商户" description="当前没有需要审核的入驻商户" icon={<Store size={24} />} />
@@ -88,8 +112,8 @@ export default function SMerchantAudit() {
         footer={
           <>
             <button onClick={() => setAuditOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={() => updateStatus('banned')} className="btn btn-danger">驳回</button>
-            <button onClick={() => updateStatus('normal')} className="btn btn-success">通过</button>
+            <button onClick={() => updateStatus('banned')} disabled={loading} className="btn btn-danger disabled:opacity-70">驳回</button>
+            <button onClick={() => updateStatus('normal')} disabled={loading} className="btn btn-success disabled:opacity-70">通过</button>
           </>
         }
       >

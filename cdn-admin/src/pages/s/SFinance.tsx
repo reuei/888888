@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { financeRecords, settlementRecords } from '../../data/mock';
+import { fetchFinanceRecords } from '../../services/api';
+import { settlementRecords } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
 import { trendLabels, trendValues } from '../../data/mock';
 import LineChart from '../../components/LineChart';
@@ -9,10 +10,24 @@ import { Plus, CheckCircle, Receipt } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
 import Pagination from '../../components/Pagination';
 import { usePagination } from '../../hooks/usePagination';
+import type { FinanceRecord } from '../../types';
 
 export default function SFinance() {
   const [tab, setTab] = useState<'overview' | 'rates' | 'settlement'>('overview');
   const [settleOpen, setSettleOpen] = useState(false);
+  const [financeRecords, setFinanceRecords] = useState<FinanceRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchFinanceRecords();
+    setFinanceRecords(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const overviewPagination = usePagination({ total: financeRecords.length });
   const settlementPagination = usePagination({ total: settlementRecords.length });
@@ -90,17 +105,21 @@ export default function SFinance() {
               </tbody>
             </table>
 
-            {financeRecords.length === 0 && (
+            {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+            {!loading && financeRecords.length === 0 && (
               <EmptyState title="暂无资金明细" description="当前没有资金流水记录" icon={<Receipt size={24} />} />
             )}
 
-            <Pagination
-              page={overviewPagination.page}
-              totalPages={overviewPagination.totalPages}
-              total={financeRecords.length}
-              pageSize={overviewPagination.pageSize}
-              onChange={overviewPagination.setPage}
-            />
+            {!loading && financeRecords.length > 0 && (
+              <Pagination
+                page={overviewPagination.page}
+                totalPages={overviewPagination.totalPages}
+                total={financeRecords.length}
+                pageSize={overviewPagination.pageSize}
+                onChange={overviewPagination.setPage}
+              />
+            )}
           </div>
         </>
       )}

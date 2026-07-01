@@ -1,29 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { sites } from '../../data/mock';
+import { useToast } from '../../components/Toast';
+import { fetchSites, createSite, updateSite, deleteSite } from '../../services/api';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { Edit, Trash2, Ban, Plus, Search } from 'lucide-react';
+import { Trash2, Ban, Plus, Search, Loader2 } from 'lucide-react';
+import type { Site } from '../../types';
 
 export default function SSites() {
-  const [list, setList] = useState(sites);
+  const { show } = useToast();
+  const [list, setList] = useState<Site[]>([]);
+  const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', domain: '', template: 'PC-01' });
 
-  const handleAdd = () => {
-    const newSite = {
-      id: String(list.length + 1),
-      name: form.name,
-      domain: form.domain,
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchSites();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const handleAdd = async () => {
+    if (!form.domain.trim() || loading) return;
+    await createSite({
+      name: form.name.trim() || form.domain.trim(),
+      domain: form.domain.trim(),
       template: form.template,
       products: 0,
       nodes: 0,
-      status: 'running' as const,
+      status: 'running',
       createdAt: new Date().toISOString().slice(0, 10),
-    };
-    setList([newSite, ...list]);
+    });
+    await load();
     setModalOpen(false);
     setForm({ name: '', domain: '', template: 'PC-01' });
+    show(`站点 ${form.domain} 添加成功`, 'success');
+  };
+
+  const handleDelete = async (s: Site) => {
+    if (loading) return;
+    await deleteSite(s.id);
+    await load();
+    show(`站点 ${s.domain} 已删除`, 'warning');
+  };
+
+  const toggleStatus = async (s: Site) => {
+    if (loading) return;
+    const next = s.status === 'running' ? 'stopped' : 'running';
+    await updateSite(s.id, { status: next });
+    await load();
+    show(`站点 ${s.domain} 已${next === 'running' ? '启用' : '停用'}`, 'success');
   };
 
   return (
@@ -80,13 +111,10 @@ export default function SSites() {
                 <td className="text-text-secondary">{s.createdAt}</td>
                 <td>
                   <div className="flex items-center gap-2">
-                    <button className="p-1.5 rounded hover:bg-gray-100 text-primary" title="编辑">
-                      <Edit size={16} />
-                    </button>
-                    <button className="p-1.5 rounded hover:bg-gray-100 text-warning" title="禁用">
+                    <button onClick={() => toggleStatus(s)} className="p-1.5 rounded hover:bg-gray-100 text-warning" title={s.status === 'running' ? '停用' : '启用'}>
                       <Ban size={16} />
                     </button>
-                    <button className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
+                    <button onClick={() => handleDelete(s)} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -95,6 +123,8 @@ export default function SSites() {
             ))}
           </tbody>
         </table>
+
+        {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
       </div>
 
       <Modal
@@ -104,7 +134,9 @@ export default function SSites() {
         footer={
           <>
             <button onClick={() => setModalOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={handleAdd} className="btn btn-primary">保存</button>
+            <button onClick={handleAdd} disabled={loading || !form.domain.trim()} className="btn btn-primary disabled:opacity-70">
+              {loading ? <Loader2 size={16} className="animate-spin" /> : '保存'}
+            </button>
           </>
         }
       >

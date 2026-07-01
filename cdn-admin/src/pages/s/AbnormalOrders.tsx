@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
@@ -7,13 +7,16 @@ import SortableHeader from '../../components/SortableHeader';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { orders } from '../../data/mock';
+import { useToast } from '../../components/Toast';
+import { fetchOrders, updateOrder } from '../../services/api';
 import { statusBadge, statusText, formatMoney } from '../../utils/helpers';
-import { AlertTriangle, RefreshCcw, RotateCcw, Search, Inbox } from 'lucide-react';
+import { AlertTriangle, RefreshCcw, RotateCcw, Search, Inbox, Loader2 } from 'lucide-react';
 import type { Order } from '../../types';
 
 export default function SAbnormalOrders() {
-  const [list, setList] = useState<Order[]>(orders.filter((o) => o.status === 'refunded' || o.status === 'closed'));
+  const { show } = useToast();
+  const [list, setList] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [current, setCurrent] = useState<Order | null>(null);
   const [reason, setReason] = useState('');
@@ -39,6 +42,17 @@ export default function SAbnormalOrders() {
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
   const pagedList = slice(sorted);
 
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchOrders();
+    setList(data.filter((o) => o.status === 'refunded' || o.status === 'closed'));
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
   useEffect(() => {
     setPage(1);
   }, [debouncedKeyword, sortKey, setPage]);
@@ -49,10 +63,12 @@ export default function SAbnormalOrders() {
     setModalOpen(true);
   };
 
-  const updateStatus = (status: 'paid' | 'closed') => {
-    if (!current) return;
-    setList((prev) => prev.map((o) => (o.id === current.id ? { ...o, status } : o)));
+  const updateStatus = async (status: 'paid' | 'closed') => {
+    if (!current || loading) return;
+    await updateOrder(current.id, { status });
+    await load();
     setModalOpen(false);
+    show(`订单 ${current.id} 已${status === 'paid' ? '补单' : '关闭'}`, status === 'paid' ? 'success' : 'warning');
   };
 
   const abnormalReason = (status: Order['status']) =>
@@ -123,11 +139,15 @@ export default function SAbnormalOrders() {
           </tbody>
         </table>
 
-        {pagedList.length === 0 && (
+        {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+        {!loading && pagedList.length === 0 && (
           <EmptyState title="暂无异常订单" description="没有符合搜索条件的异常订单" icon={<Inbox size={24} />} />
         )}
 
-        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+        {!loading && pagedList.length > 0 && (
+          <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+        )}
       </div>
 
       <Modal
@@ -137,11 +157,12 @@ export default function SAbnormalOrders() {
         footer={
           <>
             <button onClick={() => setModalOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={() => updateStatus('closed')} className="btn btn-danger flex items-center gap-1">
+            <button onClick={() => updateStatus('closed')} disabled={loading} className="btn btn-danger flex items-center gap-1 disabled:opacity-70">
               <RotateCcw size={16} /> 关闭订单
             </button>
-            <button onClick={() => updateStatus('paid')} className="btn btn-success flex items-center gap-1">
-              <RefreshCcw size={16} /> 补单
+            <button onClick={() => updateStatus('paid')} disabled={loading} className="btn btn-success flex items-center gap-1 disabled:opacity-70">
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <RefreshCcw size={16} />}
+              补单
             </button>
           </>
         }

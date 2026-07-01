@@ -1092,3 +1092,322 @@ function backup_get_cron_key()
         return '';
     }
 }
+
+/**
+ * 获取消息模板
+ * @param string $type sms|email
+ * @param string $code 模板编码
+ * @return array|null
+ */
+function message_template($type, $code)
+{
+    return Db::fetch(
+        "SELECT * FROM jz_message_template WHERE type = ? AND code = ? AND status = 1",
+        [$type, $code]
+    );
+}
+
+/**
+ * 解析模板变量 {var_name}
+ * @param string $content 模板内容
+ * @param array $vars 变量数组
+ * @return string
+ */
+function message_parse($content, array $vars)
+{
+    $vars['site_name'] = $vars['site_name'] ?? site_config('site_name', '鲸商城 Pro');
+    $vars['site_url'] = $vars['site_url'] ?? base_url();
+
+    return preg_replace_callback('/\{([a-zA-Z0-9_]+)\}/', function ($matches) use ($vars) {
+        return $vars[$matches[1]] ?? '';
+    }, $content);
+}
+
+/**
+ * 读取邮件配置
+ */
+function email_config()
+{
+    return [
+        'host' => site_config('email_host', ''),
+        'port' => (int) site_config('email_port', '465'),
+        'secure' => site_config('email_secure', 'ssl'),
+        'user' => site_config('email_user', ''),
+        'pass' => site_config('email_pass', ''),
+        'from' => site_config('email_from', site_config('email_user', '')),
+    ];
+}
+
+/**
+ * 使用 SMTP 发送邮件
+ * @param string $to 收件人邮箱
+ * @param string $subject 主题
+ * @param string $body 内容（支持 HTML）
+ * @return array ['code'=>0, 'msg'=>''] / ['code'=>1, 'msg'=>'']
+ */
+function smtp_send_mail($to, $subject, $body)
+{
+    $config = email_config();
+    if (empty($config['host']) || empty($config['user']) || empty($config['pass'])) {
+        return ['code' => 1, 'msg' => '邮件服务器未配置'];
+    }
+
+    $host = $config['host'];
+    $port = $config['port'] ?: 465;
+    $secure = strtolower($config['secure']);
+    $username = $config['user'];
+    $password = $config['pass'];
+    $from = $config['from'] ?: $username;
+
+    $remote = ($secure === 'ssl' ? 'ssl://' : '') . $host . ':' . $port;
+    $fp = @stream_socket_client($remote, $errno, $errstr, 10);
+    if (!$fp) {
+        return ['code' => 1, 'msg' => '无法连接邮件服务器：' . $errstr];
+    }
+
+    $read = function () use ($fp) {
+        $data = '';
+        while ($line = @fgets($fp, 515)) {
+            $data .= $line;
+            if (substr($line, 3, 1) === ' ') {
+                break;
+            }
+        }
+        return $data;
+    };
+
+    $cmd = function ($command) use ($fp, $read) {
+        @fwrite($fp, $command . "\r\n");
+        return $read();
+    };
+
+    $read();
+
+    $hello = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    $cmd('EHLO ' . $hello);
+
+    if ($secure === 'tls') {
+        $cmd('STARTTLS');
+        @stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+        $cmd('EHLO ' . $hello);
+    }
+
+    $cmd('AUTH LOGIN');
+    $cmd(base64_encode($username));
+    $cmd(base64_encode($password));
+    $cmd('MAIL FROM:<' . $from . '>');
+    $cmd('RCPT TO:<' . $to . '>');
+    $cmd('DATA');
+
+    $boundary = md5(uniqid('boundary', true));
+    $subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+
+    $headers = "From: =?UTF-8?B?" . base64_encode($config['from'] ?: $config['user']) . "?= <{$from}>\r\n";
+    $headers .= "To: <{$to}>\r\n";
+    $headers .= "Subject: {$subject}\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/html; charset=UTF-8; boundary={$boundary}\r\n";
+    $headers .= "Content-Transfer-Encoding: base64\r\n";
+
+    $message = $headers . "\r\n" . chunk_split(base64_encode($body)) . "\r\n.\r\n";
+    $result = $cmd($message);
+
+    $cmd('QUIT');
+    @fclose($fp);
+
+    if (strpos($result, '250') === 0) {
+        return ['code' => 0, 'msg' => '邮件发送成功'];
+    }
+    return ['code' => 1, 'msg' => '邮件发送失败：' . $result];
+}
+
+/**
+ * 发送邮件（基于模板）
+ * @param string $to 收件人
+ * @param string $templateCode 模板编码
+ * @param array $vars 模板变量
+ * @param string $subject 可选自定义主题
+ * @param string $body 可选自定义内容
+ * @return array
+ */
+function send_email($to, $templateCode, array $vars = [], $subject = '', $body = '')
+{
+    $template = message_template('email', $templateCode);
+    if (!$template && !$subject && !$body) {
+        return ['code' => 1, 'msg' => '邮件模板不存在'];
+    }
+
+    if ($template) {
+        $subject = $subject ?: message_parse($template['title'], $vars);
+        $body = $body ?: message_parse($template['content'], $vars);
+    }
+
+    if (!$to || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        return ['code' => 1, 'msg' => '收件人邮箱格式错误'];
+    }
+
+    $result = smtp_send_mail($to, $subject, $body);
+
+    try {
+        Db::insert('jz_email_log', [
+            'recipient' => $to,
+            'template_code' => $templateCode,
+            'subject' => $subject,
+            'content' => $body,
+            'result' => $result['msg'],
+            'status' => $result['code'] === 0 ? 1 : 0,
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+    } catch (Exception $e) {
+        // 记录失败不影响主流程
+    }
+
+    return $result;
+}
+
+/**
+ * 读取短信配置
+ */
+function sms_config()
+{
+    return [
+        'gateway' => site_config('sms_gateway', ''),
+        'app_id' => site_config('sms_app_id', ''),
+        'app_key' => site_config('sms_app_key', ''),
+        'sign' => site_config('sms_sign', ''),
+        'api_url' => site_config('sms_api_url', ''),
+        'api_method' => site_config('sms_api_method', 'POST'),
+        'api_params' => site_config('sms_api_params', ''),
+        'debug' => (int) site_config('sms_debug', '0'),
+    ];
+}
+
+/**
+ * 发送短信（基于模板）
+ * @param string $mobile 手机号
+ * @param string $templateCode 模板编码
+ * @param array $vars 模板变量
+ * @return array
+ */
+function send_sms($mobile, $templateCode, array $vars = [])
+{
+    $template = message_template('sms', $templateCode);
+    if (!$template) {
+        return ['code' => 1, 'msg' => '短信模板不存在'];
+    }
+
+    $config = sms_config();
+    if (empty($config['gateway']) && empty($config['api_url'])) {
+        return ['code' => 1, 'msg' => '短信网关未配置'];
+    }
+
+    $content = message_parse($template['content'], $vars);
+    if ($config['sign']) {
+        $content = '【' . $config['sign'] . '】' . $content;
+    }
+
+    if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
+        return ['code' => 1, 'msg' => '手机号格式错误'];
+    }
+
+    // 调试模式：仅记录不发短信
+    if ($config['debug']) {
+        Db::insert('jz_sms_log', [
+            'mobile' => $mobile,
+            'template_code' => $templateCode,
+            'content' => $content,
+            'gateway' => $config['gateway'] ?: 'custom',
+            'result' => '调试模式未发送',
+            'status' => 0,
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+        return ['code' => 0, 'msg' => '调试模式：短信已记录但未发送', 'content' => $content];
+    }
+
+    // 通用 HTTP 短信网关
+    if (!empty($config['api_url'])) {
+        $params = [];
+        if ($config['api_params']) {
+            parse_str($config['api_params'], $params);
+        }
+        $params['mobile'] = $mobile;
+        $params['content'] = $content;
+        $params['sign'] = $config['sign'];
+        $params['app_id'] = $config['app_id'];
+        $params['app_key'] = $config['app_key'];
+
+        $result = http_request($config['api_url'], $params, strtoupper($config['api_method']) === 'GET' ? 'GET' : 'POST');
+        $success = $result['code'] === 0;
+        Db::insert('jz_sms_log', [
+            'mobile' => $mobile,
+            'template_code' => $templateCode,
+            'content' => $content,
+            'gateway' => 'custom',
+            'result' => mb_substr($result['data'] ?? $result['msg'], 0, 500),
+            'status' => $success ? 1 : 0,
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+        return $success ? ['code' => 0, 'msg' => '短信发送成功'] : ['code' => 1, 'msg' => '短信发送失败：' . $result['msg']];
+    }
+
+    return ['code' => 1, 'msg' => '不支持的短信网关：' . $config['gateway']];
+}
+
+/**
+ * HTTP 请求辅助函数
+ * @param string $url 请求地址
+ * @param array $data 请求数据
+ * @param string $method GET|POST
+ * @param int $timeout 超时秒数
+ * @return array ['code'=>0, 'data'=>'', 'msg'=>'']
+ */
+function http_request($url, $data = [], $method = 'GET', $timeout = 30)
+{
+    if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        return ['code' => 1, 'msg' => 'URL 格式错误'];
+    }
+
+    if ($method === 'GET' && !empty($data)) {
+        $url .= (strpos($url, '?') === false ? '?' : '&') . http_build_query($data);
+    }
+
+    $options = [
+        'http' => [
+            'method' => $method,
+            'timeout' => $timeout,
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+            'ignore_errors' => true,
+        ],
+    ];
+
+    if ($method === 'POST' && !empty($data)) {
+        $options['http']['content'] = http_build_query($data);
+    }
+
+    $context = stream_context_create($options);
+    $response = @file_get_contents($url, false, $context);
+
+    if ($response === false) {
+        return ['code' => 1, 'msg' => '请求失败'];
+    }
+    return ['code' => 0, 'data' => $response];
+}
+
+/**
+ * 统一消息发送入口
+ * @param string $type sms|email
+ * @param string $code 模板编码
+ * @param string $recipient 收件人邮箱或手机号
+ * @param array $vars 模板变量
+ * @return array
+ */
+function message_send($type, $code, $recipient, array $vars = [])
+{
+    if ($type === 'email') {
+        return send_email($recipient, $code, $vars);
+    }
+    if ($type === 'sms') {
+        return send_sms($recipient, $code, $vars);
+    }
+    return ['code' => 1, 'msg' => '不支持的消息类型'];
+}

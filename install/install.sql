@@ -811,4 +811,75 @@ CREATE TABLE `jz_backup` (
   KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='数据备份表';
 
+-- ----------------------------
+-- 消息模板表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_message_template`;
+CREATE TABLE `jz_message_template` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `type` varchar(20) NOT NULL DEFAULT '' COMMENT '模板类型 sms-短信 email-邮件',
+  `code` varchar(50) NOT NULL DEFAULT '' COMMENT '模板编码',
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '模板名称',
+  `title` varchar(255) NOT NULL DEFAULT '' COMMENT '邮件主题（短信为空）',
+  `content` text COMMENT '模板内容',
+  `variables` varchar(500) NOT NULL DEFAULT '' COMMENT '可用变量，逗号分隔',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `description` varchar(255) NOT NULL DEFAULT '' COMMENT '说明',
+  `sort` int(11) NOT NULL DEFAULT 0,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_type_code` (`type`, `code`),
+  KEY `idx_type` (`type`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='消息模板表';
+
+-- ----------------------------
+-- 初始化默认消息模板
+-- ----------------------------
+INSERT INTO `jz_message_template` (`type`, `code`, `name`, `title`, `content`, `variables`, `status`, `description`, `sort`) VALUES
+('email', 'register', '用户注册验证', '欢迎注册 {site_name}', '您好，{nickname}，欢迎注册 {site_name}，您的验证码是：{code}。', 'site_name,nickname,code', 1, '用户注册时发送', 1),
+('email', 'order_paid', '订单支付成功', '订单支付成功通知', '您好，您的订单 {order_no} 已支付成功，商品：{goods_name}，金额：{amount}。', 'order_no,goods_name,amount', 1, '订单支付成功后发送', 2),
+('email', 'withdraw_done', '提现处理通知', '提现处理结果', '您好，您的提现申请 {withdraw_no} 已处理，金额：{amount}，状态：{status}。', 'withdraw_no,amount,status', 1, '提现处理后发送', 3),
+('sms', 'register', '用户注册验证', '', '您的验证码是：{code}，5分钟内有效。', 'code', 1, '用户注册时发送', 4),
+('sms', 'order_paid', '订单支付成功', '', '您的订单 {order_no} 已支付成功，金额 {amount}，如有疑问请联系客服。', 'order_no,amount', 1, '订单支付成功后发送', 5);
+
+-- ----------------------------
+-- 短信发送日志表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_sms_log`;
+CREATE TABLE `jz_sms_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `mobile` varchar(20) NOT NULL DEFAULT '' COMMENT '手机号',
+  `template_code` varchar(50) NOT NULL DEFAULT '' COMMENT '模板编码',
+  `content` text COMMENT '短信内容',
+  `gateway` varchar(50) NOT NULL DEFAULT '' COMMENT '短信网关',
+  `result` varchar(500) NOT NULL DEFAULT '' COMMENT '发送结果',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0失败/调试 1成功',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_mobile` (`mobile`),
+  KEY `idx_template` (`template_code`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='短信发送日志表';
+
+-- ----------------------------
+-- 邮件发送日志表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_email_log`;
+CREATE TABLE `jz_email_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `recipient` varchar(255) NOT NULL DEFAULT '' COMMENT '收件人',
+  `template_code` varchar(50) NOT NULL DEFAULT '' COMMENT '模板编码',
+  `subject` varchar(255) NOT NULL DEFAULT '' COMMENT '邮件主题',
+  `content` text COMMENT '邮件内容',
+  `result` varchar(500) NOT NULL DEFAULT '' COMMENT '发送结果',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0失败 1成功',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_recipient` (`recipient`),
+  KEY `idx_template` (`template_code`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邮件发送日志表';
+
 SET FOREIGN_KEY_CHECKS = 1;

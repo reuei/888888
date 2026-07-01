@@ -67,6 +67,8 @@ $menu = [
         ['name' => '站点基础', 'url' => 'admin/setting'],
         ['name' => '邮件系统', 'url' => 'admin/setting/email'],
         ['name' => '短信通知', 'url' => 'admin/setting/sms'],
+        ['name' => '消息模板', 'url' => 'admin/message'],
+        ['name' => '发送日志', 'url' => 'admin/message/log'],
         ['name' => '文件存储', 'url' => 'admin/setting/storage'],
         ['name' => '安全防护', 'url' => 'admin/setting/security'],
         ['name' => '数据备份', 'url' => 'admin/backup', 'roles' => ['super', 'admin']],

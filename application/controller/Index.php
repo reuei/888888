@@ -110,6 +110,59 @@ class Index extends Controller
         $homeBanner = Db::query("SELECT * FROM jz_ad WHERE position = 'home_banner' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 5");
         $homeTop = Db::query("SELECT * FROM jz_ad WHERE position = 'home_top' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 3");
 
+        // 热销店铺
+        $hotMerchants = [];
+        $merchantLimit = 8;
+        $merchantWhere = 'status = 1';
+        if ($subsiteId > 0) {
+            $merchantWhere .= " AND subsite_id = {$subsiteId}";
+        }
+        $hotMerchants = Db::query("SELECT id, shop_name, shop_id, avatar FROM jz_merchant WHERE {$merchantWhere} ORDER BY id DESC LIMIT {$merchantLimit}");
+
+        // 限时秒杀
+        $now = date('Y-m-d H:i:s');
+        $seckillGoods = Db::query(
+            "SELECT g.*, m.shop_name FROM jz_goods g
+             LEFT JOIN jz_merchant m ON g.merchant_id = m.id
+             WHERE g.status = 1 AND g.is_seckill = 1 AND g.seckill_start <= ? AND g.seckill_end >= ? AND g.seckill_stock > g.seckill_sold{$subsiteWhere}
+             ORDER BY g.id DESC LIMIT 4",
+            [$now, $now]
+        );
+
+        // 限时折扣
+        $discountGoods = Db::query(
+            "SELECT g.*, m.shop_name FROM jz_goods g
+             LEFT JOIN jz_merchant m ON g.merchant_id = m.id
+             WHERE g.status = 1 AND g.is_discount = 1 AND g.discount_start <= ? AND g.discount_end >= ?{$subsiteWhere}
+             ORDER BY g.id DESC LIMIT 4",
+            [$now, $now]
+        );
+
+        // 最新上架
+        $newGoods = Db::query(
+            "SELECT g.*, m.shop_name FROM jz_goods g
+             LEFT JOIN jz_merchant m ON g.merchant_id = m.id
+             WHERE g.status = 1{$subsiteWhere}
+             ORDER BY g.id DESC LIMIT 8"
+        );
+
+        // 平台统计
+        $platformStats = [];
+        try {
+            $statsWhere = 'status >= 0';
+            $statsParams = [];
+            if ($subsiteId > 0) {
+                $statsWhere .= ' AND subsite_id = ?';
+                $statsParams[] = $subsiteId;
+            }
+            $platformStats = Db::fetch(
+                "SELECT COUNT(*) AS total_orders, IFNULL(SUM(pay_amount), 0) AS total_amount FROM jz_order WHERE {$statsWhere}",
+                $statsParams
+            );
+        } catch (Exception $e) {
+            $platformStats = ['total_orders' => 0, 'total_amount' => 0];
+        }
+
         $title = $tpl['home_seo_title'] ?: site_config('site_name', '鲸商城 Pro');
         if ($this->subsite) {
             $title = $this->subsite['name'] . ' - ' . $title;
@@ -122,6 +175,11 @@ class Index extends Controller
         $this->assign('articles', $articles);
         $this->assign('homeBanner', $homeBanner);
         $this->assign('homeTop', $homeTop);
+        $this->assign('hotMerchants', $hotMerchants);
+        $this->assign('seckillGoods', $seckillGoods);
+        $this->assign('discountGoods', $discountGoods);
+        $this->assign('newGoods', $newGoods);
+        $this->assign('platformStats', $platformStats);
         $this->fetch('index/index');
     }
 
@@ -154,9 +212,12 @@ class Index extends Controller
         $maxPrice = input('max_price', '');
         $hasStock = input('has_stock', '');
 
+        $merchantId = (int) input('merchant_id', 0);
+
         $filters = [
             'keyword' => $keyword,
             'category_id' => $categoryId,
+            'merchant_id' => $merchantId,
             'has_stock' => $hasStock === '1',
         ];
 

@@ -1,5 +1,5 @@
 import { useState, Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import type { Role } from './types';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -91,20 +91,20 @@ function App() {
   if (!role) {
     return (
       <ErrorBoundary>
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </ErrorBoundary>
     );
   }
 
   return (
     <ErrorBoundary>
-      <BrowserRouter>
+      <HashRouter>
         <Layout role={role} onSwitchRole={handleSwitchRole} onLogout={handleLogout}>
           <Suspense fallback={<Loading />}>
             <Routes>
@@ -179,7 +179,7 @@ function App() {
             </Routes>
           </Suspense>
         </Layout>
-      </BrowserRouter>
+      </HashRouter>
     </ErrorBoundary>
   );
 }

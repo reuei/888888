@@ -39,6 +39,52 @@ import type {
 import * as mock from '../data/mock';
 
 const STORAGE_KEY = 'cdn-admin-data';
+const API_BASE = '/api';
+
+let usePhpApi = false;
+let phpApiChecked = false;
+
+function detectPhpApi(): Promise<boolean> {
+  if (phpApiChecked) return Promise.resolve(usePhpApi);
+  if (typeof window === 'undefined') {
+    phpApiChecked = true;
+    usePhpApi = false;
+    return Promise.resolve(false);
+  }
+  if ((window as unknown as Record<string, unknown>).__CDN_ADMIN_RUNTIME__ === 'php') {
+    phpApiChecked = true;
+    usePhpApi = true;
+    return Promise.resolve(true);
+  }
+  return fetch(`${API_BASE}/health.php`, { method: 'GET' })
+    .then((res) => res.ok)
+    .then((ok) => {
+      usePhpApi = ok;
+      phpApiChecked = true;
+      return ok;
+    })
+    .catch(() => {
+      usePhpApi = false;
+      phpApiChecked = true;
+      return false;
+    });
+}
+
+async function phpRequest<T>(method: string, resource: string, id?: string, body?: object): Promise<T> {
+  const url = new URL(`${API_BASE}/index.php`, window.location.origin);
+  url.searchParams.set('resource', resource);
+  if (id) url.searchParams.set('id', id);
+  const res = await fetch(url.toString(), {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API error ${res.status}: ${text}`);
+  }
+  return res.json() as Promise<T>;
+}
 
 interface Store {
   articles: Article[];
@@ -195,10 +241,16 @@ function delay(ms = 300) {
 function createCrud<T extends { id: string }>(key: keyof Store, prefix: string) {
   return {
     fetch: async (): Promise<T[]> => {
+      if (await detectPhpApi()) {
+        return phpRequest<T[]>('GET', key as string);
+      }
       await delay();
       return [...(store[key] as unknown as T[])];
     },
     create: async (payload: Omit<T, 'id'>): Promise<T> => {
+      if (await detectPhpApi()) {
+        return phpRequest<T>('POST', key as string, undefined, payload as object);
+      }
       await delay();
       const items = store[key] as unknown as T[];
       const id = `${prefix}${String(items.length + 1).padStart(3, '0')}`;
@@ -208,6 +260,9 @@ function createCrud<T extends { id: string }>(key: keyof Store, prefix: string) 
       return item;
     },
     update: async (id: string, payload: Partial<T>): Promise<T | null> => {
+      if (await detectPhpApi()) {
+        return phpRequest<T>('PUT', key as string, id, payload as object);
+      }
       await delay();
       const items = store[key] as unknown as T[];
       const index = items.findIndex((i) => i.id === id);
@@ -218,6 +273,10 @@ function createCrud<T extends { id: string }>(key: keyof Store, prefix: string) 
       return updated;
     },
     delete: async (id: string): Promise<boolean> => {
+      if (await detectPhpApi()) {
+        const res = await phpRequest<{ success: boolean }>('DELETE', key as string, id);
+        return res.success;
+      }
       await delay();
       const items = store[key] as unknown as T[];
       const before = items.length;
@@ -230,16 +289,25 @@ function createCrud<T extends { id: string }>(key: keyof Store, prefix: string) 
 
 // Articles
 export async function fetchArticles(): Promise<Article[]> {
+  if (await detectPhpApi()) {
+    return phpRequest<Article[]>('GET', 'articles');
+  }
   await delay();
   return [...store.articles];
 }
 
 export async function createArticle(payload: Omit<Article, 'id' | 'publishAt'>): Promise<Article> {
+  const articlePayload = {
+    ...payload,
+    publishAt: payload.status === 'published' ? new Date().toLocaleString('zh-CN') : '-',
+  };
+  if (await detectPhpApi()) {
+    return phpRequest<Article>('POST', 'articles', undefined, articlePayload);
+  }
   await delay();
   const article: Article = {
-    ...payload,
+    ...articlePayload,
     id: `A${String(store.articles.length + 1).padStart(3, '0')}`,
-    publishAt: payload.status === 'published' ? new Date().toLocaleString('zh-CN') : '-',
   };
   store.articles = [article, ...store.articles];
   saveStore(store);
@@ -247,6 +315,13 @@ export async function createArticle(payload: Omit<Article, 'id' | 'publishAt'>):
 }
 
 export async function updateArticle(id: string, payload: Partial<Article>): Promise<Article | null> {
+  if (await detectPhpApi()) {
+    const body: Partial<Article> = { ...payload };
+    if (payload.status === 'published') {
+      body.publishAt = new Date().toLocaleString('zh-CN');
+    }
+    return phpRequest<Article>('PUT', 'articles', id, body);
+  }
   await delay();
   const index = store.articles.findIndex((a) => a.id === id);
   if (index === -1) return null;
@@ -260,6 +335,10 @@ export async function updateArticle(id: string, payload: Partial<Article>): Prom
 }
 
 export async function deleteArticle(id: string): Promise<boolean> {
+  if (await detectPhpApi()) {
+    const res = await phpRequest<{ success: boolean }>('DELETE', 'articles', id);
+    return res.success;
+  }
   await delay();
   const before = store.articles.length;
   store.articles = store.articles.filter((a) => a.id !== id);
@@ -269,16 +348,22 @@ export async function deleteArticle(id: string): Promise<boolean> {
 
 // Coupons
 export async function fetchCoupons(): Promise<Coupon[]> {
+  if (await detectPhpApi()) {
+    return phpRequest<Coupon[]>('GET', 'coupons');
+  }
   await delay();
   return [...store.coupons];
 }
 
 export async function createCoupon(payload: Omit<Coupon, 'id' | 'received'>): Promise<Coupon> {
+  const couponPayload = { ...payload, received: 0 };
+  if (await detectPhpApi()) {
+    return phpRequest<Coupon>('POST', 'coupons', undefined, couponPayload);
+  }
   await delay();
   const coupon: Coupon = {
-    ...payload,
+    ...couponPayload,
     id: `CO${String(store.coupons.length + 1).padStart(3, '0')}`,
-    received: 0,
   };
   store.coupons = [coupon, ...store.coupons];
   saveStore(store);
@@ -287,11 +372,17 @@ export async function createCoupon(payload: Omit<Coupon, 'id' | 'received'>): Pr
 
 // Skus
 export async function fetchSkus(): Promise<Sku[]> {
+  if (await detectPhpApi()) {
+    return phpRequest<Sku[]>('GET', 'skus');
+  }
   await delay();
   return [...store.skus];
 }
 
 export async function createSku(payload: Omit<Sku, 'id'>): Promise<Sku> {
+  if (await detectPhpApi()) {
+    return phpRequest<Sku>('POST', 'skus', undefined, payload);
+  }
   await delay();
   const sku: Sku = {
     ...payload,
@@ -526,16 +617,25 @@ export const deleteLuckyNumber = luckyNumbersCrud.delete;
 
 // Stats (readonly)
 export async function fetchDailyStats(): Promise<DailyStat[]> {
+  if (await detectPhpApi()) {
+    return phpRequest<DailyStat[]>('GET', 'dailyStats');
+  }
   await delay();
   return [...store.dailyStats];
 }
 
 export async function fetchMerchantStats(): Promise<MerchantStat[]> {
+  if (await detectPhpApi()) {
+    return phpRequest<MerchantStat[]>('GET', 'merchantStats');
+  }
   await delay();
   return [...store.merchantStats];
 }
 
 export async function fetchUserGrowthStats(): Promise<UserGrowthStat[]> {
+  if (await detectPhpApi()) {
+    return phpRequest<UserGrowthStat[]>('GET', 'userGrowthStats');
+  }
   await delay();
   return [...store.userGrowthStats];
 }

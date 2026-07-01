@@ -63,6 +63,7 @@ $menu = [
         ['name' => '经营报表', 'url' => 'admin/stat/report'],
         ['name' => '操作日志', 'url' => 'admin/stat/log'],
     ]],
+    ['name' => '在线更新', 'icon' => '⇧', 'url' => 'admin/update', 'roles' => ['super', 'admin'], 'children' => []],
     ['name' => '系统设置', 'icon' => '⚙', 'url' => '#', 'roles' => ['super', 'admin'], 'children' => [
         ['name' => '站点基础', 'url' => 'admin/setting'],
         ['name' => '邮件系统', 'url' => 'admin/setting/email'],

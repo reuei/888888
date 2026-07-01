@@ -2006,3 +2006,276 @@ function search_suggest($keyword, $limit = 10)
 
     return ['goods' => $goods, 'categories' => $categories];
 }
+
+/* ============================================================
+ * 在线更新与授权验证
+ * ============================================================ */
+
+/**
+ * 读取本地授权配置
+ */
+function update_get_license_config()
+{
+    $file = APP_PATH . 'config' . DIRECTORY_SEPARATOR . 'license.php';
+    if (is_file($file)) {
+        return array_merge([
+            'auth_code' => '',
+            'auth_domain' => '',
+            'api_url' => '',
+            'api_key' => '',
+        ], require $file);
+    }
+    return [
+        'auth_code' => '',
+        'auth_domain' => '',
+        'api_url' => '',
+        'api_key' => '',
+    ];
+}
+
+/**
+ * 生成授权站请求签名
+ */
+function update_sign(array $params, $apiKey)
+{
+    ksort($params);
+    $str = http_build_query($params);
+    return hash_hmac('sha256', $str, $apiKey ?: 'qeefg-default-key');
+}
+
+/**
+ * 向授权站发起 POST 请求并解析 JSON
+ */
+function update_http_post($apiUrl, $path, array $params, $apiKey)
+{
+    $params['timestamp'] = time();
+    $params['nonce'] = bin2hex(random_bytes(8));
+    $params['sign'] = update_sign($params, $apiKey);
+
+    $url = rtrim($apiUrl, '/') . $path;
+    $result = http_request($url, $params, 'POST', 60);
+    if ($result['code'] !== 0) {
+        throw new Exception('授权站请求失败：' . $result['msg']);
+    }
+
+    $data = json_decode($result['data'], true);
+    if (!is_array($data)) {
+        throw new Exception('授权站返回格式错误');
+    }
+    if (($data['code'] ?? 1) !== 0) {
+        throw new Exception($data['msg'] ?? '授权站返回错误');
+    }
+    return $data['data'] ?? [];
+}
+
+/**
+ * 检查授权状态与最新版本
+ * @param array|null $license 授权配置
+ * @return array
+ * @throws Exception
+ */
+function update_check_remote($license = null)
+{
+    $license = $license ?: update_get_license_config();
+    if (empty($license['auth_code']) || empty($license['api_url'])) {
+        throw new Exception('授权配置不完整，请先填写授权站地址与授权码');
+    }
+
+    $currentVersion = Config::get('app.app_version', '1.0.0');
+    $params = [
+        'auth_code' => $license['auth_code'],
+        'auth_domain' => $license['auth_domain'] ?: ($_SERVER['HTTP_HOST'] ?? ''),
+        'current_version' => $currentVersion,
+        'php_version' => PHP_VERSION,
+    ];
+
+    $data = update_http_post($license['api_url'], '/api/license/check', $params, $license['api_key']);
+
+    $latestVersion = $data['latest_version'] ?? $currentVersion;
+    $hasUpdate = version_compare($latestVersion, $currentVersion, '>');
+
+    return [
+        'license_valid' => (bool) ($data['license_valid'] ?? false),
+        'license_msg' => $data['license_msg'] ?? '',
+        'license_type' => $data['license_type'] ?? '',
+        'auth_domain' => $data['auth_domain'] ?? ($license['auth_domain'] ?: ''),
+        'current_version' => $currentVersion,
+        'latest_version' => $latestVersion,
+        'has_update' => $hasUpdate,
+        'release_date' => $data['release_date'] ?? '',
+        'update_desc' => $data['update_desc'] ?? '',
+        'force_update' => (bool) ($data['force_update'] ?? false),
+    ];
+}
+
+/**
+ * 下载并应用更新包
+ * @param string $version 目标版本号
+ * @param array|null $license 授权配置
+ * @return array
+ * @throws Exception
+ */
+function update_apply_upgrade($version, $license = null)
+{
+    $license = $license ?: update_get_license_config();
+    if (empty($license['auth_code']) || empty($license['api_url'])) {
+        throw new Exception('授权配置不完整');
+    }
+
+    $rootPath = dirname(APP_PATH) . DIRECTORY_SEPARATOR;
+    $workDir = $rootPath . 'runtime' . DIRECTORY_SEPARATOR . 'update' . DIRECTORY_SEPARATOR;
+    if (!is_dir($workDir)) {
+        @mkdir($workDir, 0755, true);
+    }
+
+    // 获取下载地址
+    $params = [
+        'auth_code' => $license['auth_code'],
+        'auth_domain' => $license['auth_domain'] ?: ($_SERVER['HTTP_HOST'] ?? ''),
+        'version' => $version,
+    ];
+    $data = update_http_post($license['api_url'], '/api/license/download', $params, $license['api_key']);
+    $downloadUrl = $data['download_url'] ?? '';
+    if (!$downloadUrl) {
+        throw new Exception('授权站未返回更新包下载地址');
+    }
+
+    // 下载更新包
+    $zipFile = $workDir . 'upgrade_' . preg_replace('/[^0-9a-zA-Z._-]/', '_', $version) . '.zip';
+    $zipContent = @file_get_contents($downloadUrl, false, stream_context_create([
+        'http' => ['timeout' => 120, 'ignore_errors' => true],
+    ]));
+    if ($zipContent === false || strlen($zipContent) < 100) {
+        throw new Exception('更新包下载失败');
+    }
+    if (@file_put_contents($zipFile, $zipContent) === false) {
+        throw new Exception('更新包保存失败');
+    }
+
+    // 校验文件 MD5
+    if (!empty($data['file_md5']) && md5_file($zipFile) !== strtolower($data['file_md5'])) {
+        @unlink($zipFile);
+        throw new Exception('更新包校验失败');
+    }
+
+    // 解压
+    $extractDir = $workDir . 'upgrade_' . preg_replace('/[^0-9a-zA-Z._-]/', '_', $version) . DIRECTORY_SEPARATOR;
+    if (is_dir($extractDir)) {
+        update_rmdir($extractDir);
+    }
+    @mkdir($extractDir, 0755, true);
+
+    $zip = new ZipArchive();
+    if ($zip->open($zipFile) !== true) {
+        @unlink($zipFile);
+        throw new Exception('更新包解压失败');
+    }
+    $zip->extractTo($extractDir);
+    $zip->close();
+    @unlink($zipFile);
+
+    // 读取升级清单
+    $manifestFile = $extractDir . 'update.json';
+    $manifest = [];
+    if (is_file($manifestFile)) {
+        $manifest = json_decode(file_get_contents($manifestFile), true) ?: [];
+    }
+
+    // 执行 SQL 升级脚本
+    $sqlFile = $extractDir . 'update.sql';
+    if (is_file($sqlFile)) {
+        $sql = file_get_contents($sqlFile);
+        $pdo = Db::getPdo();
+        $pdo->exec("SET NAMES utf8mb4");
+        $statements = array_filter(array_map('trim', explode(';', $sql)));
+        foreach ($statements as $statement) {
+            if ($statement) {
+                $pdo->exec($statement);
+            }
+        }
+    }
+
+    // 复制文件（仅允许覆盖 application 与 public，保护配置与授权文件）
+    $protectedFiles = [
+        'application/config/database.php',
+        'application/config/license.php',
+        'install/auth.php',
+        'install/installed.lock',
+    ];
+    $allowedDirs = ['application', 'public'];
+    $copied = [];
+    foreach ($allowedDirs as $dirName) {
+        $sourceDir = $extractDir . $dirName;
+        if (!is_dir($sourceDir)) {
+            continue;
+        }
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sourceDir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($iterator as $item) {
+            $relative = $dirName . DIRECTORY_SEPARATOR . $iterator->getSubPathName();
+            $relativeUnix = str_replace('\\', '/', $relative);
+            if (in_array($relativeUnix, $protectedFiles, true)) {
+                continue;
+            }
+            $target = $rootPath . $relative;
+            if ($item->isDir()) {
+                if (!is_dir($target)) {
+                    @mkdir($target, 0755, true);
+                }
+                continue;
+            }
+            if (@copy($item->getPathname(), $target)) {
+                $copied[] = $relativeUnix;
+            }
+        }
+    }
+
+    // 执行升级后脚本
+    $afterFile = $extractDir . 'update.php';
+    if (is_file($afterFile)) {
+        require $afterFile;
+    }
+
+    // 更新版本号到 app.php
+    $appConfigFile = APP_PATH . 'config' . DIRECTORY_SEPARATOR . 'app.php';
+    if (is_file($appConfigFile)) {
+        $appConfig = require $appConfigFile;
+        if (is_array($appConfig)) {
+            $appConfig['app_version'] = $version;
+            @file_put_contents($appConfigFile, "<?php\nreturn " . var_export($appConfig, true) . ";\n");
+        }
+    }
+
+    // 清理临时目录
+    update_rmdir($extractDir);
+
+    return [
+        'version' => $version,
+        'copied_files' => $copied,
+        'manifest' => $manifest,
+    ];
+}
+
+/**
+ * 递归删除目录
+ */
+function update_rmdir($dir)
+{
+    if (!is_dir($dir)) {
+        return;
+    }
+    $items = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    foreach ($items as $item) {
+        if ($item->isDir()) {
+            @rmdir($item->getPathname());
+        } else {
+            @unlink($item->getPathname());
+        }
+    }
+    @rmdir($dir);
+}

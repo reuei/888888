@@ -194,10 +194,15 @@ export default function Header({
             <RefreshCcw size={16} />
           </button>
           <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-border">
-            <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-medium">
-              {profile.avatar}
-            </div>
-            <span className="text-sm hidden lg:inline">{profile.name}</span>
+            <Link
+              to={`/${role}/profile`}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-medium">
+                {profile.avatar}
+              </div>
+              <span className="text-sm hidden lg:inline">{profile.name}</span>
+            </Link>
             <Link
               to={`/${role}/settings`}
               className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"

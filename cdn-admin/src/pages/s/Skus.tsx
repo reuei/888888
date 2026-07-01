@@ -1,21 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import EmptyState from '../../components/EmptyState';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
+import Loading from '../../components/Loading';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { skus } from '../../data/mock';
+import { useToast } from '../../components/Toast';
+import * as api from '../../services/api';
+import type { Sku } from '../../types';
 import { Edit, Trash2, Plus, Search, Package } from 'lucide-react';
 
 export default function SSkus() {
-  const [list, setList] = useState(skus);
+  const { show } = useToast();
+  const [list, setList] = useState<Sku[]>([]);
+  const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', bandwidth: '', flow: '', domains: 1, ccLevel: '基础', price: 0 });
+
+  const load = async () => {
+    setLoading(true);
+    const data = await api.fetchSkus();
+    setList(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const filtered = list.filter((s) => {
     const q = debouncedKeyword.trim().toLowerCase();
@@ -27,22 +43,22 @@ export default function SSkus() {
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
   const pagedList = slice(sorted);
 
-  const handleAdd = () => {
-    setList([
-      {
-        id: `S00${list.length + 1}`,
-        name: form.name,
-        bandwidth: form.bandwidth,
-        flow: form.flow,
-        domains: form.domains,
-        ccLevel: form.ccLevel,
-        price: form.price,
-      },
-      ...list,
-    ]);
+  const handleAdd = async () => {
+    await api.createSku({
+      name: form.name,
+      bandwidth: form.bandwidth,
+      flow: form.flow,
+      domains: form.domains,
+      ccLevel: form.ccLevel,
+      price: form.price,
+    });
+    await load();
+    show('套餐规格新增成功', 'success');
     setModalOpen(false);
     setForm({ name: '', bandwidth: '', flow: '', domains: 1, ccLevel: '基础', price: 0 });
   };
+
+  if (loading) return <Loading />;
 
   return (
     <div>

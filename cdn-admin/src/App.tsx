@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import Notifications from './pages/Notifications';
+import Profile from './pages/Profile';
 
 // S-side pages
 const SDashboard = lazy(() => import('./pages/s/Dashboard'));
@@ -152,6 +153,7 @@ function App() {
                   <Route path="/s/backup" element={<SBackup />} />
                   <Route path="/s/system" element={<SSystem />} />
                   <Route path="/s/notifications" element={<Notifications role="s" />} />
+                  <Route path="/s/profile" element={<Profile role="s" />} />
                   <Route path="/" element={<Navigate to="/s/dashboard" replace />} />
                   <Route path="*" element={<NotFound />} />
                 </>
@@ -169,6 +171,7 @@ function App() {
                   <Route path="/b/finance" element={<BFinance />} />
                   <Route path="/b/settings" element={<BSettings />} />
                   <Route path="/b/notifications" element={<Notifications role="b" />} />
+                  <Route path="/b/profile" element={<Profile role="b" />} />
                   <Route path="/" element={<Navigate to="/b/dashboard" replace />} />
                   <Route path="*" element={<NotFound />} />
                 </>

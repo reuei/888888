@@ -1,23 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import EmptyState from '../../components/EmptyState';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
+import Loading from '../../components/Loading';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { coupons, couponRecords } from '../../data/mock';
+import { useToast } from '../../components/Toast';
+import * as api from '../../services/api';
+import { couponRecords } from '../../data/mock';
+import type { Coupon } from '../../types';
 import { Plus, Search, Ticket, Tag } from 'lucide-react';
 
 export default function SCoupons() {
+  const { show } = useToast();
   const [tab, setTab] = useState<'generate' | 'records' | 'stats'>('generate');
-  const [list, setList] = useState(coupons);
+  const [list, setList] = useState<Coupon[]>([]);
   const [records] = useState(couponRecords);
+  const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ batch: '', type: 'fixed', value: 0, threshold: 0, total: 100, limitPerUser: 1 });
+
+  const load = async () => {
+    setLoading(true);
+    const data = await api.fetchCoupons();
+    setList(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const filteredCoupons = list.filter((c) => {
     const q = debouncedKeyword.trim().toLowerCase();
@@ -55,23 +72,22 @@ export default function SCoupons() {
   const pagedCoupons = couponPagination.slice(sortedCoupons);
   const pagedRecords = recordPagination.slice(sortedRecords);
 
-  const handleAdd = () => {
-    setList([
-      {
-        id: `CO00${list.length + 1}`,
-        batch: form.batch,
-        type: form.type as 'fixed' | 'percent',
-        value: form.value,
-        threshold: form.threshold,
-        total: form.total,
-        received: 0,
-        status: 'active',
-      },
-      ...list,
-    ]);
+  const handleAdd = async () => {
+    await api.createCoupon({
+      batch: form.batch,
+      type: form.type as 'fixed' | 'percent',
+      value: form.value,
+      threshold: form.threshold,
+      total: form.total,
+      status: 'active',
+    });
+    await load();
+    show('优惠券生成成功', 'success');
     setModalOpen(false);
     setForm({ batch: '', type: 'fixed', value: 0, threshold: 0, total: 100, limitPerUser: 1 });
   };
+
+  if (loading) return <Loading />;
 
   return (
     <div>

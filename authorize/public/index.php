@@ -21,8 +21,10 @@ if (!is_dir(RUNTIME_PATH)) {
 ini_set('error_log', RUNTIME_PATH . 'error.log');
 
 if (!file_exists(APP_PATH . 'config/database.php')) {
-    if (is_dir(ROOT_PATH . 'install')) {
-        header('Location: /install/');
+    if (is_dir(ROOT_PATH . 'install') && is_file(ROOT_PATH . 'install' . DIRECTORY_SEPARATOR . 'index.php')) {
+        // 以 Web 根目录为 public 时，直接渲染安装向导
+        chdir(ROOT_PATH . 'install');
+        require ROOT_PATH . 'install' . DIRECTORY_SEPARATOR . 'index.php';
         exit;
     }
     exit('系统未安装，且未找到 install 目录');

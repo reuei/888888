@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
@@ -6,9 +6,10 @@ import EmptyState from '../../components/EmptyState';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { users } from '../../data/mock';
+import { fetchUsers } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { Medal, Search, TrendingUp } from 'lucide-react';
+import type { User } from '../../types';
 
 interface RankItem {
   id: string;
@@ -29,18 +30,35 @@ const seedLastAt = [
   '2026-06-26 11:05',
 ];
 
-const rankData: RankItem[] = users.map((u, index) => ({
-  id: u.id,
-  nickname: u.nickname,
-  amount: seedAmounts[index % seedAmounts.length],
-  orders: seedOrders[index % seedOrders.length],
-  lastAt: seedLastAt[index % seedLastAt.length],
-}));
-
 export default function UserRank() {
-  const [list] = useState(rankData);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
+
+  const loadUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchUsers();
+      setUsers(data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  const list = useMemo<RankItem[]>(() => {
+    return users.map((u, index) => ({
+      id: u.id,
+      nickname: u.nickname,
+      amount: seedAmounts[index % seedAmounts.length],
+      orders: seedOrders[index % seedOrders.length],
+      lastAt: seedLastAt[index % seedLastAt.length],
+    }));
+  }, [users]);
 
   const filtered = useMemo(() => {
     if (!debouncedKeyword) return list;
@@ -77,51 +95,57 @@ export default function UserRank() {
           <button onClick={() => setKeyword('')} className="btn btn-default">重置</button>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>排名</th>
-              <th><SortableHeader label="用户" sortKey="nickname" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th><SortableHeader label="消费金额" sortKey="amount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th><SortableHeader label="订单数" sortKey="orders" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th><SortableHeader label="最近消费时间" sortKey="lastAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedList.map((u, index) => (
-              <tr key={u.id}>
-                <td>
-                  <div className="flex items-center gap-2">
-                    {index < 3 && (
-                      <Medal
-                        size={16}
-                        className={index === 0 ? 'text-warning' : index === 1 ? 'text-text-secondary' : 'text-warning'}
-                      />
-                    )}
-                    <span className="font-medium">{(page - 1) * pageSize + index + 1}</span>
-                  </div>
-                </td>
-                <td>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs">
-                      {u.nickname.slice(0, 2).toUpperCase()}
-                    </div>
-                    <span className="font-medium">{u.nickname}</span>
-                  </div>
-                </td>
-                <td className="font-medium text-primary">¥{formatMoney(u.amount)}</td>
-                <td>{u.orders}</td>
-                <td className="text-text-secondary">{u.lastAt}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading && <div className="text-sm text-text-secondary mb-3">加载中...</div>}
 
-        {filtered.length === 0 && (
-          <EmptyState title="暂无排行数据" description="没有符合筛选条件的用户" icon={<TrendingUp size={24} />} />
+        {!loading && (
+          <>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>排名</th>
+                  <th><SortableHeader label="用户" sortKey="nickname" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th><SortableHeader label="消费金额" sortKey="amount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th><SortableHeader label="订单数" sortKey="orders" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th><SortableHeader label="最近消费时间" sortKey="lastAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedList.map((u, index) => (
+                  <tr key={u.id}>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        {index < 3 && (
+                          <Medal
+                            size={16}
+                            className={index === 0 ? 'text-warning' : index === 1 ? 'text-text-secondary' : 'text-warning'}
+                          />
+                        )}
+                        <span className="font-medium">{(page - 1) * pageSize + index + 1}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs">
+                          {u.nickname.slice(0, 2).toUpperCase()}
+                        </div>
+                        <span className="font-medium">{u.nickname}</span>
+                      </div>
+                    </td>
+                    <td className="font-medium text-primary">¥{formatMoney(u.amount)}</td>
+                    <td>{u.orders}</td>
+                    <td className="text-text-secondary">{u.lastAt}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {filtered.length === 0 && (
+              <EmptyState title="暂无排行数据" description="没有符合筛选条件的用户" icon={<TrendingUp size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+          </>
         )}
-
-        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

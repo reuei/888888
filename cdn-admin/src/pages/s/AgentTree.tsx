@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
@@ -6,8 +6,9 @@ import EmptyState from '../../components/EmptyState';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { agents } from '../../data/mock';
+import { fetchAgents } from '../../services/api';
 import { Network, Search, Users } from 'lucide-react';
+import type { Agent } from '../../types';
 
 interface AgentRow {
   id: string;
@@ -21,6 +22,19 @@ interface AgentRow {
 export default function AgentTree() {
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchAgents();
+    setAgents(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const list = useMemo<AgentRow[]>(() => {
     const agentMap = new Map(agents.map((a) => [a.id, a]));
@@ -34,7 +48,7 @@ export default function AgentTree() {
         if ((a.parent ?? '') !== (b.parent ?? '')) return (a.parent ?? '').localeCompare(b.parent ?? '');
         return a.id.localeCompare(b.id);
       });
-  }, []);
+  }, [agents]);
 
   const filtered = useMemo(() => {
     if (!debouncedKeyword) return list;
@@ -87,7 +101,14 @@ export default function AgentTree() {
             </tr>
           </thead>
           <tbody>
-            {pagedList.map((a) => (
+            {loading && (
+              <tr>
+                <td colSpan={6}>
+                  <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>
+                </td>
+              </tr>
+            )}
+            {!loading && pagedList.map((a) => (
               <tr key={a.id}>
                 <td className="text-text-secondary">{a.id}</td>
                 <td>
@@ -109,7 +130,7 @@ export default function AgentTree() {
           </tbody>
         </table>
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <EmptyState title="暂无代理" description="没有符合筛选条件的代理" icon={<Users size={24} />} />
         )}
 

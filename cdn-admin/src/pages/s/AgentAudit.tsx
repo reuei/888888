@@ -1,22 +1,39 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { agentProducts } from '../../data/mock';
+import { useToast } from '../../components/Toast';
+import { fetchAgentProducts, updateAgentProduct } from '../../services/api';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
 import { CheckCircle, XCircle, PackageSearch } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
 import type { AgentProduct } from '../../types';
 
 export default function AgentAudit() {
-  const [list, setList] = useState<AgentProduct[]>(agentProducts);
+  const { show } = useToast();
+  const [list, setList] = useState<AgentProduct[]>([]);
+  const [loading, setLoading] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchAgentProducts();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const pendingList = list.filter((p) => p.status === 'pending');
   const active = list.find((p) => p.id === activeId);
 
-  const updateStatus = (id: string, status: AgentProduct['status']) => {
-    setList(list.map((p) => (p.id === id ? { ...p, status } : p)));
+  const updateStatus = async (id: string, status: AgentProduct['status']) => {
+    if (loading) return;
+    await updateAgentProduct(id, { status });
+    await load();
     setActiveId(null);
+    show(`商品审核${status === 'on' ? '通过' : '已驳回'}`, status === 'on' ? 'success' : 'warning');
   };
 
   return (
@@ -40,7 +57,14 @@ export default function AgentAudit() {
             </tr>
           </thead>
           <tbody>
-            {pendingList.map((p) => (
+            {loading && (
+              <tr>
+                <td colSpan={7}>
+                  <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>
+                </td>
+              </tr>
+            )}
+            {!loading && pendingList.map((p) => (
               <tr key={p.id}>
                 <td className="text-text-secondary">{p.id}</td>
                 <td className="font-medium">{p.name}</td>
@@ -51,13 +75,13 @@ export default function AgentAudit() {
                   <span className={`badge ${statusBadge(p.status)}`}>{statusText(p.status)}</span>
                 </td>
                 <td>
-                  <button onClick={() => setActiveId(p.id)} className="btn btn-primary py-1 px-2 text-xs">
+                  <button onClick={() => setActiveId(p.id)} disabled={loading} className="btn btn-primary py-1 px-2 text-xs disabled:opacity-50">
                     审核
                   </button>
                 </td>
               </tr>
             ))}
-            {pendingList.length === 0 && (
+            {!loading && pendingList.length === 0 && (
               <tr>
                 <td colSpan={7}>
                   <EmptyState title="暂无待审核商品" description="当前没有需要审核的代理商品" icon={<PackageSearch size={24} />} />
@@ -74,16 +98,18 @@ export default function AgentAudit() {
         onClose={() => setActiveId(null)}
         footer={
           <>
-            <button onClick={() => setActiveId(null)} className="btn btn-default">取消</button>
+            <button onClick={() => setActiveId(null)} disabled={loading} className="btn btn-default disabled:opacity-50">取消</button>
             <button
               onClick={() => active && updateStatus(active.id, 'off')}
-              className="btn btn-danger flex items-center gap-1"
+              disabled={loading}
+              className="btn btn-danger flex items-center gap-1 disabled:opacity-50"
             >
               <XCircle size={16} /> 驳回
             </button>
             <button
               onClick={() => active && updateStatus(active.id, 'on')}
-              className="btn btn-success flex items-center gap-1"
+              disabled={loading}
+              className="btn btn-success flex items-center gap-1 disabled:opacity-50"
             >
               <CheckCircle size={16} /> 通过
             </button>

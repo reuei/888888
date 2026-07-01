@@ -1,21 +1,38 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import LineChart from '../../components/LineChart';
-import { userGrowthStats } from '../../data/mock';
+import { fetchUserGrowthStats } from '../../services/api';
 import { Users, UserPlus, Activity, CreditCard } from 'lucide-react';
+import type { UserGrowthStat } from '../../types';
 
 export default function UserGrowth() {
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('7d');
+  const [userGrowthStats, setUserGrowthStats] = useState<UserGrowthStat[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadUserGrowthStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchUserGrowthStats();
+      setUserGrowthStats(data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUserGrowthStats();
+  }, [loadUserGrowthStats]);
 
   const totalNewUsers = userGrowthStats.reduce((sum, d) => sum + d.newUsers, 0);
-  const latest = userGrowthStats[userGrowthStats.length - 1];
-  const avgActive = Math.round(
-    userGrowthStats.reduce((sum, d) => sum + d.activeUsers, 0) / userGrowthStats.length
-  );
-  const avgPaid = Math.round(
-    userGrowthStats.reduce((sum, d) => sum + d.paidUsers, 0) / userGrowthStats.length
-  );
-  const avgPaidRate = (avgPaid / avgActive) * 100;
+  const latest = userGrowthStats[userGrowthStats.length - 1] ?? { newUsers: 0, activeUsers: 0, paidUsers: 0 };
+  const avgActive = userGrowthStats.length
+    ? Math.round(userGrowthStats.reduce((sum, d) => sum + d.activeUsers, 0) / userGrowthStats.length)
+    : 0;
+  const avgPaid = userGrowthStats.length
+    ? Math.round(userGrowthStats.reduce((sum, d) => sum + d.paidUsers, 0) / userGrowthStats.length)
+    : 0;
+  const avgPaidRate = avgActive ? (avgPaid / avgActive) * 100 : 0;
 
   const statCards = [
     { title: '总用户数', value: '56,832', unit: '人', icon: Users, color: 'text-primary' },
@@ -62,48 +79,56 @@ export default function UserGrowth() {
             ))}
           </div>
         </div>
-        <LineChart
-          labels={userGrowthStats.map((d) => d.date)}
-          datasets={[
-            { label: '新增用户', values: userGrowthStats.map((d) => d.newUsers), color: '#2196F3' },
-            { label: '活跃用户', values: userGrowthStats.map((d) => d.activeUsers), color: '#4CAF50' },
-            { label: '付费用户', values: userGrowthStats.map((d) => d.paidUsers), color: '#FF9800' },
-          ]}
-        />
+        {loading ? (
+          <div className="text-center py-12 text-text-secondary">加载中...</div>
+        ) : (
+          <LineChart
+            labels={userGrowthStats.map((d) => d.date)}
+            datasets={[
+              { label: '新增用户', values: userGrowthStats.map((d) => d.newUsers), color: '#2196F3' },
+              { label: '活跃用户', values: userGrowthStats.map((d) => d.activeUsers), color: '#4CAF50' },
+              { label: '付费用户', values: userGrowthStats.map((d) => d.paidUsers), color: '#FF9800' },
+            ]}
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="card p-5 lg:col-span-2">
           <h3 className="font-semibold mb-4">用户增长明细</h3>
-          <div className="table-responsive">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>日期</th>
-                  <th>新增用户</th>
-                  <th>活跃用户</th>
-                  <th>付费用户</th>
-                  <th>付费率</th>
-                </tr>
-              </thead>
-              <tbody>
-                {userGrowthStats.map((d) => {
-                  const paidRate = (d.paidUsers / d.activeUsers) * 100;
-                  return (
-                    <tr key={d.date}>
-                      <td className="font-medium">{d.date}</td>
-                      <td className="text-primary">+{d.newUsers}</td>
-                      <td>{d.activeUsers.toLocaleString('zh-CN')}</td>
-                      <td>{d.paidUsers.toLocaleString('zh-CN')}</td>
-                      <td>
-                        <span className="badge badge-success">{paidRate.toFixed(2)}%</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          {loading ? (
+            <div className="text-center py-12 text-text-secondary">加载中...</div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th>新增用户</th>
+                    <th>活跃用户</th>
+                    <th>付费用户</th>
+                    <th>付费率</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {userGrowthStats.map((d) => {
+                    const paidRate = (d.paidUsers / d.activeUsers) * 100;
+                    return (
+                      <tr key={d.date}>
+                        <td className="font-medium">{d.date}</td>
+                        <td className="text-primary">+{d.newUsers}</td>
+                        <td>{d.activeUsers.toLocaleString('zh-CN')}</td>
+                        <td>{d.paidUsers.toLocaleString('zh-CN')}</td>
+                        <td>
+                          <span className="badge badge-success">{paidRate.toFixed(2)}%</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         <div className="card p-5">

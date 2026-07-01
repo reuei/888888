@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
@@ -6,16 +6,30 @@ import EmptyState from '../../components/EmptyState';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { commissionRecords } from '../../data/mock';
+import { useToast } from '../../components/Toast';
+import { fetchCommissionRecords, updateCommissionRecord } from '../../services/api';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
 import { CheckCircle, Search, Wallet } from 'lucide-react';
 import type { CommissionRecord } from '../../types';
 
 export default function AgentCommission() {
-  const [records, setRecords] = useState<CommissionRecord[]>(commissionRecords);
+  const { show } = useToast();
+  const [records, setRecords] = useState<CommissionRecord[]>([]);
+  const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [statusFilter, setStatusFilter] = useState('all');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchCommissionRecords();
+    setRecords(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filtered = records.filter((r) => {
     const matchKeyword = !debouncedKeyword ||
@@ -34,12 +48,20 @@ export default function AgentCommission() {
     setPage(1);
   }, [debouncedKeyword, statusFilter, setPage]);
 
-  const batchSettle = () => {
-    setRecords(records.map((r) => (r.status === 'pending' ? { ...r, status: 'settled' as const } : r)));
+  const batchSettle = async () => {
+    if (loading) return;
+    const pending = records.filter((r) => r.status === 'pending');
+    if (pending.length === 0) return;
+    await Promise.all(pending.map((r) => updateCommissionRecord(r.id, { status: 'settled' })));
+    await load();
+    show(`已批量结算 ${pending.length} 条佣金记录`, 'success');
   };
 
-  const settleOne = (id: string) => {
-    setRecords(records.map((r) => (r.id === id ? { ...r, status: 'settled' as const } : r)));
+  const settleOne = async (id: string) => {
+    if (loading) return;
+    await updateCommissionRecord(id, { status: 'settled' });
+    await load();
+    show('佣金结算成功', 'success');
   };
 
   const pendingCount = records.filter((r) => r.status === 'pending').length;
@@ -52,7 +74,7 @@ export default function AgentCommission() {
         actions={
           <button
             onClick={batchSettle}
-            disabled={pendingCount === 0}
+            disabled={loading || pendingCount === 0}
             className="btn btn-success flex items-center gap-1 disabled:opacity-50"
           >
             <CheckCircle size={16} /> 批量结算 ({pendingCount})
@@ -93,7 +115,14 @@ export default function AgentCommission() {
             </tr>
           </thead>
           <tbody>
-            {pagedList.map((r) => (
+            {loading && (
+              <tr>
+                <td colSpan={7}>
+                  <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>
+                </td>
+              </tr>
+            )}
+            {!loading && pagedList.map((r) => (
               <tr key={r.id}>
                 <td className="text-text-secondary">{r.id}</td>
                 <td>{r.agent}</td>
@@ -105,7 +134,7 @@ export default function AgentCommission() {
                 <td className="text-text-secondary">{r.createdAt}</td>
                 <td>
                   {r.status === 'pending' ? (
-                    <button onClick={() => settleOne(r.id)} className="btn btn-success py-1 px-2 text-xs">
+                    <button onClick={() => settleOne(r.id)} disabled={loading} className="btn btn-success py-1 px-2 text-xs disabled:opacity-50">
                       结算
                     </button>
                   ) : (
@@ -117,7 +146,7 @@ export default function AgentCommission() {
           </tbody>
         </table>
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <EmptyState title="暂无佣金记录" description="没有符合筛选条件的佣金记录" icon={<Wallet size={24} />} />
         )}
 

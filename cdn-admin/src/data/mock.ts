@@ -1,4 +1,4 @@
-import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, CouponRecord, TemplateItem, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, BOrder, Invoice, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord, DailyStat, MerchantStat, UserGrowthStat } from '../types';
+import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, CouponRecord, TemplateItem, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, BOrder, Invoice, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord, DailyStat, MerchantStat, UserGrowthStat, SettlementRecord } from '../types';
 
 export const sProfile: UserProfile = {
   name: '总站长',
@@ -180,7 +180,7 @@ export const cardTemplates: TemplateItem[] = [
   { id: 'CARD-11', name: 'DIY 自定义', type: 'card' },
 ];
 
-export const settlementRecords = [
+export const settlementRecords: SettlementRecord[] = [
   { id: 'SET001', merchant: '极速云', cycle: 'T+1', amount: 4820.00, fee: 48.20, status: 'settled', time: '2026-06-28 10:00' },
   { id: 'SET002', merchant: '蓝海防护', cycle: 'T+1', amount: 3150.50, fee: 31.51, status: 'settled', time: '2026-06-27 10:00' },
   { id: 'SET003', merchant: '站点卫士', cycle: 'T+7', amount: 1200.00, fee: 12.00, status: 'pending', time: '2026-06-28 09:00' },

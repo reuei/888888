@@ -1,19 +1,36 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import LineChart from '../../components/LineChart';
 import Pagination from '../../components/Pagination';
 import { usePagination } from '../../hooks/usePagination';
-import { dailyStats } from '../../data/mock';
+import { fetchDailyStats } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { Download, Calendar } from 'lucide-react';
+import type { DailyStat } from '../../types';
 
 export default function TransactionStats() {
   const [startDate, setStartDate] = useState('2026-06-22');
   const [endDate, setEndDate] = useState('2026-06-28');
+  const [dailyStats, setDailyStats] = useState<DailyStat[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadDailyStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchDailyStats();
+      setDailyStats(data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadDailyStats();
+  }, [loadDailyStats]);
 
   const totalRevenue = dailyStats.reduce((sum, d) => sum + d.revenue, 0);
   const totalOrders = dailyStats.reduce((sum, d) => sum + d.orders, 0);
-  const today = dailyStats[dailyStats.length - 1];
+  const today = dailyStats[dailyStats.length - 1] ?? { revenue: 0, orders: 0 };
 
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: dailyStats.length });
   const pagedStats = slice(dailyStats);
@@ -73,42 +90,52 @@ export default function TransactionStats() {
             />
           </div>
         </div>
-        <LineChart
-          labels={dailyStats.map((d) => d.date)}
-          datasets={[
-            { label: '交易额（元）', values: dailyStats.map((d) => d.revenue), color: '#2196F3' },
-            { label: '订单数（笔）', values: dailyStats.map((d) => d.orders), color: '#4CAF50' },
-          ]}
-        />
+        {loading ? (
+          <div className="text-center py-12 text-text-secondary">加载中...</div>
+        ) : (
+          <LineChart
+            labels={dailyStats.map((d) => d.date)}
+            datasets={[
+              { label: '交易额（元）', values: dailyStats.map((d) => d.revenue), color: '#2196F3' },
+              { label: '订单数（笔）', values: dailyStats.map((d) => d.orders), color: '#4CAF50' },
+            ]}
+          />
+        )}
       </div>
 
       <div className="card p-5">
         <h3 className="font-semibold mb-4">每日交易明细</h3>
-        <div className="table-responsive">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>日期</th>
-                <th>交易额</th>
-                <th>订单数</th>
-                <th>新增用户</th>
-                <th>新增商户</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pagedStats.map((d) => (
-                <tr key={d.date}>
-                  <td className="font-medium">{d.date}</td>
-                  <td>¥{formatMoney(d.revenue)}</td>
-                  <td>{d.orders}</td>
-                  <td>{d.users}</td>
-                  <td>{d.merchants}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <Pagination page={page} totalPages={totalPages} total={dailyStats.length} pageSize={pageSize} onChange={setPage} />
+        {loading ? (
+          <div className="text-center py-12 text-text-secondary">加载中...</div>
+        ) : (
+          <>
+            <div className="table-responsive">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th>交易额</th>
+                    <th>订单数</th>
+                    <th>新增用户</th>
+                    <th>新增商户</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pagedStats.map((d) => (
+                    <tr key={d.date}>
+                      <td className="font-medium">{d.date}</td>
+                      <td>¥{formatMoney(d.revenue)}</td>
+                      <td>{d.orders}</td>
+                      <td>{d.users}</td>
+                      <td>{d.merchants}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Pagination page={page} totalPages={totalPages} total={dailyStats.length} pageSize={pageSize} onChange={setPage} />
+          </>
+        )}
       </div>
     </div>
   );

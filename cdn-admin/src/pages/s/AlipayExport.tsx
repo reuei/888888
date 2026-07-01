@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import EmptyState from '../../components/EmptyState';
@@ -6,7 +6,7 @@ import SortableHeader from '../../components/SortableHeader';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { settlementRecords } from '../../data/mock';
+import { fetchSettlementRecords } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { FileDown, Download, Search, Inbox } from 'lucide-react';
 
@@ -27,14 +27,28 @@ const alipayMap: Record<string, { account: string; name: string }> = {
 };
 
 export default function AlipayExport() {
-  const pending = useMemo(
-    () => (settlementRecords as SettlementItem[]).filter((r) => r.status === 'pending'),
-    []
-  );
+  const [records, setRecords] = useState<SettlementItem[]>([]);
+  const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [preview, setPreview] = useState(false);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchSettlementRecords();
+    setRecords(data as SettlementItem[]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const pending = useMemo(
+    () => records.filter((r) => r.status === 'pending'),
+    [records]
+  );
 
   const filtered = useMemo(() => {
     const q = debouncedKeyword.toLowerCase();
@@ -168,11 +182,15 @@ export default function AlipayExport() {
           </tbody>
         </table>
 
-        {pagedList.length === 0 && (
+        {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+        {!loading && pagedList.length === 0 && (
           <EmptyState title="暂无待结算记录" description="没有符合搜索条件的待结算记录" icon={<Inbox size={24} />} />
         )}
 
-        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+        {!loading && pagedList.length > 0 && (
+          <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+        )}
       </div>
 
       {preview && (

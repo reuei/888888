@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import EmptyState from '../../components/EmptyState';
@@ -7,19 +7,35 @@ import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { operationLogs } from '../../data/mock';
+import { fetchOperationLogs } from '../../services/api';
 import { Search, FileSearch } from 'lucide-react';
 import type { OperationLog } from '../../types';
 
 export default function OperationLogs() {
   const { show } = useToast();
+  const [operationLogs, setOperationLogs] = useState<OperationLog[]>([]);
+  const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [moduleFilter, setModuleFilter] = useState('');
   const [actionFilter, setActionFilter] = useState('');
 
-  const modules = useMemo(() => Array.from(new Set(operationLogs.map((l) => l.module))), []);
-  const actions = useMemo(() => Array.from(new Set(operationLogs.map((l) => l.action))), []);
+  const loadOperationLogs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchOperationLogs();
+      setOperationLogs(data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadOperationLogs();
+  }, [loadOperationLogs]);
+
+  const modules = useMemo(() => Array.from(new Set(operationLogs.map((l) => l.module))), [operationLogs]);
+  const actions = useMemo(() => Array.from(new Set(operationLogs.map((l) => l.action))), [operationLogs]);
 
   const filtered = useMemo(() => {
     const q = debouncedKeyword.toLowerCase();
@@ -34,7 +50,7 @@ export default function OperationLogs() {
       const matchAction = !actionFilter || l.action === actionFilter;
       return matchKeyword && matchModule && matchAction;
     });
-  }, [debouncedKeyword, moduleFilter, actionFilter]);
+  }, [debouncedKeyword, moduleFilter, actionFilter, operationLogs]);
 
   const { sorted, sortKey, sortDirection, toggle } = useSort<OperationLog>({
     data: filtered,
@@ -104,54 +120,60 @@ export default function OperationLogs() {
 
         <div className="text-sm text-text-secondary mb-3">共 {sorted.length} 条记录</div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>
-                <SortableHeader<keyof OperationLog> label="日志ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof OperationLog> label="操作人" sortKey="operator" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof OperationLog> label="模块" sortKey="module" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof OperationLog> label="操作" sortKey="action" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof OperationLog> label="详情" sortKey="detail" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof OperationLog> label="IP" sortKey="ip" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof OperationLog> label="时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedList.map((l) => (
-              <tr key={l.id}>
-                <td className="text-text-secondary">{l.id}</td>
-                <td className="font-medium">{l.operator}</td>
-                <td>{l.module}</td>
-                <td>
-                  <span className="badge badge-default">{l.action}</span>
-                </td>
-                <td>{l.detail}</td>
-                <td className="font-mono text-text-secondary">{l.ip}</td>
-                <td className="text-text-secondary">{l.createdAt}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading && <div className="text-sm text-text-secondary mb-3">加载中...</div>}
 
-        {pagedList.length === 0 && (
-          <EmptyState title="暂无日志" description="没有符合筛选条件的操作日志" icon={<FileSearch size={24} />} />
+        {!loading && (
+          <>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>
+                    <SortableHeader<keyof OperationLog> label="日志ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof OperationLog> label="操作人" sortKey="operator" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof OperationLog> label="模块" sortKey="module" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof OperationLog> label="操作" sortKey="action" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof OperationLog> label="详情" sortKey="detail" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof OperationLog> label="IP" sortKey="ip" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof OperationLog> label="时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedList.map((l) => (
+                  <tr key={l.id}>
+                    <td className="text-text-secondary">{l.id}</td>
+                    <td className="font-medium">{l.operator}</td>
+                    <td>{l.module}</td>
+                    <td>
+                      <span className="badge badge-default">{l.action}</span>
+                    </td>
+                    <td>{l.detail}</td>
+                    <td className="font-mono text-text-secondary">{l.ip}</td>
+                    <td className="text-text-secondary">{l.createdAt}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {pagedList.length === 0 && (
+              <EmptyState title="暂无日志" description="没有符合筛选条件的操作日志" icon={<FileSearch size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+          </>
         )}
-
-        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

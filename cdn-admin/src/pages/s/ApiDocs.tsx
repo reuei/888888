@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
-import { apiDocs } from '../../data/mock';
+import { fetchApiDocs } from '../../services/api';
 import { Copy, Check } from 'lucide-react';
 import type { ApiDoc } from '../../types';
 
@@ -12,7 +12,23 @@ const methodClass: Record<ApiDoc['method'], string> = {
 };
 
 export default function ApiDocs() {
+  const [apiDocs, setApiDocs] = useState<ApiDoc[]>([]);
+  const [loading, setLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const loadApiDocs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchApiDocs();
+      setApiDocs(data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadApiDocs();
+  }, [loadApiDocs]);
 
   const grouped = useMemo(() => {
     return apiDocs.reduce<Record<string, ApiDoc[]>>((acc, doc) => {
@@ -20,7 +36,7 @@ export default function ApiDocs() {
       acc[doc.group].push(doc);
       return acc;
     }, {});
-  }, []);
+  }, [apiDocs]);
 
   const handleCopy = (doc: ApiDoc) => {
     // eslint-disable-next-line no-console
@@ -34,7 +50,9 @@ export default function ApiDocs() {
       <PageHeader title="API 文档" breadcrumb={['系统运维', 'API 文档']} />
 
       <div className="space-y-6">
-        {Object.entries(grouped).map(([group, docs]) => (
+        {loading && <div className="text-sm text-text-secondary">加载中...</div>}
+
+        {!loading && Object.entries(grouped).map(([group, docs]) => (
           <div key={group} className="card p-5">
             <h3 className="text-base font-semibold mb-4">{group}</h3>
             <table className="table">

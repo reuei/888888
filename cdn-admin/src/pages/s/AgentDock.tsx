@@ -1,35 +1,45 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { agentProducts } from '../../data/mock';
+import { useToast } from '../../components/Toast';
+import { fetchAgentProducts, createAgentProduct, updateAgentProduct } from '../../services/api';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import type { AgentProduct } from '../../types';
 
 export default function AgentDock() {
-  const [list, setList] = useState<AgentProduct[]>(agentProducts);
+  const { show } = useToast();
+  const [list, setList] = useState<AgentProduct[]>([]);
+  const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', source: '', costPrice: '', retailPrice: '' });
 
-  const setStatus = (id: string, status: AgentProduct['status']) => {
-    setList(list.map((p) => (p.id === id ? { ...p, status } : p)));
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchAgentProducts();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const setStatus = async (id: string, status: AgentProduct['status']) => {
+    if (loading) return;
+    await updateAgentProduct(id, { status });
+    await load();
+    show(`商品已${status === 'on' ? '上架' : status === 'off' ? '下架' : '设为审核中'}`, 'success');
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
+    if (loading) return;
     const costPrice = parseFloat(form.costPrice);
     const retailPrice = parseFloat(form.retailPrice);
     if (!form.name || !form.source || Number.isNaN(costPrice) || Number.isNaN(retailPrice)) return;
-    setList([
-      {
-        id: `AP00${list.length + 1}`,
-        name: form.name,
-        source: form.source,
-        costPrice,
-        retailPrice,
-        status: 'pending',
-      },
-      ...list,
-    ]);
+    await createAgentProduct({ name: form.name, source: form.source, costPrice, retailPrice, status: 'pending' });
+    await load();
+    show('商品对接成功', 'success');
     setModalOpen(false);
     setForm({ name: '', source: '', costPrice: '', retailPrice: '' });
   };
@@ -40,7 +50,7 @@ export default function AgentDock() {
         title="代理商品对接"
         breadcrumb={['代理/分销管理', '代理商品对接']}
         actions={
-          <button onClick={() => setModalOpen(true)} className="btn btn-primary flex items-center gap-1">
+          <button onClick={() => setModalOpen(true)} disabled={loading} className="btn btn-primary flex items-center gap-1 disabled:opacity-50">
             <Plus size={16} /> 对接新商品
           </button>
         }
@@ -60,7 +70,14 @@ export default function AgentDock() {
             </tr>
           </thead>
           <tbody>
-            {list.map((p) => (
+            {loading && (
+              <tr>
+                <td colSpan={7}>
+                  <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>
+                </td>
+              </tr>
+            )}
+            {!loading && list.map((p) => (
               <tr key={p.id}>
                 <td className="text-text-secondary">{p.id}</td>
                 <td className="font-medium">{p.name}</td>
@@ -75,7 +92,8 @@ export default function AgentDock() {
                     <select
                       value={p.status}
                       onChange={(e) => setStatus(p.id, e.target.value as AgentProduct['status'])}
-                      className="input py-1 px-2 w-28 text-xs"
+                      disabled={loading}
+                      className="input py-1 px-2 w-28 text-xs disabled:opacity-50"
                     >
                       <option value="on">上架</option>
                       <option value="off">下架</option>
@@ -101,8 +119,8 @@ export default function AgentDock() {
         onClose={() => setModalOpen(false)}
         footer={
           <>
-            <button onClick={() => setModalOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={handleAdd} className="btn btn-primary">保存</button>
+            <button onClick={() => setModalOpen(false)} disabled={loading} className="btn btn-default disabled:opacity-50">取消</button>
+            <button onClick={handleAdd} disabled={loading} className="btn btn-primary disabled:opacity-50">保存</button>
           </>
         }
       >

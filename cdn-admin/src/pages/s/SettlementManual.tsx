@@ -1,13 +1,14 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
 import EmptyState from '../../components/EmptyState';
 import SortableHeader from '../../components/SortableHeader';
+import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { settlementRecords } from '../../data/mock';
+import { fetchSettlementRecords, createSettlementRecord } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { Plus, CheckCircle, Search, Inbox } from 'lucide-react';
 
@@ -22,13 +23,27 @@ interface SettlementRecord {
 }
 
 export default function SettlementManual() {
-  const [records, setRecords] = useState<SettlementRecord[]>(settlementRecords as SettlementRecord[]);
+  const { show } = useToast();
+  const [records, setRecords] = useState<SettlementRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const [merchant, setMerchant] = useState('极速云');
   const [cycle, setCycle] = useState('T+1');
   const [amount, setAmount] = useState('');
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchSettlementRecords();
+    setRecords(data as SettlementRecord[]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const merchantOptions = Array.from(new Set(records.map((r) => r.merchant)));
 
@@ -60,24 +75,27 @@ export default function SettlementManual() {
     setPage(1);
   }, [debouncedKeyword, sortKey, setPage]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const value = parseFloat(amount);
     if (!value || value <= 0) return;
+    if (submitting) return;
+    setSubmitting(true);
     const fee = Math.round(value * 0.01 * 100) / 100;
     const now = new Date();
     const time = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const newRecord: SettlementRecord = {
-      id: `SET${String(records.length + 1).padStart(3, '0')}`,
+    await createSettlementRecord({
       merchant,
       cycle,
       amount: value,
       fee,
       status: 'pending',
       time,
-    };
-    setRecords([newRecord, ...records]);
+    });
     setAmount('');
     setOpen(false);
+    await load();
+    setSubmitting(false);
+    show('结算发起成功', 'success');
   };
 
   return (
@@ -151,11 +169,15 @@ export default function SettlementManual() {
           </tbody>
         </table>
 
-        {pagedList.length === 0 && (
+        {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+        {!loading && pagedList.length === 0 && (
           <EmptyState title="暂无结算记录" description="没有符合搜索条件的结算记录" icon={<Inbox size={24} />} />
         )}
 
-        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+        {!loading && pagedList.length > 0 && (
+          <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+        )}
       </div>
 
       <Modal
@@ -165,7 +187,7 @@ export default function SettlementManual() {
         footer={
           <>
             <button onClick={() => setOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={handleConfirm} className="btn btn-success flex items-center gap-1">
+            <button onClick={handleConfirm} disabled={submitting} className="btn btn-success flex items-center gap-1 disabled:opacity-50">
               <CheckCircle size={16} /> 确认结算
             </button>
           </>

@@ -336,6 +336,16 @@ export interface ApiDoc {
   group: string;
 }
 
+export interface SettlementRecord {
+  id: string;
+  merchant: string;
+  cycle: string;
+  amount: number;
+  fee: number;
+  status: 'settled' | 'pending';
+  time: string;
+}
+
 export interface BackupRecord {
   id: string;
   name: string;

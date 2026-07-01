@@ -23,6 +23,18 @@ import type {
   Invoice,
   WhitelistRecord,
   FinanceRecord,
+  SettlementRecord,
+  CommissionRecord,
+  OperationLog,
+  ApiDoc,
+  Notification,
+  DailyStat,
+  MerchantStat,
+  UserGrowthStat,
+  Agent,
+  AgentProduct,
+  TemplateItem,
+  LuckyNumber,
 } from '../types';
 import * as mock from '../data/mock';
 
@@ -53,6 +65,20 @@ interface Store {
   invoices: Invoice[];
   whitelistRecords: WhitelistRecord[];
   financeRecords: FinanceRecord[];
+  settlementRecords: SettlementRecord[];
+  commissionRecords: CommissionRecord[];
+  operationLogs: OperationLog[];
+  apiDocs: ApiDoc[];
+  notifications: Notification[];
+  dailyStats: DailyStat[];
+  merchantStats: MerchantStat[];
+  userGrowthStats: UserGrowthStat[];
+  agents: Agent[];
+  agentProducts: AgentProduct[];
+  pcTemplates: TemplateItem[];
+  mobileTemplates: TemplateItem[];
+  cardTemplates: TemplateItem[];
+  luckyNumbers: LuckyNumber[];
 }
 
 function loadStore(): Store {
@@ -86,6 +112,20 @@ function loadStore(): Store {
         invoices: parsed.invoices ?? mock.invoices,
         whitelistRecords: parsed.whitelistRecords ?? mock.whitelistRecords,
         financeRecords: parsed.financeRecords ?? mock.financeRecords,
+        settlementRecords: parsed.settlementRecords ?? mock.settlementRecords,
+        commissionRecords: parsed.commissionRecords ?? mock.commissionRecords,
+        operationLogs: parsed.operationLogs ?? mock.operationLogs,
+        apiDocs: parsed.apiDocs ?? mock.apiDocs,
+        notifications: parsed.notifications ?? mock.notifications,
+        dailyStats: parsed.dailyStats ?? mock.dailyStats,
+        merchantStats: parsed.merchantStats ?? mock.merchantStats,
+        userGrowthStats: parsed.userGrowthStats ?? mock.userGrowthStats,
+        agents: parsed.agents ?? mock.agents,
+        agentProducts: parsed.agentProducts ?? mock.agentProducts,
+        pcTemplates: parsed.pcTemplates ?? mock.pcTemplates,
+        mobileTemplates: parsed.mobileTemplates ?? mock.mobileTemplates,
+        cardTemplates: parsed.cardTemplates ?? mock.cardTemplates,
+        luckyNumbers: parsed.luckyNumbers ?? mock.luckyNumbers,
       };
     }
   } catch {
@@ -120,6 +160,20 @@ function getDefaultStore(): Store {
     invoices: mock.invoices,
     whitelistRecords: mock.whitelistRecords,
     financeRecords: mock.financeRecords,
+    settlementRecords: mock.settlementRecords,
+    commissionRecords: mock.commissionRecords,
+    operationLogs: mock.operationLogs,
+    apiDocs: mock.apiDocs,
+    notifications: mock.notifications,
+    dailyStats: mock.dailyStats,
+    merchantStats: mock.merchantStats,
+    userGrowthStats: mock.userGrowthStats,
+    agents: mock.agents,
+    agentProducts: mock.agentProducts,
+    pcTemplates: mock.pcTemplates,
+    mobileTemplates: mock.mobileTemplates,
+    cardTemplates: mock.cardTemplates,
+    luckyNumbers: mock.luckyNumbers,
   };
 }
 
@@ -394,6 +448,97 @@ export const fetchFinanceRecords = financeRecordsCrud.fetch;
 export const createFinanceRecord = financeRecordsCrud.create;
 export const updateFinanceRecord = financeRecordsCrud.update;
 export const deleteFinanceRecord = financeRecordsCrud.delete;
+
+// SettlementRecords
+export const settlementRecordsCrud = createCrud<SettlementRecord>('settlementRecords', 'SET');
+export const fetchSettlementRecords = settlementRecordsCrud.fetch;
+export const createSettlementRecord = settlementRecordsCrud.create;
+export const updateSettlementRecord = settlementRecordsCrud.update;
+export const deleteSettlementRecord = settlementRecordsCrud.delete;
+
+// CommissionRecords
+export const commissionRecordsCrud = createCrud<CommissionRecord>('commissionRecords', 'CM');
+export const fetchCommissionRecords = commissionRecordsCrud.fetch;
+export const createCommissionRecord = commissionRecordsCrud.create;
+export const updateCommissionRecord = commissionRecordsCrud.update;
+export const deleteCommissionRecord = commissionRecordsCrud.delete;
+
+// OperationLogs
+export const operationLogsCrud = createCrud<OperationLog>('operationLogs', 'L');
+export const fetchOperationLogs = operationLogsCrud.fetch;
+export const createOperationLog = operationLogsCrud.create;
+export const updateOperationLog = operationLogsCrud.update;
+export const deleteOperationLog = operationLogsCrud.delete;
+
+// ApiDocs
+export const apiDocsCrud = createCrud<ApiDoc>('apiDocs', 'A');
+export const fetchApiDocs = apiDocsCrud.fetch;
+export const createApiDoc = apiDocsCrud.create;
+export const updateApiDoc = apiDocsCrud.update;
+export const deleteApiDoc = apiDocsCrud.delete;
+
+// Notifications
+export const notificationsCrud = createCrud<Notification>('notifications', 'NT');
+export const fetchNotifications = notificationsCrud.fetch;
+export const createNotification = notificationsCrud.create;
+export const updateNotification = notificationsCrud.update;
+export const deleteNotification = notificationsCrud.delete;
+
+// Agents
+export const agentsCrud = createCrud<Agent>('agents', 'AG');
+export const fetchAgents = agentsCrud.fetch;
+export const createAgent = agentsCrud.create;
+export const updateAgent = agentsCrud.update;
+export const deleteAgent = agentsCrud.delete;
+
+// AgentProducts
+export const agentProductsCrud = createCrud<AgentProduct>('agentProducts', 'AP');
+export const fetchAgentProducts = agentProductsCrud.fetch;
+export const createAgentProduct = agentProductsCrud.create;
+export const updateAgentProduct = agentProductsCrud.update;
+export const deleteAgentProduct = agentProductsCrud.delete;
+
+// Templates
+export const pcTemplatesCrud = createCrud<TemplateItem>('pcTemplates', 'TPC');
+export const fetchPcTemplates = pcTemplatesCrud.fetch;
+export const createPcTemplate = pcTemplatesCrud.create;
+export const updatePcTemplate = pcTemplatesCrud.update;
+export const deletePcTemplate = pcTemplatesCrud.delete;
+
+export const mobileTemplatesCrud = createCrud<TemplateItem>('mobileTemplates', 'TPM');
+export const fetchMobileTemplates = mobileTemplatesCrud.fetch;
+export const createMobileTemplate = mobileTemplatesCrud.create;
+export const updateMobileTemplate = mobileTemplatesCrud.update;
+export const deleteMobileTemplate = mobileTemplatesCrud.delete;
+
+export const cardTemplatesCrud = createCrud<TemplateItem>('cardTemplates', 'TC');
+export const fetchCardTemplates = cardTemplatesCrud.fetch;
+export const createCardTemplate = cardTemplatesCrud.create;
+export const updateCardTemplate = cardTemplatesCrud.update;
+export const deleteCardTemplate = cardTemplatesCrud.delete;
+
+// LuckyNumbers
+export const luckyNumbersCrud = createCrud<LuckyNumber>('luckyNumbers', 'LN');
+export const fetchLuckyNumbers = luckyNumbersCrud.fetch;
+export const createLuckyNumber = luckyNumbersCrud.create;
+export const updateLuckyNumber = luckyNumbersCrud.update;
+export const deleteLuckyNumber = luckyNumbersCrud.delete;
+
+// Stats (readonly)
+export async function fetchDailyStats(): Promise<DailyStat[]> {
+  await delay();
+  return [...store.dailyStats];
+}
+
+export async function fetchMerchantStats(): Promise<MerchantStat[]> {
+  await delay();
+  return [...store.merchantStats];
+}
+
+export async function fetchUserGrowthStats(): Promise<UserGrowthStat[]> {
+  await delay();
+  return [...store.userGrowthStats];
+}
 
 export function resetStore() {
   store = getDefaultStore();

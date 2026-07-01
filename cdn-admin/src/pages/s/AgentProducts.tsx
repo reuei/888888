@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
@@ -6,7 +6,7 @@ import EmptyState from '../../components/EmptyState';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { agentProducts } from '../../data/mock';
+import { fetchAgentProducts } from '../../services/api';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
 import { Search, Eye, Package } from 'lucide-react';
 import type { AgentProduct } from '../../types';
@@ -18,10 +18,23 @@ interface AgentProductRow extends AgentProduct {
 export default function AgentProducts() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search);
+  const [agentProducts, setAgentProducts] = useState<AgentProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchAgentProducts();
+    setAgentProducts(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const list = useMemo<AgentProductRow[]>(
     () => agentProducts.map((p) => ({ ...p, profit: p.retailPrice - p.costPrice })),
-    []
+    [agentProducts]
   );
 
   const filtered = list.filter((p) => {
@@ -74,7 +87,14 @@ export default function AgentProducts() {
             </tr>
           </thead>
           <tbody>
-            {pagedList.map((p) => (
+            {loading && (
+              <tr>
+                <td colSpan={8}>
+                  <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>
+                </td>
+              </tr>
+            )}
+            {!loading && pagedList.map((p) => (
               <tr key={p.id}>
                 <td className="text-text-secondary">{p.id}</td>
                 <td className="font-medium">{p.name}</td>
@@ -95,7 +115,7 @@ export default function AgentProducts() {
           </tbody>
         </table>
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <EmptyState title="暂无商品" description="没有符合筛选条件的代理商品" icon={<Package size={24} />} />
         )}
 

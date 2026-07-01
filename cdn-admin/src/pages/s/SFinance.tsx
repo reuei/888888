@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { fetchFinanceRecords } from '../../services/api';
-import { settlementRecords } from '../../data/mock';
+import { fetchFinanceRecords, fetchSettlementRecords } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { trendLabels, trendValues } from '../../data/mock';
 import LineChart from '../../components/LineChart';
@@ -10,13 +9,15 @@ import { Plus, CheckCircle, Receipt } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
 import Pagination from '../../components/Pagination';
 import { usePagination } from '../../hooks/usePagination';
-import type { FinanceRecord } from '../../types';
+import type { FinanceRecord, SettlementRecord } from '../../types';
 
 export default function SFinance() {
   const [tab, setTab] = useState<'overview' | 'rates' | 'settlement'>('overview');
   const [settleOpen, setSettleOpen] = useState(false);
   const [financeRecords, setFinanceRecords] = useState<FinanceRecord[]>([]);
+  const [settlementRecords, setSettlementRecords] = useState<SettlementRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [settlementLoading, setSettlementLoading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -25,9 +26,17 @@ export default function SFinance() {
     setLoading(false);
   }, []);
 
+  const loadSettlements = useCallback(async () => {
+    setSettlementLoading(true);
+    const data = await fetchSettlementRecords();
+    setSettlementRecords(data);
+    setSettlementLoading(false);
+  }, []);
+
   useEffect(() => {
     load();
-  }, [load]);
+    loadSettlements();
+  }, [load, loadSettlements]);
 
   const overviewPagination = usePagination({ total: financeRecords.length });
   const settlementPagination = usePagination({ total: settlementRecords.length });
@@ -211,17 +220,21 @@ export default function SFinance() {
             </tbody>
           </table>
 
-          {settlementRecords.length === 0 && (
+          {settlementLoading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+          {!settlementLoading && settlementRecords.length === 0 && (
             <EmptyState title="暂无结算记录" description="当前没有结算打款记录" icon={<Receipt size={24} />} />
           )}
 
-          <Pagination
-            page={settlementPagination.page}
-            totalPages={settlementPagination.totalPages}
-            total={settlementRecords.length}
-            pageSize={settlementPagination.pageSize}
-            onChange={settlementPagination.setPage}
-          />
+          {!settlementLoading && settlementRecords.length > 0 && (
+            <Pagination
+              page={settlementPagination.page}
+              totalPages={settlementPagination.totalPages}
+              total={settlementRecords.length}
+              pageSize={settlementPagination.pageSize}
+              onChange={settlementPagination.setPage}
+            />
+          )}
         </div>
       )}
 

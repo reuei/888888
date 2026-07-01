@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
@@ -7,17 +7,34 @@ import Modal from '../../components/Modal';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { luckyNumbers } from '../../data/mock';
+import { fetchLuckyNumbers, updateLuckyNumber } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { Plus, ToggleLeft, ToggleRight, Search, Hash } from 'lucide-react';
+import type { LuckyNumber } from '../../types';
 
 export default function LuckyNumbers() {
-  const [list, setList] = useState(luckyNumbers);
+  const [list, setList] = useState<LuckyNumber[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [soldFilter, setSoldFilter] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ number: '', price: 0 });
+
+  const loadLuckyNumbers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchLuckyNumbers();
+      setList(data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadLuckyNumbers();
+  }, [loadLuckyNumbers]);
 
   const filtered = list.filter((n) => {
     const matchKeyword = !debouncedKeyword || n.number.includes(debouncedKeyword) || n.id.toLowerCase().includes(debouncedKeyword.toLowerCase());
@@ -33,8 +50,17 @@ export default function LuckyNumbers() {
     setPage(1);
   }, [debouncedKeyword, soldFilter, setPage]);
 
-  const toggleSold = (id: string) => {
-    setList(list.map((n) => (n.id === id ? { ...n, sold: !n.sold } : n)));
+  const toggleSold = async (id: string) => {
+    if (submitting) return;
+    const item = list.find((n) => n.id === id);
+    if (!item) return;
+    setSubmitting(true);
+    try {
+      await updateLuckyNumber(id, { sold: !item.sold });
+      setList(list.map((n) => (n.id === id ? { ...n, sold: !n.sold } : n)));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleAdd = () => {
@@ -84,46 +110,53 @@ export default function LuckyNumbers() {
           <button onClick={() => { setKeyword(''); setSoldFilter('all'); }} className="btn btn-default">重置</button>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>编号ID</th>
-              <th><SortableHeader label="靓号" sortKey="number" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th><SortableHeader label="价格" sortKey="price" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th><SortableHeader label="售出状态" sortKey="sold" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedList.map((n) => (
-              <tr key={n.id}>
-                <td className="text-text-secondary">{n.id}</td>
-                <td className="font-medium">{n.number}</td>
-                <td>¥{formatMoney(n.price)}</td>
-                <td>
-                  <span className={`badge ${n.sold ? 'badge-danger' : 'badge-success'}`}>
-                    {n.sold ? '已售出' : '未售出'}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    onClick={() => toggleSold(n.id)}
-                    className={`p-1.5 rounded hover:bg-gray-100 ${n.sold ? 'text-success' : 'text-warning'}`}
-                    title={n.sold ? '标记未售出' : '标记已售出'}
-                  >
-                    {n.sold ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading && <div className="text-sm text-text-secondary mb-3">加载中...</div>}
 
-        {filtered.length === 0 && (
-          <EmptyState title="暂无靓号" description="没有符合筛选条件的靓号" icon={<Hash size={24} />} />
+        {!loading && (
+          <>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>编号ID</th>
+                  <th><SortableHeader label="靓号" sortKey="number" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th><SortableHeader label="价格" sortKey="price" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th><SortableHeader label="售出状态" sortKey="sold" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedList.map((n) => (
+                  <tr key={n.id}>
+                    <td className="text-text-secondary">{n.id}</td>
+                    <td className="font-medium">{n.number}</td>
+                    <td>¥{formatMoney(n.price)}</td>
+                    <td>
+                      <span className={`badge ${n.sold ? 'badge-danger' : 'badge-success'}`}>
+                        {n.sold ? '已售出' : '未售出'}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => toggleSold(n.id)}
+                        disabled={submitting}
+                        className={`p-1.5 rounded hover:bg-gray-100 ${n.sold ? 'text-success' : 'text-warning'}`}
+                        title={n.sold ? '标记未售出' : '标记已售出'}
+                      >
+                        {n.sold ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {filtered.length === 0 && (
+              <EmptyState title="暂无靓号" description="没有符合筛选条件的靓号" icon={<Hash size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+          </>
         )}
-
-        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

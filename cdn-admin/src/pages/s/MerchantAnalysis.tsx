@@ -1,17 +1,34 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
-import { merchantStats } from '../../data/mock';
+import { fetchMerchantStats } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { Store, TrendingUp, DollarSign, ShoppingCart } from 'lucide-react';
+import type { MerchantStat } from '../../types';
 
 export default function MerchantAnalysis() {
   const [sortBy, setSortBy] = useState<'revenue' | 'orders' | 'growth'>('revenue');
+  const [merchantStats, setMerchantStats] = useState<MerchantStat[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadMerchantStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchMerchantStats();
+      setMerchantStats(data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadMerchantStats();
+  }, [loadMerchantStats]);
 
   const totalMerchants = merchantStats.length;
   const activeMerchants = merchantStats.filter((m) => m.growth >= 0).length;
   const totalRevenue = merchantStats.reduce((sum, m) => sum + m.revenue, 0);
   const totalOrders = merchantStats.reduce((sum, m) => sum + m.orders, 0);
-  const avgOrderValue = totalRevenue / totalOrders;
+  const avgOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
 
   const sortedStats = [...merchantStats].sort((a, b) => {
     if (sortBy === 'revenue') return b.revenue - a.revenue;
@@ -51,34 +68,38 @@ export default function MerchantAnalysis() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="card p-5 lg:col-span-2">
           <h3 className="font-semibold mb-4">TOP5 商户交易额</h3>
-          <div className="space-y-4">
-            {top5.map((m, i) => (
-              <div key={m.merchant} className="flex items-center gap-3">
-                <div
-                  className={`w-6 h-6 rounded flex items-center justify-center text-xs text-white ${
-                    i < 3 ? 'bg-primary' : 'bg-gray-300'
-                  }`}
-                >
-                  {i + 1}
-                </div>
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs text-text-secondary">
-                  {m.merchant[0]}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm truncate">{m.merchant}</span>
-                    <span className="text-sm font-medium">¥{formatMoney(m.revenue)}</span>
+          {loading ? (
+            <div className="text-center py-12 text-text-secondary">加载中...</div>
+          ) : (
+            <div className="space-y-4">
+              {top5.map((m, i) => (
+                <div key={m.merchant} className="flex items-center gap-3">
+                  <div
+                    className={`w-6 h-6 rounded flex items-center justify-center text-xs text-white ${
+                      i < 3 ? 'bg-primary' : 'bg-gray-300'
+                    }`}
+                  >
+                    {i + 1}
                   </div>
-                  <div className="w-full h-2 bg-gray-100 rounded overflow-hidden">
-                    <div
-                      className="h-full bg-primary"
-                      style={{ width: `${(m.revenue / maxTopRevenue) * 100}%` }}
-                    ></div>
+                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs text-text-secondary">
+                    {m.merchant[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm truncate">{m.merchant}</span>
+                      <span className="text-sm font-medium">¥{formatMoney(m.revenue)}</span>
+                    </div>
+                    <div className="w-full h-2 bg-gray-100 rounded overflow-hidden">
+                      <div
+                        className="h-full bg-primary"
+                        style={{ width: `${(m.revenue / maxTopRevenue) * 100}%` }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="card p-5">
@@ -87,7 +108,7 @@ export default function MerchantAnalysis() {
             <div className="flex items-center justify-between p-3 border border-border rounded">
               <span className="text-text-secondary">活跃商户占比</span>
               <span className="font-medium text-success">
-                {((activeMerchants / totalMerchants) * 100).toFixed(1)}%
+                {totalMerchants ? ((activeMerchants / totalMerchants) * 100).toFixed(1) : '0.0'}%
               </span>
             </div>
             <div className="flex items-center justify-between p-3 border border-border rounded">
@@ -119,45 +140,49 @@ export default function MerchantAnalysis() {
             <option value="growth">按环比增长排序</option>
           </select>
         </div>
-        <div className="table-responsive">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>排名</th>
-                <th>商户</th>
-                <th>交易额</th>
-                <th>订单数</th>
-                <th>客单价</th>
-                <th>环比增长</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedStats.map((m, i) => (
-                <tr key={m.merchant}>
-                  <td>
-                    <span
-                      className={`inline-flex w-6 h-6 rounded items-center justify-center text-xs text-white ${
-                        i < 3 ? 'bg-primary' : 'bg-gray-300'
-                      }`}
-                    >
-                      {i + 1}
-                    </span>
-                  </td>
-                  <td className="font-medium">{m.merchant}</td>
-                  <td>¥{formatMoney(m.revenue)}</td>
-                  <td>{m.orders.toLocaleString('zh-CN')}</td>
-                  <td>¥{formatMoney(m.avgOrderValue)}</td>
-                  <td>
-                    <span className={`badge ${m.growth >= 0 ? 'badge-success' : 'badge-danger'}`}>
-                      {m.growth >= 0 ? '+' : ''}
-                      {m.growth}%
-                    </span>
-                  </td>
+        {loading ? (
+          <div className="text-center py-12 text-text-secondary">加载中...</div>
+        ) : (
+          <div className="table-responsive">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>排名</th>
+                  <th>商户</th>
+                  <th>交易额</th>
+                  <th>订单数</th>
+                  <th>客单价</th>
+                  <th>环比增长</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {sortedStats.map((m, i) => (
+                  <tr key={m.merchant}>
+                    <td>
+                      <span
+                        className={`inline-flex w-6 h-6 rounded items-center justify-center text-xs text-white ${
+                          i < 3 ? 'bg-primary' : 'bg-gray-300'
+                        }`}
+                      >
+                        {i + 1}
+                      </span>
+                    </td>
+                    <td className="font-medium">{m.merchant}</td>
+                    <td>¥{formatMoney(m.revenue)}</td>
+                    <td>{m.orders.toLocaleString('zh-CN')}</td>
+                    <td>¥{formatMoney(m.avgOrderValue)}</td>
+                    <td>
+                      <span className={`badge ${m.growth >= 0 ? 'badge-success' : 'badge-danger'}`}>
+                        {m.growth >= 0 ? '+' : ''}
+                        {m.growth}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

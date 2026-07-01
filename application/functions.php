@@ -23,6 +23,33 @@ function base_url($path = '')
     return $base . '/' . ltrim($path, '/');
 }
 
+/**
+ * 获取当前 URL（含查询参数）
+ */
+function current_url()
+{
+    $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $uri = $_SERVER['REQUEST_URI'] ?? '/';
+    return $scheme . '://' . $host . $uri;
+}
+
+/**
+ * 生成带指定语言参数切换的当前 URL
+ */
+function switch_lang_url($lang)
+{
+    $url = current_url();
+    $parsed = parse_url($url);
+    $query = [];
+    if (!empty($parsed['query'])) {
+        parse_str($parsed['query'], $query);
+    }
+    $query['lang'] = $lang;
+    $parsed['query'] = http_build_query($query);
+    return ($parsed['scheme'] ?? 'http') . '://' . $parsed['host'] . ($parsed['path'] ?? '/') . '?' . $parsed['query'];
+}
+
 function input($key = null, $default = null)
 {
     if ($key === null) {
@@ -1410,4 +1437,572 @@ function message_send($type, $code, $recipient, array $vars = [])
         return send_sms($recipient, $code, $vars);
     }
     return ['code' => 1, 'msg' => '不支持的消息类型'];
+}
+
+/* ============================================================
+ * 第三方登录 OAuth
+ * ============================================================ */
+
+/**
+ * 读取第三方登录配置
+ */
+function oauth_config($type)
+{
+    $prefix = 'oauth_' . $type . '_';
+    return [
+        'appid' => site_config($prefix . 'appid', ''),
+        'secret' => site_config($prefix . 'secret', ''),
+        'enabled' => (int) site_config($prefix . 'enabled', '0'),
+        'authorize_url' => site_config($prefix . 'authorize_url', ''),
+        'token_url' => site_config($prefix . 'token_url', ''),
+        'userinfo_url' => site_config($prefix . 'userinfo_url', ''),
+        'scope' => site_config($prefix . 'scope', ''),
+    ];
+}
+
+/**
+ * OAuth 回调地址
+ */
+function oauth_callback_url($type)
+{
+    return base_url('oauth/callback?type=' . $type);
+}
+
+/**
+ * 获取 OAuth 提供者内置配置（QQ/微信/GitHub）
+ */
+function oauth_provider($type)
+{
+    $providers = [
+        'qq' => [
+            'authorize_url' => 'https://graph.qq.com/oauth2.0/authorize',
+            'token_url' => 'https://graph.qq.com/oauth2.0/token',
+            'userinfo_url' => 'https://graph.qq.com/user/get_user_info',
+            'scope' => 'get_user_info',
+        ],
+        'weixin' => [
+            'authorize_url' => 'https://open.weixin.qq.com/connect/qrconnect',
+            'token_url' => 'https://api.weixin.qq.com/sns/oauth2/access_token',
+            'userinfo_url' => 'https://api.weixin.qq.com/sns/userinfo',
+            'scope' => 'snsapi_login',
+        ],
+        'github' => [
+            'authorize_url' => 'https://github.com/login/oauth/authorize',
+            'token_url' => 'https://github.com/login/oauth/access_token',
+            'userinfo_url' => 'https://api.github.com/user',
+            'scope' => 'user:email',
+        ],
+    ];
+    return $providers[$type] ?? [];
+}
+
+/**
+ * 生成 OAuth 授权跳转 URL
+ */
+function oauth_authorize_url($type)
+{
+    $config = oauth_config($type);
+    $provider = oauth_provider($type);
+    if (empty($config['appid']) || empty($provider['authorize_url'])) {
+        return '';
+    }
+
+    $state = generate_token(16);
+    session('oauth_state_' . $type, $state);
+
+    $params = [
+        'client_id' => $config['appid'],
+        'redirect_uri' => oauth_callback_url($type),
+        'response_type' => 'code',
+        'state' => $state,
+        'scope' => $config['scope'] ?: $provider['scope'],
+    ];
+
+    // 微信使用 #wechat_redirect
+    $suffix = $type === 'weixin' ? '#wechat_redirect' : '';
+    return $provider['authorize_url'] . '?' . http_build_query($params) . $suffix;
+}
+
+/**
+ * 验证 OAuth state 参数
+ */
+function oauth_verify_state($type, $state)
+{
+    $key = 'oauth_state_' . $type;
+    $expected = session($key);
+    unset($_SESSION[$key]);
+    return $expected && $expected === $state;
+}
+
+/**
+ * 使用 code 换取 access_token
+ */
+function oauth_get_token($type, $code)
+{
+    $config = oauth_config($type);
+    $provider = oauth_provider($type);
+    if (empty($config['secret']) || empty($provider['token_url'])) {
+        return ['code' => 1, 'msg' => 'OAuth 配置不完整'];
+    }
+
+    $params = [
+        'grant_type' => 'authorization_code',
+        'client_id' => $config['appid'],
+        'client_secret' => $config['secret'],
+        'code' => $code,
+        'redirect_uri' => oauth_callback_url($type),
+    ];
+
+    $result = http_request($provider['token_url'], $params, 'POST', 30);
+    if ($result['code'] !== 0) {
+        return ['code' => 1, 'msg' => 'Token 请求失败：' . $result['msg']];
+    }
+
+    parse_str($result['data'], $data);
+    if (!empty($data['access_token'])) {
+        return ['code' => 0, 'data' => $data];
+    }
+
+    // GitHub 返回 JSON
+    $json = json_decode($result['data'], true);
+    if (!empty($json['access_token'])) {
+        return ['code' => 0, 'data' => $json];
+    }
+
+    return ['code' => 1, 'msg' => '获取 Token 失败：' . $result['data']];
+}
+
+/**
+ * 获取 OAuth 用户信息（简化版，适配 QQ/微信/GitHub 通用字段）
+ */
+function oauth_get_userinfo($type, $token, $openid = '')
+{
+    $provider = oauth_provider($type);
+    if (empty($provider['userinfo_url'])) {
+        return ['code' => 1, 'msg' => '未配置用户信息接口'];
+    }
+
+    $params = ['access_token' => $token];
+    if ($type === 'qq') {
+        $params['oauth_consumer_key'] = oauth_config('qq')['appid'];
+        $params['openid'] = $openid;
+    }
+    if ($type === 'weixin') {
+        $params['openid'] = $openid;
+    }
+
+    $result = http_request($provider['userinfo_url'], $params, 'GET', 30);
+    if ($result['code'] !== 0) {
+        return ['code' => 1, 'msg' => '用户信息请求失败：' . $result['msg']];
+    }
+
+    $data = json_decode($result['data'], true);
+    if (!$data) {
+        // QQ 返回 callback( ... )
+        if (preg_match('/callback\((.*)\);/s', $result['data'], $m)) {
+            $data = json_decode($m[1], true);
+        }
+    }
+    if (empty($data)) {
+        return ['code' => 1, 'msg' => '解析用户信息失败'];
+    }
+
+    // 统一字段
+    $user = [
+        'openid' => $openid,
+        'unionid' => '',
+        'nickname' => '',
+        'avatar' => '',
+    ];
+
+    if ($type === 'github') {
+        $user['openid'] = (string) ($data['id'] ?? '');
+        $user['nickname'] = $data['login'] ?? $data['name'] ?? '';
+        $user['avatar'] = $data['avatar_url'] ?? '';
+    } elseif ($type === 'weixin') {
+        $user['openid'] = $data['openid'] ?? $openid;
+        $user['unionid'] = $data['unionid'] ?? '';
+        $user['nickname'] = $data['nickname'] ?? '';
+        $user['avatar'] = $data['headimgurl'] ?? '';
+    } elseif ($type === 'qq') {
+        $user['openid'] = $openid;
+        $user['nickname'] = $data['nickname'] ?? '';
+        $user['avatar'] = $data['figureurl_qq_2'] ?? $data['figureurl_qq_1'] ?? '';
+    }
+
+    return ['code' => 0, 'data' => $user];
+}
+
+/**
+ * OAuth 登录或注册并绑定
+ * @return array ['code'=>0, 'msg'=>'', 'user_id'=>]
+ */
+function oauth_login_or_register($type, array $oauthUser)
+{
+    $openid = $oauthUser['openid'] ?? '';
+    if (!$openid) {
+        return ['code' => 1, 'msg' => '第三方账号信息缺失'];
+    }
+
+    $bind = Db::fetch(
+        "SELECT * FROM jz_oauth_bind WHERE type = ? AND openid = ?",
+        [$type, $openid]
+    );
+
+    if ($bind) {
+        $user = Db::fetch("SELECT * FROM jz_user WHERE id = ? AND status = 1", [$bind['user_id']]);
+        if (!$user) {
+            return ['code' => 1, 'msg' => '绑定用户不存在或已被禁用'];
+        }
+        session('user_contact', $user['nickname']);
+        return ['code' => 0, 'msg' => '登录成功', 'user_id' => $user['id']];
+    }
+
+    // 创建新用户并绑定
+    $nickname = $oauthUser['nickname'] ?: ($type . '_' . substr($openid, -8));
+    $mobile = '';
+
+    // 避免昵称重复
+    $exist = Db::fetch("SELECT id FROM jz_user WHERE nickname = ? LIMIT 1", [$nickname]);
+    if ($exist) {
+        $nickname .= '_' . generate_token(4);
+    }
+
+    $userId = Db::insert('jz_user', [
+        'nickname' => $nickname,
+        'mobile' => $mobile,
+        'password' => password_hash_custom(generate_token(16)),
+        'create_time' => date('Y-m-d H:i:s'),
+    ]);
+
+    Db::insert('jz_oauth_bind', [
+        'user_id' => $userId,
+        'type' => $type,
+        'openid' => $openid,
+        'unionid' => $oauthUser['unionid'] ?? '',
+        'nickname' => $oauthUser['nickname'] ?? '',
+        'avatar' => $oauthUser['avatar'] ?? '',
+        'create_time' => date('Y-m-d H:i:s'),
+    ]);
+
+    award_points($userId, 'register');
+    session('user_contact', $nickname);
+
+    return ['code' => 0, 'msg' => '登录成功', 'user_id' => $userId];
+}
+
+/* ============================================================
+ * 开放 API
+ * ============================================================ */
+
+/**
+ * API 认证并返回密钥信息
+ */
+function api_auth()
+{
+    $appId = input('app_id', '');
+    $sign = input('sign', '');
+    $timestamp = input('timestamp', '');
+    $nonce = input('nonce', '');
+
+    if (!$appId || !$sign || !$timestamp || !$nonce) {
+        return ['code' => 1, 'msg' => '缺少认证参数'];
+    }
+
+    // 时间戳校验（允许 ±5 分钟）
+    if (abs(time() - (int) $timestamp) > 300) {
+        return ['code' => 1, 'msg' => '请求时间戳已过期'];
+    }
+
+    $key = Db::fetch("SELECT * FROM jz_api_key WHERE app_id = ? AND status = 1", [$appId]);
+    if (!$key) {
+        return ['code' => 1, 'msg' => 'API 密钥不存在或已禁用'];
+    }
+
+    // IP 白名单校验
+    if (!empty($key['ips'])) {
+        $ips = array_filter(array_map('trim', explode(',', $key['ips'])));
+        if (!empty($ips) && !in_array(get_client_ip(), $ips, true)) {
+            return ['code' => 1, 'msg' => '当前 IP 不在允许列表'];
+        }
+    }
+
+    // 签名字符串：app_id + timestamp + nonce + app_secret 的 MD5
+    $expected = md5($appId . $timestamp . $nonce . $key['app_secret']);
+    if (!hash_equals($expected, strtolower($sign))) {
+        return ['code' => 1, 'msg' => '签名错误'];
+    }
+
+    // 更新调用统计
+    Db::execute(
+        "UPDATE jz_api_key SET request_count = request_count + 1, last_request_time = ? WHERE id = ?",
+        [date('Y-m-d H:i:s'), $key['id']]
+    );
+
+    return ['code' => 0, 'data' => $key];
+}
+
+/**
+ * 校验 API 权限
+ */
+function api_check_permission($key, $action)
+{
+    if (empty($key['permissions'])) {
+        return true;
+    }
+    $permissions = array_map('trim', explode(',', $key['permissions']));
+    return in_array('*', $permissions, true) || in_array($action, $permissions, true);
+}
+
+/**
+ * 记录 API 日志
+ */
+function api_log($appId, $action, $params, $result, $status = 1)
+{
+    try {
+        Db::insert('jz_api_log', [
+            'app_id' => $appId,
+            'action' => $action,
+            'params' => is_array($params) ? json_encode($params, JSON_UNESCAPED_UNICODE) : $params,
+            'result' => mb_substr(is_string($result) ? $result : json_encode($result, JSON_UNESCAPED_UNICODE), 0, 500),
+            'ip' => get_client_ip(),
+            'status' => $status ? 1 : 0,
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+    } catch (Exception $e) {
+    }
+}
+
+/* ============================================================
+ * 插件 / 机器人对接
+ * ============================================================ */
+
+/**
+ * 触发插件事件
+ * @param string $eventType 事件类型 order_created|order_paid|order_delivered
+ * @param array $payload 事件数据
+ */
+function plugin_trigger($eventType, array $payload)
+{
+    $plugins = Db::query(
+        "SELECT * FROM jz_plugin WHERE status = 1 AND FIND_IN_SET(?, event_types)",
+        [$eventType]
+    );
+
+    foreach ($plugins as $plugin) {
+        $config = json_decode($plugin['config'] ?? '{}', true);
+        if ($plugin['type'] === 'webhook' && !empty($config['url'])) {
+            plugin_webhook_send($plugin, $eventType, $payload);
+        }
+    }
+}
+
+/**
+ * 发送 Webhook
+ */
+function plugin_webhook_send(array $plugin, $eventType, array $payload)
+{
+    $config = json_decode($plugin['config'] ?? '{}', true);
+    $url = $config['url'] ?? '';
+    $secret = $config['secret'] ?? '';
+    if (!$url) {
+        return;
+    }
+
+    $data = [
+        'event' => $eventType,
+        'time' => time(),
+        'payload' => $payload,
+    ];
+
+    $headers = ["Content-Type: application/json"];
+    if ($secret) {
+        $sign = hash_hmac('sha256', json_encode($data, JSON_UNESCAPED_UNICODE), $secret);
+        $headers[] = "X-Plugin-Signature: {$sign}";
+    }
+
+    $options = [
+        'http' => [
+            'method' => 'POST',
+            'header' => implode("\r\n", $headers),
+            'content' => json_encode($data, JSON_UNESCAPED_UNICODE),
+            'timeout' => 30,
+            'ignore_errors' => true,
+        ],
+    ];
+
+    $context = stream_context_create($options);
+    $response = @file_get_contents($url, false, $context);
+    $success = $response !== false;
+
+    try {
+        Db::insert('jz_plugin_log', [
+            'plugin_id' => $plugin['id'],
+            'event_type' => $eventType,
+            'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE),
+            'response' => mb_substr((string) $response, 0, 2000),
+            'status' => $success ? 1 : 0,
+            'create_time' => date('Y-m-d H:i:s'),
+        ]);
+    } catch (Exception $e) {
+    }
+}
+
+/* ============================================================
+ * 多语言
+ * ============================================================ */
+
+/**
+ * 获取当前语言
+ */
+function current_lang()
+{
+    $supported = ['zh-cn', 'en'];
+    $default = 'zh-cn';
+
+    $lang = input('lang', '');
+    if ($lang && in_array(strtolower($lang), $supported, true)) {
+        session('lang', strtolower($lang));
+        return strtolower($lang);
+    }
+
+    $sessionLang = session('lang');
+    if ($sessionLang && in_array(strtolower($sessionLang), $supported, true)) {
+        return strtolower($sessionLang);
+    }
+
+    return $default;
+}
+
+/**
+ * 加载语言包
+ */
+function load_lang($lang)
+{
+    static $cache = [];
+    if (isset($cache[$lang])) {
+        return $cache[$lang];
+    }
+
+    $file = APP_PATH . 'lang' . DIRECTORY_SEPARATOR . $lang . '.php';
+    if (!is_file($file)) {
+        $cache[$lang] = [];
+        return [];
+    }
+
+    $cache[$lang] = require $file;
+    return $cache[$lang];
+}
+
+/**
+ * 翻译
+ * @param string $key 语言键，支持点号分隔
+ * @param array $replace 替换变量
+ * @param string|null $lang 指定语言
+ */
+function lang($key, array $replace = [], $lang = null)
+{
+    $lang = $lang ?: current_lang();
+    $data = load_lang($lang);
+
+    $keys = explode('.', $key);
+    $value = $data;
+    foreach ($keys as $k) {
+        if (!isset($value[$k])) {
+            // 回退到中文
+            if ($lang !== 'zh-cn') {
+                return lang($key, $replace, 'zh-cn');
+            }
+            return $key;
+        }
+        $value = $value[$k];
+    }
+
+    if (is_string($value)) {
+        foreach ($replace as $search => $replaceValue) {
+            $value = str_replace(':' . $search, $replaceValue, $value);
+        }
+    }
+
+    return $value;
+}
+
+/* ============================================================
+ * 全站搜索与筛选
+ * ============================================================ */
+
+/**
+ * 商品搜索 SQL 构造器
+ * @param array $filters 过滤条件
+ * @return array ['where'=>'', 'params'=>[]]
+ */
+function build_goods_search_where(array $filters)
+{
+    $where = 'g.status = 1';
+    $params = [];
+
+    if (!empty($filters['keyword'])) {
+        $where .= ' AND (g.name LIKE ? OR g.content LIKE ?)';
+        $params[] = '%' . $filters['keyword'] . '%';
+        $params[] = '%' . $filters['keyword'] . '%';
+    }
+
+    if (!empty($filters['category_id'])) {
+        $subIds = Db::query("SELECT id FROM jz_category WHERE parent_id = ? AND status = 1", [$filters['category_id']]);
+        $ids = array_merge([(int) $filters['category_id']], array_column($subIds, 'id'));
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $where .= " AND g.category_id IN ({$placeholders})";
+        $params = array_merge($params, $ids);
+    }
+
+    if (!empty($filters['merchant_id'])) {
+        $where .= ' AND g.merchant_id = ?';
+        $params[] = (int) $filters['merchant_id'];
+    }
+
+    if (!empty($filters['subsite_id'])) {
+        $where .= ' AND g.subsite_id = ?';
+        $params[] = (int) $filters['subsite_id'];
+    }
+
+    if (!empty($filters['min_price'])) {
+        $where .= ' AND g.price >= ?';
+        $params[] = (float) $filters['min_price'];
+    }
+    if (!empty($filters['max_price'])) {
+        $where .= ' AND g.price <= ?';
+        $params[] = (float) $filters['max_price'];
+    }
+
+    if (isset($filters['has_stock']) && $filters['has_stock']) {
+        $where .= ' AND (g.stock > 0 OR (g.is_seckill = 1 AND g.seckill_stock > g.seckill_sold))';
+    }
+
+    return ['where' => $where, 'params' => $params];
+}
+
+/**
+ * 搜索建议
+ * @param string $keyword
+ * @param int $limit
+ * @return array
+ */
+function search_suggest($keyword, $limit = 10)
+{
+    $keyword = trim($keyword);
+    if ($keyword === '') {
+        return [];
+    }
+
+    $goods = Db::query(
+        "SELECT id, name, price FROM jz_goods WHERE status = 1 AND name LIKE ? ORDER BY sold DESC LIMIT ?",
+        ['%' . $keyword . '%', (int) $limit]
+    );
+
+    $categories = Db::query(
+        "SELECT id, name FROM jz_category WHERE status = 1 AND name LIKE ? LIMIT ?",
+        ['%' . $keyword . '%', (int) $limit]
+    );
+
+    return ['goods' => $goods, 'categories' => $categories];
 }

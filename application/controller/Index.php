@@ -12,6 +12,7 @@ class Index extends Controller
         $this->setLayout('layout/main');
         $this->subsite = current_subsite();
         $this->assign('currentSubsite', $this->subsite);
+        $this->assign('currentLang', current_lang());
     }
 
     /**
@@ -149,29 +150,31 @@ class Index extends Controller
         $page = max(1, (int) input('page', 1));
         $pageSize = (int) ($tpl['goods_page_size'] ?? 24);
         $sort = input('sort', $tpl['goods_default_sort'] ?? 'sold');
+        $minPrice = input('min_price', '');
+        $maxPrice = input('max_price', '');
+        $hasStock = input('has_stock', '');
 
-        $where = 'g.status = 1 AND (g.stock > 0 OR (g.is_seckill = 1 AND g.seckill_stock > g.seckill_sold))';
-        $params = [];
+        $filters = [
+            'keyword' => $keyword,
+            'category_id' => $categoryId,
+            'has_stock' => $hasStock === '1',
+        ];
 
         $subsiteId = $this->getSubsiteId();
         if ($subsiteId > 0) {
-            $where .= ' AND g.subsite_id = ?';
-            $params[] = $subsiteId;
+            $filters['subsite_id'] = $subsiteId;
         }
 
-        if ($categoryId) {
-            // 支持父分类下所有子分类
-            $subIds = Db::query("SELECT id FROM jz_category WHERE parent_id = ? AND status = 1", [$categoryId]);
-            $ids = array_merge([$categoryId], array_column($subIds, 'id'));
-            $placeholders = implode(',', array_fill(0, count($ids), '?'));
-            $where .= " AND g.category_id IN ({$placeholders})";
-            $params = array_merge($params, $ids);
+        if ($minPrice !== '' && is_numeric($minPrice)) {
+            $filters['min_price'] = $minPrice;
+        }
+        if ($maxPrice !== '' && is_numeric($maxPrice)) {
+            $filters['max_price'] = $maxPrice;
         }
 
-        if ($keyword) {
-            $where .= ' AND g.name LIKE ?';
-            $params[] = '%' . $keyword . '%';
-        }
+        $built = build_goods_search_where($filters);
+        $where = $built['where'];
+        $params = $built['params'];
 
         $count = Db::fetch(
             "SELECT COUNT(*) AS total FROM jz_goods g WHERE {$where}",
@@ -202,7 +205,7 @@ class Index extends Controller
         // 分类页广告
         $categoryTop = Db::query("SELECT * FROM jz_ad WHERE position = 'category_top' AND status = 1 ORDER BY sort DESC, id DESC LIMIT 3");
 
-        $title = $category ? h($category['name']) : h($tpl['goods_seo_title'] ?? '全部商品');
+        $title = $category ? h($category['name']) : h($tpl['goods_seo_title'] ?? lang('nav.category'));
 
         $this->assign('title', $title);
         $this->assign('tpl', $tpl);
@@ -210,11 +213,28 @@ class Index extends Controller
         $this->assign('list', $list);
         $this->assign('keyword', $keyword);
         $this->assign('sort', $sort);
+        $this->assign('minPrice', $minPrice);
+        $this->assign('maxPrice', $maxPrice);
+        $this->assign('hasStock', $hasStock);
         $this->assign('page', $page);
         $this->assign('totalPages', $totalPages);
         $this->assign('total', $total);
         $this->assign('categoryTop', $categoryTop);
         $this->fetch('index/category');
+    }
+
+    /**
+     * 搜索建议（Ajax）
+     */
+    public function searchSuggest()
+    {
+        $keyword = trim(input('keyword', ''));
+        if (!$keyword) {
+            json_success('ok', ['goods' => [], 'categories' => []]);
+        }
+
+        $suggest = search_suggest($keyword, 8);
+        json_success('ok', $suggest);
     }
 
     /**

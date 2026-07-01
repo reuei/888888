@@ -882,4 +882,106 @@ CREATE TABLE `jz_email_log` (
   KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邮件发送日志表';
 
+-- ----------------------------
+-- 第三方登录绑定表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_oauth_bind`;
+CREATE TABLE `jz_oauth_bind` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
+  `type` varchar(20) NOT NULL DEFAULT '' COMMENT 'qq/weixin/github',
+  `openid` varchar(100) NOT NULL DEFAULT '' COMMENT '平台OpenID',
+  `unionid` varchar(100) NOT NULL DEFAULT '' COMMENT '微信UnionID',
+  `nickname` varchar(100) NOT NULL DEFAULT '' COMMENT '平台昵称',
+  `avatar` varchar(255) NOT NULL DEFAULT '' COMMENT '头像',
+  `access_token` varchar(255) NOT NULL DEFAULT '' COMMENT '访问令牌',
+  `refresh_token` varchar(255) NOT NULL DEFAULT '' COMMENT '刷新令牌',
+  `expire_time` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '令牌过期时间戳',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_type_openid` (`type`, `openid`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_type` (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='第三方登录绑定表';
+
+-- ----------------------------
+-- API 密钥表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_api_key`;
+CREATE TABLE `jz_api_key` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '密钥名称',
+  `app_id` varchar(50) NOT NULL DEFAULT '' COMMENT '应用ID',
+  `app_secret` varchar(255) NOT NULL DEFAULT '' COMMENT '应用密钥',
+  `merchant_id` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '关联商户ID（0为总站）',
+  `permissions` varchar(500) NOT NULL DEFAULT '' COMMENT '权限列表，逗号分隔',
+  `ips` varchar(500) NOT NULL DEFAULT '' COMMENT '允许IP，逗号分隔',
+  `request_count` int(11) unsigned NOT NULL DEFAULT 0 COMMENT '请求次数',
+  `last_request_time` datetime DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_app_id` (`app_id`),
+  KEY `idx_merchant` (`merchant_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API密钥表';
+
+-- ----------------------------
+-- API 请求日志表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_api_log`;
+CREATE TABLE `jz_api_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `app_id` varchar(50) NOT NULL DEFAULT '' COMMENT '应用ID',
+  `action` varchar(50) NOT NULL DEFAULT '' COMMENT '接口动作',
+  `params` text COMMENT '请求参数',
+  `result` varchar(500) NOT NULL DEFAULT '' COMMENT '返回结果摘要',
+  `ip` varchar(50) NOT NULL DEFAULT '' COMMENT '请求IP',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0失败 1成功',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_app_id` (`app_id`),
+  KEY `idx_action` (`action`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API请求日志表';
+
+-- ----------------------------
+-- 插件配置表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_plugin`;
+CREATE TABLE `jz_plugin` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) NOT NULL DEFAULT '' COMMENT '插件编码',
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '插件名称',
+  `type` varchar(30) NOT NULL DEFAULT '' COMMENT 'webhook-回调 bot-机器人',
+  `config` text COMMENT '插件配置JSON',
+  `event_types` varchar(255) NOT NULL DEFAULT '' COMMENT '监听事件，逗号分隔',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`),
+  KEY `idx_type` (`type`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='插件配置表';
+
+-- ----------------------------
+-- 插件执行日志表
+-- ----------------------------
+DROP TABLE IF EXISTS `jz_plugin_log`;
+CREATE TABLE `jz_plugin_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `plugin_id` int(11) unsigned NOT NULL DEFAULT 0,
+  `event_type` varchar(50) NOT NULL DEFAULT '' COMMENT '事件类型',
+  `payload` text COMMENT '请求内容',
+  `response` text COMMENT '响应内容',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0失败 1成功',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_plugin` (`plugin_id`),
+  KEY `idx_event` (`event_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='插件执行日志表';
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -12,6 +12,7 @@ class Chat extends Controller
         $this->setLayout('layout/main');
         $this->subsite = current_subsite();
         $this->assign('currentSubsite', $this->subsite);
+        $this->assign('currentLang', current_lang());
     }
 
     /**

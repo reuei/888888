@@ -1,22 +1,31 @@
 <div class="card" style="margin-bottom: 16px;">
-    <form method="get" action="<?php echo url('index/category'); ?>" style="display: flex; gap: 12px;">
+    <form method="get" action="<?php echo url('index/category'); ?>" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
         <?php if ($category): ?>
         <input type="hidden" name="id" value="<?php echo $category['id']; ?>">
         <?php endif; ?>
-        <input type="text" name="keyword" value="<?php echo h($keyword); ?>" placeholder="搜索商品" style="flex:1; max-width: 320px; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px;">
-        <button type="submit" class="btn">搜索</button>
+        <input type="text" name="keyword" value="<?php echo h($keyword); ?>" placeholder="<?php echo h(lang('goods.search_placeholder')); ?>" style="flex:1; min-width: 160px; max-width: 260px; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <input type="number" name="min_price" value="<?php echo h($minPrice); ?>" placeholder="<?php echo h(lang('goods.min_price')); ?>" min="0" step="0.01" style="width: 100px; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <span style="color:#94A3B8;">-</span>
+        <input type="number" name="max_price" value="<?php echo h($maxPrice); ?>" placeholder="<?php echo h(lang('goods.max_price')); ?>" min="0" step="0.01" style="width: 100px; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:#475569; cursor:pointer;">
+            <input type="checkbox" name="has_stock" value="1" <?php echo $hasStock === '1' ? 'checked' : ''; ?>> <?php echo h(lang('goods.has_stock')); ?>
+        </label>
+        <button type="submit" class="btn"><?php echo h(lang('nav.search')); ?></button>
+        <?php if ($keyword || $minPrice !== '' || $maxPrice !== '' || $hasStock === '1'): ?>
+        <a href="<?php echo url('index/category', ['id' => $category['id'] ?? 0]); ?>" class="btn btn-outline"><?php echo h(lang('common.reset')); ?></a>
+        <?php endif; ?>
     </form>
 </div>
 
 <div class="section-title">
-    <span><?php echo $category ? h($category['name']) : h($tpl['goods_seo_title'] ?? '全部商品'); ?></span>
-    <span style="font-size: 13px; color: #64748B; font-weight: normal;">共 <?php echo $total; ?> 件商品</span>
+    <span><?php echo $category ? h($category['name']) : h($tpl['goods_seo_title'] ?? lang('nav.category')); ?></span>
+    <span style="font-size: 13px; color: #64748B; font-weight: normal;"><?php echo h(lang('common.total', ['count' => $total])); ?></span>
     <div style="margin-left: auto;">
         <select onchange="location.href=this.value" style="padding: 6px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 13px;">
-            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'sort' => 'sold']); ?>" <?php echo $sort === 'sold' ? 'selected' : ''; ?>>按销量</option>
-            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'sort' => 'id']); ?>" <?php echo $sort === 'id' ? 'selected' : ''; ?>>按最新</option>
-            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'sort' => 'price_asc']); ?>" <?php echo $sort === 'price_asc' ? 'selected' : ''; ?>>价格从低到高</option>
-            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'sort' => 'price_desc']); ?>" <?php echo $sort === 'price_desc' ? 'selected' : ''; ?>>价格从高到低</option>
+            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'min_price' => $minPrice, 'max_price' => $maxPrice, 'has_stock' => $hasStock, 'sort' => 'sold']); ?>" <?php echo $sort === 'sold' ? 'selected' : ''; ?>><?php echo h(lang('goods.sort_sold')); ?></option>
+            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'min_price' => $minPrice, 'max_price' => $maxPrice, 'has_stock' => $hasStock, 'sort' => 'id']); ?>" <?php echo $sort === 'id' ? 'selected' : ''; ?>><?php echo h(lang('goods.sort_newest')); ?></option>
+            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'min_price' => $minPrice, 'max_price' => $maxPrice, 'has_stock' => $hasStock, 'sort' => 'price_asc']); ?>" <?php echo $sort === 'price_asc' ? 'selected' : ''; ?>><?php echo h(lang('goods.sort_price_asc')); ?></option>
+            <option value="<?php echo url('index/category', ['id' => $category['id'] ?? 0, 'keyword' => $keyword, 'min_price' => $minPrice, 'max_price' => $maxPrice, 'has_stock' => $hasStock, 'sort' => 'price_desc']); ?>" <?php echo $sort === 'price_desc' ? 'selected' : ''; ?>><?php echo h(lang('goods.sort_price_desc')); ?></option>
         </select>
     </div>
 </div>
@@ -42,7 +51,7 @@
                 <?php if ($item['cover']): ?>
                 <img src="<?php echo h($item['cover']); ?>" alt="<?php echo h($item['name']); ?>">
                 <?php else: ?>
-                暂无图片
+                <?php echo h(lang('goods.no_image')); ?>
                 <?php endif; ?>
                 <?php if ($eff['activity'] !== 'none'): ?>
                 <span style="position:absolute; top:8px; left:8px; background:#EF4444; color:#fff; font-size:12px; padding:2px 8px; border-radius:4px;"><?php echo $eff['label']; ?></span>
@@ -78,11 +87,11 @@
 <?php if ($totalPages > 1): ?>
 <div style="display: flex; justify-content: center; gap: 8px; margin-top: 24px;">
     <?php if ($page > 1): ?>
-    <a href="<?php echo url('index/category') . '?page=' . ($page - 1) . '&id=' . ($category['id'] ?? 0) . '&keyword=' . urlencode($keyword) . '&sort=' . $sort; ?>" class="btn btn-outline">上一页</a>
+    <a href="<?php echo url('index/category', ['page' => $page - 1, 'id' => $category['id'] ?? 0, 'keyword' => $keyword, 'min_price' => $minPrice, 'max_price' => $maxPrice, 'has_stock' => $hasStock, 'sort' => $sort]); ?>" class="btn btn-outline"><?php echo h(lang('common.prev')); ?></a>
     <?php endif; ?>
     <span style="padding: 8px 16px; color: #64748B;"><?php echo $page; ?> / <?php echo $totalPages; ?></span>
     <?php if ($page < $totalPages): ?>
-    <a href="<?php echo url('index/category') . '?page=' . ($page + 1) . '&id=' . ($category['id'] ?? 0) . '&keyword=' . urlencode($keyword) . '&sort=' . $sort; ?>" class="btn btn-outline">下一页</a>
+    <a href="<?php echo url('index/category', ['page' => $page + 1, 'id' => $category['id'] ?? 0, 'keyword' => $keyword, 'min_price' => $minPrice, 'max_price' => $maxPrice, 'has_stock' => $hasStock, 'sort' => $sort]); ?>" class="btn btn-outline"><?php echo h(lang('common.next')); ?></a>
     <?php endif; ?>
 </div>
 <?php endif; ?>

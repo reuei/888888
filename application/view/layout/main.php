@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="<?php echo $currentLang === 'en' ? 'en' : 'zh-CN'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -83,6 +83,7 @@
             display: flex;
             max-width: 420px;
             width: 100%;
+            position: relative;
         }
         .search-box input {
             flex: 1;
@@ -290,18 +291,20 @@
             <span class="subsite-tag"><?php echo h($currentSubsite['name']); ?></span>
             <?php endif; ?>
             <form class="search-box" method="get" action="<?php echo url('index/category'); ?>">
-                <input type="text" name="keyword" placeholder="搜索商品" value="<?php echo h($_GET['keyword'] ?? ''); ?>">
-                <button type="submit" class="btn">搜索</button>
+                <input type="text" name="keyword" placeholder="<?php echo h(lang('goods.search_placeholder')); ?>" value="<?php echo h($_GET['keyword'] ?? ''); ?>" autocomplete="off" id="globalSearchInput">
+                <button type="submit" class="btn"><?php echo h(lang('nav.search')); ?></button>
+                <div id="searchSuggest" style="display:none; position:absolute; top:40px; left:0; right:0; background:#fff; border:1px solid #E2E8F0; border-radius:0 0 6px 6px; box-shadow:0 4px 12px rgba(0,0,0,0.08); z-index:200; max-height:320px; overflow:auto;"></div>
             </form>
         </div>
         <div class="topbar-links">
-            <a href="<?php echo url('index/category'); ?>">购卡中心</a>
+            <a href="<?php echo url('index/category'); ?>"><?php echo h(lang('nav.category')); ?></a>
             <a href="<?php echo url('index/coupon'); ?>">领券中心</a>
-            <a href="<?php echo url('index/order'); ?>">查询订单</a>
-            <a href="<?php echo url('index/user'); ?>">个人中心</a>
+            <a href="<?php echo url('index/order'); ?>"><?php echo h(lang('order.query')); ?></a>
+            <a href="<?php echo url('index/user'); ?>"><?php echo h(lang('nav.user')); ?></a>
             <a href="<?php echo url('index/merchantJoin'); ?>">商户入驻</a>
             <a href="<?php echo url('login'); ?>?type=admin">总站后台</a>
             <a href="<?php echo url('login'); ?>?type=merchant">商户后台</a>
+            <a href="<?php echo h(switch_lang_url($currentLang === 'zh-cn' ? 'en' : 'zh-cn')); ?>">🌐 <?php echo h(lang('lang.' . ($currentLang === 'zh-cn' ? 'en' : 'zh-cn'))); ?></a>
         </div>
         <div class="mobile-menu-btn" id="mobileMenuBtn">
             <span></span>
@@ -310,10 +313,10 @@
         </div>
     </div>
     <div class="mobile-drawer" id="mobileDrawer">
-        <a href="<?php echo url('index/category'); ?>">购卡中心</a>
+        <a href="<?php echo url('index/category'); ?>"><?php echo h(lang('nav.category')); ?></a>
         <a href="<?php echo url('index/coupon'); ?>">领券中心</a>
-        <a href="<?php echo url('index/order'); ?>">查询订单</a>
-        <a href="<?php echo url('index/user'); ?>">个人中心</a>
+        <a href="<?php echo url('index/order'); ?>"><?php echo h(lang('order.query')); ?></a>
+        <a href="<?php echo url('index/user'); ?>"><?php echo h(lang('nav.user')); ?></a>
         <a href="<?php echo url('index/merchantJoin'); ?>">商户入驻</a>
         <a href="<?php echo url('login'); ?>?type=admin">总站后台</a>
         <a href="<?php echo url('login'); ?>?type=merchant">商户后台</a>
@@ -336,6 +339,56 @@
         document.addEventListener('click', (e) => {
             if (!btn.contains(e.target) && !drawer.contains(e.target)) {
                 drawer.classList.remove('open');
+            }
+        });
+    })();
+
+    // 搜索建议
+    (function() {
+        const input = document.getElementById('globalSearchInput');
+        const suggest = document.getElementById('searchSuggest');
+        if (!input || !suggest) return;
+
+        let timer = null;
+        input.addEventListener('input', () => {
+            clearTimeout(timer);
+            const keyword = input.value.trim();
+            if (!keyword) {
+                suggest.style.display = 'none';
+                return;
+            }
+            timer = setTimeout(async () => {
+                try {
+                    const res = await fetch('<?php echo url('index/searchSuggest'); ?>?keyword=' + encodeURIComponent(keyword));
+                    const data = await res.json();
+                    if (data.code !== 0) return;
+                    let html = '';
+                    if (data.data.categories && data.data.categories.length) {
+                        html += '<div style="padding:8px 12px; font-size:12px; color:#64748B; background:#F8FAFC;"><?php echo h(lang('goods.category')); ?></div>';
+                        data.data.categories.forEach(c => {
+                            html += '<a href="<?php echo url('index/category'); ?>?id=' + c.id + '" style="display:block; padding:10px 12px; color:#1F2937; border-bottom:1px solid #F1F5F9; font-size:13px;">' + c.name + '</a>';
+                        });
+                    }
+                    if (data.data.goods && data.data.goods.length) {
+                        html += '<div style="padding:8px 12px; font-size:12px; color:#64748B; background:#F8FAFC;"><?php echo h(lang('goods.price')); ?></div>';
+                        data.data.goods.forEach(g => {
+                            html += '<a href="<?php echo url('index/goods'); ?>?id=' + g.id + '" style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; color:#1F2937; border-bottom:1px solid #F1F5F9; font-size:13px;"><span>' + g.name + '</span><span style="color:#EF4444; font-weight:600;">¥' + parseFloat(g.price).toFixed(2) + '</span></a>';
+                        });
+                    }
+                    if (!html) {
+                        html = '<div style="padding:12px; color:#64748B; font-size:13px; text-align:center;"><?php echo h(lang('common.empty')); ?></div>';
+                    }
+                    suggest.innerHTML = html;
+                    suggest.style.display = 'block';
+                } catch (e) {
+                    suggest.style.display = 'none';
+                }
+            }, 300);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !suggest.contains(e.target)) {
+                suggest.style.display = 'none';
             }
         });
     })();

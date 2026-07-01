@@ -51,9 +51,9 @@
 </style>
 
 <div class="hero">
-    <h1><?php echo h(site_config('site_name', '鲸商城 Pro')); ?></h1>
-    <p>安全、便捷的卡密自动发货平台，汇聚海量优质商品</p>
-    <a href="<?php echo url('index/category'); ?>" class="btn btn-lg">立即购卡</a>
+    <h1><?php echo h(site_config('site_name', lang('site.name'))); ?></h1>
+    <p><?php echo h(lang('home.slogan')); ?></p>
+    <a href="<?php echo url('index/category'); ?>" class="btn btn-lg"><?php echo h(lang('home.buy_now')); ?></a>
 </div>
 
 <?php if (!empty($homeTop)): ?>
@@ -68,7 +68,7 @@
 
 <?php if (!empty($articles)): ?>
 <div class="notice-bar">
-    <strong>公告</strong>
+    <strong><?php echo h(lang('home.notice')); ?></strong>
     <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
         <?php foreach ($articles as $article): ?>
         <a href="<?php echo url('index/article', ['id' => $article['id']]); ?>"><?php echo h($article['title']); ?></a>
@@ -98,8 +98,8 @@
 <?php endif; ?>
 
 <div class="section-title">
-    <span>热门商品</span>
-    <a href="<?php echo url('index/category'); ?>">查看更多</a>
+    <span><?php echo h(lang('home.hot_goods')); ?></span>
+    <a href="<?php echo url('index/category'); ?>"><?php echo h(lang('common.more')); ?></a>
 </div>
 
 <?php if (empty($goods)): ?>
@@ -113,7 +113,7 @@
                 <?php if ($item['cover']): ?>
                 <img src="<?php echo h($item['cover']); ?>" alt="<?php echo h($item['name']); ?>">
                 <?php else: ?>
-                暂无图片
+                <?php echo h(lang('goods.no_image')); ?>
                 <?php endif; ?>
                 <?php if ($eff['activity'] !== 'none'): ?>
                 <span style="position:absolute; top:8px; left:8px; background:#EF4444; color:#fff; font-size:12px; padding:2px 8px; border-radius:4px;"><?php echo $eff['label']; ?></span>
@@ -149,7 +149,7 @@
 
 <?php if (($tpl['home_show_stats'] ?? '1') === '1'): ?>
 <div class="card" style="margin-top: 24px; text-align: center; background: #F8FAFC;">
-    <div style="font-size: 15px; font-weight: 500; color: #334155;"><?php echo h($tpl['home_stats_text'] ?? '平台交易 安全快捷'); ?></div>
-    <div style="font-size: 12px; color: #94A3B8; margin-top: 8px;">卡密自动发货 · 7×24小时服务 · 订单即时查询</div>
+    <div style="font-size: 15px; font-weight: 500; color: #334155;"><?php echo h($tpl['home_stats_text'] ?? lang('home.stats_text')); ?></div>
+    <div style="font-size: 12px; color: #94A3B8; margin-top: 8px;"><?php echo h(lang('home.stats_text')); ?></div>
 </div>
 <?php endif; ?>

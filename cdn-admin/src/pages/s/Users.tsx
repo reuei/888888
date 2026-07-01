@@ -3,14 +3,17 @@ import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
 import EmptyState from '../../components/EmptyState';
+import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
 import { users } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { Search, Ban, CheckCircle, Users as UsersIcon } from 'lucide-react';
+import { Search, Ban, CheckCircle, Users as UsersIcon, FileDown } from 'lucide-react';
+import { exportToCsv } from '../../utils/export';
 
 export default function Users() {
+  const { show } = useToast();
   const [list, setList] = useState(users);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
@@ -30,9 +33,34 @@ export default function Users() {
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
   const pagedList = slice(sorted);
 
+  const handleExport = () => {
+    exportToCsv(
+      '用户列表',
+      sorted,
+      [
+        { key: 'id', label: '用户ID' },
+        { key: 'nickname', label: '昵称' },
+        { key: 'phone', label: '手机号' },
+        { key: 'level', label: '等级' },
+        { key: 'group', label: '分组' },
+        { key: 'registerAt', label: '注册时间' },
+        { key: 'status', label: '状态' },
+      ]
+    );
+    show('用户列表导出成功', 'success');
+  };
+
   return (
     <div>
-      <PageHeader title="用户列表" breadcrumb={['会员/用户管理', '用户列表']} />
+      <PageHeader
+        title="用户列表"
+        breadcrumb={['会员/用户管理', '用户列表']}
+        actions={
+          <button onClick={handleExport} className="btn btn-default flex items-center gap-1">
+            <FileDown size={16} /> 导出
+          </button>
+        }
+      />
 
       <div className="card p-5">
         <div className="flex flex-wrap gap-3 mb-4">

@@ -7,7 +7,8 @@ import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { orders } from '../../data/mock';
 import { statusBadge, statusText, formatMoney } from '../../utils/helpers';
-import { Eye, RefreshCcw } from 'lucide-react';
+import { Eye, RefreshCcw, FileDown } from 'lucide-react';
+import { exportToCsv } from '../../utils/export';
 
 export default function SOrders() {
   const { show } = useToast();
@@ -16,9 +17,34 @@ export default function SOrders() {
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
   const pagedList = slice(sorted);
 
+  const handleExport = () => {
+    exportToCsv(
+      '全部订单',
+      sorted,
+      [
+        { key: 'id', label: '订单号' },
+        { key: 'buyer', label: '买家' },
+        { key: 'merchant', label: '商户' },
+        { key: 'product', label: '商品' },
+        { key: 'amount', label: '金额' },
+        { key: 'status', label: '状态' },
+        { key: 'createdAt', label: '下单时间' },
+      ]
+    );
+    show('订单导出成功', 'success');
+  };
+
   return (
     <div>
-      <PageHeader title="全部订单" breadcrumb={['订单管理', '全部订单']} />
+      <PageHeader
+        title="全部订单"
+        breadcrumb={['订单管理', '全部订单']}
+        actions={
+          <button onClick={handleExport} className="btn btn-default flex items-center gap-1">
+            <FileDown size={16} /> 导出
+          </button>
+        }
+      />
 
       <div className="card p-5">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">

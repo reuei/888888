@@ -4,7 +4,8 @@ import Modal from '../../components/Modal';
 import { useToast } from '../../components/Toast';
 import { merchants } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { CheckCircle, XCircle, Eye, Plus, Store, RefreshCcw } from 'lucide-react';
+import { CheckCircle, XCircle, Eye, Plus, Store, RefreshCcw, FileDown } from 'lucide-react';
+import { exportToCsv } from '../../utils/export';
 import EmptyState from '../../components/EmptyState';
 import Pagination from '../../components/Pagination';
 import { usePagination } from '../../hooks/usePagination';
@@ -25,6 +26,22 @@ export default function SMerchants() {
 
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: filtered.length });
   const pagedList = slice(filtered);
+
+  const handleExport = () => {
+    exportToCsv(
+      '商户列表',
+      filtered,
+      [
+        { key: 'id', label: '店铺ID' },
+        { key: 'shopName', label: '店铺名' },
+        { key: 'phone', label: '手机号' },
+        { key: 'registerAt', label: '开店时间' },
+        { key: 'deposit', label: '保证金' },
+        { key: 'status', label: '状态' },
+      ]
+    );
+    show('商户列表导出成功', 'success');
+  };
 
   const reset = () => {
     setKeyword('');
@@ -64,6 +81,7 @@ export default function SMerchants() {
           </select>
           <button className="btn btn-primary">查询</button>
           <button onClick={reset} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
+          <button onClick={handleExport} className="btn btn-default flex items-center gap-1"><FileDown size={16} /> 导出</button>
         </div>
 
         <table className="table">

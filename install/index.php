@@ -7,10 +7,26 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $rootPath = dirname(__DIR__) . DIRECTORY_SEPARATOR;
 $step = $_GET['step'] ?? 1;
 $error = '';
 $success = '';
+
+// 加载授权码配置
+$authConfigFile = __DIR__ . DIRECTORY_SEPARATOR . 'auth.php';
+$authConfig = [];
+if (is_file($authConfigFile)) {
+    $authConfig = require $authConfigFile;
+}
+$authConfig = array_merge([
+    'auth_code' => '',
+    'max_attempts' => 5,
+], $authConfig);
+$authCodeRequired = !empty($authConfig['auth_code']);
 
 // 已安装检测
 if (file_exists($rootPath . 'application/config/database.php')) {
@@ -92,10 +108,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step == 2) {
     $dbPass = $_POST['db_pass'] ?? '';
     $adminUser = $_POST['admin_user'] ?? 'admin';
     $adminPass = $_POST['admin_pass'] ?? '';
+    $authCodeInput = trim($_POST['auth_code'] ?? '');
 
-    if (!$dbName || !$dbUser || !$adminPass) {
+    // 授权码验证
+    if ($authCodeRequired) {
+        $sessionKey = 'install_auth_attempts';
+        $attempts = (int) ($_SESSION[$sessionKey] ?? 0);
+        $maxAttempts = (int) $authConfig['max_attempts'];
+
+        if ($maxAttempts > 0 && $attempts >= $maxAttempts) {
+            $error = '授权码验证失败次数过多，请稍后重试';
+        } elseif ($authCodeInput === '') {
+            $error = '请输入安装授权码';
+        } elseif (!hash_equals((string) $authConfig['auth_code'], $authCodeInput)) {
+            $_SESSION[$sessionKey] = $attempts + 1;
+            $error = '授权码错误，请核对后重新输入';
+        }
+    }
+
+    if (!$error && (!$dbName || !$dbUser || !$adminPass)) {
         $error = '请填写完整的数据库信息和管理员密码';
-    } else {
+    }
+
+    if (!$error) {
         try {
             $config = [
                 'type' => 'mysql',
@@ -264,6 +299,15 @@ $allPass = !in_array(false, $envItems, true);
             <?php endif; ?>
         <?php elseif ($step == 2): ?>
             <form method="POST" action="?step=2">
+                <?php if ($authCodeRequired): ?>
+                <h3 style="margin-bottom: 16px; font-size: 16px;">授权码验证</h3>
+                <div class="form-group">
+                    <label>安装授权码</label>
+                    <input type="text" name="auth_code" placeholder="请输入安装授权码" required autocomplete="off">
+                    <p class="hint">授权码由系统提供，请输入正确的授权码后继续安装。错误次数过多将暂时锁定。</p>
+                </div>
+                <?php endif; ?>
+
                 <h3 style="margin-bottom: 16px; font-size: 16px;">数据库配置</h3>
                 <div class="form-group">
                     <label>数据库主机</label>

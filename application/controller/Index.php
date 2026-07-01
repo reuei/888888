@@ -77,6 +77,7 @@ class Index extends Controller
     public function index()
     {
         $tpl = $this->getTemplateConfig();
+        $subsiteId = $this->getSubsiteId();
 
         // 导航分类
         $categories = [];

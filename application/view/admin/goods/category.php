@@ -5,7 +5,7 @@
 </div>
 
 <div class="card" style="margin-bottom: 16px;">
-    <h3 style="font-size: 16px; margin-bottom: 16px;"><?php echo isset($_GET['edit']) ? '编辑分类' : '新增分类'; ?></h3>
+    <h3 style="font-size: 16px; margin-bottom: 16px;"><?php echo input('edit') ? '编辑分类' : '新增分类'; ?></h3>
     <form id="categoryForm" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
         <input type="hidden" name="id" id="catId" value="0">
         <div>

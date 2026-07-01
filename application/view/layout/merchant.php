@@ -1,6 +1,6 @@
 <?php
 $merchant = session('merchant_user') ?? [];
-$currentPath = trim($_SERVER['REQUEST_URI'], '/');
+$currentPath = parse_url(trim($_SERVER['REQUEST_URI'], '/'), PHP_URL_PATH);
 $currentPath = preg_replace('#^public/#', '', $currentPath);
 
 $menu = [

@@ -291,7 +291,7 @@
             <span class="subsite-tag"><?php echo h($currentSubsite['name']); ?></span>
             <?php endif; ?>
             <form class="search-box" method="get" action="<?php echo url('index/category'); ?>">
-                <input type="text" name="keyword" placeholder="<?php echo h(lang('goods.search_placeholder')); ?>" value="<?php echo h($_GET['keyword'] ?? ''); ?>" autocomplete="off" id="globalSearchInput">
+                <input type="text" name="keyword" placeholder="<?php echo h(lang('goods.search_placeholder')); ?>" value="<?php echo h(input('keyword', '')); ?>" autocomplete="off" id="globalSearchInput">
                 <button type="submit" class="btn"><?php echo h(lang('nav.search')); ?></button>
                 <div id="searchSuggest" style="display:none; position:absolute; top:40px; left:0; right:0; background:#fff; border:1px solid #E2E8F0; border-radius:0 0 6px 6px; box-shadow:0 4px 12px rgba(0,0,0,0.08); z-index:200; max-height:320px; overflow:auto;"></div>
             </form>

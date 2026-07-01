@@ -1,4 +1,29 @@
-import type { Article, Coupon, Sku } from '../types';
+import type {
+  Article,
+  Coupon,
+  Sku,
+  Merchant,
+  User,
+  Order,
+  Category,
+  AdSlot,
+  Complaint,
+  Gateway,
+  Node,
+  Product,
+  InviteCode,
+  UserGroup,
+  UserLevel,
+  RealnameRecord,
+  RolePermission,
+  BackupRecord,
+  Site,
+  MyPackage,
+  BOrder,
+  Invoice,
+  WhitelistRecord,
+  FinanceRecord,
+} from '../types';
 import * as mock from '../data/mock';
 
 const STORAGE_KEY = 'cdn-admin-data';
@@ -7,10 +32,31 @@ interface Store {
   articles: Article[];
   coupons: Coupon[];
   skus: Sku[];
+  merchants: Merchant[];
+  users: User[];
+  orders: Order[];
+  categories: Category[];
+  adSlots: AdSlot[];
+  complaints: Complaint[];
+  gateways: Gateway[];
+  nodes: Node[];
+  products: Product[];
+  inviteCodes: InviteCode[];
+  userGroups: UserGroup[];
+  userLevels: UserLevel[];
+  realnameRecords: RealnameRecord[];
+  roles: RolePermission[];
+  backupRecords: BackupRecord[];
+  sites: Site[];
+  myPackages: MyPackage[];
+  bOrders: BOrder[];
+  invoices: Invoice[];
+  whitelistRecords: WhitelistRecord[];
+  financeRecords: FinanceRecord[];
 }
 
 function loadStore(): Store {
-  if (typeof window === 'undefined') return { articles: mock.articles, coupons: mock.coupons, skus: mock.skus };
+  if (typeof window === 'undefined') return getDefaultStore();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -19,12 +65,62 @@ function loadStore(): Store {
         articles: parsed.articles ?? mock.articles,
         coupons: parsed.coupons ?? mock.coupons,
         skus: parsed.skus ?? mock.skus,
+        merchants: parsed.merchants ?? mock.merchants,
+        users: parsed.users ?? mock.users,
+        orders: parsed.orders ?? mock.orders,
+        categories: parsed.categories ?? mock.categories,
+        adSlots: parsed.adSlots ?? mock.adSlots,
+        complaints: parsed.complaints ?? mock.complaints,
+        gateways: parsed.gateways ?? mock.gateways,
+        nodes: parsed.nodes ?? mock.nodes,
+        products: parsed.products ?? mock.products,
+        inviteCodes: parsed.inviteCodes ?? mock.inviteCodes,
+        userGroups: parsed.userGroups ?? mock.userGroups,
+        userLevels: parsed.userLevels ?? mock.userLevels,
+        realnameRecords: parsed.realnameRecords ?? mock.realnameRecords,
+        roles: parsed.roles ?? mock.roles,
+        backupRecords: parsed.backupRecords ?? mock.backupRecords,
+        sites: parsed.sites ?? mock.sites,
+        myPackages: parsed.myPackages ?? mock.myPackages,
+        bOrders: parsed.bOrders ?? mock.bOrders,
+        invoices: parsed.invoices ?? mock.invoices,
+        whitelistRecords: parsed.whitelistRecords ?? mock.whitelistRecords,
+        financeRecords: parsed.financeRecords ?? mock.financeRecords,
       };
     }
   } catch {
     // ignore
   }
-  return { articles: mock.articles, coupons: mock.coupons, skus: mock.skus };
+  return getDefaultStore();
+}
+
+function getDefaultStore(): Store {
+  return {
+    articles: mock.articles,
+    coupons: mock.coupons,
+    skus: mock.skus,
+    merchants: mock.merchants,
+    users: mock.users,
+    orders: mock.orders,
+    categories: mock.categories,
+    adSlots: mock.adSlots,
+    complaints: mock.complaints,
+    gateways: mock.gateways,
+    nodes: mock.nodes,
+    products: mock.products,
+    inviteCodes: mock.inviteCodes,
+    userGroups: mock.userGroups,
+    userLevels: mock.userLevels,
+    realnameRecords: mock.realnameRecords,
+    roles: mock.roles,
+    backupRecords: mock.backupRecords,
+    sites: mock.sites,
+    myPackages: mock.myPackages,
+    bOrders: mock.bOrders,
+    invoices: mock.invoices,
+    whitelistRecords: mock.whitelistRecords,
+    financeRecords: mock.financeRecords,
+  };
 }
 
 function saveStore(store: Store) {
@@ -42,6 +138,43 @@ function delay(ms = 300) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function createCrud<T extends { id: string }>(key: keyof Store, prefix: string) {
+  return {
+    fetch: async (): Promise<T[]> => {
+      await delay();
+      return [...(store[key] as unknown as T[])];
+    },
+    create: async (payload: Omit<T, 'id'>): Promise<T> => {
+      await delay();
+      const items = store[key] as unknown as T[];
+      const id = `${prefix}${String(items.length + 1).padStart(3, '0')}`;
+      const item = { ...payload, id } as unknown as T;
+      (store[key] as unknown as T[]) = [item, ...items];
+      saveStore(store);
+      return item;
+    },
+    update: async (id: string, payload: Partial<T>): Promise<T | null> => {
+      await delay();
+      const items = store[key] as unknown as T[];
+      const index = items.findIndex((i) => i.id === id);
+      if (index === -1) return null;
+      const updated = { ...items[index], ...payload };
+      items[index] = updated;
+      saveStore(store);
+      return updated;
+    },
+    delete: async (id: string): Promise<boolean> => {
+      await delay();
+      const items = store[key] as unknown as T[];
+      const before = items.length;
+      (store[key] as unknown as T[]) = items.filter((i) => i.id !== id);
+      saveStore(store);
+      return (store[key] as unknown as T[]).length < before;
+    },
+  };
+}
+
+// Articles
 export async function fetchArticles(): Promise<Article[]> {
   await delay();
   return [...store.articles];
@@ -80,6 +213,7 @@ export async function deleteArticle(id: string): Promise<boolean> {
   return store.articles.length < before;
 }
 
+// Coupons
 export async function fetchCoupons(): Promise<Coupon[]> {
   await delay();
   return [...store.coupons];
@@ -97,6 +231,7 @@ export async function createCoupon(payload: Omit<Coupon, 'id' | 'received'>): Pr
   return coupon;
 }
 
+// Skus
 export async function fetchSkus(): Promise<Sku[]> {
   await delay();
   return [...store.skus];
@@ -113,7 +248,154 @@ export async function createSku(payload: Omit<Sku, 'id'>): Promise<Sku> {
   return sku;
 }
 
+// Merchants
+export const merchantsCrud = createCrud<Merchant>('merchants', 'M');
+export const fetchMerchants = merchantsCrud.fetch;
+export const createMerchant = merchantsCrud.create;
+export const updateMerchant = merchantsCrud.update;
+export const deleteMerchant = merchantsCrud.delete;
+
+// Users
+export const usersCrud = createCrud<User>('users', 'U');
+export const fetchUsers = usersCrud.fetch;
+export const createUser = usersCrud.create;
+export const updateUser = usersCrud.update;
+export const deleteUser = usersCrud.delete;
+
+// Orders
+export const ordersCrud = createCrud<Order>('orders', 'O');
+export const fetchOrders = ordersCrud.fetch;
+export const createOrder = ordersCrud.create;
+export const updateOrder = ordersCrud.update;
+export const deleteOrder = ordersCrud.delete;
+
+// Categories
+export const categoriesCrud = createCrud<Category>('categories', 'C');
+export const fetchCategories = categoriesCrud.fetch;
+export const createCategory = categoriesCrud.create;
+export const updateCategory = categoriesCrud.update;
+export const deleteCategory = categoriesCrud.delete;
+
+// AdSlots
+export const adSlotsCrud = createCrud<AdSlot>('adSlots', 'AD');
+export const fetchAdSlots = adSlotsCrud.fetch;
+export const createAdSlot = adSlotsCrud.create;
+export const updateAdSlot = adSlotsCrud.update;
+export const deleteAdSlot = adSlotsCrud.delete;
+
+// Complaints
+export const complaintsCrud = createCrud<Complaint>('complaints', 'CP');
+export const fetchComplaints = complaintsCrud.fetch;
+export const createComplaint = complaintsCrud.create;
+export const updateComplaint = complaintsCrud.update;
+export const deleteComplaint = complaintsCrud.delete;
+
+// Gateways
+export const gatewaysCrud = createCrud<Gateway>('gateways', 'GW');
+export const fetchGateways = gatewaysCrud.fetch;
+export const createGateway = gatewaysCrud.create;
+export const updateGateway = gatewaysCrud.update;
+export const deleteGateway = gatewaysCrud.delete;
+
+// Nodes
+export const nodesCrud = createCrud<Node>('nodes', 'N');
+export const fetchNodes = nodesCrud.fetch;
+export const createNode = nodesCrud.create;
+export const updateNode = nodesCrud.update;
+export const deleteNode = nodesCrud.delete;
+
+// Products
+export const productsCrud = createCrud<Product>('products', 'P');
+export const fetchProducts = productsCrud.fetch;
+export const createProduct = productsCrud.create;
+export const updateProduct = productsCrud.update;
+export const deleteProduct = productsCrud.delete;
+
+// InviteCodes
+export const inviteCodesCrud = createCrud<InviteCode>('inviteCodes', 'I');
+export const fetchInviteCodes = inviteCodesCrud.fetch;
+export const createInviteCode = inviteCodesCrud.create;
+export const updateInviteCode = inviteCodesCrud.update;
+export const deleteInviteCode = inviteCodesCrud.delete;
+
+// UserGroups
+export const userGroupsCrud = createCrud<UserGroup>('userGroups', 'G');
+export const fetchUserGroups = userGroupsCrud.fetch;
+export const createUserGroup = userGroupsCrud.create;
+export const updateUserGroup = userGroupsCrud.update;
+export const deleteUserGroup = userGroupsCrud.delete;
+
+// UserLevels
+export const userLevelsCrud = createCrud<UserLevel>('userLevels', 'L');
+export const fetchUserLevels = userLevelsCrud.fetch;
+export const createUserLevel = userLevelsCrud.create;
+export const updateUserLevel = userLevelsCrud.update;
+export const deleteUserLevel = userLevelsCrud.delete;
+
+// RealnameRecords
+export const realnameRecordsCrud = createCrud<RealnameRecord>('realnameRecords', 'R');
+export const fetchRealnameRecords = realnameRecordsCrud.fetch;
+export const createRealnameRecord = realnameRecordsCrud.create;
+export const updateRealnameRecord = realnameRecordsCrud.update;
+export const deleteRealnameRecord = realnameRecordsCrud.delete;
+
+// Roles
+export const rolesCrud = createCrud<RolePermission>('roles', 'R');
+export const fetchRoles = rolesCrud.fetch;
+export const createRole = rolesCrud.create;
+export const updateRole = rolesCrud.update;
+export const deleteRole = rolesCrud.delete;
+
+// BackupRecords
+export const backupRecordsCrud = createCrud<BackupRecord>('backupRecords', 'B');
+export const fetchBackupRecords = backupRecordsCrud.fetch;
+export const createBackupRecord = backupRecordsCrud.create;
+export const updateBackupRecord = backupRecordsCrud.update;
+export const deleteBackupRecord = backupRecordsCrud.delete;
+
+// Sites
+export const sitesCrud = createCrud<Site>('sites', 'ST');
+export const fetchSites = sitesCrud.fetch;
+export const createSite = sitesCrud.create;
+export const updateSite = sitesCrud.update;
+export const deleteSite = sitesCrud.delete;
+
+// MyPackages
+export const myPackagesCrud = createCrud<MyPackage>('myPackages', 'MP');
+export const fetchMyPackages = myPackagesCrud.fetch;
+export const createMyPackage = myPackagesCrud.create;
+export const updateMyPackage = myPackagesCrud.update;
+export const deleteMyPackage = myPackagesCrud.delete;
+
+// BOrders
+export const bOrdersCrud = createCrud<BOrder>('bOrders', 'BO');
+export const fetchBOrders = bOrdersCrud.fetch;
+export const createBOrder = bOrdersCrud.create;
+export const updateBOrder = bOrdersCrud.update;
+export const deleteBOrder = bOrdersCrud.delete;
+
+// Invoices
+export const invoicesCrud = createCrud<Invoice>('invoices', 'INV');
+export const fetchInvoices = invoicesCrud.fetch;
+export const createInvoice = invoicesCrud.create;
+export const updateInvoice = invoicesCrud.update;
+export const deleteInvoice = invoicesCrud.delete;
+
+// WhitelistRecords
+export const whitelistRecordsCrud = createCrud<WhitelistRecord>('whitelistRecords', 'W');
+export const fetchWhitelistRecords = whitelistRecordsCrud.fetch;
+export const createWhitelistRecord = whitelistRecordsCrud.create;
+export const updateWhitelistRecord = whitelistRecordsCrud.update;
+export const deleteWhitelistRecord = whitelistRecordsCrud.delete;
+
+// FinanceRecords
+export const financeRecordsCrud = createCrud<FinanceRecord>('financeRecords', 'F');
+export const fetchFinanceRecords = financeRecordsCrud.fetch;
+export const createFinanceRecord = financeRecordsCrud.create;
+export const updateFinanceRecord = financeRecordsCrud.update;
+export const deleteFinanceRecord = financeRecordsCrud.delete;
+
 export function resetStore() {
-  store = { articles: mock.articles, coupons: mock.coupons, skus: mock.skus };
+  store = getDefaultStore();
   saveStore(store);
 }

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast';
+import { createSite } from '../../services/api';
 import { products } from '../../data/mock';
 import { statusBadge, statusText } from '../../utils/helpers';
-import { Plus, CheckCircle } from 'lucide-react';
+import { Plus, CheckCircle, Loader2 } from 'lucide-react';
 
 interface PreviewSite {
   id: string;
@@ -20,6 +22,7 @@ const templates = ['PC-01', 'PC-02', 'PC-03', 'M-01', 'M-02'];
 const nodePools = Array.from(new Set(products.map((p) => p.nodePool)));
 
 export default function AddSite() {
+  const { show } = useToast();
   const [form, setForm] = useState({
     name: '',
     domain: '',
@@ -29,8 +32,20 @@ export default function AddSite() {
   });
   const [list, setList] = useState<PreviewSite[]>([]);
   const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!form.domain.trim() || submitting) return;
+    setSubmitting(true);
+    await createSite({
+      name: form.name.trim() || form.domain.trim(),
+      domain: form.domain.trim(),
+      template: form.template,
+      products: 0,
+      nodes: 0,
+      status: 'pending',
+      createdAt: new Date().toISOString().slice(0, 10),
+    });
     const newSite: PreviewSite = {
       id: Date.now().toString(),
       name: form.name.trim() || form.domain.trim(),
@@ -44,6 +59,8 @@ export default function AddSite() {
     setList([newSite, ...list]);
     setSuccess(true);
     setForm({ name: '', domain: '', template: templates[0], nodePool: nodePools[0] || '', remark: '' });
+    setSubmitting(false);
+    show(`站点 ${newSite.domain} 创建成功`, 'success');
   };
 
   return (
@@ -120,9 +137,11 @@ export default function AddSite() {
 
           <button
             onClick={handleSubmit}
-            className="btn btn-primary flex items-center gap-1"
+            disabled={submitting || !form.domain.trim()}
+            className="btn btn-primary flex items-center gap-1 disabled:opacity-70"
           >
-            <Plus size={16} /> 提交创建
+            {submitting ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+            提交创建
           </button>
         </div>
       </div>

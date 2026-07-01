@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
@@ -8,21 +8,35 @@ import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { bOrders, invoices as invoicesData } from '../../data/mock';
+import { fetchBOrders, fetchInvoices, createInvoice } from '../../services/api';
 import { formatMoney, statusBadge, statusText, invoiceTypeText } from '../../utils/helpers';
 import { FileText, Plus, Eye, Search, RefreshCcw } from 'lucide-react';
-import type { Invoice } from '../../types';
+import type { Invoice, BOrder } from '../../types';
 
 export default function Invoice() {
   const { show } = useToast();
-  const [invoices, setInvoices] = useState(invoicesData);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [bOrders, setBOrders] = useState<BOrder[]>([]);
+  const [loading, setLoading] = useState(false);
   const [applyOpen, setApplyOpen] = useState(false);
   const [detail, setDetail] = useState<Invoice | null>(null);
 
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
 
-  const paidOrders = useMemo(() => bOrders.filter((o) => o.status === 'paid'), []);
+  const load = useCallback(async () => {
+    setLoading(true);
+    const [invData, orderData] = await Promise.all([fetchInvoices(), fetchBOrders()]);
+    setInvoices(invData);
+    setBOrders(orderData);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const paidOrders = useMemo(() => bOrders.filter((o) => o.status === 'paid'), [bOrders]);
 
   const [form, setForm] = useState({
     orderId: paidOrders[0]?.id || '',
@@ -58,12 +72,11 @@ export default function Invoice() {
     setPage(1);
   };
 
-  const handleSubmit = () => {
-    if (!selectedOrder || !form.title.trim()) return;
+  const handleSubmit = async () => {
+    if (!selectedOrder || !form.title.trim() || loading) return;
     const now = new Date();
     const createdAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const newInvoice: Invoice = {
-      id: `INV${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(invoices.length + 1).padStart(3, '0')}`,
+    await createInvoice({
       orderId: selectedOrder.id,
       amount: selectedOrder.amount,
       status: 'pending',
@@ -79,12 +92,12 @@ export default function Invoice() {
         },
       ],
       createdAt,
-    };
-    setInvoices([newInvoice, ...invoices]);
+    });
+    await load();
     setApplyOpen(false);
     setForm({ orderId: paidOrders[0]?.id || '', type: 'personal', title: '', taxId: '' });
     setPage(1);
-    show(`发票申请 ${newInvoice.id} 提交成功`, 'success');
+    show(`发票申请提交成功`, 'success');
   };
 
   return (
@@ -159,7 +172,9 @@ export default function Invoice() {
           </tbody>
         </table>
 
-        {sorted.length === 0 && (
+        {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+        {!loading && sorted.length === 0 && (
           <EmptyState
             title="暂无发票记录"
             description="您还没有申请过发票"

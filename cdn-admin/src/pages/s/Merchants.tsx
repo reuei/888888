@@ -1,22 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { useToast } from '../../components/Toast';
-import { merchants } from '../../data/mock';
-import { statusBadge, statusText } from '../../utils/helpers';
-import { CheckCircle, XCircle, Eye, Plus, Store, RefreshCcw, FileDown } from 'lucide-react';
-import { exportToCsv } from '../../utils/export';
 import EmptyState from '../../components/EmptyState';
 import Pagination from '../../components/Pagination';
+import Loading from '../../components/Loading';
+import { useToast } from '../../components/Toast';
+import * as api from '../../services/api';
+import type { Merchant } from '../../types';
+import { statusBadge, statusText } from '../../utils/helpers';
+import { CheckCircle, XCircle, Eye, Plus, Store, RefreshCcw, FileDown, Trash2 } from 'lucide-react';
+import { exportToCsv } from '../../utils/export';
 import { usePagination } from '../../hooks/usePagination';
 
 export default function SMerchants() {
   const { show } = useToast();
-  const [list, setList] = useState(merchants);
+  const [list, setList] = useState<Merchant[]>([]);
+  const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [auditOpen, setAuditOpen] = useState(false);
-  const [current, setCurrent] = useState<typeof merchants[0] | null>(null);
+  const [current, setCurrent] = useState<Merchant | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    const data = await api.fetchMerchants();
+    setList(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const filtered = list.filter((m) => {
     const matchKeyword = !keyword || m.shopName.includes(keyword) || m.phone.includes(keyword) || m.id.includes(keyword);
@@ -48,22 +62,31 @@ export default function SMerchants() {
     setStatusFilter('all');
   };
 
-  const handleAudit = (m: typeof merchants[0]) => {
+  const handleAudit = (m: Merchant) => {
     setCurrent(m);
     setAuditOpen(true);
   };
 
-  const updateStatus = (status: 'normal' | 'rejected') => {
+  const updateStatus = async (status: 'normal' | 'rejected') => {
     if (!current) return;
-    setList(list.map((m) => (m.id === current.id ? { ...m, status: status === 'normal' ? 'normal' : 'banned' } : m)));
+    await api.updateMerchant(current.id, { status: status === 'normal' ? 'normal' : 'banned' });
+    await load();
     setAuditOpen(false);
     show(`商户 ${current.shopName} 审核${status === 'normal' ? '通过' : '已驳回'}`, status === 'normal' ? 'success' : 'warning');
+  };
+
+  const handleDelete = async (id: string, shopName: string) => {
+    if (!confirm(`确定删除商户「${shopName}」吗？`)) return;
+    await api.deleteMerchant(id);
+    await load();
+    show('商户已删除', 'info');
   };
 
   return (
     <div>
       <PageHeader title="商户列表" breadcrumb={['商户管理', '商户列表']} />
 
+      {loading ? <Loading /> : <>
       <div className="card p-5">
         <div className="flex flex-wrap gap-3 mb-4">
           <input
@@ -133,6 +156,9 @@ export default function SMerchants() {
                         <Plus size={16} />
                       </button>
                     )}
+                    <button onClick={() => handleDelete(m.id, m.shopName)} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -176,6 +202,7 @@ export default function SMerchants() {
           </div>
         )}
       </Modal>
+      </>}
     </div>
   );
 }

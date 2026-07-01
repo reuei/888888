@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
@@ -8,9 +8,10 @@ import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { packages, myPackages } from '../../data/mock';
+import { fetchMyPackages, createMyPackage, updateMyPackage, createBOrder } from '../../services/api';
+import { packages } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
-import { ShoppingCart, Check, Search, RefreshCcw, Package } from 'lucide-react';
+import { ShoppingCart, Check, Search, RefreshCcw, Package, Loader2, CreditCard } from 'lucide-react';
 import type { Package as PackageType, MyPackage } from '../../types';
 
 export default function BPackages() {
@@ -18,6 +19,9 @@ export default function BPackages() {
   const [activeTab, setActiveTab] = useState<'buy' | 'my' | 'renew'>('buy');
   const [buyOpen, setBuyOpen] = useState(false);
   const [selected, setSelected] = useState<PackageType | null>(null);
+  const [myPackages, setMyPackages] = useState<MyPackage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const openBuy = (p: PackageType) => {
     setSelected(p);
@@ -47,6 +51,17 @@ export default function BPackages() {
   } = usePagination({ total: sortedPackages.length, pageSize: 8 });
   const pagedPackages = buySlice(sortedPackages);
 
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchMyPackages();
+    setMyPackages(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
   // 我的套餐
   const [myKeyword, setMyKeyword] = useState('');
   const debouncedMyKeyword = useDebounce(myKeyword);
@@ -54,7 +69,7 @@ export default function BPackages() {
     const kw = debouncedMyKeyword.trim().toLowerCase();
     if (!kw) return myPackages;
     return myPackages.filter((p) => p.name.toLowerCase().includes(kw) || p.id.toLowerCase().includes(kw));
-  }, [debouncedMyKeyword]);
+  }, [debouncedMyKeyword, myPackages]);
   const {
     sorted: sortedMy,
     sortKey: mySortKey,
@@ -88,6 +103,51 @@ export default function BPackages() {
   const resetMy = () => {
     setMyKeyword('');
     setMyPage(1);
+  };
+
+  const handleBuy = async () => {
+    if (!selected || submitting) return;
+    setSubmitting(true);
+    const now = new Date();
+    const createdAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const expireAt = `${now.getFullYear() + 1}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    await Promise.all([
+      createBOrder({
+        product: selected.name,
+        amount: selected.price,
+        status: 'paid',
+        createdAt,
+        paidAt: createdAt,
+        packageId: selected.id,
+        period: `1${selected.period}`,
+      }),
+      createMyPackage({
+        name: selected.name,
+        flow: selected.flow,
+        bandwidth: selected.bandwidth,
+        domains: selected.domains,
+        expireAt,
+        status: 'active',
+      }),
+    ]);
+    await load();
+    setBuyOpen(false);
+    setSubmitting(false);
+    setActiveTab('my');
+    show(`套餐 ${selected.name} 购买成功`, 'success');
+  };
+
+  const handleRenewPay = async () => {
+    if (!renewItem || submitting) return;
+    setSubmitting(true);
+    const [year, month, day] = renewItem.expireAt.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setMonth(date.getMonth() + renewMonths);
+    const newExpireAt = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    await updateMyPackage(renewItem.id, { expireAt: newExpireAt, status: 'active' });
+    await load();
+    setSubmitting(false);
+    show(`续费支付成功，到期时间已延长至 ${newExpireAt}`, 'success');
   };
 
   const statusBadge = (status: MyPackage['status']) => {
@@ -234,11 +294,13 @@ export default function BPackages() {
             </tbody>
           </table>
 
-          {sortedMy.length === 0 && (
+          {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+          {!loading && sortedMy.length === 0 && (
             <EmptyState title="暂无套餐" description="您还没有购买套餐" icon={<Package size={24} />} />
           )}
 
-          {sortedMy.length > 0 && (
+          {!loading && sortedMy.length > 0 && (
             <Pagination page={myPage} totalPages={myTotalPages} total={sortedMy.length} pageSize={myPageSize} onChange={setMyPage} />
           )}
         </div>
@@ -274,7 +336,10 @@ export default function BPackages() {
               </select>
             </div>
             <div className="text-lg font-bold text-primary">应付：¥{formatMoney(renewPayable)}</div>
-            <button onClick={() => show('续费支付成功', 'success')} className="btn btn-primary">立即支付</button>
+            <button onClick={handleRenewPay} disabled={submitting || !renewItem} className="btn btn-primary flex items-center gap-1 disabled:opacity-70">
+              {submitting ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
+              立即支付
+            </button>
           </div>
         </div>
       )}
@@ -286,7 +351,10 @@ export default function BPackages() {
         footer={
           <>
             <button onClick={() => setBuyOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={() => { setBuyOpen(false); show(`套餐 ${selected?.name} 购买成功`, 'success'); }} className="btn btn-primary">立即支付</button>
+            <button onClick={handleBuy} disabled={submitting || !selected} className="btn btn-primary flex items-center gap-1 disabled:opacity-70">
+              {submitting ? <Loader2 size={16} className="animate-spin" /> : <ShoppingCart size={16} />}
+              立即支付
+            </button>
           </>
         }
       >

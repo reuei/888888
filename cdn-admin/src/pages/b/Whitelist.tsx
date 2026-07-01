@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
@@ -7,19 +7,31 @@ import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { whitelistRecords } from '../../data/mock';
+import { fetchWhitelistRecords, createWhitelistRecord } from '../../services/api';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Plus, Search, RefreshCcw, ShieldCheck } from 'lucide-react';
 import type { WhitelistRecord } from '../../types';
 
 export default function BWhitelist() {
   const { show } = useToast();
-  const [list, setList] = useState(whitelistRecords);
+  const [list, setList] = useState<WhitelistRecord[]>([]);
+  const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [statusFilter, setStatusFilter] = useState<'all' | WhitelistRecord['status']>('all');
 
   const [form, setForm] = useState({ domain: '', purpose: '', icp: '' });
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchWhitelistRecords();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     const kw = debouncedKeyword.trim().toLowerCase();
@@ -49,20 +61,20 @@ export default function BWhitelist() {
     setPage(1);
   };
 
-  const handleSubmit = () => {
-    if (!form.domain.trim()) return;
+  const handleSubmit = async () => {
+    if (!form.domain.trim() || loading) return;
     const now = new Date();
     const createdAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const newRecord: WhitelistRecord = {
-      id: `W${String(list.length + 1).padStart(3, '0')}`,
+    await createWhitelistRecord({
       domain: form.domain.trim(),
       purpose: form.purpose.trim() || '-',
       icp: form.icp.trim() || '-',
       status: 'pending',
       createdAt,
-    };
-    setList([newRecord, ...list]);
+    });
+    await load();
     setForm({ domain: '', purpose: '', icp: '' });
+    setPage(1);
     show('过白申请已提交', 'success');
   };
 
@@ -152,7 +164,9 @@ export default function BWhitelist() {
           </tbody>
         </table>
 
-        {sorted.length === 0 && (
+        {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+        {!loading && sorted.length === 0 && (
           <EmptyState title="暂无申请记录" description="没有符合筛选条件的过白申请" icon={<ShieldCheck size={24} />} />
         )}
 

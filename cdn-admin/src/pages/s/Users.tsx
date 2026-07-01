@@ -1,26 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
 import EmptyState from '../../components/EmptyState';
+import Loading from '../../components/Loading';
 import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { users } from '../../data/mock';
+import * as api from '../../services/api';
+import type { User } from '../../types';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Search, Ban, CheckCircle, Users as UsersIcon, FileDown } from 'lucide-react';
 import { exportToCsv } from '../../utils/export';
 
 export default function Users() {
   const { show } = useToast();
-  const [list, setList] = useState(users);
+  const [list, setList] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const toggleStatus = (id: string) => {
-    setList(list.map((u) => (u.id === id ? { ...u, status: u.status === 'normal' ? 'banned' : 'normal' } : u)));
+  const load = async () => {
+    setLoading(true);
+    const data = await api.fetchUsers();
+    setList(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const toggleStatus = async (id: string) => {
+    const target = list.find((u) => u.id === id);
+    if (!target) return;
+    await api.updateUser(id, { status: target.status === 'normal' ? 'banned' : 'normal' });
+    await load();
+    show('用户状态已更新', 'success');
   };
 
   const filtered = list.filter((u) => {
@@ -49,6 +67,8 @@ export default function Users() {
     );
     show('用户列表导出成功', 'success');
   };
+
+  if (loading) return <Loading />;
 
   return (
     <div>

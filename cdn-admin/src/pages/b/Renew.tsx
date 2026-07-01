@@ -1,23 +1,46 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import { useToast } from '../../components/Toast';
-import { myPackages as myPackagesData, packages } from '../../data/mock';
+import { fetchMyPackages, updateMyPackage } from '../../services/api';
+import { packages } from '../../data/mock';
 import { formatMoney } from '../../utils/helpers';
-import { CreditCard, CheckCircle, PackageX } from 'lucide-react';
+import { CreditCard, CheckCircle, PackageX, Loader2 } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
+import type { MyPackage } from '../../types';
 
 const periods = [1, 3, 6, 12];
 
 export default function Renew() {
   const { show } = useToast();
+  const [myPackages, setMyPackages] = useState<MyPackage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [paying, setPaying] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchMyPackages();
+    setMyPackages(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
   const activePackages = useMemo(
-    () => myPackagesData.filter((p) => p.status === 'active'),
-    []
+    () => myPackages.filter((p) => p.status === 'active'),
+    [myPackages]
   );
   const [selectedId, setSelectedId] = useState(activePackages[0]?.id || '');
   const [months, setMonths] = useState(1);
   const [payOpen, setPayOpen] = useState(false);
+
+  useEffect(() => {
+    if (activePackages.length > 0 && !selectedId) {
+      setSelectedId(activePackages[0].id);
+    }
+  }, [activePackages, selectedId]);
 
   const selectedPackage = activePackages.find((p) => p.id === selectedId);
   const unitPrice = selectedPackage
@@ -25,16 +48,27 @@ export default function Renew() {
     : 0;
   const payable = unitPrice * months;
 
-  const handlePay = () => {
+  const handlePay = async () => {
+    if (!selectedPackage || paying) return;
+    setPaying(true);
+    const [year, month, day] = selectedPackage.expireAt.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setMonth(date.getMonth() + months);
+    const newExpireAt = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    await updateMyPackage(selectedPackage.id, { expireAt: newExpireAt, status: 'active' });
+    await load();
     setPayOpen(false);
-    show('套餐续费支付成功', 'success');
+    setPaying(false);
+    show(`套餐续费支付成功，到期时间已延长至 ${newExpireAt}`, 'success');
   };
 
   return (
     <div>
       <PageHeader title="套餐续费" breadcrumb={['套餐管理', '套餐续费']} />
 
-      {activePackages.length === 0 ? (
+      {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+      {!loading && activePackages.length === 0 ? (
         <EmptyState
           title="暂无生效套餐"
           description="您当前没有可续费的生效套餐，请先订购套餐"
@@ -100,8 +134,9 @@ export default function Renew() {
         footer={
           <>
             <button onClick={() => setPayOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={handlePay} className="btn btn-success flex items-center gap-1">
-              <CheckCircle size={16} /> 确认支付
+            <button onClick={handlePay} disabled={paying} className="btn btn-success flex items-center gap-1 disabled:opacity-70">
+              {paying ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+              确认支付
             </button>
           </>
         }

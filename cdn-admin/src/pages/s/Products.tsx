@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import { useToast } from '../../components/Toast';
-import { products } from '../../data/mock';
+import Loading from '../../components/Loading';
+import * as api from '../../services/api';
+import type { Product } from '../../types';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Edit, Trash2, ArrowUpDown, Plus, PackageSearch, RefreshCcw } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
@@ -11,11 +13,26 @@ import { usePagination } from '../../hooks/usePagination';
 
 export default function SProducts() {
   const { show } = useToast();
-  const [list, setList] = useState(products);
+  const [list, setList] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', type: 'CDN', nodePool: '', priceRange: '' });
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const data = await api.fetchProducts();
+      setList(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const filtered = list.filter((p) => {
     const matchKeyword = !keyword || p.name.toLowerCase().includes(keyword.toLowerCase()) || p.id.toLowerCase().includes(keyword.toLowerCase());
@@ -31,25 +48,24 @@ export default function SProducts() {
     setTypeFilter('all');
   };
 
-  const toggleStatus = (id: string) => {
+  const toggleStatus = async (id: string) => {
     const target = list.find((p) => p.id === id);
     const nextStatus = target?.status === 'on' ? 'off' : 'on';
-    setList(list.map((p) => (p.id === id ? { ...p, status: nextStatus } : p)));
+    await api.updateProduct(id, { status: nextStatus });
+    await load();
     show(`产品 ${target?.name} 已${nextStatus === 'on' ? '上架' : '下架'}`, nextStatus === 'on' ? 'success' : 'warning');
   };
 
-  const handleAdd = () => {
-    setList([
-      {
-        id: `P00${list.length + 1}`,
-        name: form.name,
-        type: form.type,
-        nodePool: form.nodePool,
-        priceRange: form.priceRange,
-        status: 'on',
-      },
-      ...list,
-    ]);
+  const handleDelete = async (id: string) => {
+    const target = list.find((p) => p.id === id);
+    await api.deleteProduct(id);
+    await load();
+    show(`产品 ${target?.name} 已删除`, 'warning');
+  };
+
+  const handleAdd = async () => {
+    await api.createProduct({ name: form.name, type: form.type, nodePool: form.nodePool, priceRange: form.priceRange, status: 'on' });
+    await load();
     setModalOpen(false);
     setForm({ name: '', type: 'CDN', nodePool: '', priceRange: '' });
     show('新产品添加成功', 'success');
@@ -86,50 +102,56 @@ export default function SProducts() {
           <button onClick={reset} className="btn btn-default flex items-center gap-1"><RefreshCcw size={14} /> 重置</button>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>产品名称</th>
-              <th>类型</th>
-              <th>节点池</th>
-              <th>价格区间</th>
-              <th>状态</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedList.map((p) => (
-              <tr key={p.id}>
-                <td className="font-medium">{p.name}</td>
-                <td>{p.type}</td>
-                <td className="text-text-secondary">{p.nodePool}</td>
-                <td>{p.priceRange}</td>
-                <td>
-                  <span className={`badge ${statusBadge(p.status)}`}>{statusText(p.status)}</span>
-                </td>
-                <td>
-                  <div className="flex items-center gap-2">
-                    <button className="p-1.5 rounded hover:bg-gray-100 text-primary" title="编辑">
-                      <Edit size={16} />
-                    </button>
-                    <button onClick={() => toggleStatus(p.id)} className="p-1.5 rounded hover:bg-gray-100 text-warning" title="上/下架">
-                      <ArrowUpDown size={16} />
-                    </button>
-                    <button onClick={() => show(`产品 ${p.name} 已删除`, 'warning')} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>产品名称</th>
+                  <th>类型</th>
+                  <th>节点池</th>
+                  <th>价格区间</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedList.map((p) => (
+                  <tr key={p.id}>
+                    <td className="font-medium">{p.name}</td>
+                    <td>{p.type}</td>
+                    <td className="text-text-secondary">{p.nodePool}</td>
+                    <td>{p.priceRange}</td>
+                    <td>
+                      <span className={`badge ${statusBadge(p.status)}`}>{statusText(p.status)}</span>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <button className="p-1.5 rounded hover:bg-gray-100 text-primary" title="编辑">
+                          <Edit size={16} />
+                        </button>
+                        <button onClick={() => toggleStatus(p.id)} className="p-1.5 rounded hover:bg-gray-100 text-warning" title="上/下架">
+                          <ArrowUpDown size={16} />
+                        </button>
+                        <button onClick={() => handleDelete(p.id)} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-        {filtered.length === 0 && (
-          <EmptyState title="暂无产品" description="没有符合筛选条件的产品" icon={<PackageSearch size={24} />} />
+            {filtered.length === 0 && (
+              <EmptyState title="暂无产品" description="没有符合筛选条件的产品" icon={<PackageSearch size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+          </>
         )}
-
-        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

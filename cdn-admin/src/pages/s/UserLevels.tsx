@@ -4,12 +4,14 @@ import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
 import EmptyState from '../../components/EmptyState';
 import Modal from '../../components/Modal';
+import Loading from '../../components/Loading';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { userLevels } from '../../data/mock';
+import * as api from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { Plus, Trophy } from 'lucide-react';
+import type { UserLevel } from '../../types';
 
 function formatDiscount(d: number) {
   if (d === 1) return '无折扣';
@@ -19,7 +21,8 @@ function formatDiscount(d: number) {
 }
 
 export default function UserLevels() {
-  const [list, setList] = useState(userLevels);
+  const [list, setList] = useState<UserLevel[]>([]);
+  const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
@@ -39,17 +42,39 @@ export default function UserLevels() {
     setPage(1);
   }, [debouncedKeyword, setPage]);
 
-  const handleAdd = () => {
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    api.fetchUserLevels()
+      .then((data) => {
+        if (!ignore) setList(data);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await api.fetchUserLevels();
+      setList(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAdd = async () => {
     if (!form.name.trim()) return;
-    setList([
-      ...list,
-      {
-        id: `L${list.length + 1}`,
-        name: form.name.trim(),
-        minAmount: form.minAmount,
-        discount: form.discount,
-      },
-    ]);
+    await api.createUserLevel({
+      name: form.name.trim(),
+      minAmount: form.minAmount,
+      discount: form.discount,
+    });
+    await loadData();
     setForm({ name: '', minAmount: 0, discount: 1 });
     setModalOpen(false);
   };
@@ -81,36 +106,42 @@ export default function UserLevels() {
           <button onClick={() => setKeyword('')} className="btn btn-default">重置</button>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th><SortableHeader label="等级ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th><SortableHeader label="等级名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th><SortableHeader label="最低消费金额" sortKey="minAmount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th><SortableHeader label="折扣" sortKey="discount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedList.map((l) => (
-              <tr key={l.id}>
-                <td className="text-text-secondary">{l.id}</td>
-                <td className="font-medium">{l.name}</td>
-                <td>¥{formatMoney(l.minAmount)}</td>
-                <td>{formatDiscount(l.discount)}</td>
-                <td>
-                  <button className="text-sm text-primary hover:underline">编辑</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th><SortableHeader label="等级ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th><SortableHeader label="等级名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th><SortableHeader label="最低消费金额" sortKey="minAmount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th><SortableHeader label="折扣" sortKey="discount" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedList.map((l) => (
+                  <tr key={l.id}>
+                    <td className="text-text-secondary">{l.id}</td>
+                    <td className="font-medium">{l.name}</td>
+                    <td>¥{formatMoney(l.minAmount)}</td>
+                    <td>{formatDiscount(l.discount)}</td>
+                    <td>
+                      <button className="text-sm text-primary hover:underline">编辑</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-        {filtered.length === 0 && (
-          <EmptyState title="暂无等级" description="没有符合筛选条件的等级" icon={<Trophy size={24} />} />
+            {filtered.length === 0 && (
+              <EmptyState title="暂无等级" description="没有符合筛选条件的等级" icon={<Trophy size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+          </>
         )}
-
-        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

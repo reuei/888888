@@ -1,11 +1,25 @@
+import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import StatCard from '../../components/StatCard';
 import LineChart from '../../components/LineChart';
-import { bStats, trendLabels, bTrendValues1, bTrendValues2, bTrendValues3, bOrders } from '../../data/mock';
+import { fetchBOrders } from '../../services/api';
+import { bStats, trendLabels, bTrendValues1, bTrendValues2, bTrendValues3 } from '../../data/mock';
 import { formatMoney, orderStatusText } from '../../utils/helpers';
 import { AlertTriangle, ShoppingCart } from 'lucide-react';
+import type { BOrder } from '../../types';
 
 export default function BDashboard() {
+  const [bOrders, setBOrders] = useState<BOrder[]>([]);
+
+  const load = useCallback(async () => {
+    const data = await fetchBOrders();
+    setBOrders(data);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
   return (
     <div>
       <PageHeader title="数据监控" breadcrumb={['仪表盘', '数据监控']} />

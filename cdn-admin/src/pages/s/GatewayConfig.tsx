@@ -1,24 +1,39 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
 import EmptyState from '../../components/EmptyState';
 import SortableHeader from '../../components/SortableHeader';
+import Loading from '../../components/Loading';
+import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { gateways } from '../../data/mock';
+import * as api from '../../services/api';
 import { Plus, Trash2, CheckCircle, Search, Inbox } from 'lucide-react';
 import type { Gateway } from '../../types';
 
 export default function GatewayConfig() {
-  const [list, setList] = useState<Gateway[]>(gateways);
+  const { show } = useToast();
+  const [list, setList] = useState<Gateway[]>([]);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [channel, setChannel] = useState('alipay');
   const [fee, setFee] = useState('');
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const data = await api.fetchGateways();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const filtered = useMemo(() => {
     const q = debouncedKeyword.toLowerCase();
@@ -41,34 +56,35 @@ export default function GatewayConfig() {
     setPage(1);
   }, [debouncedKeyword, sortKey, setPage]);
 
-  const toggleEnabled = (id: string) => {
-    setList((prev) =>
-      prev.map((g) => (g.id === id ? { ...g, enabled: !g.enabled } : g))
+  const toggleEnabled = async (id: string) => {
+    const target = list.find((g) => g.id === id);
+    if (!target) return;
+    await api.updateGateway(id, { enabled: !target.enabled });
+    await loadData();
+    show('状态已更新', 'success');
+  };
+
+  const setDefault = async (id: string) => {
+    await Promise.all(
+      list.filter((g) => g.isDefault).map((g) => api.updateGateway(g.id, { isDefault: false }))
     );
+    await api.updateGateway(id, { isDefault: true });
+    await loadData();
+    show('默认网关已设置', 'success');
   };
 
-  const setDefault = (id: string) => {
-    setList((prev) =>
-      prev.map((g) => ({ ...g, isDefault: g.id === id }))
-    );
+  const remove = async (id: string) => {
+    await api.deleteGateway(id);
+    await loadData();
+    show('网关已删除', 'success');
   };
 
-  const remove = (id: string) => {
-    setList((prev) => prev.filter((g) => g.id !== id));
-  };
-
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const feeValue = parseFloat(fee);
     if (!name || Number.isNaN(feeValue)) return;
-    const newGateway: Gateway = {
-      id: `GW${String(list.length + 1).padStart(3, '0')}`,
-      name,
-      channel,
-      fee: feeValue,
-      enabled: true,
-      isDefault: false,
-    };
-    setList([...list, newGateway]);
+    await api.createGateway({ name, channel, fee: feeValue, enabled: true, isDefault: false });
+    await loadData();
+    show('网关已添加', 'success');
     setName('');
     setChannel('alipay');
     setFee('');
@@ -88,7 +104,11 @@ export default function GatewayConfig() {
       />
 
       <div className="card p-5">
-        <div className="flex flex-wrap gap-3 mb-4">
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-3 mb-4">
           <div className="relative flex-1 min-w-[200px]">
             <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
             <input
@@ -169,7 +189,9 @@ export default function GatewayConfig() {
           <EmptyState title="暂无网关" description="没有符合搜索条件的网关配置" icon={<Inbox size={24} />} />
         )}
 
-        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+            <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+          </>
+        )}
       </div>
 
       <Modal

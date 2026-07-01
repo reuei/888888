@@ -4,15 +4,20 @@ import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
 import EmptyState from '../../components/EmptyState';
 import SortableHeader from '../../components/SortableHeader';
+import Loading from '../../components/Loading';
+import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { roles, permissionOptions } from '../../data/mock';
+import { permissionOptions } from '../../data/mock';
 import { Plus, Edit, Trash2, Shield, Search, Inbox } from 'lucide-react';
+import * as api from '../../services/api';
 import type { RolePermission } from '../../types';
 
 export default function Roles() {
-  const [list, setList] = useState<RolePermission[]>(roles);
+  const [list, setList] = useState<RolePermission[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { show } = useToast();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<RolePermission | null>(null);
@@ -47,6 +52,31 @@ export default function Roles() {
     setPage(1);
   }, [debouncedKeyword, sortKey, setPage]);
 
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    api.fetchRoles()
+      .then((data) => {
+        if (!ignore) setList(data);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await api.fetchRoles();
+      setList(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const togglePermission = (current: string[], key: string) => {
     if (current.includes(key)) {
       return current.filter((k) => k !== key);
@@ -54,16 +84,16 @@ export default function Roles() {
     return [...current, key];
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!addForm.name.trim()) return;
-    const newRole: RolePermission = {
-      id: `R${String(list.length + 1).padStart(3, '0')}`,
+    await api.createRole({
       name: addForm.name.trim(),
       description: addForm.description.trim(),
       permissions: addForm.permissions,
       userCount: 0,
-    };
-    setList([...list, newRole]);
+    });
+    await loadData();
+    show('角色添加成功', 'success');
     setAddForm({ name: '', description: '', permissions: [] });
     setAddModalOpen(false);
   };
@@ -74,17 +104,19 @@ export default function Roles() {
     setEditModalOpen(true);
   };
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     if (!editingRole) return;
-    setList((prev) =>
-      prev.map((r) => (r.id === editingRole.id ? { ...r, permissions: editPermissions } : r))
-    );
+    await api.updateRole(editingRole.id, { permissions: editPermissions });
+    await loadData();
+    show('权限更新成功', 'success');
     setEditModalOpen(false);
     setEditingRole(null);
   };
 
-  const handleDelete = (id: string) => {
-    setList((prev) => prev.filter((r) => r.id !== id));
+  const handleDelete = async (id: string) => {
+    await api.deleteRole(id);
+    await loadData();
+    show('角色已删除', 'success');
   };
 
   return (
@@ -113,100 +145,106 @@ export default function Roles() {
           </div>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>
-                <SortableHeader<keyof RolePermission>
-                  label="角色ID"
-                  sortKey="id"
-                  activeKey={sortKey}
-                  direction={sortDirection}
-                  onSort={toggle}
-                />
-              </th>
-              <th>
-                <SortableHeader<keyof RolePermission>
-                  label="角色名称"
-                  sortKey="name"
-                  activeKey={sortKey}
-                  direction={sortDirection}
-                  onSort={toggle}
-                />
-              </th>
-              <th>
-                <SortableHeader<keyof RolePermission>
-                  label="描述"
-                  sortKey="description"
-                  activeKey={sortKey}
-                  direction={sortDirection}
-                  onSort={toggle}
-                />
-              </th>
-              <th>
-                <SortableHeader<keyof RolePermission>
-                  label="权限数"
-                  sortKey="permissions"
-                  activeKey={sortKey}
-                  direction={sortDirection}
-                  onSort={toggle}
-                />
-              </th>
-              <th>
-                <SortableHeader<keyof RolePermission>
-                  label="关联用户数"
-                  sortKey="userCount"
-                  activeKey={sortKey}
-                  direction={sortDirection}
-                  onSort={toggle}
-                />
-              </th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedList.map((r) => (
-              <tr key={r.id}>
-                <td className="text-text-secondary">{r.id}</td>
-                <td className="font-medium">{r.name}</td>
-                <td className="text-text-secondary">{r.description}</td>
-                <td>{r.permissions.includes('*') ? '全部' : r.permissions.length}</td>
-                <td>{r.userCount}</td>
-                <td>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => openEditModal(r)}
-                      className="p-1.5 rounded hover:bg-gray-100 text-primary"
-                      title="编辑权限"
-                    >
-                      <Shield size={16} />
-                    </button>
-                    <button
-                      onClick={() => openEditModal(r)}
-                      className="p-1.5 rounded hover:bg-gray-100 text-warning"
-                      title="编辑"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(r.id)}
-                      className="p-1.5 rounded hover:bg-gray-100 text-danger"
-                      title="删除"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>
+                    <SortableHeader<keyof RolePermission>
+                      label="角色ID"
+                      sortKey="id"
+                      activeKey={sortKey}
+                      direction={sortDirection}
+                      onSort={toggle}
+                    />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof RolePermission>
+                      label="角色名称"
+                      sortKey="name"
+                      activeKey={sortKey}
+                      direction={sortDirection}
+                      onSort={toggle}
+                    />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof RolePermission>
+                      label="描述"
+                      sortKey="description"
+                      activeKey={sortKey}
+                      direction={sortDirection}
+                      onSort={toggle}
+                    />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof RolePermission>
+                      label="权限数"
+                      sortKey="permissions"
+                      activeKey={sortKey}
+                      direction={sortDirection}
+                      onSort={toggle}
+                    />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof RolePermission>
+                      label="关联用户数"
+                      sortKey="userCount"
+                      activeKey={sortKey}
+                      direction={sortDirection}
+                      onSort={toggle}
+                    />
+                  </th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedList.map((r) => (
+                  <tr key={r.id}>
+                    <td className="text-text-secondary">{r.id}</td>
+                    <td className="font-medium">{r.name}</td>
+                    <td className="text-text-secondary">{r.description}</td>
+                    <td>{r.permissions.includes('*') ? '全部' : r.permissions.length}</td>
+                    <td>{r.userCount}</td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => openEditModal(r)}
+                          className="p-1.5 rounded hover:bg-gray-100 text-primary"
+                          title="编辑权限"
+                        >
+                          <Shield size={16} />
+                        </button>
+                        <button
+                          onClick={() => openEditModal(r)}
+                          className="p-1.5 rounded hover:bg-gray-100 text-warning"
+                          title="编辑"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(r.id)}
+                          className="p-1.5 rounded hover:bg-gray-100 text-danger"
+                          title="删除"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-        {pagedList.length === 0 && (
-          <EmptyState title="暂无角色" description="没有符合搜索条件的角色" icon={<Inbox size={24} />} />
+            {pagedList.length === 0 && (
+              <EmptyState title="暂无角色" description="没有符合搜索条件的角色" icon={<Inbox size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+          </>
         )}
-
-        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

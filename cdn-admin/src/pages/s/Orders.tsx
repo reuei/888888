@@ -1,18 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
+import Loading from '../../components/Loading';
 import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
-import { orders } from '../../data/mock';
+import * as api from '../../services/api';
+import type { Order } from '../../types';
 import { statusBadge, statusText, formatMoney } from '../../utils/helpers';
 import { Eye, RefreshCcw, FileDown } from 'lucide-react';
 import { exportToCsv } from '../../utils/export';
 
 export default function SOrders() {
   const { show } = useToast();
-  const [list] = useState(orders);
+  const [list, setList] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    const data = await api.fetchOrders();
+    setList(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
   const { sorted, sortKey, sortDirection, toggle } = useSort({ data: list, initialKey: 'createdAt', initialDirection: 'desc' });
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
   const pagedList = slice(sorted);
@@ -33,6 +48,8 @@ export default function SOrders() {
     );
     show('订单导出成功', 'success');
   };
+
+  if (loading) return <Loading />;
 
   return (
     <div>

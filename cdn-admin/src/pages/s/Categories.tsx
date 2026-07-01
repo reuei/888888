@@ -1,17 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import EmptyState from '../../components/EmptyState';
-import { categories } from '../../data/mock';
+import Loading from '../../components/Loading';
 import { useDebounce } from '../../hooks/useDebounce';
+import * as api from '../../services/api';
+import type { Category } from '../../types';
 import { Edit, Trash2, Plus, GripVertical, Search, FolderTree } from 'lucide-react';
 
 export default function SCategories() {
-  const [list, setList] = useState(categories);
+  const [list, setList] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', parentId: '' });
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const data = await api.fetchCategories();
+      setList(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const q = debouncedKeyword.trim().toLowerCase();
   const visibleIds = new Set(
@@ -30,10 +47,20 @@ export default function SCategories() {
       : list.map((c) => c.id)
   );
 
-  const handleAdd = () => {
-    setList([...list, { id: `C${list.length + 1}`, name: form.name, parentId: form.parentId || null, sort: list.length + 1 }]);
+  const handleAdd = async () => {
+    await api.createCategory({
+      name: form.name,
+      parentId: form.parentId || null,
+      sort: list.length + 1,
+    });
     setModalOpen(false);
     setForm({ name: '', parentId: '' });
+    await load();
+  };
+
+  const handleDelete = async (id: string) => {
+    await api.deleteCategory(id);
+    await load();
   };
 
   const renderTree = (parentId: string | null, level = 0) => {
@@ -55,7 +82,11 @@ export default function SCategories() {
             <button className="p-1.5 rounded hover:bg-gray-100 text-primary" title="编辑">
               <Edit size={16} />
             </button>
-            <button className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
+            <button
+              onClick={() => handleDelete(c.id)}
+              className="p-1.5 rounded hover:bg-gray-100 text-danger"
+              title="删除"
+            >
               <Trash2 size={16} />
             </button>
           </div>
@@ -93,11 +124,15 @@ export default function SCategories() {
           </div>
         </div>
 
-        <div className="border border-border rounded overflow-hidden">
-          {topNodes.length > 0 ? topNodes : (
-            <EmptyState title="暂无分类" description="没有符合搜索条件的分类" icon={<FolderTree size={24} />} />
-          )}
-        </div>
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="border border-border rounded overflow-hidden">
+            {topNodes.length > 0 ? topNodes : (
+              <EmptyState title="暂无分类" description="没有符合搜索条件的分类" icon={<FolderTree size={24} />} />
+            )}
+          </div>
+        )}
       </div>
 
       <Modal

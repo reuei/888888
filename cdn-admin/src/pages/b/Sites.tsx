@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
@@ -7,7 +7,7 @@ import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { sites } from '../../data/mock';
+import { fetchSites, createSite, updateSite, deleteSite } from '../../services/api';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Edit, Trash2, Activity, Plus, Search, CheckCircle, Globe, RefreshCcw } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
@@ -15,7 +15,8 @@ import type { Site } from '../../types';
 
 export default function BSites() {
   const { show } = useToast();
-  const [list, setList] = useState(sites);
+  const [list, setList] = useState<Site[]>([]);
+  const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [addOpen, setAddOpen] = useState(false);
@@ -39,14 +40,25 @@ export default function BSites() {
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
   const pagedList = slice(sorted);
 
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchSites();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
   const reset = () => {
     setKeyword('');
     setPage(1);
   };
 
-  const handleAdd = () => {
-    const newSite: Site = {
-      id: String(list.length + 1),
+  const handleAdd = async () => {
+    if (!form.domain.trim() || loading) return;
+    await createSite({
       name: form.domain,
       domain: form.domain,
       template: 'PC-01',
@@ -54,12 +66,12 @@ export default function BSites() {
       nodes: 0,
       status: 'pending',
       createdAt: new Date().toISOString().slice(0, 10),
-    };
-    setList([newSite, ...list]);
+    });
+    await load();
     setAddOpen(false);
     setForm({ domain: '', pkg: 'PKG02' });
     setPage(1);
-    show(`站点 ${newSite.domain} 添加成功`, 'success');
+    show(`站点 ${form.domain} 添加成功`, 'success');
   };
 
   const openEdit = (s: Site) => {
@@ -67,12 +79,27 @@ export default function BSites() {
     setEditOpen(true);
   };
 
-  const checkCname = () => {
-    if (current) {
-      setList(list.map((s) => (s.id === current.id ? { ...s, status: 'running' as const } : s)));
-      setCurrent({ ...current, status: 'running' });
-      show(`站点 ${current.domain} CNAME 检测通过`, 'success');
-    }
+  const handleSaveEdit = async () => {
+    if (!current || loading) return;
+    await updateSite(current.id, { ...current });
+    await load();
+    setEditOpen(false);
+    show('站点配置保存成功', 'success');
+  };
+
+  const handleDelete = async (s: Site) => {
+    if (loading) return;
+    await deleteSite(s.id);
+    await load();
+    show(`站点 ${s.domain} 已删除`, 'warning');
+  };
+
+  const checkCname = async () => {
+    if (!current || loading) return;
+    await updateSite(current.id, { status: 'running' });
+    await load();
+    setCurrent({ ...current, status: 'running' });
+    show(`站点 ${current.domain} CNAME 检测通过`, 'success');
   };
 
   return (
@@ -134,7 +161,7 @@ export default function BSites() {
                     <button onClick={() => show(`站点 ${s.domain} 检测正常`, 'success')} className="p-1.5 rounded hover:bg-gray-100 text-success" title="检测">
                       <Activity size={16} />
                     </button>
-                    <button onClick={() => show(`站点 ${s.domain} 已删除`, 'warning')} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
+                    <button onClick={() => handleDelete(s)} className="p-1.5 rounded hover:bg-gray-100 text-danger" title="删除">
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -144,11 +171,13 @@ export default function BSites() {
           </tbody>
         </table>
 
-        {sorted.length === 0 && (
+        {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+        {!loading && sorted.length === 0 && (
           <EmptyState title="暂无站点" description="没有符合筛选条件的站点" icon={<Globe size={24} />} />
         )}
 
-        {sorted.length > 0 && (
+        {!loading && sorted.length > 0 && (
           <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
         )}
       </div>
@@ -160,7 +189,7 @@ export default function BSites() {
         footer={
           <>
             <button onClick={() => setAddOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={handleAdd} className="btn btn-primary">保存</button>
+            <button onClick={handleAdd} disabled={loading || !form.domain.trim()} className="btn btn-primary disabled:opacity-70">保存</button>
           </>
         }
       >
@@ -191,7 +220,7 @@ export default function BSites() {
         footer={
           <>
             <button onClick={() => setEditOpen(false)} className="btn btn-default">取消</button>
-            <button onClick={() => { setEditOpen(false); show('站点配置保存成功', 'success'); }} className="btn btn-primary">保存</button>
+            <button onClick={handleSaveEdit} disabled={loading} className="btn btn-primary disabled:opacity-70">保存</button>
           </>
         }
       >

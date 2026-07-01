@@ -1,23 +1,38 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
 import EmptyState from '../../components/EmptyState';
 import SortableHeader from '../../components/SortableHeader';
+import Loading from '../../components/Loading';
+import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { complaints } from '../../data/mock';
+import * as api from '../../services/api';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Eye, Search, Inbox } from 'lucide-react';
 import type { Complaint } from '../../types';
 
 export default function SComplaints() {
-  const [list, setList] = useState<Complaint[]>(complaints);
+  const { show } = useToast();
+  const [list, setList] = useState<Complaint[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [current, setCurrent] = useState<Complaint | null>(null);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const data = await api.fetchComplaints();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const filtered = useMemo(() => {
     const q = debouncedKeyword.toLowerCase();
@@ -47,9 +62,11 @@ export default function SComplaints() {
     setModalOpen(true);
   };
 
-  const handleResolve = (result: 'resolved' | 'rejected') => {
+  const handleResolve = async (result: 'resolved' | 'rejected') => {
     if (!current) return;
-    setList((prev) => prev.map((c) => (c.id === current.id ? { ...c, status: result } : c)));
+    await api.updateComplaint(current.id, { status: result });
+    await loadData();
+    show('投诉已处理', 'success');
     setModalOpen(false);
   };
 
@@ -58,7 +75,11 @@ export default function SComplaints() {
       <PageHeader title="投诉管理" breadcrumb={['订单管理', '投诉管理']} />
 
       <div className="card p-5">
-        <div className="flex flex-wrap gap-3 mb-4">
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-3 mb-4">
           <div className="relative flex-1 min-w-[200px]">
             <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary" />
             <input
@@ -126,7 +147,9 @@ export default function SComplaints() {
           <EmptyState title="暂无投诉" description="没有符合搜索条件的投诉记录" icon={<Inbox size={24} />} />
         )}
 
-        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+            <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+          </>
+        )}
       </div>
 
       <Modal

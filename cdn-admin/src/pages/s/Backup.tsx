@@ -3,11 +3,12 @@ import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import EmptyState from '../../components/EmptyState';
 import SortableHeader from '../../components/SortableHeader';
+import Loading from '../../components/Loading';
 import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { backupRecords } from '../../data/mock';
+import * as api from '../../services/api';
 import { Play, RotateCcw, Trash2, Database, FileArchive, FileText, Search, Inbox } from 'lucide-react';
 import type { BackupRecord } from '../../types';
 
@@ -31,7 +32,8 @@ const statusTextMap: Record<BackupRecord['status'], string> = {
 
 export default function Backup() {
   const { show } = useToast();
-  const [records, setRecords] = useState<BackupRecord[]>(backupRecords);
+  const [records, setRecords] = useState<BackupRecord[]>([]);
+  const [loading, setLoading] = useState(false);
   const [autoBackup, setAutoBackup] = useState(true);
   const [cycle, setCycle] = useState('daily');
   const [retainCount, setRetainCount] = useState(7);
@@ -63,37 +65,60 @@ export default function Backup() {
     setPage(1);
   }, [debouncedKeyword, sortKey, setPage]);
 
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    api.fetchBackupRecords()
+      .then((data) => {
+        if (!ignore) setRecords(data);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await api.fetchBackupRecords();
+      setRecords(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const toggleContent = (key: string) => {
     setContents((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   };
 
-  const handleBackupNow = () => {
+  const handleBackupNow = async () => {
     show('备份任务已启动', 'info');
     const now = new Date();
-    const id = `B${String(records.length + 1).padStart(3, '0')}`;
     const name = `手动备份-${now.toISOString().slice(0, 10).replace(/-/g, '')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-    const newRecord: BackupRecord = {
-      id,
+    const createdAt = now.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }).replace(/\//g, '-');
+    const record = await api.createBackupRecord({
       name,
       size: '计算中...',
       type: 'manual',
       status: 'running',
-      createdAt: now.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      }).replace(/\//g, '-'),
-    };
-    setRecords([newRecord, ...records]);
-    setRunningId(id);
+      createdAt,
+    });
+    await loadData();
+    setRunningId(record.id);
 
-    setTimeout(() => {
-      setRecords((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status: 'success', size: '1.1GB' } : r))
-      );
+    setTimeout(async () => {
+      await api.updateBackupRecord(record.id, { status: 'success', size: '1.1GB' });
+      await loadData();
       setRunningId(null);
       show('备份任务执行成功', 'success');
     }, 1500);
@@ -103,8 +128,9 @@ export default function Backup() {
     show(`备份 ${id} 恢复任务已提交`, 'success');
   };
 
-  const handleDelete = (id: string) => {
-    setRecords((prev) => prev.filter((r) => r.id !== id));
+  const handleDelete = async (id: string) => {
+    await api.deleteBackupRecord(id);
+    await loadData();
     show('备份记录已删除', 'warning');
   };
 
@@ -188,75 +214,81 @@ export default function Backup() {
           </div>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>
-                <SortableHeader<keyof BackupRecord> label="备份ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof BackupRecord> label="备份名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof BackupRecord> label="大小" sortKey="size" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof BackupRecord> label="类型" sortKey="type" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof BackupRecord> label="状态" sortKey="status" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>
-                <SortableHeader<keyof BackupRecord> label="时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
-              </th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedList.map((r) => (
-              <tr key={r.id}>
-                <td className="text-text-secondary">{r.id}</td>
-                <td className="font-medium">{r.name}</td>
-                <td>{r.size}</td>
-                <td>
-                  <span className={`badge ${r.type === 'auto' ? 'badge-default' : 'bg-primary/10 text-primary'}`}>
-                    {r.type === 'auto' ? '自动' : '手动'}
-                  </span>
-                </td>
-                <td>
-                  <span className={statusBadgeClass[r.status]}>{statusTextMap[r.status]}</span>
-                </td>
-                <td className="text-text-secondary">{r.createdAt}</td>
-                <td>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleRestore(r.id)}
-                      className="p-1.5 rounded hover:bg-gray-100 text-primary"
-                      title="恢复"
-                      disabled={r.status === 'running'}
-                    >
-                      <RotateCcw size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(r.id)}
-                      className="p-1.5 rounded hover:bg-gray-100 text-danger"
-                      title="删除"
-                      disabled={r.status === 'running'}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>
+                    <SortableHeader<keyof BackupRecord> label="备份ID" sortKey="id" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof BackupRecord> label="备份名称" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof BackupRecord> label="大小" sortKey="size" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof BackupRecord> label="类型" sortKey="type" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof BackupRecord> label="状态" sortKey="status" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>
+                    <SortableHeader<keyof BackupRecord> label="时间" sortKey="createdAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} />
+                  </th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedList.map((r) => (
+                  <tr key={r.id}>
+                    <td className="text-text-secondary">{r.id}</td>
+                    <td className="font-medium">{r.name}</td>
+                    <td>{r.size}</td>
+                    <td>
+                      <span className={`badge ${r.type === 'auto' ? 'badge-default' : 'bg-primary/10 text-primary'}`}>
+                        {r.type === 'auto' ? '自动' : '手动'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={statusBadgeClass[r.status]}>{statusTextMap[r.status]}</span>
+                    </td>
+                    <td className="text-text-secondary">{r.createdAt}</td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleRestore(r.id)}
+                          className="p-1.5 rounded hover:bg-gray-100 text-primary"
+                          title="恢复"
+                          disabled={r.status === 'running'}
+                        >
+                          <RotateCcw size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(r.id)}
+                          className="p-1.5 rounded hover:bg-gray-100 text-danger"
+                          title="删除"
+                          disabled={r.status === 'running'}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-        {pagedList.length === 0 && (
-          <EmptyState title="暂无备份记录" description="没有符合搜索条件的备份记录" icon={<Inbox size={24} />} />
+            {pagedList.length === 0 && (
+              <EmptyState title="暂无备份记录" description="没有符合搜索条件的备份记录" icon={<Inbox size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
+          </>
         )}
-
-        <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
       </div>
     </div>
   );

@@ -1,21 +1,36 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import EmptyState from '../../components/EmptyState';
 import SortableHeader from '../../components/SortableHeader';
+import Loading from '../../components/Loading';
+import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { nodes } from '../../data/mock';
+import * as api from '../../services/api';
 import { Activity, Edit, Server, Search, Inbox } from 'lucide-react';
 import type { Node } from '../../types';
 
 export default function SNodes() {
+  const { show } = useToast();
   const [tab, setTab] = useState<'list' | 'groups' | 'health'>('list');
-  const [list, setList] = useState<Node[]>(nodes);
+  const [list, setList] = useState<Node[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [listKeyword, setListKeyword] = useState('');
   const listDebounced = useDebounce(listKeyword);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const data = await api.fetchNodes();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const listFiltered = useMemo(() => {
     const q = listDebounced.toLowerCase();
@@ -77,8 +92,12 @@ export default function SNodes() {
     setHealthPage(1);
   }, [healthDebounced, healthSortKey, setHealthPage]);
 
-  const toggleEnabled = (id: string) => {
-    setList((prev) => prev.map((n) => (n.id === id ? { ...n, enabled: !n.enabled } : n)));
+  const toggleEnabled = async (id: string) => {
+    const target = list.find((n) => n.id === id);
+    if (!target) return;
+    await api.updateNode(id, { enabled: !target.enabled });
+    await loadData();
+    show('状态已更新', 'success');
   };
 
   const healthBadge = (h: string) => {
@@ -120,7 +139,11 @@ export default function SNodes() {
           ))}
         </div>
 
-        {tab === 'list' && (
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            {tab === 'list' && (
           <>
             <div className="flex flex-wrap gap-3 mb-4">
               <div className="relative flex-1 min-w-[200px]">
@@ -274,6 +297,8 @@ export default function SNodes() {
             {healthPaged.length === 0 && <EmptyState title="暂无节点" description="没有符合搜索条件的节点" icon={<Inbox size={24} />} />}
 
             <Pagination page={healthPage} totalPages={healthTotalPages} total={healthSorted.length} pageSize={pageSize} onChange={setHealthPage} />
+          </>
+        )}
           </>
         )}
       </div>

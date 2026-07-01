@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
@@ -8,7 +8,8 @@ import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { myPackages as myPackagesData, packages } from '../../data/mock';
+import { fetchMyPackages, updateMyPackage } from '../../services/api';
+import { packages } from '../../data/mock';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
 import { RefreshCw, CreditCard, Search, RefreshCcw, Package } from 'lucide-react';
 import type { MyPackage } from '../../types';
@@ -17,7 +18,8 @@ const periods = [1, 3, 6, 12];
 
 export default function MyPackages() {
   const { show } = useToast();
-  const [list] = useState(myPackagesData);
+  const [list, setList] = useState<MyPackage[]>([]);
+  const [loading, setLoading] = useState(false);
   const [renewItem, setRenewItem] = useState<MyPackage | null>(null);
   const [months, setMonths] = useState(1);
 
@@ -55,12 +57,35 @@ export default function MyPackages() {
   const { page, pageSize, totalPages, slice, setPage } = usePagination({ total: sorted.length });
   const pagedList = slice(sorted);
 
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchMyPackages();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
   const openRenew = (item: MyPackage) => {
     setRenewItem(item);
     setMonths(1);
   };
 
   const payable = renewItem ? (priceMap[renewItem.name] || 0) * months : 0;
+
+  const handleRenew = async () => {
+    if (!renewItem || loading) return;
+    const [year, month, day] = renewItem.expireAt.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setMonth(date.getMonth() + months);
+    const newExpireAt = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    await updateMyPackage(renewItem.id, { expireAt: newExpireAt, status: 'active' });
+    await load();
+    setRenewItem(null);
+    show(`套餐续费成功，到期时间已延长至 ${newExpireAt}`, 'success');
+  };
 
   const reset = () => {
     setKeyword('');
@@ -126,11 +151,13 @@ export default function MyPackages() {
           </tbody>
         </table>
 
-        {sorted.length === 0 && (
+        {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+        {!loading && sorted.length === 0 && (
           <EmptyState title="暂无套餐" description="没有符合筛选条件的套餐" icon={<Package size={24} />} />
         )}
 
-        {sorted.length > 0 && (
+        {!loading && sorted.length > 0 && (
           <Pagination page={page} totalPages={totalPages} total={sorted.length} pageSize={pageSize} onChange={setPage} />
         )}
       </div>
@@ -142,7 +169,7 @@ export default function MyPackages() {
         footer={
           <>
             <button onClick={() => setRenewItem(null)} className="btn btn-default">取消</button>
-            <button onClick={() => { setRenewItem(null); show('续费支付成功', 'success'); }} className="btn btn-primary flex items-center gap-1">
+            <button onClick={handleRenew} disabled={!renewItem || loading} className="btn btn-primary flex items-center gap-1 disabled:opacity-70">
               <CreditCard size={16} /> 确认续费
             </button>
           </>

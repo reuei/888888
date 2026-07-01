@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
@@ -7,16 +7,17 @@ import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
+import { fetchBOrders } from '../../services/api';
 import type { BOrder } from '../../types';
-import { bOrders } from '../../data/mock';
 import { formatMoney, statusBadge, orderStatusText } from '../../utils/helpers';
 import { Eye, FileText, RefreshCcw } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
 
 export default function MyOrders() {
   const { show } = useToast();
-  const [list] = useState(bOrders);
-  const [detail, setDetail] = useState<typeof bOrders[0] | null>(null);
+  const [list, setList] = useState<BOrder[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [detail, setDetail] = useState<BOrder | null>(null);
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [productKeyword, setProductKeyword] = useState('');
@@ -30,6 +31,17 @@ export default function MyOrders() {
     { value: 'refunded', label: '已退款' },
     { value: 'cancelled', label: '已取消' },
   ];
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchBOrders();
+    setList(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filtered = list.filter((o) => {
     const matchId = !debouncedKeyword || o.id.toLowerCase().includes(debouncedKeyword.trim().toLowerCase());
@@ -130,11 +142,15 @@ export default function MyOrders() {
           </tbody>
         </table>
 
-        {filtered.length === 0 && (
+        {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
+
+        {!loading && filtered.length === 0 && (
           <EmptyState title="暂无订单" description="没有符合筛选条件的订单" />
         )}
 
-        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+        {!loading && filtered.length > 0 && (
+          <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+        )}
       </div>
 
       <Modal

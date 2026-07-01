@@ -4,20 +4,25 @@ import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
 import EmptyState from '../../components/EmptyState';
 import Modal from '../../components/Modal';
+import Loading from '../../components/Loading';
+import { useToast } from '../../components/Toast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { realnameRecords } from '../../data/mock';
+import * as api from '../../services/api';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Eye, Search, UserCheck } from 'lucide-react';
+import type { RealnameRecord } from '../../types';
 
 export default function UserRealname() {
-  const [list, setList] = useState(realnameRecords);
+  const [list, setList] = useState<RealnameRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { show } = useToast();
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword);
   const [statusFilter, setStatusFilter] = useState('all');
   const [auditOpen, setAuditOpen] = useState(false);
-  const [current, setCurrent] = useState<typeof list[0] | null>(null);
+  const [current, setCurrent] = useState<RealnameRecord | null>(null);
 
   const filtered = list.filter((r) => {
     const matchKeyword = !debouncedKeyword ||
@@ -38,16 +43,43 @@ export default function UserRealname() {
     setPage(1);
   }, [debouncedKeyword, statusFilter, setPage]);
 
-  const openAudit = (r: typeof list[0]) => {
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    api.fetchRealnameRecords()
+      .then((data) => {
+        if (!ignore) setList(data);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await api.fetchRealnameRecords();
+      setList(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openAudit = (r: RealnameRecord) => {
     setCurrent(r);
     setAuditOpen(true);
   };
 
-  const updateStatus = (status: 'approved' | 'rejected') => {
+  const updateStatus = async (status: 'approved' | 'rejected') => {
     if (!current) return;
-    setList(list.map((r) => (r.id === current.id ? { ...r, status } : r)));
+    await api.updateRealnameRecord(current.id, { status });
+    await loadData();
     setAuditOpen(false);
     setCurrent(null);
+    show('审核操作已保存', 'success');
   };
 
   return (
@@ -75,50 +107,56 @@ export default function UserRealname() {
           <button onClick={() => { setKeyword(''); setStatusFilter('all'); }} className="btn btn-default">重置</button>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>申请ID</th>
-              <th>用户ID</th>
-              <th><SortableHeader label="姓名" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th>身份证号</th>
-              <th>手机号</th>
-              <th><SortableHeader label="提交时间" sortKey="submittedAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
-              <th>状态</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedList.map((r) => (
-              <tr key={r.id}>
-                <td className="text-text-secondary">{r.id}</td>
-                <td className="text-text-secondary">{r.userId}</td>
-                <td className="font-medium">{r.name}</td>
-                <td>{r.idCard}</td>
-                <td>{r.phone}</td>
-                <td className="text-text-secondary">{r.submittedAt}</td>
-                <td>
-                  <span className={`badge ${statusBadge(r.status)}`}>{statusText(r.status)}</span>
-                </td>
-                <td>
-                  <button
-                    onClick={() => openAudit(r)}
-                    className="p-1.5 rounded hover:bg-gray-100 text-primary"
-                    title="审核"
-                  >
-                    <Eye size={16} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>申请ID</th>
+                  <th>用户ID</th>
+                  <th><SortableHeader label="姓名" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th>身份证号</th>
+                  <th>手机号</th>
+                  <th><SortableHeader label="提交时间" sortKey="submittedAt" activeKey={sortKey} direction={sortDirection} onSort={toggle} /></th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedList.map((r) => (
+                  <tr key={r.id}>
+                    <td className="text-text-secondary">{r.id}</td>
+                    <td className="text-text-secondary">{r.userId}</td>
+                    <td className="font-medium">{r.name}</td>
+                    <td>{r.idCard}</td>
+                    <td>{r.phone}</td>
+                    <td className="text-text-secondary">{r.submittedAt}</td>
+                    <td>
+                      <span className={`badge ${statusBadge(r.status)}`}>{statusText(r.status)}</span>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => openAudit(r)}
+                        className="p-1.5 rounded hover:bg-gray-100 text-primary"
+                        title="审核"
+                      >
+                        <Eye size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-        {filtered.length === 0 && (
-          <EmptyState title="暂无实名申请" description="没有符合筛选条件的实名记录" icon={<UserCheck size={24} />} />
+            {filtered.length === 0 && (
+              <EmptyState title="暂无实名申请" description="没有符合筛选条件的实名记录" icon={<UserCheck size={24} />} />
+            )}
+
+            <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
+          </>
         )}
-
-        <Pagination page={page} totalPages={totalPages} total={filtered.length} pageSize={pageSize} onChange={setPage} />
       </div>
 
       <Modal

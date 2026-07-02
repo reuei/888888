@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Role } from '../types';
-import { sMenu, bMenu } from './Sidebar';
+import { sMenu, bMenu, type MenuItem } from './menu';
 import { Search, X, FileText } from 'lucide-react';
 
 interface SearchModalProps {
@@ -17,7 +17,7 @@ interface SearchItem {
   keywords: string;
 }
 
-function flattenMenu(menu: typeof sMenu): SearchItem[] {
+function flattenMenu(menu: MenuItem[]): SearchItem[] {
   const items: SearchItem[] = [];
   menu.forEach((m) => {
     items.push({ key: m.key, label: m.label, path: m.key, keywords: m.label });
@@ -53,11 +53,11 @@ export default function SearchModal({ open, role, onClose }: SearchModalProps) {
     setActiveIndex(0);
   }, [query, results.length]);
 
-  const handleSelect = (path: string) => {
+  const handleSelect = useCallback((path: string) => {
     navigate(path);
     setQuery('');
     onClose();
-  };
+  }, [navigate, onClose]);
 
   useEffect(() => {
     if (!open) {
@@ -83,7 +83,7 @@ export default function SearchModal({ open, role, onClose }: SearchModalProps) {
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [open, results, activeIndex]);
+  }, [open, results, activeIndex, handleSelect]);
 
   if (!open) return null;
 

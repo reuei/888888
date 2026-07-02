@@ -74,8 +74,12 @@ function App() {
     return saved === 's' || saved === 'b' ? saved : null;
   });
 
-  const handleLogin = (r: Role) => {
-    localStorage.setItem('role', r);
+  const handleLogin = (r: Role, remember = true) => {
+    if (remember) {
+      localStorage.setItem('role', r);
+    } else {
+      localStorage.removeItem('role');
+    }
     setRole(r);
   };
   const handleLogout = () => {

@@ -7,7 +7,7 @@ import SortableHeader from '../../components/SortableHeader';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import { fetchOrders, updateOrder } from '../../services/api';
 import { statusBadge, statusText, formatMoney } from '../../utils/helpers';
 import { AlertTriangle, RefreshCcw, RotateCcw, Search, Inbox, Loader2 } from 'lucide-react';

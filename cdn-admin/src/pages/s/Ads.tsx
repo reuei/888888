@@ -8,7 +8,7 @@ import Loading from '../../components/Loading';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import * as api from '../../services/api';
 import type { AdSlot } from '../../types';
 import { Plus, Edit, Trash2, Image, Search, Megaphone } from 'lucide-react';

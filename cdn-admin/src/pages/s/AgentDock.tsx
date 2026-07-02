@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import { fetchAgentProducts, createAgentProduct, updateAgentProduct } from '../../services/api';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
 import { Plus, Edit, Trash2 } from 'lucide-react';

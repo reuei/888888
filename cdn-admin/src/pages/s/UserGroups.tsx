@@ -8,7 +8,7 @@ import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
 import Loading from '../../components/Loading';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import * as api from '../../services/api';
 import type { UserGroup } from '../../types';
 import { Plus, Trash2, Users as UsersIcon } from 'lucide-react';

@@ -1,25 +1,29 @@
 import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
-import { useToast } from '../../components/Toast';
-import { fetchFinanceRecords } from '../../services/api';
-import { settlementRecords } from '../../data/mock';
+import { useToast } from '../../hooks/useToast';
+import { fetchFinanceRecords, fetchSettlementRecords } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { ArrowDownLeft, ArrowUpRight, Minus, Wallet, Receipt } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
 import Pagination from '../../components/Pagination';
 import { usePagination } from '../../hooks/usePagination';
-import type { FinanceRecord } from '../../types';
+import type { FinanceRecord, SettlementRecord } from '../../types';
 
 export default function BFinance() {
   const [activeTab, setActiveTab] = useState<'detail' | 'settlement' | 'withdraw'>('detail');
   const { show } = useToast();
   const [financeRecords, setFinanceRecords] = useState<FinanceRecord[]>([]);
+  const [settlementRecords, setSettlementRecords] = useState<SettlementRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const data = await fetchFinanceRecords();
-    setFinanceRecords(data);
+    const [financeData, settlementData] = await Promise.all([
+      fetchFinanceRecords(),
+      fetchSettlementRecords(),
+    ]);
+    setFinanceRecords(financeData);
+    setSettlementRecords(settlementData);
     setLoading(false);
   }, []);
 

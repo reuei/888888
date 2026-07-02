@@ -8,7 +8,7 @@ import Loading from '../../components/Loading';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import * as api from '../../services/api';
 import type { Article } from '../../types';
 import { Plus, Edit, Trash2, Pin, Search, FileText } from 'lucide-react';

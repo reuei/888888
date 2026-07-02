@@ -3,7 +3,7 @@ import PageHeader from '../../components/PageHeader';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
 import Loading from '../../components/Loading';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import * as api from '../../services/api';

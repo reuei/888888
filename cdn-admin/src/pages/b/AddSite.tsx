@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
-import { useToast } from '../../components/Toast';
-import { createSite } from '../../services/api';
-import { products } from '../../data/mock';
+import { useToast } from '../../hooks/useToast';
+import { createSite, fetchProducts } from '../../services/api';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Plus, CheckCircle, Loader2 } from 'lucide-react';
+import type { Product } from '../../types';
 
 interface PreviewSite {
   id: string;
@@ -19,20 +19,36 @@ interface PreviewSite {
 
 const templates = ['PC-01', 'PC-02', 'PC-03', 'M-01', 'M-02'];
 
-const nodePools = Array.from(new Set(products.map((p) => p.nodePool)));
-
 export default function AddSite() {
   const { show } = useToast();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const nodePools = Array.from(new Set(products.map((p) => p.nodePool)));
   const [form, setForm] = useState({
     name: '',
     domain: '',
     template: templates[0],
-    nodePool: nodePools[0] || '',
+    nodePool: '',
     remark: '',
   });
   const [list, setList] = useState<PreviewSite[]>([]);
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const loadProducts = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchProducts();
+    setProducts(data);
+    if (data.length > 0) {
+      const pools = Array.from(new Set(data.map((p) => p.nodePool)));
+      setForm((prev) => ({ ...prev, nodePool: pools[0] || '' }));
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
 
   const handleSubmit = async () => {
     if (!form.domain.trim() || submitting) return;
@@ -62,6 +78,12 @@ export default function AddSite() {
     setSubmitting(false);
     show(`站点 ${newSite.domain} 创建成功`, 'success');
   };
+
+  useEffect(() => {
+    if (nodePools.length > 0 && !nodePools.includes(form.nodePool)) {
+      setForm((prev) => ({ ...prev, nodePool: nodePools[0] }));
+    }
+  }, [nodePools, form.nodePool]);
 
   return (
     <div>
@@ -109,12 +131,17 @@ export default function AddSite() {
               value={form.nodePool}
               onChange={(e) => setForm({ ...form, nodePool: e.target.value })}
               className="input"
+              disabled={loading}
             >
-              {nodePools.map((pool) => (
-                <option key={pool} value={pool}>
-                  {pool}
-                </option>
-              ))}
+              {loading ? (
+                <option>加载中...</option>
+              ) : (
+                nodePools.map((pool) => (
+                  <option key={pool} value={pool}>
+                    {pool}
+                  </option>
+                ))
+              )}
             </select>
           </div>
           <div>

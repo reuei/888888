@@ -4,7 +4,7 @@ import Modal from '../../components/Modal';
 import EmptyState from '../../components/EmptyState';
 import Pagination from '../../components/Pagination';
 import Loading from '../../components/Loading';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import * as api from '../../services/api';
 import type { Merchant } from '../../types';
 import { statusBadge, statusText } from '../../utils/helpers';

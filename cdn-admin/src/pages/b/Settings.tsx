@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PageHeader from '../../components/PageHeader';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import { User, Lock, Phone, Mail, CreditCard, MessageCircle } from 'lucide-react';
 
 export default function BSettings() {

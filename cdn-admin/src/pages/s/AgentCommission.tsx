@@ -6,7 +6,7 @@ import EmptyState from '../../components/EmptyState';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import { fetchCommissionRecords, updateCommissionRecord } from '../../services/api';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
 import { CheckCircle, Search, Wallet } from 'lucide-react';

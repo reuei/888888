@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import { fetchSites, createSite, updateSite, deleteSite } from '../../services/api';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { Trash2, Ban, Plus, Search, Loader2 } from 'lucide-react';

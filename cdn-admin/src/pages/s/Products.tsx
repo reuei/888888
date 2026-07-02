@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import Loading from '../../components/Loading';
 import * as api from '../../services/api';
 import type { Product } from '../../types';

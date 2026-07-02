@@ -4,20 +4,20 @@ import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
 import EmptyState from '../../components/EmptyState';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { fetchMyPackages, updateMyPackage } from '../../services/api';
-import { packages } from '../../data/mock';
+import { fetchPackages, fetchMyPackages, updateMyPackage } from '../../services/api';
 import { formatMoney, statusBadge, statusText } from '../../utils/helpers';
-import { RefreshCw, CreditCard, Search, RefreshCcw, Package } from 'lucide-react';
-import type { MyPackage } from '../../types';
+import { RefreshCw, CreditCard, Search, RefreshCcw, Package as PackageIcon } from 'lucide-react';
+import type { MyPackage, Package as PackageType } from '../../types';
 
 const periods = [1, 3, 6, 12];
 
 export default function MyPackages() {
   const { show } = useToast();
+  const [packages, setPackages] = useState<PackageType[]>([]);
   const [list, setList] = useState<MyPackage[]>([]);
   const [loading, setLoading] = useState(false);
   const [renewItem, setRenewItem] = useState<MyPackage | null>(null);
@@ -30,7 +30,7 @@ export default function MyPackages() {
     const map: Record<string, number> = {};
     packages.forEach((p) => { map[p.name] = p.price; });
     return map;
-  }, []);
+  }, [packages]);
 
   const filtered = useMemo(() => {
     const kw = debouncedKeyword.trim().toLowerCase();
@@ -59,8 +59,9 @@ export default function MyPackages() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const data = await fetchMyPackages();
-    setList(data);
+    const [pkgData, myData] = await Promise.all([fetchPackages(), fetchMyPackages()]);
+    setPackages(pkgData);
+    setList(myData);
     setLoading(false);
   }, []);
 
@@ -154,7 +155,7 @@ export default function MyPackages() {
         {loading && <div className="py-8 text-center text-sm text-text-secondary">加载中...</div>}
 
         {!loading && sorted.length === 0 && (
-          <EmptyState title="暂无套餐" description="没有符合筛选条件的套餐" icon={<Package size={24} />} />
+          <EmptyState title="暂无套餐" description="没有符合筛选条件的套餐" icon={<PackageIcon size={24} />} />
         )}
 
         {!loading && sorted.length > 0 && (

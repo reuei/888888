@@ -1,5 +1,5 @@
 import PageHeader from '../../components/PageHeader';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import StatCard from '../../components/StatCard';
 import LineChart from '../../components/LineChart';
 import { sStats, trendLabels, trendValues, merchantRank } from '../../data/mock';

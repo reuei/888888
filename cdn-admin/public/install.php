@@ -27,7 +27,17 @@ function isInstalled(): bool
 
 function getEnvChecks(): array
 {
-    global $dataDir, $minPhpVersion;
+    global $dataDir, $minPhpVersion, $configFile;
+
+    if (!is_dir($dataDir)) {
+        @mkdir($dataDir, 0755, true);
+    }
+
+    $apiDir = dirname($configFile);
+    if (!is_dir($apiDir)) {
+        @mkdir($apiDir, 0755, true);
+    }
+
     return [
         'php_version' => [
             'name' => 'PHP 版本',
@@ -44,14 +54,14 @@ function getEnvChecks(): array
         'writable_data' => [
             'name' => '数据目录可写',
             'required' => 'api/data/ 可写',
-            'current' => is_writable($dataDir) ? '可写' : '不可写',
-            'ok' => is_writable($dataDir),
+            'current' => is_dir($dataDir) && is_writable($dataDir) ? '可写' : '不可写',
+            'ok' => is_dir($dataDir) && is_writable($dataDir),
         ],
         'writable_config' => [
             'name' => '配置目录可写',
             'required' => 'api/ 可写',
-            'current' => is_writable(dirname($configFile)) ? '可写' : '不可写',
-            'ok' => is_writable(dirname($configFile)),
+            'current' => is_dir($apiDir) && is_writable($apiDir) ? '可写' : '不可写',
+            'ok' => is_dir($apiDir) && is_writable($apiDir),
         ],
     ];
 }

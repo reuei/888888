@@ -1,26 +1,27 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { useToast } from '../../components/Toast';
-import { fetchMyPackages, updateMyPackage } from '../../services/api';
-import { packages } from '../../data/mock';
+import { useToast } from '../../hooks/useToast';
+import { fetchPackages, fetchMyPackages, updateMyPackage } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { CreditCard, CheckCircle, PackageX, Loader2 } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
-import type { MyPackage } from '../../types';
+import type { MyPackage, Package } from '../../types';
 
 const periods = [1, 3, 6, 12];
 
 export default function Renew() {
   const { show } = useToast();
+  const [packages, setPackages] = useState<Package[]>([]);
   const [myPackages, setMyPackages] = useState<MyPackage[]>([]);
   const [loading, setLoading] = useState(false);
   const [paying, setPaying] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const data = await fetchMyPackages();
-    setMyPackages(data);
+    const [pkgData, myData] = await Promise.all([fetchPackages(), fetchMyPackages()]);
+    setPackages(pkgData);
+    setMyPackages(myData);
     setLoading(false);
   }, []);
 
@@ -43,9 +44,12 @@ export default function Renew() {
   }, [activePackages, selectedId]);
 
   const selectedPackage = activePackages.find((p) => p.id === selectedId);
-  const unitPrice = selectedPackage
-    ? packages.find((p) => p.name === selectedPackage.name)?.price || 0
-    : 0;
+  const unitPrice = useMemo(() =>
+    selectedPackage
+      ? packages.find((p) => p.name === selectedPackage.name)?.price || 0
+      : 0,
+    [selectedPackage, packages]
+  );
   const payable = unitPrice * months;
 
   const handlePay = async () => {

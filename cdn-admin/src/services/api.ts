@@ -2,6 +2,7 @@ import type {
   Article,
   Coupon,
   Sku,
+  Package,
   Merchant,
   User,
   Order,
@@ -90,6 +91,7 @@ interface Store {
   articles: Article[];
   coupons: Coupon[];
   skus: Sku[];
+  packages: Package[];
   merchants: Merchant[];
   users: User[];
   orders: Order[];
@@ -137,6 +139,7 @@ function loadStore(): Store {
         articles: parsed.articles ?? mock.articles,
         coupons: parsed.coupons ?? mock.coupons,
         skus: parsed.skus ?? mock.skus,
+        packages: parsed.packages ?? mock.packages,
         merchants: parsed.merchants ?? mock.merchants,
         users: parsed.users ?? mock.users,
         orders: parsed.orders ?? mock.orders,
@@ -185,6 +188,7 @@ function getDefaultStore(): Store {
     articles: mock.articles,
     coupons: mock.coupons,
     skus: mock.skus,
+    packages: mock.packages,
     merchants: mock.merchants,
     users: mock.users,
     orders: mock.orders,
@@ -392,6 +396,13 @@ export async function createSku(payload: Omit<Sku, 'id'>): Promise<Sku> {
   saveStore(store);
   return sku;
 }
+
+// Packages
+export const packagesCrud = createCrud<Package>('packages', 'PKG');
+export const fetchPackages = packagesCrud.fetch;
+export const createPackage = packagesCrud.create;
+export const updatePackage = packagesCrud.update;
+export const deletePackage = packagesCrud.delete;
 
 // Merchants
 export const merchantsCrud = createCrud<Merchant>('merchants', 'M');
@@ -638,6 +649,27 @@ export async function fetchUserGrowthStats(): Promise<UserGrowthStat[]> {
   }
   await delay();
   return [...store.userGrowthStats];
+}
+
+export async function login(payload: { account: string; password: string; role: 's' | 'b' }): Promise<{ success: boolean; role?: 's' | 'b'; error?: string }> {
+  if (await detectPhpApi()) {
+    const res = await fetch(`${API_BASE}/login.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = (await res.json()) as { success?: boolean; role?: 's' | 'b'; error?: string };
+    if (!res.ok) {
+      return { success: false, error: data.error || '登录失败' };
+    }
+    return { success: data.success ?? true, role: data.role };
+  }
+  // 本地开发模式：前端模拟验证
+  await delay();
+  if (payload.password.length < 6) {
+    return { success: false, error: '密码长度不能少于 6 位' };
+  }
+  return { success: true, role: payload.role };
 }
 
 export function resetStore() {

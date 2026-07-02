@@ -71,6 +71,7 @@ $resourcePrefixes = [
     'articles' => 'A',
     'coupons' => 'CO',
     'skus' => 'S',
+    'packages' => 'PKG',
     'merchants' => 'M',
     'users' => 'U',
     'orders' => 'O',

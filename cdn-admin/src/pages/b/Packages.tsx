@@ -4,12 +4,11 @@ import Modal from '../../components/Modal';
 import Pagination from '../../components/Pagination';
 import SortableHeader from '../../components/SortableHeader';
 import EmptyState from '../../components/EmptyState';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import { usePagination } from '../../hooks/usePagination';
 import { useSort } from '../../hooks/useSort';
 import { useDebounce } from '../../hooks/useDebounce';
-import { fetchMyPackages, createMyPackage, updateMyPackage, createBOrder } from '../../services/api';
-import { packages } from '../../data/mock';
+import { fetchPackages, fetchMyPackages, createMyPackage, updateMyPackage, createBOrder } from '../../services/api';
 import { formatMoney } from '../../utils/helpers';
 import { ShoppingCart, Check, Search, RefreshCcw, Package, Loader2, CreditCard } from 'lucide-react';
 import type { Package as PackageType, MyPackage } from '../../types';
@@ -19,6 +18,7 @@ export default function BPackages() {
   const [activeTab, setActiveTab] = useState<'buy' | 'my' | 'renew'>('buy');
   const [buyOpen, setBuyOpen] = useState(false);
   const [selected, setSelected] = useState<PackageType | null>(null);
+  const [packages, setPackages] = useState<PackageType[]>([]);
   const [myPackages, setMyPackages] = useState<MyPackage[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -35,7 +35,7 @@ export default function BPackages() {
     const kw = debouncedBuyKeyword.trim().toLowerCase();
     if (!kw) return packages;
     return packages.filter((p) => p.name.toLowerCase().includes(kw) || p.id.toLowerCase().includes(kw));
-  }, [debouncedBuyKeyword]);
+  }, [debouncedBuyKeyword, packages]);
   const {
     sorted: sortedPackages,
     sortKey: pkgSortKey,
@@ -53,8 +53,9 @@ export default function BPackages() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const data = await fetchMyPackages();
-    setMyPackages(data);
+    const [pkgData, myData] = await Promise.all([fetchPackages(), fetchMyPackages()]);
+    setPackages(pkgData);
+    setMyPackages(myData);
     setLoading(false);
   }, []);
 
@@ -92,7 +93,7 @@ export default function BPackages() {
   const renewPrice = useMemo(() => {
     if (!renewItem) return 0;
     return packages.find((p) => p.name === renewItem.name)?.price || 0;
-  }, [renewItem]);
+  }, [renewItem, packages]);
   const renewPayable = renewPrice * renewMonths;
 
   const resetBuy = () => {

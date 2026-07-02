@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../hooks/useToast';
 import { fetchMerchants, updateMerchant } from '../../services/api';
 import { statusBadge, statusText } from '../../utils/helpers';
 import { CheckCircle, XCircle, Eye, Store } from 'lucide-react';

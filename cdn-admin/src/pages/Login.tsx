@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Role } from '../types';
+import { login } from '../services/api';
 import { Shield, Store, AlertCircle, Globe, ArrowLeft } from 'lucide-react';
 
 interface LoginProps {
-  onLogin: (role: Role) => void;
+  onLogin: (role: Role, remember?: boolean) => void;
 }
 
 export default function Login({ onLogin }: LoginProps) {
@@ -23,7 +24,7 @@ export default function Login({ onLogin }: LoginProps) {
     setError('');
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!account.trim()) {
       setError('请输入账号');
       return;
@@ -38,13 +39,13 @@ export default function Login({ onLogin }: LoginProps) {
     }
     setError('');
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (!remember) {
-        localStorage.removeItem('role');
-      }
-      onLogin(role);
-    }, 500);
+    const res = await login({ account, password, role });
+    setLoading(false);
+    if (!res.success) {
+      setError(res.error || '登录失败');
+      return;
+    }
+    onLogin(role, remember);
   };
 
   return (

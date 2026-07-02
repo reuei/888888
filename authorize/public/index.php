@@ -21,6 +21,12 @@ if (!is_dir(RUNTIME_PATH)) {
 ini_set('error_log', RUNTIME_PATH . 'error.log');
 
 if (!file_exists(APP_PATH . 'config/database.php')) {
+    // API 请求在未安装时直接返回 JSON，避免主站解析 HTML 报错
+    if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['code' => 1, 'msg' => '授权站尚未安装', 'data' => []]);
+        exit;
+    }
     if (is_dir(ROOT_PATH . 'install') && is_file(ROOT_PATH . 'install' . DIRECTORY_SEPARATOR . 'index.php')) {
         // 以 Web 根目录为 public 时，直接渲染安装向导
         chdir(ROOT_PATH . 'install');

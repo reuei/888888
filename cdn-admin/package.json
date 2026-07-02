@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run copy-public",
+    "copy-public": "cp -r dist/assets public/ && cp dist/index.html public/index.html && cp -f dist/favicon.svg public/favicon.svg 2>/dev/null; cp -f dist/icons.svg public/icons.svg 2>/dev/null; true",
     "lint": "oxlint",
     "preview": "vite preview"
   },

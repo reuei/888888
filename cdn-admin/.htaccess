@@ -1,0 +1,32 @@
+# CDN 防护加速平台 - 虚拟主机根目录重写规则
+# 当无法将文档根目录指向 public/ 时使用此文件
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # 静态资源重写到 public/ 目录
+    RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+    RewriteRule ^favicon\.svg$ public/favicon.svg [L]
+    RewriteRule ^icons\.svg$ public/icons.svg [L]
+    RewriteRule ^index\.html$ public/index.html [L]
+
+    # 如果请求的是真实文件或目录，则直接访问
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # 否则交给 public/index.php 处理，由 ThinkPHP 接管
+    RewriteRule ^(.*)$ public/index.php?s=$1 [QSA,PT,L]
+</IfModule>
+
+# 保护敏感目录与文件
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# 禁止直接访问 app / config / route / runtime / vendor / data
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(app|config|route|runtime|vendor|data|install)(/|$) - [F,L]
+</IfModule>

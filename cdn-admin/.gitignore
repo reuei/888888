@@ -22,3 +22,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ThinkPHP
+runtime/
+.env
+.env.local
+.env.*.local
+
+# Generated data files (installation specific)
+data/config.php
+data/data.json
+data/install.lock
+
+# Built frontend assets in public/
+public/assets/
+public/index.html
+public/favicon.svg
+public/icons.svg

@@ -1,34 +1,8 @@
-# CDN 防护加速平台 - Apache 重写规则
-# 确保 React HashRouter SPA 在 PHP 虚拟主机上可直接访问
-
-# 优先使用 PHP 入口
-DirectoryIndex index.php index.html
-
-# 开启 rewrite（如模块可用）
 <IfModule mod_rewrite.c>
+    Options +FollowSymlinks -Multiviews
     RewriteEngine On
 
-    # 如果请求的是真实文件或目录，则直接访问
-    RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-
-    # 否则交给 index.php 处理，前端 HashRouter 会接管路由
-    RewriteRule ^ index.php [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php?s=$1 [QSA,PT,L]
 </IfModule>
-
-# 静态资源缓存（可选）
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType image/svg+xml "access plus 1 month"
-</IfModule>
-
-# 禁用 index.html 被直接缓存导致更新不生效（开发调试用，生产可去掉）
-<FilesMatch "^index\.html$">
-    <IfModule mod_headers.c>
-        Header set Cache-Control "no-cache, no-store, must-revalidate"
-        Header set Pragma "no-cache"
-        Header set Expires "0"
-    </IfModule>
-</FilesMatch>

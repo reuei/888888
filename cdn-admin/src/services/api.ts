@@ -57,7 +57,7 @@ function detectPhpApi(): Promise<boolean> {
     usePhpApi = true;
     return Promise.resolve(true);
   }
-  return fetch(`${API_BASE}/health.php`, { method: 'GET' })
+  return fetch(`${API_BASE}/health`, { method: 'GET' })
     .then((res) => res.ok)
     .then((ok) => {
       usePhpApi = ok;
@@ -72,8 +72,7 @@ function detectPhpApi(): Promise<boolean> {
 }
 
 async function phpRequest<T>(method: string, resource: string, id?: string, body?: object): Promise<T> {
-  const url = new URL(`${API_BASE}/index.php`, window.location.origin);
-  url.searchParams.set('resource', resource);
+  const url = new URL(`${API_BASE}/${resource}`, window.location.origin);
   if (id) url.searchParams.set('id', id);
   const res = await fetch(url.toString(), {
     method,
@@ -653,7 +652,7 @@ export async function fetchUserGrowthStats(): Promise<UserGrowthStat[]> {
 
 export async function login(payload: { account: string; password: string; role: 's' | 'b' }): Promise<{ success: boolean; role?: 's' | 'b'; error?: string }> {
   if (await detectPhpApi()) {
-    const res = await fetch(`${API_BASE}/login.php`, {
+    const res = await fetch(`${API_BASE}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

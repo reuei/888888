@@ -57,13 +57,13 @@ npm run build
 
 ### 方式二：无法修改文档根目录（根目录即 web 根目录）
 
-1. 将整个项目上传到站点根目录
+1. 将整个项目上传到站点根目录或子目录（如 `public_html/cdn-admin/`）
 2. 确保根目录的 `.htaccess` 和 `index.php` 存在（已包含）
 3. 确保 `config/`、`data/` 和 `runtime/` 目录可写
-4. 浏览器访问 `https://你的域名/install`
+4. 浏览器访问 `https://你的域名/install` 或 `https://你的域名/cdn-admin/install`
 5. 完成安装向导
 
-根目录的 `.htaccess` 会自动将请求转发到 `public/index.php`，并把 `/assets/`、`favicon.svg` 等静态资源重写到 `public/` 下，同时禁止直接访问敏感目录。
+根目录的 `.htaccess` 会自动将请求转发到 `public/index.php`，并把 `/assets/`、`favicon.svg` 等静态资源重写到 `public/` 下，同时禁止直接访问敏感目录。程序会自动识别部署路径并注入 `<base href>`，因此支持子目录部署。
 
 ## 安装向导详细步骤
 
@@ -305,16 +305,23 @@ chmod -R 777 config data runtime
 - 确认 MySQL 版本 ≥ 5.7 或 MariaDB ≥ 10.2
 - 部分虚拟主机的 MySQL 主机不是 `127.0.0.1`，请查看主机商提供的数据库地址
 
-### 4. 登录时提示账号或密码错误
+### 4. 访问页面报 500 错误
+
+- 检查 PHP 版本是否 ≥ 8.0，且已启用 `pdo_mysql`、`json` 扩展
+- 检查 `config/`、`data/`、`runtime/` 目录是否可写
+- 检查是否已上传 `vendor/` 目录与 `public/` 下的构建产物
+- 将 `config/app.php` 中 `'show_error_msg' => false` 改为 `true`，或开启 `'app_debug' => true`，可查看具体错误信息（调试用，生产环境请关闭）
+
+### 5. 登录时提示账号或密码错误
 
 - S 端：使用安装向导中设置的管理员账号密码
 - B 端：使用 `merchant / 123456`，或在 `cdn_merchants` 表中为商户配置 `account` 与 `password_hash`/`password`
 
-### 5. 忘记管理员密码
+### 6. 忘记管理员密码
 
 删除 `data/config.php`，重新访问 `/install` 进行安装。数据库中的业务数据不会丢失。
 
-### 6. 如何修改数据库配置
+### 7. 如何修改数据库配置
 
 编辑 `config/database.php` 中的 `connections.mysql` 配置项，修改后刷新页面即可生效。
 

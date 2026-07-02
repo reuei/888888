@@ -186,7 +186,7 @@ class Install
             return $this->renderStep2($error);
         }
 
-        return redirect('/install?step=3');
+        return redirect('./install?step=3');
     }
 
     /**
@@ -453,7 +453,7 @@ class Install
                     <p style="font-weight:600;margin:0 0 4px;">系统已安装</p>
                     <p class="text-sm" style="margin:0;">如需重新安装，请先删除 <code>data/install.lock</code>、<code>data/config.php</code> 与 <code>config/database.php</code>。</p>
                     <div class="mt-4">
-                        <a href="/" class="btn" style="width:auto;display:inline-block;padding:10px 20px;">进入平台</a>
+                        <a href="./" class="btn" style="width:auto;display:inline-block;padding:10px 20px;">进入平台</a>
                     </div>
                 </div>
             <?php elseif ($step === 1): ?>
@@ -482,7 +482,7 @@ class Install
                     <div class="alert alert-green">
                         <p style="margin:0;">环境检测通过，可以继续安装。</p>
                     </div>
-                    <a href="/install?step=2" class="btn">下一步：数据库配置</a>
+                    <a href="./install?step=2" class="btn">下一步：数据库配置</a>
                 <?php endif; ?>
 
             <?php elseif ($step === 2): ?>
@@ -490,7 +490,7 @@ class Install
                 <?php if ($error): ?>
                     <div class="alert alert-red"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
-                <form method="POST" action="/install?step=2">
+                <form method="POST" action="./install?step=2">
                     <div class="section-title">MySQL 数据库信息</div>
                     <div class="form-row">
                         <div class="form-group">
@@ -559,7 +559,7 @@ class Install
                         <p style="font-weight:600;margin:0 0 4px;">安全提示</p>
                         <p class="text-sm" style="margin:0;">安装完成后建议删除或重命名 <code>app/controller/Install.php</code> 与 <code>install/</code> 目录，防止被重复执行。</p>
                     </div>
-                    <a href="/" class="btn" style="width:auto;display:inline-block;padding:10px 24px;">进入平台</a>
+                    <a href="./" class="btn" style="width:auto;display:inline-block;padding:10px 24px;">进入平台</a>
                 </div>
             <?php endif; ?>
         </div>

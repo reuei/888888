@@ -40,7 +40,19 @@ import type {
 import * as mock from '../data/mock';
 
 const STORAGE_KEY = 'cdn-admin-data';
-const API_BASE = '/api';
+
+// 根据部署路径动态计算 API 根地址，支持子目录部署
+function getApiBase(): string {
+  if (typeof window === 'undefined') return '/api';
+  const custom = (window as unknown as Record<string, unknown>).__CDN_ADMIN_API_BASE__;
+  if (typeof custom === 'string' && custom !== '') {
+    return custom.replace(/\/$/, '');
+  }
+  // 默认使用当前页面路径作为基准，使 ./api 能正确解析到部署根目录
+  return './api';
+}
+
+const API_BASE = getApiBase();
 
 let usePhpApi = false;
 let phpApiChecked = false;
@@ -72,7 +84,10 @@ function detectPhpApi(): Promise<boolean> {
 }
 
 async function phpRequest<T>(method: string, resource: string, id?: string, body?: object): Promise<T> {
-  const url = new URL(`${API_BASE}/${resource}`, window.location.origin);
+  const path = `${API_BASE}/${resource}`;
+  // 使用 document.baseURI 保证在 <base href> 或子目录部署下解析正确
+  const base = typeof document !== 'undefined' ? document.baseURI : window.location.origin + '/';
+  const url = new URL(path, base);
   if (id) url.searchParams.set('id', id);
   const res = await fetch(url.toString(), {
     method,

@@ -17,9 +17,9 @@ class Index
 
     public function index(): Response
     {
-        // 未安装时跳转到安装向导
+        // 未安装时跳转到安装向导（相对路径，兼容子目录部署）
         if (!$this->dataService->isInstalled()) {
-            return redirect('/install');
+            return redirect('./install');
         }
 
         $htmlFile = public_path() . 'index.html';
@@ -42,9 +42,18 @@ class Index
             )->header(['Content-Type' => 'text/plain; charset=utf-8']);
         }
 
-        // 注入运行环境标识，前端可据此判断是否在 PHP 主机运行
-        $envScript = '<script>window.__CDN_ADMIN_RUNTIME__="php";</script>';
-        $html = str_replace('<head>', '<head>' . $envScript, $html);
+        // 计算部署根路径，支持虚拟主机子目录
+        $basePath = rtrim(request()->root(), '/') . '/';
+        if ($basePath === '//') {
+            $basePath = '/';
+        }
+
+        // 注入运行环境标识与 API 基准地址，前端可据此判断是否在 PHP 主机运行
+        $headInject = sprintf(
+            '<base href="%s"><script>window.__CDN_ADMIN_RUNTIME__="php";window.__CDN_ADMIN_API_BASE__="./api";</script>',
+            htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8')
+        );
+        $html = str_replace('<head>', '<head>' . $headInject, $html);
 
         return Response::create($html, 'html', 200)->header([
             'Content-Type' => 'text/html; charset=utf-8',

@@ -3,7 +3,7 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
+    # 不设置 RewriteBase，让重写目标相对于本 .htaccess 所在目录，兼容子目录部署
 
     # 静态资源重写到 public/ 目录
     RewriteRule ^assets/(.*)$ public/assets/$1 [L]

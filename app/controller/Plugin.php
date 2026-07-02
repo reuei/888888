@@ -24,7 +24,7 @@ class Plugin extends Controller
         $code = input('code', '');
         $token = input('token', '');
 
-        $plugin = Db::fetch("SELECT * FROM jz_plugin WHERE code = ? AND status = 1", [$code]);
+        $plugin = \Db::fetch("SELECT * FROM jz_plugin WHERE code = ? AND status = 1", [$code]);
         if (!$plugin) {
             json_error('插件不存在或已禁用');
         }
@@ -47,7 +47,7 @@ class Plugin extends Controller
             $this->autoDeliver($orderNo, $cards);
         }
 
-        Db::insert('jz_plugin_log', [
+        \Db::insert('jz_plugin_log', [
             'plugin_id' => $plugin['id'],
             'event_type' => $payload['action'] ?? 'webhook',
             'payload' => $input,
@@ -64,19 +64,19 @@ class Plugin extends Controller
      */
     private function autoDeliver($orderNo, array $cards)
     {
-        $order = Db::fetch("SELECT * FROM jz_order WHERE order_no = ? AND status = 1", [$orderNo]);
+        $order = \Db::fetch("SELECT * FROM jz_order WHERE order_no = ? AND status = 1", [$orderNo]);
         if (!$order) {
             return;
         }
 
-        $goods = Db::fetch("SELECT * FROM jz_goods WHERE id = ?", [$order['goods_id']]);
+        $goods = \Db::fetch("SELECT * FROM jz_goods WHERE id = ?", [$order['goods_id']]);
         if (!$goods || $goods['type'] != 1) {
             return;
         }
 
         if (empty($cards)) {
             // 尝试从库存取卡密
-            $stockCards = Db::query("SELECT * FROM jz_card WHERE goods_id = ? AND status = 0 ORDER BY id ASC LIMIT ?", [$goods['id'], $order['quantity']]);
+            $stockCards = \Db::query("SELECT * FROM jz_card WHERE goods_id = ? AND status = 0 ORDER BY id ASC LIMIT ?", [$goods['id'], $order['quantity']]);
             $cards = $stockCards;
         }
 
@@ -87,12 +87,12 @@ class Plugin extends Controller
         foreach ($cards as $i => $card) {
             $cardId = $card['id'] ?? 0;
             if ($cardId > 0) {
-                Db::execute(
+                \Db::execute(
                     "UPDATE jz_card SET status = 1, order_id = ?, sell_time = ? WHERE id = ?",
                     [$order['id'], date('Y-m-d H:i:s'), $cardId]
                 );
             } else {
-                Db::insert('jz_card', [
+                \Db::insert('jz_card', [
                     'goods_id' => $goods['id'],
                     'merchant_id' => $goods['merchant_id'],
                     'card_no' => $card['card_no'] ?? '',
@@ -104,7 +104,7 @@ class Plugin extends Controller
             }
         }
 
-        Db::execute(
+        \Db::execute(
             "UPDATE jz_order SET status = 2, deliver_time = ? WHERE id = ?",
             [date('Y-m-d H:i:s'), $order['id']]
         );

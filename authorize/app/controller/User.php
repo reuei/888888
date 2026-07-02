@@ -312,6 +312,6 @@ class User extends BaseController
     public function logout()
     {
         Session::delete('user');
-        redirect(url('/'));
+        return redirect(url('/'));
     }
 }

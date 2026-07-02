@@ -35,6 +35,10 @@ Route::get('plugin/:action', 'Plugin/:action');
 // 订单
 Route::rule('order/:action', 'Order/:action');
 
+// 后台首页（兼容原 /admin）
+Route::get('admin', 'admin.Dashboard/index');
+Route::get('admin/index', 'admin.Dashboard/index');
+
 // 后台登录
 Route::get('admin/admin', 'admin.Admin/index');
 Route::rule('admin/admin/:action', 'admin.Admin/:action');
@@ -77,4 +81,4 @@ Route::rule('admin/version/:action', 'admin.Version/:action');
 
 // API
 Route::get('api/download', 'api.Download/index');
-Route::post('api/license/:action', 'api.License/:action');
+Route::rule('api/license/:action', 'api.License/:action');

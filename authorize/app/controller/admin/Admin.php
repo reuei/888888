@@ -20,7 +20,7 @@ class Admin extends BaseController
     public function index()
     {
         if (get_admin_user()) {
-            redirect(url('admin/dashboard'));
+            return redirect(url('admin/dashboard'));
         }
         $this->disableLayout();
         $this->assign('title', '管理员登录');
@@ -54,6 +54,6 @@ class Admin extends BaseController
     public function logout()
     {
         Session::delete('admin_user');
-        redirect(url('admin/admin'));
+        return redirect(url('admin/admin'));
     }
 }

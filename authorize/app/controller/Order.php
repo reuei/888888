@@ -91,7 +91,7 @@ class Order extends BaseController
             throw new \Exception('订单不存在');
         }
         if ($order['status'] != 0) {
-            redirect(url('user/order'));
+            return redirect(url('user/order'));
         }
 
         $this->assign('title', '订单支付');

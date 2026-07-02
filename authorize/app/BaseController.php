@@ -64,7 +64,10 @@ abstract class BaseController
 
     // 初始化
     protected function initialize()
-    {}
+    {
+        // 统一视图根目录为项目 view/，避免 admin 等子目录被追加为应用前缀
+        View::config(['view_path' => $this->app->getRootPath() . 'view' . DIRECTORY_SEPARATOR]);
+    }
 
     /**
      * 模板变量赋值

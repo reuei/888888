@@ -52,5 +52,5 @@ Route::rule('merchant/:controller', 'merchant.:controller/index');
 Route::rule('subsite/:controller/:action', 'subsite.:controller/:action');
 Route::rule('subsite/:controller', 'subsite.:controller/index');
 
-// 插件回调（保持 /plugin/xxx 形式）
-Route::any('plugin/:action', 'Plugin/index');
+// 插件回调（保持 /plugin/xxx 形式，映射到 Plugin 控制器的同名方法）
+Route::any('plugin/:action', 'Plugin/:action');

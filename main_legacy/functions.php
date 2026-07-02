@@ -52,6 +52,24 @@ function switch_lang_url($lang)
 
 function input($key = null, $default = null)
 {
+    // 优先从 ThinkPHP 请求对象读取（支持路由参数、get/post 等）
+    if (function_exists('request')) {
+        try {
+            $request = request();
+            if (is_object($request) && method_exists($request, 'param')) {
+                if ($key === null) {
+                    return $request->param();
+                }
+                $value = $request->param($key);
+                if ($value !== null) {
+                    return $value;
+                }
+            }
+        } catch (Throwable $e) {
+            // 未初始化时回退到 $_REQUEST
+        }
+    }
+
     if ($key === null) {
         return $_REQUEST;
     }

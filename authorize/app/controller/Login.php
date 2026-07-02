@@ -20,7 +20,7 @@ class Login extends BaseController
     public function index()
     {
         if (get_user()) {
-            redirect(url('user'));
+            return redirect(url('user'));
         }
         $this->assign('title', '用户登录');
         $this->fetch('login/index');
@@ -47,7 +47,7 @@ class Login extends BaseController
     public function register()
     {
         if (get_user()) {
-            redirect(url('user'));
+            return redirect(url('user'));
         }
         $this->assign('title', '用户注册');
         $this->fetch('login/register');
@@ -98,6 +98,6 @@ class Login extends BaseController
     public function logout()
     {
         Session::delete('user');
-        redirect(url('/'));
+        return redirect(url('/'));
     }
 }

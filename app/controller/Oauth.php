@@ -17,23 +17,23 @@ class Oauth extends Controller
     }
 
     /**
-     * 跳转到第三方授权页
+     * 跳转到第三方授权页（对应路由 /oauth/:type）
      */
-    public function redirect()
+    public function index()
     {
         $type = input('type', '');
         if (!in_array($type, ['qq', 'weixin', 'github'], true)) {
-            throw new Exception('不支持的登录方式');
+            throw new \Exception('不支持的登录方式');
         }
 
         $config = oauth_config($type);
         if (empty($config['enabled']) || empty($config['appid'])) {
-            throw new Exception('该登录方式未启用或未配置');
+            throw new \Exception('该登录方式未启用或未配置');
         }
 
         $url = oauth_authorize_url($type);
         if (!$url) {
-            throw new Exception('生成授权链接失败');
+            throw new \Exception('生成授权链接失败');
         }
 
         redirect($url);
@@ -49,20 +49,20 @@ class Oauth extends Controller
         $state = input('state', '');
 
         if (!in_array($type, ['qq', 'weixin', 'github'], true)) {
-            throw new Exception('不支持的登录方式');
+            throw new \Exception('不支持的登录方式');
         }
 
         if (!$code) {
-            throw new Exception('授权失败，未获取到授权码');
+            throw new \Exception('授权失败，未获取到授权码');
         }
 
         if (!oauth_verify_state($type, $state)) {
-            throw new Exception('授权状态校验失败');
+            throw new \Exception('授权状态校验失败');
         }
 
         $tokenResult = oauth_get_token($type, $code);
         if ($tokenResult['code'] !== 0) {
-            throw new Exception($tokenResult['msg']);
+            throw new \Exception($tokenResult['msg']);
         }
 
         $token = $tokenResult['data']['access_token'];
@@ -75,7 +75,7 @@ class Oauth extends Controller
 
         $userinfoResult = oauth_get_userinfo($type, $token, $openid);
         if ($userinfoResult['code'] !== 0) {
-            throw new Exception($userinfoResult['msg']);
+            throw new \Exception($userinfoResult['msg']);
         }
 
         $oauthUser = $userinfoResult['data'];
@@ -85,7 +85,7 @@ class Oauth extends Controller
 
         $loginResult = oauth_login_or_register($type, $oauthUser);
         if ($loginResult['code'] !== 0) {
-            throw new Exception($loginResult['msg']);
+            throw new \Exception($loginResult['msg']);
         }
 
         redirect(url('index/user'));

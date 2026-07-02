@@ -28,9 +28,9 @@ $authConfig = array_merge([
 ], $authConfig);
 $authCodeRequired = !empty($authConfig['auth_code']);
 
-// 已安装检测
-if (file_exists($rootPath . 'config/database.php')) {
-    $success = '系统已安装，如需重新安装请删除 config/database.php 后刷新页面。';
+// 已安装检测（使用安装锁文件，避免 vendor:publish 生成的默认 database.php 误判）
+if (file_exists($rootPath . 'install/installed.lock')) {
+    $success = '系统已安装，如需重新安装请删除 install/installed.lock 后刷新页面。';
     $step = 'done';
 }
 
@@ -171,6 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step == 2) {
                 'prefix' => 'jz_',
             ];
             installDatabase($config, $adminUser, $adminPass);
+            @file_put_contents($rootPath . 'install/installed.lock', date('Y-m-d H:i:s'));
             $success = '安装成功，请删除 install 目录后 <a href="/">点击访问首页</a> 或 <a href="/admin/dashboard">进入总站后台</a>';
             $step = 'done';
         } catch (Exception $e) {

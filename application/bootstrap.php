@@ -40,6 +40,12 @@ class App
     {
         // 加载配置
         $config = require APP_PATH . 'config.php';
+        if (is_file(APP_PATH . 'config' . DIRECTORY_SEPARATOR . 'app.php')) {
+            $appConfig = require APP_PATH . 'config' . DIRECTORY_SEPARATOR . 'app.php';
+            if (is_array($appConfig)) {
+                $config = array_merge($config, $appConfig);
+            }
+        }
         Config::set($config);
 
         // 数据库初始化

@@ -71,7 +71,7 @@ class Order extends Controller
             'create_time' => date('Y-m-d H:i:s'),
         ]);
 
-        redirect(url('order/pay', ['order_no' => $orderNo]));
+        json_success('订单创建成功', ['redirect' => url('order/pay', ['order_no' => $orderNo])]);
     }
 
     public function pay()

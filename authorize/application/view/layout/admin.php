@@ -11,6 +11,7 @@ $menu = [
     ['name' => '授权码管理', 'icon' => '◎', 'url' => 'admin/license'],
     ['name' => '插件市场', 'icon' => '◈', 'url' => 'admin/plugin'],
     ['name' => '版本更新包', 'icon' => '⇧', 'url' => 'admin/version'],
+    ['name' => '充值管理', 'icon' => '¥', 'url' => 'admin/recharge'],
     ['name' => '系统设置', 'icon' => '⚙', 'url' => 'admin/setting'],
 ];
 ?>

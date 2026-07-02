@@ -2040,7 +2040,7 @@ function update_sign(array $params, $apiKey)
 {
     ksort($params);
     $str = http_build_query($params);
-    return hash_hmac('sha256', $str, $apiKey ?: 'qeefg-default-key');
+    return hash_hmac('sha256', $str, $apiKey ?? '');
 }
 
 /**
@@ -2240,12 +2240,13 @@ function update_apply_upgrade($version, $license = null)
 
     // 更新版本号到 app.php
     $appConfigFile = APP_PATH . 'config' . DIRECTORY_SEPARATOR . 'app.php';
+    $appConfig = [];
     if (is_file($appConfigFile)) {
         $appConfig = require $appConfigFile;
-        if (is_array($appConfig)) {
-            $appConfig['app_version'] = $version;
-            @file_put_contents($appConfigFile, "<?php\nreturn " . var_export($appConfig, true) . ";\n");
-        }
+    }
+    if (is_array($appConfig)) {
+        $appConfig['app']['app_version'] = $version;
+        @file_put_contents($appConfigFile, "<?php\nreturn " . var_export($appConfig, true) . ";\n");
     }
 
     // 清理临时目录

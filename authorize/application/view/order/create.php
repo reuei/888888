@@ -24,13 +24,10 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
     fetch('<?php echo url('order/doCreate'); ?>', {
         method: 'POST',
         body: new FormData(form)
-    }).then(r => r.text()).then(html => {
-        if (html.indexOf('{') === 0) {
-            const res = JSON.parse(html);
-            alert(res.msg);
-            if (res.code === 0) location.href = res.data.redirect;
-        } else {
-            location.href = '<?php echo url('order/pay', ['order_no' => '__ORDER_NO__']); ?>'.replace('__ORDER_NO__', '<?php echo generate_order_no(); ?>');
+    }).then(r => r.json()).then(res => {
+        alert(res.msg);
+        if (res.code === 0 && res.data.redirect) {
+            location.href = res.data.redirect;
         }
     });
 });

@@ -10,7 +10,9 @@ if (file_exists(APP_PATH . 'config/database.php')) {
 
 return array_merge([
     'app_name' => '鲸商城 Pro',
-    'app_version' => '1.0.0',
+    'app' => [
+        'app_version' => '1.0.0',
+    ],
     'default_controller' => 'Index',
     'default_action' => 'index',
     'template' => [

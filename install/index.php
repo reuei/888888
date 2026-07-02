@@ -46,16 +46,20 @@ function checkEnv()
     }
 
     $items = [];
-    $items['PHP >= 7.4'] = version_compare(PHP_VERSION, '7.4.0', '>=');
+    $items['PHP >= 8.0'] = version_compare(PHP_VERSION, '8.0.0', '>=');
     $items['PDO 扩展'] = extension_loaded('pdo');
     $items['PDO_MySQL 扩展'] = extension_loaded('pdo_mysql');
     $items['GD 扩展'] = extension_loaded('gd');
     $items['mbstring 扩展'] = extension_loaded('mbstring');
     $items['JSON 扩展'] = extension_loaded('json');
     $items['openssl 扩展'] = extension_loaded('openssl');
-    $items['config 可写'] = is_writable($rootPath . 'config');
+    $items['session 扩展'] = extension_loaded('session');
+    $items['fileinfo 扩展'] = extension_loaded('fileinfo');
+    $items['curl 扩展'] = extension_loaded('curl');
+    $items['config 可写'] = is_writable($rootPath . 'config') || @chmod($rootPath . 'config', 0755);
     $items['runtime 可写'] = is_writable($rootPath . 'runtime') || @mkdir($rootPath . 'runtime', 0755, true);
     $items['public/uploads 可写'] = is_writable($rootPath . 'public/uploads') || @mkdir($rootPath . 'public/uploads', 0755, true);
+    $items['安装目录可写'] = is_writable($rootPath . 'install');
     return $items;
 }
 
@@ -326,6 +330,9 @@ $allPass = !in_array(false, $envItems, true);
             <?php if (!$allPass): ?>
                 <p class="hint" style="color: #EF4444; text-align: center; margin-top: 8px;">请修复未通过的检测项后刷新页面</p>
             <?php endif; ?>
+            <div class="alert" style="background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; margin-top: 16px;">
+                <strong>easypanel 虚拟主机部署提示：</strong>请将站点运行目录（web 根目录）设置为 <code>public</code>；PHP 版本选择 <code>8.0 及以上</code>；上传 zip 包后解压，访问 <code>/install</code> 完成安装。若文件较大（&gt;15MB），建议使用 FTP 上传或 easypanel 在线解压功能。
+            </div>
         <?php elseif ($step == 2): ?>
             <form method="POST" action="?step=2">
                 <?php if ($authCodeRequired): ?>

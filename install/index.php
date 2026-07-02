@@ -29,8 +29,8 @@ $authConfig = array_merge([
 $authCodeRequired = !empty($authConfig['auth_code']);
 
 // 已安装检测
-if (file_exists($rootPath . 'application/config/database.php')) {
-    $success = '系统已安装，如需重新安装请删除 application/config/database.php 后刷新页面。';
+if (file_exists($rootPath . 'config/database.php')) {
+    $success = '系统已安装，如需重新安装请删除 config/database.php 后刷新页面。';
     $step = 'done';
 }
 
@@ -40,7 +40,7 @@ function checkEnv()
     global $rootPath;
 
     // 配置文件目录不存在时自动创建
-    $configDir = $rootPath . 'application/config';
+    $configDir = $rootPath . 'config';
     if (!is_dir($configDir)) {
         @mkdir($configDir, 0755, true);
     }
@@ -53,7 +53,7 @@ function checkEnv()
     $items['mbstring 扩展'] = extension_loaded('mbstring');
     $items['JSON 扩展'] = extension_loaded('json');
     $items['openssl 扩展'] = extension_loaded('openssl');
-    $items['application/config 可写'] = is_writable($rootPath . 'application/config');
+    $items['config 可写'] = is_writable($rootPath . 'config');
     $items['runtime 可写'] = is_writable($rootPath . 'runtime') || @mkdir($rootPath . 'runtime', 0755, true);
     $items['public/uploads 可写'] = is_writable($rootPath . 'public/uploads') || @mkdir($rootPath . 'public/uploads', 0755, true);
     return $items;
@@ -93,9 +93,37 @@ function installDatabase($config, $adminUser, $adminPass)
     $stmt = $pdo->prepare("INSERT INTO jz_admin (username, password, role, status, create_time) VALUES (?, ?, 'super', 1, ?)");
     $stmt->execute([$adminUser, $hash, date('Y-m-d H:i:s')]);
 
-    // 写入配置文件
-    $configContent = "<?php\nreturn " . var_export($config, true) . ";\n";
-    file_put_contents($rootPath . 'application/config/database.php', $configContent);
+    // 写入配置文件（ThinkPHP 8 格式）
+    $tpConfig = [
+        'default'         => 'mysql',
+        'time_query_rule' => [],
+        'auto_timestamp'  => true,
+        'datetime_format' => 'Y-m-d H:i:s',
+        'datetime_field'  => '',
+        'connections'     => [
+            'mysql' => [
+                'type'            => $config['type'] ?? 'mysql',
+                'hostname'        => $config['hostname'],
+                'database'        => $config['database'],
+                'username'        => $config['username'],
+                'password'        => $config['password'],
+                'hostport'        => $config['hostport'] ?? 3306,
+                'params'          => [],
+                'charset'         => $config['charset'] ?? 'utf8mb4',
+                'prefix'          => $config['prefix'] ?? 'jz_',
+                'deploy'          => 0,
+                'rw_separate'     => false,
+                'master_num'      => 1,
+                'slave_no'        => '',
+                'fields_strict'   => true,
+                'break_reconnect' => false,
+                'trigger_sql'     => true,
+                'fields_cache'    => false,
+            ],
+        ],
+    ];
+    $configContent = "<?php\nreturn " . var_export($tpConfig, true) . ";\n";
+    file_put_contents($rootPath . 'config/database.php', $configContent);
 
     return true;
 }

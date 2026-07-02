@@ -1,0 +1,343 @@
+<?php
+/**
+ * QEEFG 授权站安装向导
+ */
+
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$rootPath = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+$step = $_GET['step'] ?? 1;
+$error = '';
+$success = '';
+
+$authConfigFile = __DIR__ . DIRECTORY_SEPARATOR . 'auth.php';
+$authConfig = [];
+if (is_file($authConfigFile)) {
+    $authConfig = require $authConfigFile;
+}
+$authConfig = array_merge([
+    'auth_code' => '',
+    'max_attempts' => 5,
+], $authConfig);
+$authCodeRequired = !empty($authConfig['auth_code']);
+
+if (file_exists($rootPath . 'application/config/database.php')) {
+    $success = '系统已安装，如需重新安装请删除 application/config/database.php 后刷新页面。';
+    $step = 'done';
+}
+
+function checkEnv($rootPath)
+{
+    $configDir = $rootPath . 'application/config';
+    if (!is_dir($configDir)) {
+        @mkdir($configDir, 0755, true);
+    }
+
+    $items = [];
+    $items['PHP >= 7.4'] = version_compare(PHP_VERSION, '7.4.0', '>=');
+    $items['PDO 扩展'] = extension_loaded('pdo');
+    $items['PDO_MySQL 扩展'] = extension_loaded('pdo_mysql');
+    $items['JSON 扩展'] = extension_loaded('json');
+    $items['openssl 扩展'] = extension_loaded('openssl');
+    $items['mbstring 扩展'] = extension_loaded('mbstring');
+    $items['application/config 可写'] = is_writable($configDir);
+    $items['runtime 可写'] = is_writable($rootPath . 'runtime') || @mkdir($rootPath . 'runtime', 0755, true);
+    $items['public/uploads 可写'] = is_writable($rootPath . 'public/uploads') || @mkdir($rootPath . 'public/uploads', 0755, true);
+    $items['runtime/update 可写'] = is_writable($rootPath . 'runtime/update') || @mkdir($rootPath . 'runtime/update', 0755, true);
+    return $items;
+}
+
+function installDatabase($config, $adminUser, $adminPass)
+{
+    global $rootPath;
+
+    $dsn = sprintf('mysql:host=%s;port=%s;charset=utf8mb4', $config['hostname'], $config['hostport'] ?? 3306);
+    $pdo = new PDO($dsn, $config['username'], $config['password'], [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ]);
+
+    $dbname = $config['database'];
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbname}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    $pdo->exec("USE `{$dbname}`");
+
+    $sql = file_get_contents($rootPath . 'install/install.sql');
+    if (!$sql) {
+        throw new Exception('install.sql 文件不存在或读取失败');
+    }
+
+    $statements = array_filter(array_map('trim', explode(';', $sql)));
+    foreach ($statements as $statement) {
+        if ($statement) {
+            $pdo->exec($statement);
+        }
+    }
+
+    $hash = password_hash($adminPass, PASSWORD_DEFAULT);
+    $apiKey = bin2hex(random_bytes(32));
+
+    $stmt = $pdo->prepare("INSERT INTO qef_admin (username, password, role, status, create_time) VALUES (?, ?, 'super', 1, ?)");
+    $stmt->execute([$adminUser, $hash, date('Y-m-d H:i:s')]);
+
+    $stmt = $pdo->prepare("UPDATE qef_config SET cfg_value = ? WHERE cfg_key = 'api_key'");
+    $stmt->execute([$apiKey]);
+
+    $configContent = "<?php\nreturn " . var_export($config, true) . ";\n";
+    file_put_contents($rootPath . 'application/config/database.php', $configContent);
+
+    $lockFile = $rootPath . 'install/installed.lock';
+    @file_put_contents($lockFile, date('Y-m-d H:i:s'));
+
+    return true;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step == 2) {
+    $dbHost = $_POST['db_host'] ?? '127.0.0.1';
+    $dbPort = $_POST['db_port'] ?? 3306;
+    $dbName = $_POST['db_name'] ?? '';
+    $dbUser = $_POST['db_user'] ?? '';
+    $dbPass = $_POST['db_pass'] ?? '';
+    $adminUser = $_POST['admin_user'] ?? 'admin';
+    $adminPass = $_POST['admin_pass'] ?? '';
+    $authCodeInput = trim($_POST['auth_code'] ?? '');
+
+    if ($authCodeRequired) {
+        $sessionKey = 'install_auth_attempts';
+        $attempts = (int) ($_SESSION[$sessionKey] ?? 0);
+        $maxAttempts = (int) $authConfig['max_attempts'];
+
+        if ($maxAttempts > 0 && $attempts >= $maxAttempts) {
+            $error = '授权码验证失败次数过多，请稍后重试';
+        } elseif ($authCodeInput === '') {
+            $error = '请输入安装授权码';
+        } elseif (!hash_equals((string) $authConfig['auth_code'], $authCodeInput)) {
+            $_SESSION[$sessionKey] = $attempts + 1;
+            $error = '授权码错误，请核对后重新输入';
+        }
+    }
+
+    if (!$error && (!$dbName || !$dbUser || !$adminPass)) {
+        $error = '请填写完整的数据库信息和管理员密码';
+    }
+
+    if (!$error) {
+        try {
+            $config = [
+                'type' => 'mysql',
+                'hostname' => $dbHost,
+                'hostport' => $dbPort,
+                'database' => $dbName,
+                'username' => $dbUser,
+                'password' => $dbPass,
+                'charset' => 'utf8mb4',
+                'prefix' => 'qef_',
+            ];
+            installDatabase($config, $adminUser, $adminPass);
+            $success = '安装成功，请删除 install 目录后 <a href="/">点击访问首页</a> 或 <a href="/admin/dashboard">进入后台</a>';
+            $step = 'done';
+        } catch (Exception $e) {
+            $error = '安装失败：' . $e->getMessage();
+        }
+    }
+}
+
+$envItems = checkEnv($rootPath);
+$allPass = !in_array(false, $envItems, true);
+?>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QEEFG 授权站安装向导</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #F8FAFC;
+            color: #1F2937;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 720px;
+            margin: 40px auto;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background: #2563EB;
+            color: #fff;
+            padding: 24px;
+            text-align: center;
+        }
+        .header h1 { font-size: 20px; font-weight: 600; }
+        .body { padding: 24px; }
+        .step-list {
+            display: flex;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .step-list .step {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            font-size: 14px;
+            color: #64748B;
+            border-bottom: 2px solid transparent;
+        }
+        .step-list .step.active {
+            color: #2563EB;
+            border-bottom-color: #2563EB;
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        th { background: #F8FAFC; font-weight: 600; }
+        .status-ok { color: #10B981; }
+        .status-fail { color: #EF4444; }
+        .form-group { margin-bottom: 16px; }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="password"], input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        input:focus { outline: none; border-color: #2563EB; }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #2563EB;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn:disabled { background: #94A3B8; cursor: not-allowed; }
+        .btn-block { width: 100%; }
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .alert-error { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+        .alert-success { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+        .hint { color: #64748B; font-size: 12px; margin-top: 4px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>QEEFG 授权站安装向导</h1>
+        <p style="margin-top: 8px; opacity: 0.9;">版本 1.0.0 | 授权码销售 + 插件市场</p>
+    </div>
+    <div class="body">
+        <div class="step-list">
+            <div class="step <?php echo $step == 1 ? 'active' : ''; ?>">1. 环境检测</div>
+            <div class="step <?php echo $step == 2 ? 'active' : ''; ?>">2. 数据库配置</div>
+            <div class="step <?php echo $step == 'done' ? 'active' : ''; ?>">3. 完成安装</div>
+        </div>
+
+        <?php if ($error): ?>
+            <div class="alert alert-error"><?php echo $error; ?></div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="alert alert-success"><?php echo $success; ?></div>
+        <?php endif; ?>
+
+        <?php if ($step == 1): ?>
+            <h3 style="margin-bottom: 16px; font-size: 16px;">运行环境检测</h3>
+            <table>
+                <tr><th>检测项</th><th>状态</th></tr>
+                <?php foreach ($envItems as $name => $ok): ?>
+                <tr>
+                    <td><?php echo $name; ?></td>
+                    <td class="<?php echo $ok ? 'status-ok' : 'status-fail'; ?>">
+                        <?php echo $ok ? '通过' : '未通过'; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+            <a href="?step=2" class="btn btn-block" <?php echo $allPass ? '' : 'disabled'; ?>>下一步：配置数据库</a>
+            <?php if (!$allPass): ?>
+                <p class="hint" style="color: #EF4444; text-align: center; margin-top: 8px;">请修复未通过的检测项后刷新页面</p>
+            <?php endif; ?>
+        <?php elseif ($step == 2): ?>
+            <form method="POST" action="?step=2">
+                <?php if ($authCodeRequired): ?>
+                <h3 style="margin-bottom: 16px; font-size: 16px;">授权码验证</h3>
+                <div class="form-group">
+                    <label>安装授权码</label>
+                    <input type="text" name="auth_code" placeholder="请输入安装授权码" required autocomplete="off">
+                </div>
+                <?php endif; ?>
+
+                <h3 style="margin-bottom: 16px; font-size: 16px;">数据库配置</h3>
+                <div class="form-group">
+                    <label>数据库主机</label>
+                    <input type="text" name="db_host" value="127.0.0.1" required>
+                </div>
+                <div class="form-group">
+                    <label>数据库端口</label>
+                    <input type="number" name="db_port" value="3306" required>
+                </div>
+                <div class="form-group">
+                    <label>数据库名</label>
+                    <input type="text" name="db_name" placeholder="如：qefg_auth" required>
+                    <p class="hint">若数据库不存在，安装程序会自动创建</p>
+                </div>
+                <div class="form-group">
+                    <label>数据库用户名</label>
+                    <input type="text" name="db_user" placeholder="如：root" required>
+                </div>
+                <div class="form-group">
+                    <label>数据库密码</label>
+                    <input type="password" name="db_pass" placeholder="">
+                </div>
+
+                <h3 style="margin: 24px 0 16px; font-size: 16px;">管理员账号</h3>
+                <div class="form-group">
+                    <label>管理员账号</label>
+                    <input type="text" name="admin_user" value="admin" required>
+                </div>
+                <div class="form-group">
+                    <label>管理员密码</label>
+                    <input type="password" name="admin_pass" value="admin123" required>
+                    <p class="hint">默认密码 admin123，安装后请及时修改</p>
+                </div>
+                <button type="submit" class="btn btn-block">立即安装</button>
+            </form>
+        <?php elseif ($step == 'done'): ?>
+            <div style="text-align: center; padding: 20px;">
+                <p style="font-size: 16px; margin-bottom: 16px;">安装已完成</p>
+                <p class="hint">为了安全，请删除服务器上的 install 目录</p>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+</body>
+</html>

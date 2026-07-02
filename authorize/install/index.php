@@ -26,14 +26,14 @@ $authConfig = array_merge([
 ], $authConfig);
 $authCodeRequired = !empty($authConfig['auth_code']);
 
-if (file_exists($rootPath . 'application/config/database.php')) {
-    $success = '系统已安装，如需重新安装请删除 application/config/database.php 后刷新页面。';
+if (file_exists($rootPath . 'install/installed.lock')) {
+    $success = '系统已安装，如需重新安装请删除 install/installed.lock 和 config/database.php 后刷新页面。';
     $step = 'done';
 }
 
 function checkEnv($rootPath)
 {
-    $configDir = $rootPath . 'application/config';
+    $configDir = $rootPath . 'config';
     if (!is_dir($configDir)) {
         @mkdir($configDir, 0755, true);
     }
@@ -45,10 +45,9 @@ function checkEnv($rootPath)
     $items['JSON 扩展'] = extension_loaded('json');
     $items['openssl 扩展'] = extension_loaded('openssl');
     $items['mbstring 扩展'] = extension_loaded('mbstring');
-    $items['application/config 可写'] = is_writable($configDir);
+    $items['config 可写'] = is_writable($configDir);
     $items['runtime 可写'] = is_writable($rootPath . 'runtime') || @mkdir($rootPath . 'runtime', 0755, true);
     $items['public/uploads 可写'] = is_writable($rootPath . 'public/uploads') || @mkdir($rootPath . 'public/uploads', 0755, true);
-    $items['runtime/update 可写'] = is_writable($rootPath . 'runtime/update') || @mkdir($rootPath . 'runtime/update', 0755, true);
     return $items;
 }
 
@@ -86,8 +85,19 @@ function installDatabase($config, $adminUser, $adminPass)
     $stmt = $pdo->prepare("UPDATE qef_config SET cfg_value = ? WHERE cfg_key = 'api_key'");
     $stmt->execute([$apiKey]);
 
-    $configContent = "<?php\nreturn " . var_export($config, true) . ";\n";
-    file_put_contents($rootPath . 'application/config/database.php', $configContent);
+    $tpDbConfig = [
+        'default'         => 'mysql',
+        'time_query_rule' => [],
+        'auto_timestamp'  => true,
+        'datetime_format' => 'Y-m-d H:i:s',
+        'datetime_field'  => '',
+        'connections'     => [
+            'mysql' => $config,
+        ],
+    ];
+
+    $configContent = "<?php\n\nreturn " . var_export($tpDbConfig, true) . ";\n";
+    file_put_contents($rootPath . 'config/database.php', $configContent);
 
     $lockFile = $rootPath . 'install/installed.lock';
     @file_put_contents($lockFile, date('Y-m-d H:i:s'));

@@ -1,40 +1,25 @@
 <?php
-/**
- * 入口文件
- * 兼容 ThinkPHP 风格目录结构，适合虚拟主机部署
- */
+// +----------------------------------------------------------------------
+// | ThinkPHP [ WE CAN DO IT JUST THINK ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2006-2019 http://thinkphp.cn All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: liu21st <liu21st@gmail.com>
+// +----------------------------------------------------------------------
 
-// 定义根目录
-define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
-define('APP_PATH', ROOT_PATH . 'application' . DIRECTORY_SEPARATOR);
-define('RUNTIME_PATH', ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR);
+use think\App;
 
-// 基础安全响应头
-header('X-Frame-Options: SAMEORIGIN');
-header('X-Content-Type-Options: nosniff');
-header('Referrer-Policy: strict-origin-when-cross-origin');
-header('X-XSS-Protection: 1; mode=block');
+// [ 应用入口文件 ]
 
-// 错误处理：生产环境关闭页面报错，写入日志
-error_reporting(E_ALL);
-ini_set('display_errors', '0');
-ini_set('log_errors', '1');
-if (!is_dir(RUNTIME_PATH)) {
-    @mkdir(RUNTIME_PATH, 0755, true);
-}
-ini_set('error_log', RUNTIME_PATH . 'error.log');
+require __DIR__ . '/../vendor/autoload.php';
 
-// 检查是否已安装
-if (!file_exists(APP_PATH . 'config/database.php')) {
-    if (is_dir(ROOT_PATH . 'install')) {
-        header('Location: /install/');
-        exit;
-    }
-    exit('系统未安装，且未找到 install 目录');
-}
+// 执行HTTP应用并响应
+$http = (new App())->http;
 
-// 加载启动文件
-require APP_PATH . 'bootstrap.php';
+$response = $http->run();
 
-$app = new App();
-$app->run();
+$response->send();
+
+$http->end($response);

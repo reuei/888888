@@ -135,7 +135,10 @@ function admin_log($action, $content = '')
 function check_admin_role($allowedRoles = ['super', 'admin', 'operator'])
 {
     $admin = session('admin_user');
-    if (empty($admin) || !in_array($admin['role'] ?? '', $allowedRoles, true)) {
+    if (empty($admin)) {
+        redirect(url('login') . '?type=admin');
+    }
+    if (!in_array($admin['role'] ?? '', $allowedRoles, true)) {
         throw new Exception('无权访问该页面');
     }
 }

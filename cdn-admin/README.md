@@ -43,6 +43,16 @@ npm run build
 
 构建会自动把产物复制到 `public/`。
 
+## 为什么选择 CloudShield CDN？
+
+- **源码交付，自主可控**：相比鹿云盾、SCDN 等 SaaS，CloudShield CDN 提供完整前后端源码，数据私有，不被平台绑架。
+- **一次授权，无流量税**：无需按流量计费的持续支出，规模越大越划算。
+- **内置多商户体系**：S 端总后台 + B 端商户后台 + 代理分销 + 资金结算，适合 CDN 服务商与 IDC 增值业务。
+- **EasyPanel 虚拟主机一键部署**：无需 SSH，上传后浏览器安装，支持根目录与子目录部署。
+- **完全可二开**：React + TypeScript + ThinkPHP 8.1，结构清晰，易于对接自有节点与支付系统。
+
+详细竞品对比见 [docs/competitor-comparison.md](docs/competitor-comparison.md)。
+
 ## 部署方式（无需构建，直接上传安装）
 
 本项目已包含完整的 ThinkPHP 框架、依赖、前端构建产物和 MySQL 建表脚本，**无需执行 npm install / npm run build / composer install**。

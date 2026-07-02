@@ -2,6 +2,7 @@
 # 当无法将文档根目录指向 public/ 时使用此文件
 
 <IfModule mod_rewrite.c>
+    Options +FollowSymlinks -Multiviews
     RewriteEngine On
     # 不设置 RewriteBase，让重写目标相对于本 .htaccess 所在目录，兼容子目录部署
 
@@ -21,11 +22,16 @@
 
 # 保护敏感目录与文件
 <FilesMatch "^\.">
-    Order allow,deny
-    Deny from all
+    <IfModule authz_core_module>
+        Require all denied
+    </IfModule>
+    <IfModule !authz_core_module>
+        Order allow,deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
 
-# 禁止直接访问 app / config / route / runtime / vendor / data
+# 禁止直接访问 app / config / route / runtime / vendor / data / install
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^(app|config|route|runtime|vendor|data|install)(/|$) - [F,L]

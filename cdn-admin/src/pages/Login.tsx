@@ -75,7 +75,7 @@ export default function Login({ onLogin }: LoginProps) {
               <Shield size={28} />
             </div>
             <h1 className="text-2xl font-bold">CDN 防护加速平台</h1>
-            <p className="text-sm text-text-secondary mt-1">企业级 CDN 防护加速后台</p>
+            <p className="text-sm text-text-secondary mt-1">比鹿云盾更开放 · 比 SCDN 更经济</p>
           </div>
 
         <div className="flex gap-2 mb-6">

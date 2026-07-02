@@ -444,7 +444,7 @@ class Install
     <div class="card">
         <div class="header">
             <h1>CDN 防护加速平台安装向导</h1>
-            <p>基于 ThinkPHP + MySQL 的虚拟主机一键安装</p>
+            <p>比鹿云盾更开放，比 SCDN 更经济的企业级 CDN 防护加速后台</p>
         </div>
 
         <div class="body">
@@ -475,7 +475,8 @@ class Install
                 <?php if (!$this->dataService->allChecksOk($checks)): ?>
                     <div class="alert alert-red">
                         <p style="margin:0 0 4px;">环境检测未通过，请根据上方提示调整主机环境后刷新本页。</p>
-                        <p class="text-sm" style="margin:0;">常见解决方式：开启 PDO_MySQL 扩展，将 <code>config/</code>、<code>data/</code>、<code>runtime/</code> 目录权限设置为 755 或 777。</p>
+                        <p class="text-sm" style="margin:0 0 4px;">EasyPanel 用户：请确认 PHP 版本 ≥ 8.0，开启 PDO_MySQL，并将 <code>config/</code>、<code>data/</code>、<code>runtime/</code> 目录权限设置为 755 或 777。</p>
+                        <p class="text-sm" style="margin:0;">若内存或执行时间不足，可在 EasyPanel「PHP 设置」中调整 <code>memory_limit ≥ 64M</code>、<code>max_execution_time ≥ 30</code>，或直接编辑项目根目录的 <code>.user.ini</code>。详细说明见 docs/easypanel-deploy.md。</p>
                     </div>
                     <button disabled class="btn">下一步</button>
                 <?php else: ?>

@@ -131,11 +131,11 @@ export default function Home() {
               企业级 CDN 防护加速平台
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
-              让每一次访问
-              <span className="text-primary block mt-2">更快、更安全</span>
+              比鹿云盾更开放
+              <span className="text-primary block mt-2">比 SCDN 更经济</span>
             </h1>
             <p className="text-lg text-text-secondary mb-8 max-w-2xl mx-auto leading-relaxed">
-              融合全球加速网络与智能安全防护，为电商、金融、游戏、政企提供一站式 CDN 与 WAF 解决方案。
+              自主可控的企业级 CDN 防护加速后台，源码交付、数据私有、按需部署。告别平台绑架与高额流量税，为电商、金融、游戏、政企提供一站式加速与 WAF 解决方案。
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
@@ -197,6 +197,45 @@ export default function Home() {
                 <p className="text-sm text-text-secondary leading-relaxed">{f.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison */}
+      <section className="py-20 bg-black/[0.02] dark:bg-white/[0.02]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">为什么选择 CloudShield CDN？</h2>
+            <p className="text-text-secondary">源码级交付，数据与部署完全自主，不再被第三方平台绑定。</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="py-4 px-4 text-left font-semibold">能力</th>
+                  <th className="py-4 px-4 text-center font-semibold text-primary">CloudShield CDN</th>
+                  <th className="py-4 px-4 text-center font-semibold text-text-secondary">鹿云盾</th>
+                  <th className="py-4 px-4 text-center font-semibold text-text-secondary">SCDN</th>
+                </tr>
+              </thead>
+              <tbody className="text-text-secondary">
+                {[
+                  ['源码交付 / 二次开发', '支持', '不支持', '不支持'],
+                  ['数据私有 / 自主部署', '支持', '部分支持', '不支持'],
+                  ['一次性授权 / 无流量税', '支持', '按量计费', '按量计费'],
+                  ['多商户 / 代理分销', '内置', '增值模块', '增值模块'],
+                  ['自定义节点与套餐', '完全开放', '受限', '受限'],
+                  ['EasyPanel 虚拟主机部署', '一键安装', '不适用', '不适用'],
+                ].map((row, i) => (
+                  <tr key={i} className="border-b border-border last:border-0">
+                    <td className="py-4 px-4">{row[0]}</td>
+                    <td className="py-4 px-4 text-center text-success font-medium">{row[1]}</td>
+                    <td className="py-4 px-4 text-center">{row[2]}</td>
+                    <td className="py-4 px-4 text-center">{row[3]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

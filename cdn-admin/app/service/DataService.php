@@ -509,6 +509,17 @@ class DataService
     {
         $minPhpVersion = '8.0.0';
         $configDir = root_path() . 'config';
+        $runtimeDir = root_path() . 'runtime';
+
+        $disabledFunctions = ini_get('disable_functions');
+        $disabledList = $disabledFunctions !== '' ? explode(',', $disabledFunctions) : [];
+        $criticalFunctions = ['file_put_contents', 'file_get_contents', 'mkdir', 'unlink', 'json_encode', 'json_decode', 'pdo'];
+        $blockedFunctions = [];
+        foreach ($criticalFunctions as $func) {
+            if (in_array($func, $disabledList, true)) {
+                $blockedFunctions[] = $func;
+            }
+        }
 
         return [
             'php_version' => [
@@ -535,25 +546,114 @@ class DataService
                 'current' => extension_loaded('openssl') ? '已启用' : '未启用',
                 'ok' => extension_loaded('openssl'),
             ],
+            'disabled_functions' => [
+                'name' => '关键函数是否被禁用',
+                'required' => '无关键函数被禁用',
+                'current' => empty($blockedFunctions) ? '正常' : '被禁用：' . implode(', ', $blockedFunctions),
+                'ok' => empty($blockedFunctions),
+            ],
+            'open_basedir' => [
+                'name' => 'open_basedir 限制',
+                'required' => '包含项目目录',
+                'current' => $this->checkOpenBasedir(),
+                'ok' => $this->checkOpenBasedir() === '正常',
+            ],
             'writable_config' => [
                 'name' => '配置目录可写',
                 'required' => 'config/ 可写',
-                'current' => is_dir($configDir) && is_writable($configDir) ? '可写' : '不可写',
-                'ok' => is_dir($configDir) && is_writable($configDir),
+                'current' => $this->isDirReallyWritable($configDir),
+                'ok' => $this->isDirReallyWritable($configDir) === '可写',
             ],
             'writable_data' => [
                 'name' => '数据目录可写',
                 'required' => 'data/ 可写',
-                'current' => is_dir($this->dataDir) && is_writable($this->dataDir) ? '可写' : '不可写',
-                'ok' => is_dir($this->dataDir) && is_writable($this->dataDir),
+                'current' => $this->isDirReallyWritable($this->dataDir),
+                'ok' => $this->isDirReallyWritable($this->dataDir) === '可写',
             ],
             'writable_runtime' => [
-                'name' => '运行缓存目录可写',
-                'required' => 'runtime/ 可写',
-                'current' => is_dir(root_path() . 'runtime') && is_writable(root_path() . 'runtime') ? '可写' : '不可写',
-                'ok' => is_dir(root_path() . 'runtime') && is_writable(root_path() . 'runtime'),
-            ],
-        ];
+                    'name' => '运行缓存目录可写',
+                    'required' => 'runtime/ 可写',
+                    'current' => $this->isDirReallyWritable($runtimeDir),
+                    'ok' => $this->isDirReallyWritable($runtimeDir) === '可写',
+                ],
+                'memory_limit' => [
+                    'name' => 'PHP 内存限制',
+                    'required' => '≥ 64M',
+                    'current' => ini_get('memory_limit'),
+                    'ok' => $this->memoryToBytes(ini_get('memory_limit')) >= 64 * 1024 * 1024,
+                ],
+                'max_execution_time' => [
+                    'name' => 'PHP 最大执行时间',
+                    'required' => '≥ 30 秒',
+                    'current' => ini_get('max_execution_time') . ' 秒',
+                    'ok' => (int) ini_get('max_execution_time') === 0 || (int) ini_get('max_execution_time') >= 30,
+                ],
+            ];
+    }
+
+    /**
+     * 将 PHP 内存限制字符串转换为字节数
+     */
+    protected function memoryToBytes(string $value): int
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return 0;
+        }
+        $last = strtolower($value[strlen($value) - 1]);
+        $num = (int) $value;
+        switch ($last) {
+            case 'g':
+                $num *= 1024;
+            case 'm':
+                $num *= 1024;
+            case 'k':
+                $num *= 1024;
+        }
+        return $num;
+    }
+
+    /**
+     * 实际写入测试，避免 is_writable 在部分虚拟主机上误判
+     */
+    protected function isDirReallyWritable(string $dir): string
+    {
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+        }
+        if (!is_dir($dir)) {
+            return '目录不存在';
+        }
+        $testFile = rtrim($dir, '/') . '/.write_test_' . uniqid();
+        $written = @file_put_contents($testFile, 'test');
+        if ($written === false) {
+            return '不可写';
+        }
+        @unlink($testFile);
+        return '可写';
+    }
+
+    /**
+     * 检查 open_basedir 是否包含项目目录
+     */
+    protected function checkOpenBasedir(): string
+    {
+        $openBasedir = ini_get('open_basedir');
+        if ($openBasedir === '' || $openBasedir === false) {
+            return '正常';
+        }
+        $projectRoot = root_path();
+        $paths = explode(PATH_SEPARATOR, $openBasedir);
+        foreach ($paths as $path) {
+            $path = rtrim($path, '/\\');
+            if ($path !== '' && str_starts_with($projectRoot, $path . DIRECTORY_SEPARATOR)) {
+                return '正常';
+            }
+            if ($path !== '' && rtrim($projectRoot, '/\\') === $path) {
+                return '正常';
+            }
+        }
+        return '受限：' . $openBasedir;
     }
 
     public function allChecksOk(array $checks): bool

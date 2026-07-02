@@ -18,7 +18,7 @@ class Auth
 
     public function login(Request $request): Response
     {
-        $input = $request->post();
+        $input = $this->getInputData($request);
         $account = trim($input['account'] ?? '');
         $password = $input['password'] ?? '';
         $role = $input['role'] ?? '';
@@ -49,5 +49,18 @@ class Auth
         }
 
         return json(['error' => '账号或密码错误'], 401);
+    }
+
+    protected function getInputData(Request $request): array
+    {
+        $contentType = $request->header('Content-Type', '');
+        $input = $request->getInput();
+
+        if (stripos($contentType, 'application/json') !== false) {
+            $decoded = json_decode($input, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return $request->post() ?: [];
     }
 }

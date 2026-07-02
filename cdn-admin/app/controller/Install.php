@@ -74,101 +74,212 @@ class Install
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CDN 防护加速平台 - 安装向导</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .card {
+            width: 100%;
+            max-width: 640px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: #4f46e5;
+            color: #fff;
+            padding: 24px 32px;
+        }
+        .header h1 { margin: 0 0 8px; font-size: 24px; }
+        .header p { margin: 0; opacity: 0.9; }
+        .body { padding: 32px; }
+        h2 { margin: 0 0 16px; font-size: 18px; color: #1f2937; }
+        .check-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .check-row:last-child { border-bottom: none; }
+        .check-info { flex: 1; }
+        .check-name { color: #374151; font-size: 14px; }
+        .check-meta { color: #9ca3af; font-size: 12px; margin-top: 2px; }
+        .check-status { font-size: 14px; font-weight: 500; }
+        .status-ok { color: #16a34a; }
+        .status-fail { color: #dc2626; }
+        .alert {
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .alert-red { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .alert-green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+        .alert-yellow { background: #fefce8; border: 1px solid #fde68a; color: #854d0e; }
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            background: #4f46e5;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #4338ca; }
+        .btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .checkbox-row input { margin-right: 8px; }
+        .checkbox-row label { font-size: 14px; color: #374151; }
+        code {
+            background: rgba(0,0,0,0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, monospace;
+        }
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: #dcfce7;
+            color: #16a34a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 13px; }
+        .mt-4 { margin-top: 16px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-6 { margin-bottom: 24px; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-indigo-600 px-8 py-6">
-            <h1 class="text-2xl font-bold text-white">CDN 防护加速平台安装向导</h1>
-            <p class="text-indigo-100 mt-2">基于 ThinkPHP 的虚拟主机一键安装</p>
+<body>
+    <div class="card">
+        <div class="header">
+            <h1>CDN 防护加速平台安装向导</h1>
+            <p>基于 ThinkPHP 的虚拟主机一键安装</p>
         </div>
 
-        <div class="px-8 py-6">
+        <div class="body">
             <?php if ($isInstalled && $step !== 3): ?>
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-800">
-                    <p class="font-medium">系统已安装</p>
-                    <p class="text-sm mt-1">如需重新安装，请先删除 <code class="bg-yellow-100 px-1 rounded">data/install.lock</code> 与 <code class="bg-yellow-100 px-1 rounded">data/config.php</code>。</p>
+                <div class="alert alert-yellow">
+                    <p style="font-weight:600;margin:0 0 4px;">系统已安装</p>
+                    <p class="text-sm" style="margin:0;">如需重新安装，请先删除 <code>data/install.lock</code> 与 <code>data/config.php</code>。</p>
                     <div class="mt-4">
-                        <a href="/" class="inline-block bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">进入平台</a>
+                        <a href="/" class="btn" style="width:auto;display:inline-block;padding:10px 20px;">进入平台</a>
                     </div>
                 </div>
             <?php elseif ($step === 1): ?>
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">步骤 1：环境检测</h2>
-                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <h2>步骤 1：环境检测</h2>
+                <div class="alert" style="background:#f9fafb;border:1px solid #e5e7eb;padding:0 16px;">
                     <?php foreach ($checks as $c): ?>
-                        <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                            <span class="text-gray-700"><?php echo htmlspecialchars($c['name']); ?></span>
-                            <div class="text-right text-sm">
-                                <div>当前：<?php echo htmlspecialchars($c['current']); ?></div>
-                                <div class="text-gray-400">要求：<?php echo htmlspecialchars($c['required']); ?></div>
+                        <div class="check-row">
+                            <div class="check-info">
+                                <div class="check-name"><?php echo htmlspecialchars($c['name']); ?></div>
+                                <div class="check-meta">当前：<?php echo htmlspecialchars($c['current']); ?> / 要求：<?php echo htmlspecialchars($c['required']); ?></div>
                             </div>
-                            <div class="ml-4">
-                                <?php if ($c['ok']): ?>
-                                    <span class="text-green-600 font-medium">通过</span>
-                                <?php else: ?>
-                                    <span class="text-red-600 font-medium">失败</span>
-                                <?php endif; ?>
+                            <div class="check-status <?php echo $c['ok'] ? 'status-ok' : 'status-fail'; ?>">
+                                <?php echo $c['ok'] ? '通过' : '失败'; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
 
                 <?php if (!$this->dataService->allChecksOk($checks)): ?>
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 mb-4">
-                        <p>环境检测未通过，请根据上方提示调整主机环境后刷新本页。</p>
-                        <p class="text-sm mt-1">常见解决方式：将 <code class="bg-red-100 px-1 rounded">data/</code> 目录权限设置为 755 或 777。</p>
+                    <div class="alert alert-red">
+                        <p style="margin:0 0 4px;">环境检测未通过，请根据上方提示调整主机环境后刷新本页。</p>
+                        <p class="text-sm" style="margin:0;">常见解决方式：将 <code>data/</code> 目录权限设置为 755 或 777。</p>
                     </div>
-                    <button disabled class="w-full bg-gray-300 text-white py-3 rounded-lg cursor-not-allowed">下一步</button>
+                    <button disabled class="btn">下一步</button>
                 <?php else: ?>
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 mb-6">
-                        <p>环境检测通过，可以继续安装。</p>
+                    <div class="alert alert-green">
+                        <p style="margin:0;">环境检测通过，可以继续安装。</p>
                     </div>
-                    <a href="/install?step=2" class="block w-full text-center bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition">下一步：初始化配置</a>
+                    <a href="/install?step=2" class="btn">下一步：初始化配置</a>
                 <?php endif; ?>
 
             <?php elseif ($step === 2): ?>
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">步骤 2：初始化配置</h2>
+                <h2>步骤 2：初始化配置</h2>
                 <?php if ($error): ?>
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 mb-4"><?php echo htmlspecialchars($error); ?></div>
+                    <div class="alert alert-red"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
-                <form method="POST" action="/install?step=2" class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">管理员账号</label>
-                        <input type="text" name="admin_user" value="admin" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                <form method="POST" action="/install?step=2">
+                    <div class="form-group">
+                        <label>管理员账号</label>
+                        <input type="text" name="admin_user" value="admin" required class="form-control">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">管理员密码</label>
-                        <input type="password" name="admin_pass" required minlength="6"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                    <div class="form-group">
+                        <label>管理员密码</label>
+                        <input type="password" name="admin_pass" required minlength="6" class="form-control">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">确认密码</label>
-                        <input type="password" name="admin_pass2" required minlength="6"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" name="admin_pass2" required minlength="6" class="form-control">
                     </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" id="import_demo" name="import_demo" checked
-                               class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                        <label for="import_demo" class="ml-2 text-sm text-gray-700">导入演示数据（推荐首次安装勾选）</label>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="import_demo" name="import_demo" checked>
+                        <label for="import_demo">导入演示数据（推荐首次安装勾选）</label>
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition">开始安装</button>
+                    <button type="submit" class="btn">开始安装</button>
                 </form>
 
             <?php elseif ($step === 3): ?>
-                <div class="text-center py-8">
-                    <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                <div class="text-center" style="padding:24px 0;">
+                    <div class="success-icon">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
                         </svg>
                     </div>
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2">安装完成</h2>
-                    <p class="text-gray-600 mb-6">系统已成功安装，数据文件已生成。</p>
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-800 text-left mb-6">
-                        <p class="font-medium mb-1">安全提示</p>
-                        <p class="text-sm">安装完成后建议删除或重命名 <code class="bg-yellow-100 px-1 rounded">app/controller/Install.php</code> 与 <code class="bg-yellow-100 px-1 rounded">install/</code> 目录，防止被重复执行。</p>
+                    <h2>安装完成</h2>
+                    <p style="color:#6b7280;margin:0 0 24px;">系统已成功安装，数据文件已生成。</p>
+                    <div class="alert alert-yellow text-left">
+                        <p style="font-weight:600;margin:0 0 4px;">安全提示</p>
+                        <p class="text-sm" style="margin:0;">安装完成后建议删除或重命名 <code>app/controller/Install.php</code> 与 <code>install/</code> 目录，防止被重复执行。</p>
                     </div>
-                    <a href="/" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">进入平台</a>
+                    <a href="/" class="btn" style="width:auto;display:inline-block;padding:10px 24px;">进入平台</a>
                 </div>
             <?php endif; ?>
         </div>

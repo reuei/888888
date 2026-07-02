@@ -24,7 +24,7 @@ class Api
 
         $method = $request->method();
         $id = $request->param('id');
-        $body = $request->isJson() ? $request->put() : $request->post();
+        $body = $this->getInputData($request);
 
         if (!$resource) {
             return json(['error' => 'Missing resource parameter'], 400);
@@ -56,12 +56,33 @@ class Api
         }
     }
 
+    protected function getInputData(Request $request): array
+    {
+        $contentType = $request->header('Content-Type', '');
+        $input = $request->getInput();
+
+        if (stripos($contentType, 'application/json') !== false) {
+            $decoded = json_decode($input, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return $request->post() ?: [];
+    }
+
     protected function create(string $resource, array $body, array $data): Response
     {
         $prefixes = $this->dataService->resourcePrefixes();
         $prefix = $prefixes[$resource] ?? 'ID';
         $items = $data[$resource] ?? [];
-        $newId = $prefix . str_pad((string) (count($items) + 1), 3, '0', STR_PAD_LEFT);
+
+        $max = 0;
+        foreach ($items as $item) {
+            if (isset($item['id'])) {
+                $num = (int) preg_replace('/^' . preg_quote($prefix, '/') . '/', '', (string) $item['id']);
+                $max = max($max, $num);
+            }
+        }
+        $newId = $prefix . str_pad((string) ($max + 1), 3, '0', STR_PAD_LEFT);
         $newItem = array_merge($body, ['id' => $newId]);
         array_unshift($items, $newItem);
         $data[$resource] = $items;

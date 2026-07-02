@@ -1,12 +1,12 @@
-# CDN 防护加速平台后台（ThinkPHP 版）
+# CDN 防护加速平台后台（ThinkPHP + MySQL 版）
 
-基于 React 19 + TypeScript + Vite 8 + Tailwind CSS v4 的企业级 CDN 防护加速平台后台界面，后端采用 **ThinkPHP 8.1**，可直接部署到支持 PHP 的 Apache/Nginx 虚拟主机。
+基于 React 19 + TypeScript + Vite 8 + Tailwind CSS v4 的企业级 CDN 防护加速平台后台界面，后端采用 **ThinkPHP 8.1**，数据持久化使用 **MySQL 5.7+**，可直接部署到支持 PHP 的 Apache/Nginx 虚拟主机。
 
 ## 技术栈
 
 - 前端：React 19 + React Router v7 + TypeScript 6 + Vite 8 + Tailwind CSS v4
 - 后端：ThinkPHP 8.1 + PHP ≥ 8.0
-- 数据：JSON 文件持久化（`data/data.json`）
+- 数据：MySQL 5.7+ / MariaDB 10.2+，表前缀 `cdn_`
 - 部署：Apache/Nginx 虚拟主机，无需 Node.js 运行环境
 
 ## 环境要求
@@ -14,10 +14,13 @@
 | 项目 | 要求 | 说明 |
 |------|------|------|
 | PHP 版本 | ≥ 8.0 | 推荐 8.1 或 8.2 |
+| PHP 扩展 | pdo_mysql | 必须启用 |
 | PHP 扩展 | json | 必须启用 |
+| PHP 扩展 | openssl | 推荐启用，用于安全密码哈希 |
+| 数据库 | MySQL 5.7+ / MariaDB 10.2+ | 需要支持 JSON 类型 |
+| 数据库账号 | 具备 CREATE DATABASE、CREATE TABLE 权限 | 安装向导会自动建库建表 |
 | Web 服务器 | Apache / Nginx | Apache 已自带 `.htaccess` 配置 |
-| 目录权限 | data/、runtime/ 可写 | 安装时会自动创建 |
-| 数据库 | 不需要 | 使用 JSON 文件存储 |
+| 目录权限 | `config/`、`data/`、`runtime/` 可写 | 安装时会自动创建 |
 | Node.js | 不需要 | 构建产物已包含在 `public/` 中 |
 | Composer | 不需要 | 依赖 `vendor/` 已包含 |
 
@@ -30,7 +33,7 @@ npm install
 npm run dev
 ```
 
-开发模式下使用浏览器 localStorage 持久化 mock 数据，刷新页面后数据不丢失。
+开发模式下前端使用浏览器 localStorage 持久化 mock 数据，刷新页面后数据不丢失。
 
 修改源码后重新构建：
 
@@ -42,27 +45,27 @@ npm run build
 
 ## 部署方式（无需构建，直接上传安装）
 
-本项目已包含完整的 ThinkPHP 框架、依赖和前端构建产物，**无需执行 npm install / npm run build / composer install**。
+本项目已包含完整的 ThinkPHP 框架、依赖、前端构建产物和 MySQL 建表脚本，**无需执行 npm install / npm run build / composer install**。
 
 ### 方式一：推荐（文档根目录指向 public/）
 
 1. 将整个项目通过 FTP/文件管理器上传到虚拟主机，例如 `public_html/cdn-admin/`
 2. 在主机控制面板中将域名**文档根目录（Document Root）**指向项目内的 `public/` 目录
-3. 确保 `data/` 和 `runtime/` 目录可写（如不存在则手动创建并设为 755 或 777）
+3. 确保 `config/`、`data/` 和 `runtime/` 目录可写（如不存在则手动创建并设为 755 或 777）
 4. 浏览器访问 `https://你的域名/install`
-5. 按向导完成环境检测 → 设置管理员账号密码 → 安装完成
+5. 按向导完成环境检测 → 填写 MySQL 数据库与管理账号 → 安装完成
 
 ### 方式二：无法修改文档根目录（根目录即 web 根目录）
 
 1. 将整个项目上传到站点根目录
 2. 确保根目录的 `.htaccess` 和 `index.php` 存在（已包含）
-3. 确保 `data/` 和 `runtime/` 目录可写
+3. 确保 `config/`、`data/` 和 `runtime/` 目录可写
 4. 浏览器访问 `https://你的域名/install`
 5. 完成安装向导
 
 根目录的 `.htaccess` 会自动将请求转发到 `public/index.php`，并把 `/assets/`、`favicon.svg` 等静态资源重写到 `public/` 下，同时禁止直接访问敏感目录。
 
-### 安装向导详细步骤
+## 安装向导详细步骤
 
 访问：
 
@@ -70,32 +73,40 @@ npm run build
 https://你的域名/install
 ```
 
-#### 步骤 1：环境检测
+### 步骤 1：环境检测
 
 系统自动检查：
 
 - PHP 版本是否 ≥ 8.0
+- PDO_MySQL 扩展是否启用
 - JSON 扩展是否启用
-- `data/` 目录是否可写
+- `config/`、`data/`、`runtime/` 目录是否可写
 
-若提示 `data/ 不可写`，请在 FTP/文件管理器中将 `data/` 目录权限设置为 `755` 或 `777`。
+若提示某目录不可写，请在 FTP/文件管理器中将该目录权限设置为 `755` 或 `777`。
 
-#### 步骤 2：初始化配置
+### 步骤 2：数据库与管理员配置
 
 填写：
 
-- **管理员账号**：用于登录 S 端总站长后台，默认 `admin`
-- **管理员密码**：长度至少 6 位
-- **确认密码**：与管理员密码一致
+- **数据库主机**：MySQL 服务器地址，通常为 `127.0.0.1` 或 `localhost`
+- **端口**：MySQL 端口，默认 `3306`
+- **数据库名**：目标数据库名，如 `cdn_admin`，不存在会自动创建
+- **数据库账号**：具备建库建表权限的 MySQL 账号
+- **数据库密码**：对应密码
+- **表前缀**：建议使用 `cdn_`，安装后会自动创建 `cdn_articles`、`cdn_orders` 等 35 张数据表
+- **管理员账号/密码**：用于登录 S 端总站长后台，密码至少 6 位
 - **导入演示数据**：首次安装建议勾选，系统会预置商品、订单、商户、站点等演示数据
 
-点击「开始安装」后，系统会生成：
+点击「开始安装」后，系统会：
 
-- `data/config.php` — 站点配置文件（包含管理员账号密码）
-- `data/install.lock` — 安装锁文件
-- `data/data.json` — 运行时数据文件
+1. 测试数据库连接并自动创建数据库
+2. 生成 `config/database.php` 数据库配置文件
+3. 自动创建 35 张数据表（表前缀 `cdn_`）
+4. 生成 `data/config.php` 站点配置文件（包含管理员账号密码）
+5. 可选导入 `install/data-demo.php` 演示数据
+6. 创建 `data/install.lock` 安装锁文件
 
-#### 步骤 3：安装完成
+### 步骤 3：安装完成
 
 安装完成后点击「进入平台」即可开始使用。
 
@@ -113,7 +124,7 @@ https://你的域名/install
 | 角色 | 账号 | 密码 | 说明 |
 |------|------|------|------|
 | S 端总站长 | 安装时设置 | 安装时设置 | 示例：admin / 123456 |
-| B 端商户 | merchant | 123456 | 演示商户账号 |
+| B 端商户 | merchant | 123456 | 演示商户账号；也可在 `cdn_merchants` 表中配置正式账号 |
 
 ## 安全设置
 
@@ -127,10 +138,18 @@ install/
 如需重新安装，删除以下文件后刷新安装页面：
 
 ```text
-data/config.php
 data/install.lock
-data/data.json
+data/config.php
+config/database.php
 ```
+
+## 数据库说明
+
+- 所有业务数据统一以 `id + data(json) + created_at + updated_at` 形式存储
+- 默认表前缀 `cdn_`，共 35 张数据表
+- 每张表均为 `created_at` 和 `updated_at` 添加了索引，优化按时间排序与分页
+- 数据库结构定义见 `install/database.sql`
+- 演示数据见 `install/data-demo.php`
 
 ## 服务器配置参考
 
@@ -215,16 +234,18 @@ cdn-admin/
 ├── app/
 │   ├── controller/          # ThinkPHP 控制器
 │   │   ├── Index.php        # SPA 入口
-│   │   ├── Api.php          # REST API
-│   │   ├── Auth.php         # 登录
+│   │   ├── Api.php          # REST API（支持分页、搜索）
+│   │   ├── Auth.php         # 登录认证（S 端管理员 + B 端商户）
 │   │   ├── Health.php       # 健康检查
 │   │   └── Install.php      # 安装向导
 │   └── service/
-│       └── DataService.php  # JSON 数据读写服务
+│       └── DataService.php  # MySQL 数据读写服务
 ├── config/                  # ThinkPHP 配置
-├── data/                    # 运行时 JSON 数据（安装后生成）
+│   └── database.php         # 数据库配置（安装时会被覆盖）
+├── data/                    # 站点配置与安装锁（安装后生成）
 ├── frontend-public/         # 前端公共资源（favicon、icons）
 ├── install/
+│   ├── database.sql         # MySQL 建表脚本（表前缀 cdn_）
 │   └── data-demo.php        # 演示数据集
 ├── public/                  # ThinkPHP 入口 + 构建后前端资源
 │   ├── index.php            # ThinkPHP 入口
@@ -249,14 +270,15 @@ cdn-admin/
 |------|-----------|------|
 | `GET /api/health` | `health/index` | 健康检查，前端据此判断是否 PHP 运行 |
 | `POST /api/login` | `auth/login` | 登录验证 |
-| `GET/POST/PUT/DELETE /api/:resource` | `api/index` | RESTful CRUD |
+| `GET /api/me` | `auth/profile` | 当前登录/安装信息 |
+| `GET/POST/PUT/DELETE /api/:resource` | `api/index` | RESTful CRUD，支持 `?id=`、`?search=`、`?page=`、`?limit=` |
 | `GET/POST /install` | `install/index` | 安装向导 |
 | `GET /` | `index/index` | 返回 React SPA |
 | `GET /:path` | `index/spa` | 兜底返回 React SPA |
 
 ## 数据持久化
 
-部署到 PHP 主机后，所有 CRUD 请求由 ThinkPHP 控制器处理，数据保存到 `data/data.json`。未部署 PHP 时（本地 `npm run dev`），前端自动回退到浏览器 localStorage。
+部署到 PHP 主机后，所有 CRUD 请求由 ThinkPHP 控制器处理，数据保存到 MySQL。未部署 PHP 时（本地 `npm run dev`），前端自动回退到浏览器 localStorage。
 
 ## 常见问题
 
@@ -266,24 +288,35 @@ cdn-admin/
 - Nginx：参考上方 Nginx 配置
 - 无法修改文档根目录时：确认根目录 `.htaccess` 已上传
 
-### 2. 安装时提示 `data/ 不可写`
+### 2. 安装时提示 `config/ 不可写` 或 `data/ 不可写`
 
-将 `data/` 和 `runtime/` 目录权限设置为 `755` 或 `777`：
+将 `config/`、`data/` 和 `runtime/` 目录权限设置为 `755` 或 `777`：
 
 ```bash
-chmod -R 755 data runtime
+chmod -R 755 config data runtime
 # 或
-chmod -R 777 data runtime
+chmod -R 777 config data runtime
 ```
 
-### 3. 登录时提示账号或密码错误
+### 3. 安装时提示数据库连接失败
+
+- 确认数据库主机、端口、账号、密码正确
+- 确认数据库账号具备 `CREATE DATABASE` 权限
+- 确认 MySQL 版本 ≥ 5.7 或 MariaDB ≥ 10.2
+- 部分虚拟主机的 MySQL 主机不是 `127.0.0.1`，请查看主机商提供的数据库地址
+
+### 4. 登录时提示账号或密码错误
 
 - S 端：使用安装向导中设置的管理员账号密码
-- B 端：使用 `merchant / 123456`
+- B 端：使用 `merchant / 123456`，或在 `cdn_merchants` 表中为商户配置 `account` 与 `password_hash`/`password`
 
-### 4. 忘记管理员密码
+### 5. 忘记管理员密码
 
-删除 `data/config.php`，重新访问 `/install` 进行安装（注意：`data/data.json` 中的业务数据会保留，除非删除）。
+删除 `data/config.php`，重新访问 `/install` 进行安装。数据库中的业务数据不会丢失。
+
+### 6. 如何修改数据库配置
+
+编辑 `config/database.php` 中的 `connections.mysql` 配置项，修改后刷新页面即可生效。
 
 ## 许可证
 

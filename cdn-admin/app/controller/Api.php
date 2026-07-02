@@ -7,6 +7,12 @@ use app\service\DataService;
 use think\Request;
 use think\Response;
 
+/**
+ * RESTful API 控制器
+ *
+ * 统一入口：/api/:resource
+ * 支持 GET/POST/PUT/DELETE，并可按 id、search、page、limit 查询。
+ */
 class Api
 {
     protected DataService $dataService;
@@ -19,43 +25,94 @@ class Api
     public function index(Request $request, string $resource = ''): Response
     {
         if (!$this->dataService->isInstalled()) {
-            return json(['error' => 'System not installed. Please run install first.'], 403);
+            return $this->error('System not installed. Please run install first.', 403);
+        }
+
+        if (!$resource || !$this->dataService->validateResource($resource)) {
+            return $this->error('Invalid or unsupported resource', 400);
         }
 
         $method = $request->method();
-        $id = $request->param('id');
+        $id = trim((string) $request->param('id', ''));
         $body = $this->getInputData($request);
 
-        if (!$resource) {
-            return json(['error' => 'Missing resource parameter'], 400);
-        }
+        try {
+            switch ($method) {
+                case 'GET':
+                    return $this->handleGet($request, $resource, $id);
 
-        $data = $this->dataService->loadData();
+                case 'POST':
+                    $newItem = $this->dataService->create($resource, $body);
+                    return json($newItem, 201);
 
-        switch ($method) {
-            case 'GET':
-                return json($data[$resource] ?? []);
+                case 'PUT':
+                    if ($id === '') {
+                        return $this->error('Missing id parameter', 400);
+                    }
+                    $updated = $this->dataService->update($resource, $id, $body);
+                    if ($updated === null) {
+                        return $this->error('Resource not found', 404);
+                    }
+                    return json($updated);
 
-            case 'POST':
-                return $this->create($resource, $body, $data);
+                case 'DELETE':
+                    if ($id === '') {
+                        return $this->error('Missing id parameter', 400);
+                    }
+                    $success = $this->dataService->delete($resource, $id);
+                    return json(['success' => $success]);
 
-            case 'PUT':
-                if (!$id) {
-                    return json(['error' => 'Missing id parameter'], 400);
-                }
-                return $this->update($resource, $id, $body, $data);
-
-            case 'DELETE':
-                if (!$id) {
-                    return json(['error' => 'Missing id parameter'], 400);
-                }
-                return $this->delete($resource, $id, $data);
-
-            default:
-                return json(['error' => 'Method not allowed'], 405);
+                default:
+                    return $this->error('Method not allowed', 405);
+            }
+        } catch (\InvalidArgumentException $e) {
+            return $this->error($e->getMessage(), 400);
+        } catch (\Throwable $e) {
+            return $this->error($e->getMessage(), 500);
         }
     }
 
+    /**
+     * 处理 GET 请求：支持按 id 查询、搜索、分页、全部列表
+     */
+    protected function handleGet(Request $request, string $resource, string $id): Response
+    {
+        if ($id !== '') {
+            $item = $this->dataService->find($resource, $id);
+            if ($item === null) {
+                return $this->error('Resource not found', 404);
+            }
+            return json($item);
+        }
+
+        $search = trim((string) $request->param('search', ''));
+        $hasPaginateFlag = $request->param('paginate') !== null;
+        $hasPageParam = $request->param('page') !== null;
+
+        if ($hasPaginateFlag || $hasPageParam) {
+            $page = (int) $request->param('page', 1);
+            $limit = (int) $request->param('limit', 0);
+            return json($this->dataService->paginate($resource, $page, $limit, $search));
+        }
+
+        if ($search !== '') {
+            return json($this->dataService->search($resource, $search));
+        }
+
+        return json($this->dataService->list($resource));
+    }
+
+    /**
+     * 统一错误响应
+     */
+    protected function error(string $message, int $code): Response
+    {
+        return json(['error' => $message], $code);
+    }
+
+    /**
+     * 解析请求体
+     */
     protected function getInputData(Request $request): array
     {
         $contentType = $request->header('Content-Type', '');
@@ -67,58 +124,5 @@ class Api
         }
 
         return $request->post() ?: [];
-    }
-
-    protected function create(string $resource, array $body, array $data): Response
-    {
-        $prefixes = $this->dataService->resourcePrefixes();
-        $prefix = $prefixes[$resource] ?? 'ID';
-        $items = $data[$resource] ?? [];
-
-        $max = 0;
-        foreach ($items as $item) {
-            if (isset($item['id'])) {
-                $num = (int) preg_replace('/^' . preg_quote($prefix, '/') . '/', '', (string) $item['id']);
-                $max = max($max, $num);
-            }
-        }
-        $newId = $prefix . str_pad((string) ($max + 1), 3, '0', STR_PAD_LEFT);
-        $newItem = array_merge($body, ['id' => $newId]);
-        array_unshift($items, $newItem);
-        $data[$resource] = $items;
-        $this->dataService->saveData($data);
-        return json($newItem);
-    }
-
-    protected function update(string $resource, string $id, array $body, array $data): Response
-    {
-        $items = $data[$resource] ?? [];
-        $updated = null;
-        foreach ($items as &$item) {
-            if (isset($item['id']) && $item['id'] === $id) {
-                $item = array_merge($item, $body);
-                $updated = $item;
-                break;
-            }
-        }
-        unset($item);
-
-        if ($updated === null) {
-            return json(['error' => 'Resource not found'], 404);
-        }
-
-        $data[$resource] = $items;
-        $this->dataService->saveData($data);
-        return json($updated);
-    }
-
-    protected function delete(string $resource, string $id, array $data): Response
-    {
-        $items = $data[$resource] ?? [];
-        $before = count($items);
-        $items = array_values(array_filter($items, fn ($item) => !isset($item['id']) || $item['id'] !== $id));
-        $data[$resource] = $items;
-        $this->dataService->saveData($data);
-        return json(['success' => count($items) < $before]);
     }
 }

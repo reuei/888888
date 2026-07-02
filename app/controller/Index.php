@@ -165,7 +165,7 @@ class Index extends Controller
                 "SELECT COUNT(*) AS total_orders, IFNULL(SUM(pay_amount), 0) AS total_amount FROM jz_order WHERE {$statsWhere}",
                 $statsParams
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $platformStats = ['total_orders' => 0, 'total_amount' => 0];
         }
 
@@ -328,7 +328,7 @@ class Index extends Controller
         );
 
         if (!$goods) {
-            throw new Exception('商品不存在或已下架');
+            throw new \Exception('商品不存在或已下架');
         }
 
         // 同类推荐
@@ -792,7 +792,7 @@ class Index extends Controller
         );
 
         if (!$order) {
-            throw new Exception('订单不存在');
+            throw new \Exception('订单不存在');
         }
         if ($order['status'] != 0) {
             redirect(url('index/order', ['no' => $orderNo]));
@@ -904,7 +904,7 @@ class Index extends Controller
         $id = (int) input('id', 0);
         $article = Db::fetch("SELECT * FROM jz_article WHERE id = ? AND status = 1", [$id]);
         if (!$article) {
-            throw new Exception('公告不存在');
+            throw new \Exception('公告不存在');
         }
 
         $this->assign('title', h($article['title']));

@@ -28,7 +28,7 @@ class Update extends Controller
         $error = '';
         try {
             $remoteInfo = update_check_remote($license);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $error = $e->getMessage();
         }
 
@@ -83,7 +83,7 @@ class Update extends Controller
             }
             admin_log('更新授权配置', ['api_url' => $apiUrl, 'auth_domain' => $config['auth_domain']]);
             json_success('保存并验证成功', $result);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             json_error('配置已保存，但授权站验证失败：' . $e->getMessage());
         }
     }
@@ -96,7 +96,7 @@ class Update extends Controller
         try {
             $info = update_check_remote($this->getLicenseConfig());
             json_success('检查成功', $info);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             json_error($e->getMessage());
         }
     }
@@ -119,7 +119,7 @@ class Update extends Controller
             $result = update_apply_upgrade($version, $this->getLicenseConfig());
             admin_log('系统在线更新', ['version' => $version, 'result' => $result]);
             json_success('更新成功', $result);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             json_error('更新失败：' . $e->getMessage());
         }
     }

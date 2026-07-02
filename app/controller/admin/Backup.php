@@ -82,12 +82,12 @@ class Backup extends Controller
     {
         $id = (int) input('id', 0);
         if ($id <= 0) {
-            throw new Exception('参数错误');
+            throw new \Exception('参数错误');
         }
 
         $record = Db::fetch("SELECT * FROM jz_backup WHERE id = ? AND status = 0", [$id]);
         if (!$record) {
-            throw new Exception('备份记录不存在或已失效');
+            throw new \Exception('备份记录不存在或已失效');
         }
 
         $backupPath = backup_storage_path();
@@ -95,12 +95,12 @@ class Backup extends Controller
         $filepath = $backupPath . $filename;
 
         if (!is_file($filepath)) {
-            throw new Exception('备份文件不存在');
+            throw new \Exception('备份文件不存在');
         }
 
         $md5 = md5_file($filepath);
         if ($md5 !== $record['file_md5']) {
-            throw new Exception('备份文件校验失败');
+            throw new \Exception('备份文件校验失败');
         }
 
         admin_log('backup_download', ['id' => $id, 'filename' => $filename]);

@@ -152,7 +152,7 @@ class Subsite extends Controller
             $pdo->commit();
             admin_log('subsite_create', ['id' => $subsiteId, 'name' => $name, 'domain_prefix' => $domainPrefix, 'admin' => $adminUser]);
             json_success('分站创建成功', ['redirect' => url('admin/subsite')]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $pdo->rollBack();
             json_error('创建失败：' . $e->getMessage());
         }

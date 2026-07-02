@@ -19,7 +19,7 @@ class Admin extends Controller
         }
         // 仅超级管理员可操作
         if (($admin['role'] ?? '') !== 'super') {
-            throw new Exception('无权访问管理员管理');
+            throw new \Exception('无权访问管理员管理');
         }
     }
 

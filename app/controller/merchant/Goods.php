@@ -88,7 +88,7 @@ class Goods extends Controller
         if ($id) {
             $goods = Db::fetch("SELECT * FROM jz_goods WHERE id = ? AND merchant_id = ?", [$id, $merchant['id']]);
             if (!$goods) {
-                throw new Exception('商品不存在');
+                throw new \Exception('商品不存在');
             }
         }
 

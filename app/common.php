@@ -260,5 +260,22 @@ class Model
     }
 }
 
+// 为各控制器命名空间创建全局兼容类的别名，避免未加反斜杠的 Db/Config 等调用报错
+$__compatNamespaces = [
+    'app\\controller',
+    'app\\controller\\admin',
+    'app\\controller\\merchant',
+    'app\\controller\\subsite',
+];
+foreach ($__compatNamespaces as $ns) {
+    foreach (['Db', 'Config', 'Model', 'Query'] as $className) {
+        $alias = $ns . '\\' . $className;
+        if (!class_exists($alias, false)) {
+            class_alias($className, $alias, false);
+        }
+    }
+}
+unset($__compatNamespaces);
+
 // 载入原主站函数库；其中 url/input/session/redirect/json 等函数将覆盖 ThinkPHP 默认助手
 require_once APP_PATH . 'main_legacy' . DIRECTORY_SEPARATOR . 'functions.php';

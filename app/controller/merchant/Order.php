@@ -85,7 +85,7 @@ class Order extends Controller
         );
 
         if (!$order) {
-            throw new Exception('订单不存在');
+            throw new \Exception('订单不存在');
         }
 
         $cards = [];

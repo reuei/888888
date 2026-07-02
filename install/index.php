@@ -195,196 +195,476 @@ $allPass = !in_array(false, $envItems, true);
     <title>鲸商城 Pro 安装向导</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #F8FAFC;
-            color: #1F2937;
-            line-height: 1.5;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #1f2937;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .bg-shapes {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.35;
+            animation: float 20s infinite ease-in-out;
+        }
+        .shape:nth-child(1) { width: 300px; height: 300px; background: #6366f1; top: -100px; left: -100px; animation-delay: 0s; }
+        .shape:nth-child(2) { width: 400px; height: 400px; background: #ec4899; bottom: -150px; right: -100px; animation-delay: -5s; }
+        .shape:nth-child(3) { width: 250px; height: 250px; background: #06b6d4; top: 40%; left: 60%; animation-delay: -10s; }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
         }
         .container {
-            max-width: 720px;
-            margin: 40px auto;
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 760px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
             overflow: hidden;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .header {
-            background: #2563EB;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: #fff;
-            padding: 24px;
+            padding: 40px 32px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .header h1 { font-size: 20px; font-weight: 600; }
-        .body { padding: 24px; }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at top right, rgba(255,255,255,0.2) 0%, transparent 40%);
+        }
+        .header h1 { font-size: 28px; font-weight: 700; position: relative; letter-spacing: -0.5px; }
+        .header p { margin-top: 10px; opacity: 0.9; font-size: 15px; position: relative; }
+        .body { padding: 32px; }
         .step-list {
             display: flex;
-            margin-bottom: 24px;
-            border-bottom: 1px solid #E2E8F0;
+            margin-bottom: 32px;
+            position: relative;
+        }
+        .step-list::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 16%;
+            right: 16%;
+            height: 3px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            z-index: 0;
         }
         .step-list .step {
             flex: 1;
             text-align: center;
-            padding: 12px;
-            font-size: 14px;
-            color: #64748B;
-            border-bottom: 2px solid transparent;
+            padding: 0 8px;
+            font-size: 13px;
+            color: #94a3b8;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+        .step-list .step::before {
+            content: attr(data-step);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            margin: 0 auto 10px;
+            background: #fff;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .step-list .step.active {
-            color: #2563EB;
-            border-bottom-color: #2563EB;
+            color: var(--primary);
             font-weight: 600;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .step-list .step.active::before {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 0 0 6px rgba(79, 70, 229, 0.15);
+        }
+        .step-list .step.done {
+            color: var(--success);
+        }
+        .step-list .step.done::before {
+            background: var(--success);
+            border-color: var(--success);
+            color: #fff;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
             margin-bottom: 20px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 22px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        .env-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 24px;
             font-size: 14px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.6s ease 0.2s both;
         }
-        th, td {
-            padding: 12px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .env-table th, .env-table td {
+            padding: 14px 18px;
             text-align: left;
-            border-bottom: 1px solid #E2E8F0;
         }
-        th { background: #F8FAFC; font-weight: 600; }
-        .status-ok { color: #10B981; }
-        .status-fail { color: #EF4444; }
-        .form-group {
-            margin-bottom: 16px;
+        .env-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
         }
+        .env-table tr:not(:last-child) td { border-bottom: 1px solid #f1f5f9; }
+        .env-table tr:nth-child(even) td { background: #fafafa; }
+        .env-table td { transition: background 0.2s; }
+        .env-table tr:hover td { background: #f1f5f9; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-ok { background: #d1fae5; color: #065f46; }
+        .status-fail { background: #fee2e2; color: #991b1b; }
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .form-group { margin-bottom: 20px; animation: fadeIn 0.5s ease both; }
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-size: 14px;
             font-weight: 500;
+            color: #334155;
         }
         input[type="text"], input[type="password"], input[type="number"] {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #CBD5E1;
-            border-radius: 6px;
+            padding: 13px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
             font-size: 14px;
+            background: #fff;
+            transition: all 0.25s ease;
         }
         input:focus {
             outline: none;
-            border-color: #2563EB;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            transform: translateY(-1px);
+        }
+        .hint {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #2563EB;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: #fff;
             border: none;
-            border-radius: 6px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+            position: relative;
+            overflow: hidden;
         }
-        .btn:disabled { background: #94A3B8; cursor: not-allowed; }
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.5s ease;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79, 70, 229, 0.45); }
+        .btn:hover::after { left: 100%; }
+        .btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
         .btn-block { width: 100%; }
         .alert {
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 16px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 24px;
             font-size: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: shakeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .alert-error { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
-        .alert-success { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
-        .hint { color: #64748B; font-size: 12px; margin-top: 4px; }
+        @keyframes shakeIn {
+            0% { opacity: 0; transform: translateX(-20px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        .alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+        .alert-icon { font-size: 18px; flex-shrink: 0; }
+        .done-box {
+            text-align: center;
+            padding: 40px 20px;
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes scaleIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .done-box .icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 36px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+            animation: checkPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+        }
+        @keyframes checkPop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        .done-box h3 { font-size: 22px; color: #1e293b; margin-bottom: 12px; }
+        .done-box p { color: #64748b; }
+        .panel {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+        @media (max-width: 640px) {
+            .body { padding: 24px; }
+            .header { padding: 28px 20px; }
+            .header h1 { font-size: 22px; }
+            .step-list::before { left: 12%; right: 12%; }
+        }
     </style>
 </head>
 <body>
+<div class="bg-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
 <div class="container">
     <div class="header">
         <h1>鲸商城 Pro 安装向导</h1>
-        <p style="margin-top: 8px; opacity: 0.9;">版本 1.0.0 | 总站 + 商户双端后台</p>
+        <p>版本 1.0.0 | 总站 + 商户双端后台</p>
     </div>
     <div class="body">
         <div class="step-list">
-            <div class="step <?php echo $step == 1 ? 'active' : ''; ?>">1. 环境检测</div>
-            <div class="step <?php echo $step == 2 ? 'active' : ''; ?>">2. 数据库配置</div>
-            <div class="step <?php echo $step == 'done' ? 'active' : ''; ?>">3. 完成安装</div>
+            <div class="step <?php echo $step == 1 ? 'active' : ($step == 2 || $step == 'done' ? 'done' : ''); ?>" data-step="1">环境检测</div>
+            <div class="step <?php echo $step == 2 ? 'active' : ($step == 'done' ? 'done' : ''); ?>" data-step="2">数据库配置</div>
+            <div class="step <?php echo $step == 'done' ? 'active done' : ''; ?>" data-step="3">完成安装</div>
         </div>
 
         <?php if ($error): ?>
-            <div class="alert alert-error"><?php echo $error; ?></div>
+            <div class="alert alert-error"><span class="alert-icon">&#9888;</span><div><?php echo $error; ?></div></div>
         <?php endif; ?>
         <?php if ($success): ?>
-            <div class="alert alert-success"><?php echo $success; ?></div>
+            <div class="alert alert-success"><span class="alert-icon">&#10003;</span><div><?php echo $success; ?></div></div>
         <?php endif; ?>
 
         <?php if ($step == 1): ?>
-            <h3 style="margin-bottom: 16px; font-size: 16px;">运行环境检测</h3>
-            <table>
+            <div class="section-title">运行环境检测</div>
+            <table class="env-table">
                 <tr><th>检测项</th><th>状态</th></tr>
                 <?php foreach ($envItems as $name => $ok): ?>
                 <tr>
                     <td><?php echo $name; ?></td>
-                    <td class="<?php echo $ok ? 'status-ok' : 'status-fail'; ?>">
-                        <?php echo $ok ? '通过' : '未通过'; ?>
+                    <td>
+                        <span class="status-badge <?php echo $ok ? 'status-ok' : 'status-fail'; ?>">
+                            <?php echo $ok ? '通过' : '未通过'; ?>
+                        </span>
                     </td>
                 </tr>
                 <?php endforeach; ?>
             </table>
             <a href="?step=2" class="btn btn-block" <?php echo $allPass ? '' : 'disabled'; ?>>下一步：配置数据库</a>
             <?php if (!$allPass): ?>
-                <p class="hint" style="color: #EF4444; text-align: center; margin-top: 8px;">请修复未通过的检测项后刷新页面</p>
+                <p class="hint" style="color: var(--danger); text-align: center; margin-top: 12px;">请修复未通过的检测项后刷新页面</p>
             <?php endif; ?>
-            <div class="alert" style="background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; margin-top: 16px;">
-                <strong>easypanel 虚拟主机部署提示：</strong>请将站点运行目录（web 根目录）设置为 <code>public</code>；PHP 版本选择 <code>8.0 及以上</code>；上传 zip 包后解压，访问 <code>/install</code> 完成安装。若文件较大（&gt;15MB），建议使用 FTP 上传或 easypanel 在线解压功能。
+            <div class="alert alert-info" style="margin-top: 20px;">
+                <span class="alert-icon">&#9432;</span>
+                <div>
+                    <strong>easypanel 虚拟主机部署提示：</strong>请将站点运行目录（web 根目录）设置为 <code>public</code>；PHP 版本选择 <code>8.0 及以上</code>；上传 zip 包后解压，访问 <code>/install</code> 完成安装。
+                </div>
             </div>
         <?php elseif ($step == 2): ?>
-            <form method="POST" action="?step=2">
+            <form method="POST" action="?step=2" id="installForm">
                 <?php if ($authCodeRequired): ?>
-                <h3 style="margin-bottom: 16px; font-size: 16px;">授权码验证</h3>
-                <div class="form-group">
-                    <label>安装授权码</label>
-                    <input type="text" name="auth_code" placeholder="请输入安装授权码" required autocomplete="off">
-                    <p class="hint">授权码由系统提供，请输入正确的授权码后继续安装。错误次数过多将暂时锁定。</p>
+                <div class="panel">
+                    <div class="section-title">授权码验证</div>
+                    <div class="form-group">
+                        <label>安装授权码</label>
+                        <input type="text" name="auth_code" placeholder="请输入安装授权码" required autocomplete="off">
+                        <p class="hint">授权码由系统提供，请输入正确的授权码后继续安装。错误次数过多将暂时锁定。</p>
+                    </div>
                 </div>
                 <?php endif; ?>
 
-                <h3 style="margin-bottom: 16px; font-size: 16px;">数据库配置</h3>
-                <div class="form-group">
-                    <label>数据库主机</label>
-                    <input type="text" name="db_host" value="127.0.0.1" required>
-                </div>
-                <div class="form-group">
-                    <label>数据库端口</label>
-                    <input type="number" name="db_port" value="3306" required>
-                </div>
-                <div class="form-group">
-                    <label>数据库名</label>
-                    <input type="text" name="db_name" placeholder="如：jing_mall" required>
-                    <p class="hint">若数据库不存在，安装程序会自动创建</p>
-                </div>
-                <div class="form-group">
-                    <label>数据库用户名</label>
-                    <input type="text" name="db_user" placeholder="如：root" required>
-                </div>
-                <div class="form-group">
-                    <label>数据库密码</label>
-                    <input type="password" name="db_pass" placeholder="">
+                <div class="panel">
+                    <div class="section-title">数据库配置</div>
+                    <div class="form-group">
+                        <label>数据库主机</label>
+                        <input type="text" name="db_host" value="127.0.0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>数据库端口</label>
+                        <input type="number" name="db_port" value="3306" required>
+                    </div>
+                    <div class="form-group">
+                        <label>数据库名</label>
+                        <input type="text" name="db_name" placeholder="如：jing_mall" required>
+                        <p class="hint">若数据库不存在，安装程序会自动创建</p>
+                    </div>
+                    <div class="form-group">
+                        <label>数据库用户名</label>
+                        <input type="text" name="db_user" placeholder="如：root" required>
+                    </div>
+                    <div class="form-group">
+                        <label>数据库密码</label>
+                        <input type="password" name="db_pass" placeholder="">
+                    </div>
                 </div>
 
-                <h3 style="margin: 24px 0 16px; font-size: 16px;">管理员账号</h3>
-                <div class="form-group">
-                    <label>管理员账号</label>
-                    <input type="text" name="admin_user" value="admin" required>
+                <div class="panel">
+                    <div class="section-title">管理员账号</div>
+                    <div class="form-group">
+                        <label>管理员账号</label>
+                        <input type="text" name="admin_user" value="admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>管理员密码</label>
+                        <input type="password" name="admin_pass" placeholder="请设置强密码" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>管理员密码</label>
-                    <input type="password" name="admin_pass" placeholder="请设置强密码" required>
-                </div>
-                <button type="submit" class="btn btn-block">立即安装</button>
+                <button type="submit" class="btn btn-block" id="submitBtn">立即安装</button>
             </form>
         <?php elseif ($step == 'done'): ?>
-            <div style="text-align: center; padding: 20px;">
-                <p style="font-size: 16px; margin-bottom: 16px;">安装已完成</p>
-                <p class="hint">为了安全，请删除服务器上的 install 目录</p>
+            <div class="done-box">
+                <div class="icon">&#10003;</div>
+                <h3>安装已完成</h3>
+                <p>为了安全，请删除服务器上的 install 目录</p>
             </div>
         <?php endif; ?>
     </div>
 </div>
+<script>
+    document.getElementById('installForm')?.addEventListener('submit', function() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> 安装中，请稍候...';
+        btn.style.opacity = '0.8';
+    });
+</script>
+<style>
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
 </body>
 </html>

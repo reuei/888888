@@ -4,184 +4,189 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录 - 鲸商城 Pro</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #F8FAFC;
-            color: #1F2937;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .login-box {
-            width: 420px;
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            padding: 32px;
-        }
-        .login-title {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        .login-title h1 { font-size: 20px; color: #2563EB; margin-bottom: 8px; }
-        .login-title p { color: #64748B; font-size: 13px; }
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #E2E8F0;
-            margin-bottom: 24px;
-        }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            cursor: pointer;
-            color: #64748B;
-            border-bottom: 2px solid transparent;
-            font-weight: 500;
-        }
-        .tab.active { color: #2563EB; border-bottom-color: #2563EB; }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #CBD5E1;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        input:focus { outline: none; border-color: #2563EB; }
-        .captcha-row { display: flex; gap: 10px; align-items: center; }
-        .captcha-row input { flex: 1; }
-        .captcha-row img { height: 40px; border-radius: 6px; cursor: pointer; border: 1px solid #CBD5E1; }
-        .btn {
-            width: 100%;
-            padding: 11px;
-            background: #2563EB;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .btn:disabled { background: #94A3B8; }
-        .alert {
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            display: none;
-        }
-        .alert-error { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
-        .alert-success { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 16px;
-            color: #64748B;
-            text-decoration: none;
-            font-size: 13px;
-        }
-        .back-link:hover { color: #2563EB; }
-    </style>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body>
-    <div class="login-box">
-        <div class="login-title">
-            <h1>鲸商城 Pro</h1>
-            <p id="subTitle">总站管理后台</p>
-        </div>
-        <div class="tabs">
-            <div class="tab <?php echo $type === 'admin' ? 'active' : ''; ?>" data-type="admin">总站后台</div>
-            <div class="tab <?php echo $type === 'merchant' ? 'active' : ''; ?>" data-type="merchant">商户后台</div>
-        </div>
-        <div class="alert" id="alertBox"></div>
-        <form id="loginForm">
-            <input type="hidden" name="type" id="loginType" value="<?php echo h($type); ?>">
-            <div class="form-group">
-                <label>账号</label>
-                <input type="text" name="username" placeholder="请输入账号" required autofocus>
+<body class="login-body">
+    <div class="login-shell">
+        <!-- 左侧品牌/插画区 -->
+        <aside class="login-aside">
+            <div class="brand">
+                <span class="logo-mark"><svg class="icon" aria-hidden="true"><use href="#icon-zap"></use></svg></span>
+                鲸商城 Pro
             </div>
-            <div class="form-group">
-                <label>密码</label>
-                <input type="password" name="password" placeholder="请输入密码" required>
+
+            <div class="illust">
+                <!-- 3D 风格 SVG 装饰插画 -->
+                <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" fill="none">
+                    <defs>
+                        <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#fff" stop-opacity="0.95"/>
+                            <stop offset="1" stop-color="#BFDBFE" stop-opacity="0.85"/>
+                        </linearGradient>
+                        <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#fff"/>
+                            <stop offset="1" stop-color="#DBEAFE"/>
+                        </linearGradient>
+                        <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0F172A" flood-opacity="0.18"/>
+                        </filter>
+                    </defs>
+                    <!-- 底座 -->
+                    <ellipse cx="160" cy="210" rx="120" ry="14" fill="#0F172A" opacity="0.18"/>
+                    <!-- 主卡片 -->
+                    <g filter="url(#sh)">
+                        <rect x="60" y="60" width="200" height="130" rx="18" fill="url(#g1)"/>
+                        <rect x="60" y="60" width="200" height="38" rx="18" fill="#fff" opacity="0.5"/>
+                        <circle cx="84" cy="79" r="5" fill="#EF4444"/>
+                        <circle cx="100" cy="79" r="5" fill="#F59E0B"/>
+                        <circle cx="116" cy="79" r="5" fill="#10B981"/>
+                    </g>
+                    <!-- 卡片内容线 -->
+                    <rect x="82" y="116" width="100" height="10" rx="5" fill="#fff"/>
+                    <rect x="82" y="136" width="156" height="8" rx="4" fill="#fff" opacity="0.7"/>
+                    <rect x="82" y="152" width="120" height="8" rx="4" fill="#fff" opacity="0.6"/>
+                    <!-- 浮动徽章：闪电（自动发货） -->
+                    <g filter="url(#sh)">
+                        <circle cx="244" cy="56" r="26" fill="#fff"/>
+                        <path d="M244 44 l-8 14 h6 l-2 12 10 -16 h-6 z" fill="#F59E0B"/>
+                    </g>
+                    <!-- 浮动徽章：盾牌（安全） -->
+                    <g filter="url(#sh)">
+                        <circle cx="76" cy="170" r="22" fill="#10B981"/>
+                        <path d="M76 158 l8 3 v8 c0 6 -4 9 -8 11 c-4 -2 -8 -5 -8 -11 v-8 z" fill="#fff"/>
+                    </g>
+                    <!-- 浮动徽章：勾 -->
+                    <g filter="url(#sh)">
+                        <circle cx="200" cy="186" r="20" fill="#fff"/>
+                        <path d="M191 186 l6 6 12 -12" stroke="#2563EB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </g>
+                </svg>
             </div>
-            <?php if (captcha_required('login')): ?>
-            <div class="form-group">
-                <label>验证码</label>
-                <div class="captcha-row">
-                    <input type="text" name="captcha" placeholder="请输入验证码" maxlength="4" required>
-                    <img src="<?php echo url('login/captcha'); ?>" alt="验证码" id="captchaImg" title="点击刷新">
+
+            <div class="tagline">
+                <h2>安全、便捷的<br>卡密自动发货平台</h2>
+                <p>汇聚海量优质商品，7×24 小时自动发货，资金托管交易无忧。</p>
+            </div>
+        </aside>
+
+        <!-- 右侧登录表单 -->
+        <main class="login-main">
+            <div class="login-title">
+                <h1>欢迎回来</h1>
+                <p id="subTitle">请登录总站管理后台</p>
+            </div>
+
+            <div class="tabs">
+                <div class="tab <?php echo $type === 'admin' ? 'active' : ''; ?>" data-type="admin">
+                    <svg class="icon icon-sm" aria-hidden="true" style="vertical-align:-3px;margin-right:4px"><use href="#icon-admin"></use></svg>
+                    总站后台
+                </div>
+                <div class="tab <?php echo $type === 'merchant' ? 'active' : ''; ?>" data-type="merchant">
+                    <svg class="icon icon-sm" aria-hidden="true" style="vertical-align:-3px;margin-right:4px"><use href="#icon-merchant"></use></svg>
+                    商户后台
                 </div>
             </div>
-            <?php endif; ?>
-            <button type="submit" class="btn" id="submitBtn">登录</button>
-        </form>
-        <a href="<?php echo url('/'); ?>" class="back-link">返回首页</a>
+
+            <div class="alert" id="alertBox"></div>
+
+            <form id="loginForm" data-form-loading>
+                <input type="hidden" name="type" id="loginType" value="<?php echo h($type); ?>">
+                <div class="form-group">
+                    <label>账号</label>
+                    <div class="input-wrap">
+                        <span class="input-icon"><svg class="icon icon-sm" aria-hidden="true"><use href="#icon-user"></use></svg></span>
+                        <input type="text" name="username" placeholder="请输入账号" required autofocus>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <div class="input-wrap">
+                        <span class="input-icon"><svg class="icon icon-sm" aria-hidden="true"><use href="#icon-lock"></use></svg></span>
+                        <input type="password" name="password" id="pwdInput" placeholder="请输入密码" required>
+                    </div>
+                </div>
+                <?php if (captcha_required('login')): ?>
+                <div class="form-group">
+                    <label>验证码</label>
+                    <div class="captcha-row">
+                        <div class="input-wrap" style="flex:1">
+                            <span class="input-icon"><svg class="icon icon-sm" aria-hidden="true"><use href="#icon-shield"></use></svg></span>
+                            <input type="text" name="captcha" placeholder="请输入验证码" maxlength="4" required>
+                        </div>
+                        <img src="<?php echo url('login/captcha'); ?>" alt="验证码" id="captchaImg" title="点击刷新">
+                    </div>
+                </div>
+                <?php endif; ?>
+                <button type="submit" class="btn btn-block btn-lg" id="submitBtn" style="margin-top: 8px;">
+                    <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-arrow-right"></use></svg>
+                    登录
+                </button>
+            </form>
+
+            <a href="<?php echo url('/'); ?>" class="back-link">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-chevron-left"></use></svg>
+                返回首页
+            </a>
+        </main>
     </div>
 
+    <script src="/static/js/app.js"></script>
     <script>
-        const tabs = document.querySelectorAll('.tab');
-        const typeInput = document.getElementById('loginType');
-        const subTitle = document.getElementById('subTitle');
-        const alertBox = document.getElementById('alertBox');
-        const form = document.getElementById('loginForm');
-        const submitBtn = document.getElementById('submitBtn');
+    (function() {
+        var tabs = document.querySelectorAll('.tab');
+        var typeInput = document.getElementById('loginType');
+        var subTitle = document.getElementById('subTitle');
+        var alertBox = document.getElementById('alertBox');
+        var form = document.getElementById('loginForm');
+        var submitBtn = document.getElementById('submitBtn');
 
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                tabs.forEach(function(t) { t.classList.remove('active'); });
                 tab.classList.add('active');
-                const type = tab.dataset.type;
+                var type = tab.dataset.type;
                 typeInput.value = type;
-                subTitle.textContent = type === 'merchant' ? '商户管理后台' : '总站管理后台';
-                alertBox.style.display = 'none';
+                subTitle.textContent = type === 'merchant' ? '请登录商户管理后台' : '请登录总站管理后台';
+                hideAlert();
             });
         });
 
-        const captchaImg = document.getElementById('captchaImg');
+        var captchaImg = document.getElementById('captchaImg');
         if (captchaImg) {
-            captchaImg.addEventListener('click', () => {
+            captchaImg.addEventListener('click', function() {
                 captchaImg.src = '<?php echo url('login/captcha'); ?>?' + Date.now();
             });
         }
 
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            alertBox.style.display = 'none';
-            submitBtn.disabled = true;
-            submitBtn.textContent = '登录中...';
+            hideAlert();
+            var restore = btnLoading(submitBtn);
 
-            const formData = new FormData(form);
+            var formData = new FormData(form);
             try {
-                const res = await fetch('<?php echo url('login/doLogin'); ?>', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.code === 0) {
-                    showAlert(data.msg, 'success');
-                    setTimeout(() => location.href = data.data.redirect, 500);
-                } else {
-                    showAlert(data.msg, 'error');
+                var data = await App.ajax('<?php echo url('login/doLogin'); ?>', { method: 'POST', body: formData });
+                if (data && data.code === 0) {
+                    if (window.Toast) { Toast.success(data.msg || '登录成功'); }
+                    showAlert(data.msg || '登录成功', 'success');
+                    setTimeout(function() { location.href = data.data.redirect; }, 600);
+                    return;
                 }
+                showAlert((data && data.msg) || '登录失败', 'error');
             } catch (err) {
                 showAlert('网络请求失败', 'error');
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '登录';
+                // 稍后恢复按钮，避免重复提交
+                setTimeout(function() { restore(); }, 300);
             }
         });
 
         function showAlert(msg, type) {
             alertBox.textContent = msg;
-            alertBox.className = 'alert alert-' + type;
-            alertBox.style.display = 'block';
+            alertBox.className = 'alert alert-' + type + ' show';
         }
+        function hideAlert() { alertBox.className = 'alert'; }
+    })();
     </script>
 </body>
 </html>

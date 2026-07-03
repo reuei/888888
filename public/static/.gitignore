@@ -1,2 +1,12 @@
+# 默认忽略所有内容，按需放行静态资源
 *
 !.gitignore
+!css/
+!js/
+!icons/
+css/*
+!css/style.css
+js/*
+!js/app.js
+icons/*
+!icons/sprite.svg

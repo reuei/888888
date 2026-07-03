@@ -17,6 +17,9 @@ Route::rule('api/:resource', 'api/index', 'GET|POST|PUT|DELETE');
 Route::get('install', 'install/index');
 Route::post('install', 'install/index');
 
-// React SPA 前端路由兜底：所有非文件/非 API 请求返回 index.html
+// CDN 站点入口
+Route::get('cdn', 'index/cdn');
+
+// React SPA 前端路由兜底：所有非文件/非 API 请求返回对应站点 HTML
 Route::get('/:path', 'index/spa')->pattern(['path' => '[\w\-\/\.]+']);
 Route::get('/', 'index/index');

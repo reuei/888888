@@ -1,4 +1,5 @@
 export type Role = 's' | 'b';
+export type SalesRole = 'user';
 
 export interface MenuItem {
   key: string;

@@ -60,6 +60,11 @@ class DataService
         'dailyStats' => 'daily_stats',
         'merchantStats' => 'merchant_stats',
         'userGrowthStats' => 'user_growth_stats',
+        'sourceLicenses' => 'source_licenses',
+        'nodePurchases' => 'node_purchases',
+        'updateRecords' => 'update_records',
+        'salesAnnouncements' => 'sales_announcements',
+        'salesOrders' => 'sales_orders',
     ];
 
     /** @var array<string, string> 主键前缀 */
@@ -104,6 +109,11 @@ class DataService
         'dailyStats' => 'DS',
         'merchantStats' => 'MS',
         'userGrowthStats' => 'UG',
+        'sourceLicenses' => 'SL',
+        'nodePurchases' => 'NP',
+        'updateRecords' => 'UR',
+        'salesAnnouncements' => 'SA',
+        'salesOrders' => 'SO',
     ];
 
     public function __construct()
@@ -507,7 +517,7 @@ class DataService
      */
     public function getEnvChecks(): array
     {
-        $minPhpVersion = '8.0.0';
+        $minPhpVersion = '8.2.0';
         $configDir = root_path() . 'config';
         $runtimeDir = root_path() . 'runtime';
 

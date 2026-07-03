@@ -18,7 +18,9 @@
   --color-hover-bg: #F3F4F6;
 }
 
-:root {
+/* CDN theme (default) */
+:root,
+.cdn-theme {
   --color-primary: #2196F3;
   --color-primary-dark: #1976D2;
   --color-success: #4CAF50;
@@ -32,9 +34,23 @@
   --color-input-bg: #FFFFFF;
   --color-table-header-bg: #F9FAFB;
   --color-hover-bg: #F3F4F6;
+
+  --sales-primary: #2196F3;
+  --sales-primary-dark: #1976D2;
+  --sales-accent: #7C3AED;
+  --sales-success: #10B981;
+  --sales-warning: #F59E0B;
+  --sales-danger: #EF4444;
+  --sales-bg: #F5F7FA;
+  --sales-card: #FFFFFF;
+  --sales-text: #1F2937;
+  --sales-text-secondary: #6B7280;
+  --sales-border: #E5E7EB;
+  --sales-input-bg: #FFFFFF;
 }
 
-.dark {
+.dark,
+.cdn-theme.dark {
   --color-bg: #0F172A;
   --color-card: #1E293B;
   --color-text: #F1F5F9;
@@ -43,6 +59,61 @@
   --color-input-bg: #0F172A;
   --color-table-header-bg: #1E293B;
   --color-hover-bg: #334155;
+
+  --sales-bg: #0F172A;
+  --sales-card: #1E293B;
+  --sales-text: #F1F5F9;
+  --sales-text-secondary: #94A3B8;
+  --sales-border: #334155;
+  --sales-input-bg: #0F172A;
+}
+
+/* Sales theme */
+.sales-theme {
+  --sales-primary: #2563EB;
+  --sales-primary-dark: #1D4ED8;
+  --sales-accent: #8B5CF6;
+  --sales-success: #10B981;
+  --sales-warning: #F59E0B;
+  --sales-danger: #EF4444;
+  --sales-bg: #F8FAFC;
+  --sales-card: #FFFFFF;
+  --sales-text: #0F172A;
+  --sales-text-secondary: #64748B;
+  --sales-border: #E2E8F0;
+  --sales-input-bg: #FFFFFF;
+
+  --color-primary: #2563EB;
+  --color-primary-dark: #1D4ED8;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-bg: #F8FAFC;
+  --color-card: #FFFFFF;
+  --color-text: #0F172A;
+  --color-text-secondary: #64748B;
+  --color-border: #E2E8F0;
+  --color-input-bg: #FFFFFF;
+  --color-table-header-bg: #F1F5F9;
+  --color-hover-bg: #F1F5F9;
+}
+
+.sales-theme.dark {
+  --sales-bg: #020617;
+  --sales-card: #0F172A;
+  --sales-text: #F8FAFC;
+  --sales-text-secondary: #94A3B8;
+  --sales-border: #1E293B;
+  --sales-input-bg: #020617;
+
+  --color-bg: #020617;
+  --color-card: #0F172A;
+  --color-text: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-border: #1E293B;
+  --color-input-bg: #020617;
+  --color-table-header-bg: #0F172A;
+  --color-hover-bg: #1E293B;
 }
 
 * {
@@ -248,4 +319,69 @@ body {
 
 .animate-slideIn {
   animation: slideIn 200ms ease;
+}
+
+/* 3D Hero orbiting animations */
+.orbit-1 {
+  animation: orbit1 12s linear infinite;
+}
+.orbit-2 {
+  animation: orbit2 14s linear infinite;
+}
+.orbit-3 {
+  animation: orbit3 16s linear infinite;
+}
+.orbit-4 {
+  animation: orbit4 18s linear infinite;
+}
+.orbit-5 {
+  animation: orbit5 20s linear infinite;
+}
+
+@keyframes orbit1 {
+  from { transform: translate(-50%, -50%) rotate(0deg) translateX(130px) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg) translateX(130px) rotate(-360deg); }
+}
+
+@keyframes orbit2 {
+  from { transform: translate(-50%, -50%) rotate(72deg) translateX(150px) rotate(-72deg); }
+  to { transform: translate(-50%, -50%) rotate(432deg) translateX(150px) rotate(-432deg); }
+}
+
+@keyframes orbit3 {
+  from { transform: translate(-50%, -50%) rotate(144deg) translateX(120px) rotate(-144deg); }
+  to { transform: translate(-50%, -50%) rotate(504deg) translateX(120px) rotate(-504deg); }
+}
+
+@keyframes orbit4 {
+  from { transform: translate(-50%, -50%) rotate(216deg) translateX(160px) rotate(-216deg); }
+  to { transform: translate(-50%, -50%) rotate(576deg) translateX(160px) rotate(-576deg); }
+}
+
+@keyframes orbit5 {
+  from { transform: translate(-50%, -50%) rotate(288deg) translateX(140px) rotate(-288deg); }
+  to { transform: translate(-50%, -50%) rotate(648deg) translateX(140px) rotate(-648deg); }
+}
+
+@media (min-width: 768px) {
+  @keyframes orbit1 {
+    from { transform: translate(-50%, -50%) rotate(0deg) translateX(160px) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg) translateX(160px) rotate(-360deg); }
+  }
+  @keyframes orbit2 {
+    from { transform: translate(-50%, -50%) rotate(72deg) translateX(190px) rotate(-72deg); }
+    to { transform: translate(-50%, -50%) rotate(432deg) translateX(190px) rotate(-432deg); }
+  }
+  @keyframes orbit3 {
+    from { transform: translate(-50%, -50%) rotate(144deg) translateX(150px) rotate(-144deg); }
+    to { transform: translate(-50%, -50%) rotate(504deg) translateX(150px) rotate(-504deg); }
+  }
+  @keyframes orbit4 {
+    from { transform: translate(-50%, -50%) rotate(216deg) translateX(200px) rotate(-216deg); }
+    to { transform: translate(-50%, -50%) rotate(576deg) translateX(200px) rotate(-576deg); }
+  }
+  @keyframes orbit5 {
+    from { transform: translate(-50%, -50%) rotate(288deg) translateX(170px) rotate(-288deg); }
+    to { transform: translate(-50%, -50%) rotate(648deg) translateX(170px) rotate(-648deg); }
+  }
 }

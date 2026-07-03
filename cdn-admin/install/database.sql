@@ -405,4 +405,54 @@ CREATE TABLE IF NOT EXISTS `cdn_user_growth_stats` (
   KEY `idx_updated_at` (`updated_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户增长统计数据';
 
+CREATE TABLE IF NOT EXISTS `cdn_source_licenses` (
+  `id` varchar(32) NOT NULL,
+  `data` json NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_updated_at` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='源码授权订单';
+
+CREATE TABLE IF NOT EXISTS `cdn_node_purchases` (
+  `id` varchar(32) NOT NULL,
+  `data` json NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_updated_at` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CDN节点购买记录';
+
+CREATE TABLE IF NOT EXISTS `cdn_update_records` (
+  `id` varchar(32) NOT NULL,
+  `data` json NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_updated_at` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='在线更新记录';
+
+CREATE TABLE IF NOT EXISTS `cdn_sales_announcements` (
+  `id` varchar(32) NOT NULL,
+  `data` json NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_updated_at` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='销售系统公告';
+
+CREATE TABLE IF NOT EXISTS `cdn_sales_orders` (
+  `id` varchar(32) NOT NULL,
+  `data` json NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_updated_at` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='销售系统订单';
+
 SET FOREIGN_KEY_CHECKS = 1;

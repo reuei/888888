@@ -37,5 +37,7 @@ data/install.lock
 # Built frontend assets in public/
 public/assets/
 public/index.html
+public/sales.html
+public/cdn.html
 public/favicon.svg
 public/icons.svg

@@ -5,7 +5,7 @@
 ## 技术栈
 
 - 前端：React 19 + React Router v7 + TypeScript 6 + Vite 8 + Tailwind CSS v4
-- 后端：ThinkPHP 8.1 + PHP ≥ 8.0
+- 后端：ThinkPHP 8.1 + PHP ≥ 8.2
 - 数据：MySQL 5.7+ / MariaDB 10.2+，表前缀 `cdn_`
 - 部署：Apache/Nginx 虚拟主机，无需 Node.js 运行环境
 
@@ -13,7 +13,7 @@
 
 | 项目 | 要求 | 说明 |
 |------|------|------|
-| PHP 版本 | ≥ 8.0 | 推荐 8.1 或 8.2 |
+| PHP 版本 | ≥ 8.2 | 推荐 8.2 或 8.3 |
 | PHP 扩展 | pdo_mysql | 必须启用 |
 | PHP 扩展 | json | 必须启用 |
 | PHP 扩展 | openssl | 推荐启用，用于安全密码哈希 |
@@ -87,7 +87,7 @@ https://你的域名/install
 
 系统自动检查：
 
-- PHP 版本是否 ≥ 8.0
+- PHP 版本是否 ≥ 8.2
 - PDO_MySQL 扩展是否启用
 - JSON 扩展是否启用
 - `config/`、`data/`、`runtime/` 目录是否可写
@@ -317,7 +317,7 @@ chmod -R 777 config data runtime
 
 ### 4. 访问页面报 500 错误
 
-- 检查 PHP 版本是否 ≥ 8.0，且已启用 `pdo_mysql`、`json` 扩展
+- 检查 PHP 版本是否 ≥ 8.2，且已启用 `pdo_mysql`、`json` 扩展
 - 检查 `config/`、`data/`、`runtime/` 目录是否可写
 - 检查是否已上传 `vendor/` 目录与 `public/` 下的构建产物
 - 将 `config/app.php` 中 `'show_error_msg' => false` 改为 `true`，或开启 `'app_debug' => true`，可查看具体错误信息（调试用，生产环境请关闭）

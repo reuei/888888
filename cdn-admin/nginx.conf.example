@@ -1,0 +1,45 @@
+# CloudShield CDN / EdgeOne 控制台 - Nginx 虚拟主机配置示例
+# 适用于将域名文档根目录指向 public/ 的部署方式
+
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /www/wwwroot/cdn-admin/public;
+    index index.php index.html;
+
+    # 日志
+    access_log /www/wwwlogs/cdn-admin.access.log;
+    error_log /www/wwwlogs/cdn-admin.error.log;
+
+    # 禁止访问敏感目录与文件
+    location ~ ^/(app|config|route|runtime|vendor|data|install)/ {
+        deny all;
+        return 404;
+    }
+
+    location ~ /\. {
+        deny all;
+    }
+
+    # 静态资源缓存
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|otf)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # ThinkPHP 重写规则
+    location / {
+        if (!-e $request_filename) {
+            rewrite ^(.*)$ /index.php?s=$1 last;
+        }
+    }
+
+    # PHP 处理（PHP-FPM，请根据实际 socket 或端口调整）
+    location ~ \.php$ {
+        fastcgi_pass 127.0.0.1:9000;
+        # fastcgi_pass unix:/tmp/php-cgi-82.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}

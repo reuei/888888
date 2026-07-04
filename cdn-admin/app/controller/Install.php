@@ -306,7 +306,7 @@ class Install
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            background: linear-gradient(135deg, #ecf2ff 0%, #dbe8ff 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -322,7 +322,7 @@ class Install
             overflow: hidden;
         }
         .header {
-            background: #4f46e5;
+            background: linear-gradient(90deg, #0052d9, #4656ff);
             color: #fff;
             padding: 24px 32px;
         }
@@ -357,7 +357,7 @@ class Install
             display: inline-block;
             width: 100%;
             padding: 12px;
-            background: #4f46e5;
+            background: linear-gradient(90deg, #0052d9, #4656ff);
             color: #fff;
             text-align: center;
             text-decoration: none;
@@ -367,7 +367,7 @@ class Install
             cursor: pointer;
             transition: background 0.2s;
         }
-        .btn:hover { background: #4338ca; }
+        .btn:hover { background: linear-gradient(90deg, #003bb3, #3244cc); }
         .btn:disabled {
             background: #d1d5db;
             cursor: not-allowed;
@@ -389,8 +389,8 @@ class Install
             outline: none;
         }
         .form-control:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            border-color: #0052d9;
+            box-shadow: 0 0 0 3px rgba(0, 82, 217, 0.1);
         }
         .form-row {
             display: grid;
@@ -432,7 +432,7 @@ class Install
         .section-title {
             font-size: 15px;
             font-weight: 600;
-            color: #4f46e5;
+            color: #0052d9;
             margin: 24px 0 12px;
             padding-bottom: 8px;
             border-bottom: 1px solid #e5e7eb;
@@ -475,7 +475,7 @@ class Install
                 <?php if (!$this->dataService->allChecksOk($checks)): ?>
                     <div class="alert alert-red">
                         <p style="margin:0 0 4px;">环境检测未通过，请根据上方提示调整主机环境后刷新本页。</p>
-                        <p class="text-sm" style="margin:0 0 4px;">EasyPanel 用户：请确认 PHP 版本 ≥ 8.0，开启 PDO_MySQL，并将 <code>config/</code>、<code>data/</code>、<code>runtime/</code> 目录权限设置为 755 或 777。</p>
+                        <p class="text-sm" style="margin:0 0 4px;">EasyPanel 用户：请确认 PHP 版本 ≥ 8.2，开启 PDO_MySQL，并将 <code>config/</code>、<code>data/</code>、<code>runtime/</code> 目录权限设置为 755 或 777。</p>
                         <p class="text-sm" style="margin:0;">若内存或执行时间不足，可在 EasyPanel「PHP 设置」中调整 <code>memory_limit ≥ 64M</code>、<code>max_execution_time ≥ 30</code>，或直接编辑项目根目录的 <code>.user.ini</code>。详细说明见 docs/easypanel-deploy.md。</p>
                     </div>
                     <button disabled class="btn">下一步</button>

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build && npm run copy-public",
-    "copy-public": "cp -r dist/assets public/ && cp dist/sales.html public/sales.html && cp dist/cdn.html public/cdn.html && cp -f dist/favicon.svg public/favicon.svg 2>/dev/null; cp -f dist/icons.svg public/icons.svg 2>/dev/null; true",
+    "copy-public": "rm -rf public/assets && cp -r dist/assets public/ && cp dist/sales.html public/sales.html && cp dist/cdn.html public/cdn.html && cp -f dist/favicon.svg public/favicon.svg 2>/dev/null; cp -f dist/icons.svg public/icons.svg 2>/dev/null; true",
     "lint": "oxlint",
     "preview": "vite preview"
   },

@@ -3,117 +3,120 @@
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #2196F3;
-  --color-primary-dark: #1976D2;
-  --color-success: #4CAF50;
-  --color-warning: #FF9800;
-  --color-danger: #F44336;
-  --color-bg: #F5F7FA;
-  --color-card: #FFFFFF;
-  --color-text: #1F2937;
-  --color-text-secondary: #6B7280;
-  --color-border: #E5E7EB;
-  --color-input-bg: #FFFFFF;
-  --color-table-header-bg: #F9FAFB;
-  --color-hover-bg: #F3F4F6;
+  --color-primary: #0052d9;
+  --color-primary-dark: #3d52e8;
+  --color-accent: #4656ff;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-bg: #f8fafc;
+  --color-card: #ffffff;
+  --color-text: #1f2329;
+  --color-text-secondary: #4e5566;
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-input-bg: #ffffff;
+  --color-table-header-bg: #f8fafc;
+  --color-hover-bg: #f1f5f9;
 }
 
 /* CDN theme (default) */
 :root,
 .cdn-theme {
-  --color-primary: #2196F3;
-  --color-primary-dark: #1976D2;
-  --color-success: #4CAF50;
-  --color-warning: #FF9800;
-  --color-danger: #F44336;
-  --color-bg: #F5F7FA;
-  --color-card: #FFFFFF;
-  --color-text: #1F2937;
-  --color-text-secondary: #6B7280;
-  --color-border: #E5E7EB;
-  --color-input-bg: #FFFFFF;
-  --color-table-header-bg: #F9FAFB;
-  --color-hover-bg: #F3F4F6;
+  --color-primary: #0052d9;
+  --color-primary-dark: #3d52e8;
+  --color-accent: #4656ff;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-bg: #f8fafc;
+  --color-card: #ffffff;
+  --color-text: #1f2329;
+  --color-text-secondary: #4e5566;
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-input-bg: #ffffff;
+  --color-table-header-bg: #f8fafc;
+  --color-hover-bg: #f1f5f9;
 
-  --sales-primary: #2196F3;
-  --sales-primary-dark: #1976D2;
-  --sales-accent: #7C3AED;
-  --sales-success: #10B981;
-  --sales-warning: #F59E0B;
-  --sales-danger: #EF4444;
-  --sales-bg: #F5F7FA;
-  --sales-card: #FFFFFF;
-  --sales-text: #1F2937;
-  --sales-text-secondary: #6B7280;
-  --sales-border: #E5E7EB;
-  --sales-input-bg: #FFFFFF;
+  --sales-primary: #0052d9;
+  --sales-primary-dark: #3d52e8;
+  --sales-accent: #4656ff;
+  --sales-success: #22c55e;
+  --sales-warning: #f59e0b;
+  --sales-danger: #ef4444;
+  --sales-bg: #ecf2ff;
+  --sales-card: #ffffff;
+  --sales-text: #0f172a;
+  --sales-text-secondary: #64748b;
+  --sales-border: #e2e8f0;
+  --sales-input-bg: #ffffff;
 }
 
 .dark,
 .cdn-theme.dark {
-  --color-bg: #0F172A;
-  --color-card: #1E293B;
-  --color-text: #F1F5F9;
-  --color-text-secondary: #94A3B8;
+  --color-bg: #0f172a;
+  --color-card: #1e293b;
+  --color-text: #f1f5f9;
+  --color-text-secondary: #94a3b8;
   --color-border: #334155;
-  --color-input-bg: #0F172A;
-  --color-table-header-bg: #1E293B;
+  --color-input-bg: #0f172a;
+  --color-table-header-bg: #1e293b;
   --color-hover-bg: #334155;
 
-  --sales-bg: #0F172A;
-  --sales-card: #1E293B;
-  --sales-text: #F1F5F9;
-  --sales-text-secondary: #94A3B8;
-  --sales-border: #334155;
-  --sales-input-bg: #0F172A;
+  --sales-bg: #020617;
+  --sales-card: #0f172a;
+  --sales-text: #f8fafc;
+  --sales-text-secondary: #94a3b8;
+  --sales-border: #1e293b;
+  --sales-input-bg: #020617;
 }
 
 /* Sales theme */
 .sales-theme {
-  --sales-primary: #2563EB;
-  --sales-primary-dark: #1D4ED8;
-  --sales-accent: #8B5CF6;
-  --sales-success: #10B981;
-  --sales-warning: #F59E0B;
-  --sales-danger: #EF4444;
-  --sales-bg: #F8FAFC;
-  --sales-card: #FFFFFF;
-  --sales-text: #0F172A;
-  --sales-text-secondary: #64748B;
-  --sales-border: #E2E8F0;
-  --sales-input-bg: #FFFFFF;
+  --sales-primary: #0052d9;
+  --sales-primary-dark: #3d52e8;
+  --sales-accent: #4656ff;
+  --sales-success: #22c55e;
+  --sales-warning: #f59e0b;
+  --sales-danger: #ef4444;
+  --sales-bg: #ecf2ff;
+  --sales-card: #ffffff;
+  --sales-text: #0f172a;
+  --sales-text-secondary: #64748b;
+  --sales-border: #e2e8f0;
+  --sales-input-bg: #ffffff;
 
-  --color-primary: #2563EB;
-  --color-primary-dark: #1D4ED8;
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-danger: #EF4444;
-  --color-bg: #F8FAFC;
-  --color-card: #FFFFFF;
-  --color-text: #0F172A;
-  --color-text-secondary: #64748B;
-  --color-border: #E2E8F0;
-  --color-input-bg: #FFFFFF;
-  --color-table-header-bg: #F1F5F9;
-  --color-hover-bg: #F1F5F9;
+  --color-primary: #0052d9;
+  --color-primary-dark: #3d52e8;
+  --color-accent: #4656ff;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-bg: #f8fafc;
+  --color-card: #ffffff;
+  --color-text: #1f2329;
+  --color-text-secondary: #4e5566;
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-input-bg: #ffffff;
+  --color-table-header-bg: #f8fafc;
+  --color-hover-bg: #f1f5f9;
 }
 
 .sales-theme.dark {
   --sales-bg: #020617;
-  --sales-card: #0F172A;
-  --sales-text: #F8FAFC;
-  --sales-text-secondary: #94A3B8;
-  --sales-border: #1E293B;
+  --sales-card: #0f172a;
+  --sales-text: #f8fafc;
+  --sales-text-secondary: #94a3b8;
+  --sales-border: #1e293b;
   --sales-input-bg: #020617;
 
   --color-bg: #020617;
-  --color-card: #0F172A;
-  --color-text: #F8FAFC;
-  --color-text-secondary: #94A3B8;
-  --color-border: #1E293B;
+  --color-card: #0f172a;
+  --color-text: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-border: #1e293b;
   --color-input-bg: #020617;
-  --color-table-header-bg: #0F172A;
-  --color-hover-bg: #1E293B;
+  --color-table-header-bg: #0f172a;
+  --color-hover-bg: #1e293b;
 }
 
 * {
@@ -123,7 +126,7 @@
 html, body, #root {
   height: 100%;
   margin: 0;
-  font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
 }
 
 body {
@@ -132,7 +135,7 @@ body {
   transition: background-color 200ms ease, color 200ms ease;
 }
 
-/* Flat design: no shadows, no gradients */
+/* EdgeOne inspired buttons with gradient and soft shadows */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -141,7 +144,7 @@ body {
   border-radius: 0.25rem;
   font-size: 0.875rem;
   font-weight: 500;
-  transition-property: color, background-color, border-color, opacity, transform;
+  transition-property: color, background-color, border-color, opacity, transform, box-shadow;
   transition-duration: 150ms;
   cursor: pointer;
   border: 1px solid transparent;
@@ -152,11 +155,12 @@ body {
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
+  background: linear-gradient(90deg, #0052d9, #4656ff);
   color: #fff;
 }
 .btn-primary:hover {
-  background-color: var(--color-primary-dark);
+  background: linear-gradient(90deg, #0046bb, #3a49ee);
+  box-shadow: 0 8px 20px rgba(0, 82, 217, 0.25);
 }
 
 .btn-success {
@@ -194,9 +198,9 @@ body {
 
 .card {
   background-color: var(--color-card);
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   border: 1px solid var(--color-border);
-  transition: background-color 200ms ease, border-color 200ms ease;
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
 }
 
 .input {
@@ -208,10 +212,11 @@ body {
   font-size: 0.875rem;
   color: var(--color-text);
   outline: none;
-  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
 }
 .input:focus {
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 82, 217, 0.1);
 }
 
 .table {
@@ -245,17 +250,17 @@ body {
 }
 
 .badge-success {
-  background-color: rgba(76, 175, 80, 0.12);
+  background-color: rgba(34, 197, 94, 0.12);
   color: var(--color-success);
 }
 
 .badge-warning {
-  background-color: rgba(255, 152, 0, 0.12);
+  background-color: rgba(245, 158, 11, 0.12);
   color: var(--color-warning);
 }
 
 .badge-danger {
-  background-color: rgba(244, 67, 54, 0.12);
+  background-color: rgba(239, 68, 68, 0.12);
   color: var(--color-danger);
 }
 
@@ -271,7 +276,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #D1D5DB;
+  background-color: #d1d5db;
   border-radius: 3px;
 }
 
@@ -319,6 +324,16 @@ body {
 
 .animate-slideIn {
   animation: slideIn 200ms ease;
+}
+
+/* Hero carousel progress */
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.animate-progress {
+  animation: progress linear forwards;
 }
 
 /* 3D Hero orbiting animations */

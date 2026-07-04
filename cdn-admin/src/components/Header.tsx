@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Menu, Bell, Search, LogOut, RefreshCcw, Check, Settings, Sun, Moon } from 'lucide-react';
+import { Menu, Bell, Search, LogOut, RefreshCcw, Check, Settings, Sun, Moon, Shield, ChevronDown } from 'lucide-react';
 import type { Role } from '../types';
 import { sProfile, bProfile, notifications as initialNotifications } from '../data/mock';
 import SearchModal from './SearchModal';
@@ -35,8 +35,10 @@ export default function Header({
   const profile = role === 's' ? sProfile : bProfile;
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
   const notifyRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -50,6 +52,7 @@ export default function Header({
       if (e.key === 'Escape') {
         setSearchOpen(false);
         setNotifyOpen(false);
+        setUserOpen(false);
       }
     };
     window.addEventListener('keydown', handleKey);
@@ -60,6 +63,9 @@ export default function Header({
     const handleClick = (e: MouseEvent) => {
       if (notifyRef.current && !notifyRef.current.contains(e.target as Node)) {
         setNotifyOpen(false);
+      }
+      if (userRef.current && !userRef.current.contains(e.target as Node)) {
+        setUserOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -74,7 +80,7 @@ export default function Header({
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
-  const handleNotifyClick = (n: typeof notifications[0]) => {
+  const handleNotifyClick = (n: (typeof notifications)[0]) => {
     markRead(n.id);
     setNotifyOpen(false);
     if (n.link && n.link.startsWith(`/${role}`)) {
@@ -84,50 +90,58 @@ export default function Header({
 
   return (
     <>
-      <header className="h-12 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
+      <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-3">
           <button
             onClick={onMobileToggle}
-            className="md:hidden p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+            className="md:hidden p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary transition-colors"
           >
             <Menu size={18} />
           </button>
           <button
             onClick={onToggle}
-            className="hidden md:block p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+            className="hidden md:block p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary transition-colors"
           >
             <Menu size={18} />
           </button>
-          <span className="font-semibold text-primary">CDN 防护加速平台</span>
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center">
+              <Shield size={16} />
+            </div>
+            <span className="font-semibold text-text">EdgeOne 控制台</span>
+          </div>
           {role === 'b' && profile.shopName && (
             <span className="text-sm text-text-secondary ml-2 hidden sm:inline">| {profile.shopName}</span>
           )}
         </div>
-        <div className="flex items-center gap-2 md:gap-4">
+
+        <div className="flex items-center gap-1 md:gap-2">
           <button
             onClick={() => setSearchOpen(true)}
-            className="hidden md:flex items-center gap-2 h-8 px-3 rounded border border-border text-xs text-text-secondary hover:border-primary hover:text-primary transition-colors"
+            className="hidden md:flex items-center gap-2 h-9 px-3 rounded-full border border-border bg-hover-bg text-xs text-text-secondary hover:border-primary/40 hover:text-primary transition-colors"
           >
             <Search size={14} /> 全站搜索 <span className="text-[10px] opacity-60">⌘K</span>
           </button>
+
           {role === 'b' && (
-            <div className="text-sm hidden sm:block">
+            <div className="text-sm hidden sm:block px-2">
               余额：<span className="text-danger font-medium">¥{profile.balance.toLocaleString('zh-CN')}</span>
             </div>
           )}
+
           <div className="relative" ref={notifyRef}>
             <button
               onClick={() => setNotifyOpen((v) => !v)}
-              className="relative p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+              className="relative p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary transition-colors"
             >
               <Bell size={18} />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full ring-2 ring-card" />
               )}
             </button>
             {notifyOpen && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded shadow-lg z-40">
-                <div className="flex items-center justify-between px-4 h-10 border-b border-border">
+              <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-lg z-40 overflow-hidden">
+                <div className="flex items-center justify-between px-4 h-11 border-b border-border">
                   <span className="text-sm font-medium">消息通知</span>
                   <button onClick={markAllRead} className="text-xs text-primary hover:underline">
                     全部已读
@@ -141,7 +155,7 @@ export default function Header({
                       <div
                         key={n.id}
                         onClick={() => handleNotifyClick(n)}
-                        className={`px-4 py-3 border-b border-border last:border-0 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 ${n.read ? 'opacity-70' : ''}`}
+                        className={`px-4 py-3 border-b border-border last:border-0 cursor-pointer hover:bg-hover-bg transition-colors ${n.read ? 'opacity-70' : ''}`}
                       >
                         <div className="flex items-start gap-2">
                           <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${typeColor[n.type]}`}></span>
@@ -179,44 +193,66 @@ export default function Header({
               </div>
             )}
           </div>
+
           <button
             onClick={onThemeToggle}
-            className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+            className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary transition-colors"
             title={dark ? '切换亮色' : '切换暗色'}
           >
-            {dark ? <Sun size={16} /> : <Moon size={16} />}
+            {dark ? <Sun size={17} /> : <Moon size={17} />}
           </button>
+
           <button
             onClick={onSwitchRole}
-            className="hidden sm:flex p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
+            className="hidden sm:flex p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary transition-colors"
             title="切换角色"
           >
-            <RefreshCcw size={16} />
+            <RefreshCcw size={17} />
           </button>
-          <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-border">
-            <Link
-              to={`/${role}/profile`}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+
+          <div className="relative" ref={userRef}>
+            <button
+              onClick={() => setUserOpen((v) => !v)}
+              className="flex items-center gap-2 pl-2 md:pl-3 ml-1 border-l border-border hover:opacity-90 transition-opacity"
             >
-              <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-medium">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center text-xs font-medium">
                 {profile.avatar}
               </div>
-              <span className="text-sm hidden lg:inline">{profile.name}</span>
-            </Link>
-            <Link
-              to={`/${role}/settings`}
-              className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
-              title="设置"
-            >
-              <Settings size={16} />
-            </Link>
-            <button
-              onClick={onLogout}
-              className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary"
-              title="退出"
-            >
-              <LogOut size={16} />
+              <span className="text-sm hidden lg:inline text-text">{profile.name}</span>
+              <ChevronDown size={14} className="text-text-secondary hidden lg:inline" />
             </button>
+
+            {userOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-xl shadow-lg z-40 overflow-hidden">
+                <div className="px-4 py-3 border-b border-border">
+                  <div className="text-sm font-medium text-text">{profile.name}</div>
+                  <div className="text-xs text-text-secondary">{role === 's' ? 'S 端总站长' : 'B 端商户'}</div>
+                </div>
+                <Link
+                  to={`/${role}/profile`}
+                  onClick={() => setUserOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-text-secondary hover:bg-hover-bg hover:text-text transition-colors"
+                >
+                  <Settings size={15} /> 个人设置
+                </Link>
+                <Link
+                  to={`/${role}/settings`}
+                  onClick={() => setUserOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-text-secondary hover:bg-hover-bg hover:text-text transition-colors"
+                >
+                  <Settings size={15} /> 系统设置
+                </Link>
+                <button
+                  onClick={() => {
+                    setUserOpen(false);
+                    onLogout();
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-danger hover:bg-danger/5 transition-colors"
+                >
+                  <LogOut size={15} /> 退出登录
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>

@@ -49,7 +49,7 @@ export default function Layout({ role, children, onSwitchRole, onLogout }: Layou
           </>
         )}
 
-        <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex flex-col flex-1 min-w-0 shadow-[-1px_0_0_0_var(--color-border)]">
           <Header
             role={role}
             collapsed={collapsed}
@@ -61,9 +61,11 @@ export default function Layout({ role, children, onSwitchRole, onLogout }: Layou
             onLogout={onLogout}
           />
           <main className="flex-1 overflow-auto p-4 md:p-6">
-            {children}
-            <footer className="mt-8 text-xs text-text-secondary text-center py-2 border-t border-border">
-              CDN 防护加速平台 v1.0.0 · © 2026 企业级CDN · 帮助文档
+            <div className="min-h-[calc(100%-3rem)]">
+              {children}
+            </div>
+            <footer className="mt-8 text-xs text-text-secondary text-center py-4 border-t border-border bg-card/50 rounded-lg">
+              EdgeOne 控制台 v1.0.0 · © 2026 企业级 CDN · 帮助文档
             </footer>
           </main>
         </div>

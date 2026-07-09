@@ -1,0 +1,87 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'system_update'; $page_title = '系统更新'; {/php}
+
+{block name="__CONTENT__"}
+<div class="card" style="max-width:800px">
+  <div class="card-header">
+    <h3 class="card-title">系统更新</h3>
+    <button class="btn btn-sm btn-primary" id="checkUpdateBtn">检查更新</button>
+  </div>
+  <div class="card-body">
+    <div style="display:flex;align-items:center;gap:40px;padding:20px;background:var(--bg-tertiary);border-radius:var(--radius);margin-bottom:24px">
+      <div style="text-align:center;flex:1">
+        <div style="font-size:14px;color:var(--text-secondary);margin-bottom:4px">当前版本</div>
+        <div style="font-size:32px;font-weight:700;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent">v{$currentVersion}</div>
+      </div>
+      <div style="font-size:32px;color:var(--text-muted)">→</div>
+      <div style="text-align:center;flex:1">
+        <div style="font-size:14px;color:var(--text-secondary);margin-bottom:4px">最新版本</div>
+        <div id="latestVersion" style="font-size:32px;font-weight:700;color:var(--text-muted)">v{$currentVersion}</div>
+      </div>
+    </div>
+
+    <div id="updateInfo">
+      <div class="form-group">
+        <label class="form-label">更新内容</label>
+        <div class="empty" style="padding:40px">
+          <div class="empty-icon">🔄</div>
+          <div>暂无更新信息</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="upgradeBtn" disabled>立即更新</button>
+    </div>
+
+    <div style="margin-top:24px;padding:16px;background:rgb(245 158 11 / 0.1);border-radius:var(--radius);border:1px solid rgb(245 158 11 / 0.2)">
+      <div style="font-weight:600;color:var(--warning);margin-bottom:8px">⚠️ 温馨提示</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.8">
+        1. 更新前请务必备份数据库和重要文件<br>
+        2. 更新过程中请勿关闭页面，避免数据丢失<br>
+        3. 如遇到更新失败，请联系技术支持处理
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('checkUpdateBtn')?.addEventListener('click', async function() {
+  const btn = this;
+  App.setButtonLoading(btn, true);
+  const result = await App.post('/admin/system/checkUpdate');
+  App.setButtonLoading(btn, false);
+  
+  if (result.code === 0) {
+    const data = result.data || {};
+    document.getElementById('latestVersion').textContent = 'v' + (data.latest_version || '{$currentVersion}');
+    document.getElementById('latestVersion').style.color = data.has_update ? 'var(--success)' : 'var(--text-muted)';
+    const upgradeBtn = document.getElementById('upgradeBtn');
+    if (data.has_update) {
+      upgradeBtn.disabled = false;
+      upgradeBtn.dataset.url = data.update_url || '';
+    }
+    App.toastSuccess(data.has_update ? '发现新版本' : '当前已是最新版本');
+  } else {
+    App.toastError(result.msg || '检查失败');
+  }
+});
+
+document.getElementById('upgradeBtn')?.addEventListener('click', async function() {
+  const url = this.dataset.url;
+  if (!url) {
+    App.toastError('暂无可更新版本');
+    return;
+  }
+  if (!confirm('确定要更新系统吗？更新前请务必备份数据。')) return;
+  
+  App.setButtonLoading(this, true);
+  const result = await App.post('/admin/system/upgrade', { package_url: url });
+  App.setButtonLoading(this, false);
+  
+  if (result.code === 0) {
+    App.toastSuccess('更新成功，正在刷新...');
+    setTimeout(() => location.reload(), 1500);
+  } else {
+    App.toastError(result.msg || '更新失败');
+  }
+});
+</script>
+{/block}

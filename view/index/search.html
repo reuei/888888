@@ -1,0 +1,26 @@
+{extend name="layout/main"}
+
+{block name="__CONTENT__"}
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">搜索结果：{$keyword}</h2>
+      <div style="color:var(--text-secondary);font-size:14px">找到 {$goods|count} 件相关商品</div>
+    </div>
+    <div class="goods-grid">
+      {volist name="goods" id="good"}
+      <a href="/goods/{$good.id}" class="goods-card">
+        <div class="goods-image">🎁</div>
+        <div class="goods-info">
+          <div class="goods-name">{$good.name}</div>
+          <div class="goods-price-row">
+            <span class="goods-price">{$good.price}</span>
+            <span class="goods-sales">已售{$good.sales}+</span>
+          </div>
+        </div>
+      </a>
+      {/volist}
+    </div>
+  </div>
+</section>
+{/block}

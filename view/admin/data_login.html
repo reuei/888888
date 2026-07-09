@@ -1,0 +1,93 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'data_login'; $page_title = '登录日志'; {/php}
+
+{block name="__CONTENT__"}
+<div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+  <div class="stat-card">
+    <div class="stat-icon green">✅</div>
+    <div class="stat-content">
+      <div class="stat-value">1,256</div>
+      <div class="stat-label">今日成功登录</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red" style="background:rgba(239,68,68,0.1);color:var(--danger)">❌</div>
+    <div class="stat-content">
+      <div class="stat-value">89</div>
+      <div class="stat-label">今日失败登录</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue">🌍</div>
+    <div class="stat-content">
+      <div class="stat-value">156</div>
+      <div class="stat-label">今日访问IP</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">⏱️</div>
+    <div class="stat-content">
+      <div class="stat-value">12</div>
+      <div class="stat-label">异常登录</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">登录日志</h3>
+    <div style="display:flex;gap:10px">
+      <select class="form-select" style="width:100px;padding:6px 10px;font-size:13px">
+        <option>全部类型</option>
+        <option>后台</option>
+        <option>前台</option>
+        <option>商家</option>
+      </select>
+      <input type="text" placeholder="搜索用户名/IP..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;width:200px">
+    </div>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>用户名</th>
+          <th>类型</th>
+          <th>IP地址</th>
+          <th>地理位置</th>
+          <th>状态</th>
+          <th>登录时间</th>
+        </tr>
+      </thead>
+      <tbody>
+        {volist name="logs" id="log"}
+        <tr>
+          <td>{$log.id}</td>
+          <td style="font-weight:500">{$log.username}</td>
+          <td><span class="badge badge-secondary">{$log.type}</span></td>
+          <td style="font-family:monospace">{$log.ip}</td>
+          <td>{$log.location}</td>
+          <td>
+            <span class="badge badge-{$log.status == 1 ? 'success' : 'danger'}">
+              {$log.status == 1 ? '成功' : '失败'}
+            </span>
+          </td>
+          <td style="color:var(--text-muted)">{$log.time}</td>
+        </tr>
+        {/volist}
+      </tbody>
+    </table>
+  </div>
+  <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+    <div class="pagination">
+      <a href="#">上一页</a>
+      <span class="current">1</span>
+      <a href="#">2</a>
+      <a href="#">3</a>
+      <a href="#">4</a>
+      <a href="#">5</a>
+      <a href="#">下一页</a>
+    </div>
+  </div>
+</div>
+{/block}

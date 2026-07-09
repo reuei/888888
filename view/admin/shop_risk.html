@@ -1,0 +1,85 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'shop_risk'; $page_title = '风控管理'; {/php}
+
+{block name="__CONTENT__"}
+<div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+  <div class="stat-card">
+    <div class="stat-icon green">✅</div>
+    <div class="stat-content">
+      <div class="stat-value" style="color:var(--success)">低风险</div>
+      <div class="stat-label">126家</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">⚠️</div>
+    <div class="stat-content">
+      <div class="stat-value" style="color:var(--warning)">中风险</div>
+      <div class="stat-label">32家</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(239,68,68,0.1);color:var(--danger)">🚨</div>
+    <div class="stat-content">
+      <div class="stat-value" style="color:var(--danger)">高风险</div>
+      <div class="stat-label">8家</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple">📊</div>
+    <div class="stat-content">
+      <div class="stat-value">166</div>
+      <div class="stat-label">总店铺数</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">店铺风控列表</h3>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>店铺名称</th>
+          <th>风险等级</th>
+          <th>风险分数</th>
+          <th>警告次数</th>
+          <th>最近检查</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {volist name="list" id="item"}
+        <tr>
+          <td>{$item.id}</td>
+          <td style="font-weight:500">{$item.shop_name}</td>
+          <td>
+            {switch $item.risk_level}
+            {case 低}<span class="badge badge-success">低风险</span>{/case}
+            {case 中}<span class="badge badge-warning">中风险</span>{/case}
+            {case 高}<span class="badge badge-danger">高风险</span>{/case}
+            {/switch}
+          </td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:80px;height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden">
+                <div style="width:{$item.risk_score}%;height:100%;background:{$item.risk_level == '高' ? 'var(--danger)' : ($item.risk_level == '中' ? 'var(--warning)' : 'var(--success)')}"></div>
+              </div>
+              <span style="font-size:12px">{$item.risk_score}</span>
+            </div>
+          </td>
+          <td>{$item.warn_count}次</td>
+          <td style="color:var(--text-muted)">{$item.last_check}</td>
+          <td>
+            <a href="#" style="color:var(--primary);font-size:13px;margin-right:10px">详情</a>
+            <a href="#" style="color:var(--warning);font-size:13px">处理</a>
+          </td>
+        </tr>
+        {/volist}
+      </tbody>
+    </table>
+  </div>
+</div>
+{/block}

@@ -1,0 +1,59 @@
+{extend name="layout/main"}
+
+{block name="__CONTENT__"}
+<section class="section">
+  <div class="container" style="max-width:800px">
+    <div class="card" style="padding:32px">
+      <div style="text-align:center;padding:20px 0 32px">
+        <div style="font-size:64px;margin-bottom:16px">
+          {if $order.status == 1}✅{else}⏳{/if}
+        </div>
+        <h2 style="font-size:24px;margin-bottom:8px">
+          {if $order.status == 1}支付成功{else}等待支付{/if}
+        </h2>
+        <p style="color:var(--text-secondary)">订单号：{$order.order_no}</p>
+      </div>
+
+      <div style="background:var(--bg-tertiary);padding:20px;border-radius:var(--radius);margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="width:60px;height:60px;border-radius:var(--radius);background:linear-gradient(135deg,#e0e7ff,#fce7f3);display:flex;align-items:center;justify-content:center;font-size:28px">🎁</div>
+          <div style="flex:1">
+            <div style="font-weight:600;margin-bottom:4px">{$order.goods_name}</div>
+            <div style="font-size:13px;color:var(--text-muted)">数量：{$order.quantity}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:22px;font-weight:700;color:var(--danger)">¥{$order.total}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--border)">
+          <span style="color:var(--text-secondary)">商品金额</span>
+          <span>¥{$order.total}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--border)">
+          <span style="color:var(--text-secondary)">优惠金额</span>
+          <span style="color:var(--success)">-¥0.00</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0">
+          <span style="font-weight:600">实付金额</span>
+          <span style="font-size:20px;font-weight:700;color:var(--danger)">¥{$order.total}</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px">
+        {if $order.status == 0}
+        <button class="btn btn-primary btn-lg" style="flex:1">立即支付</button>
+        {/if}
+        <button class="btn btn-outline btn-lg" style="flex:1">返回首页</button>
+      </div>
+
+      <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
+        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px">下单时间：{$order.create_time}</div>
+        <div style="font-size:13px;color:var(--text-secondary)">订单编号：{$order.order_no}</div>
+      </div>
+    </div>
+  </div>
+</section>
+{/block}

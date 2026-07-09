@@ -1,0 +1,60 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'shop_realname'; $page_title = '实名管理'; {/php}
+
+{block name="__CONTENT__"}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">实名认证管理</h3>
+    <div style="display:flex;gap:10px">
+      <select style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
+        <option>全部状态</option>
+        <option>待审核</option>
+        <option>已通过</option>
+        <option>已拒绝</option>
+      </select>
+      <button class="btn btn-sm btn-primary">筛选</button>
+    </div>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>店铺名称</th>
+          <th>真实姓名</th>
+          <th>身份证号</th>
+          <th>状态</th>
+          <th>提交时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {volist name="list" id="item"}
+        <tr>
+          <td>{$item.id}</td>
+          <td style="font-weight:500">{$item.shop_name}</td>
+          <td>{$item.real_name}</td>
+          <td style="font-family:monospace">{$item.id_card}</td>
+          <td>
+            {switch $item.status}
+            {case 0}<span class="badge badge-warning">待审核</span>{/case}
+            {case 1}<span class="badge badge-success">已通过</span>{/case}
+            {case 2}<span class="badge badge-danger">已拒绝</span>{/case}
+            {/switch}
+          </td>
+          <td style="color:var(--text-muted)">{$item.submit_time}</td>
+          <td>
+            {if $item.status == 0}
+            <a href="#" style="color:var(--success);font-size:13px;margin-right:10px">通过</a>
+            <a href="#" style="color:var(--danger);font-size:13px">拒绝</a>
+            {else}
+            <a href="#" style="color:var(--primary);font-size:13px">查看详情</a>
+            {/if}
+          </td>
+        </tr>
+        {/volist}
+      </tbody>
+    </table>
+  </div>
+</div>
+{/block}

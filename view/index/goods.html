@@ -1,0 +1,103 @@
+{extend name="layout/main"}
+
+{block name="__CONTENT__"}
+<section class="section">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px">
+      <div class="fade-in">
+        <div class="card" style="overflow:hidden">
+        <div style="height:400px;background:linear-gradient(135deg,#e0e7ff 0%,#fce7f3 100%);display:flex;align-items:center;justify-content:center;font-size:120px">🎁</div>
+        </div>
+      </div>
+      <div class="slide-up">
+        <div style="margin-bottom:16px">
+          <span class="badge badge-primary">{$good.category}</span>
+        </div>
+        <h1 style="font-size:26px;font-weight:700;margin-bottom:12px">{$good.name}</h1>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:24px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--text-muted);font-size:13px">已售 {$good.sales}+</span>
+          <span style="color:var(--text-muted);font-size:13px">库存 {$good.stock} 件</span>
+        </div>
+        <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);padding:20px 24px;border-radius:var(--radius-md);margin-bottom:24px">
+          <div style="display:flex;align-items:baseline;gap:12px">
+            <span style="font-size:14px;color:#92400e">¥</span>
+            <span style="font-size:42px;font-weight:800;color:#dc2626">{$good.price}</span>
+            <span style="text-decoration:line-through;color:#92400e;font-size:14px">¥{$good.original_price}</span>
+            <span class="badge" style="background:#dc2626;color:white;margin-left:auto">限时特惠</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">选择规格</label>
+          <div style="display:flex;gap:10px">
+            {volist name="good.specs" id="spec"}
+            <button type="button" style="padding:10px 20px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--bg-primary);cursor:pointer">
+              {$spec.name} <span style="color:var(--danger);font-weight:600">¥{$spec.price}</span>
+            </button>
+            {/volist}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">购买数量</label>
+          <div style="display:flex;align-items:center;gap:0">
+            <button style="width:40px;height:40px;border:1.5px solid var(--border);border-right:none;border-radius:var(--radius) 0 0 var(--radius);background:var(--bg-tertiary);cursor:pointer">-</button>
+            <input type="number" value="1" style="width:80px;height:40px;border:1.5px solid var(--border);text-align:center">
+            <button style="width:40px;height:40px;border:1.5px solid var(--border);border-left:none;border-radius:0 var(--radius) var(--radius) 0;background:var(--bg-tertiary);cursor:pointer">+</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <button class="btn btn-lg btn-primary" style="flex:1">立即购买</button>
+          <button class="btn btn-lg btn-outline" style="padding:14px 20px">加入购物车</button>
+        </div>
+        <div style="display:flex;gap:24px;margin-top:24px;padding-top:24px;border-top:1px solid var(--border);font-size:13px;color:var(--text-secondary)">
+          <span>✓ 自动发货</span>
+          <span>✓ 7天无理由</span>
+          <span>✓ 正品保障</span>
+          <span>✓ 售后无忧</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--bg-tertiary)">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">商品详情</h2>
+    </div>
+    <div class="card" style="padding:32px">
+      <p style="line-height:2;color:var(--text-secondary)">{$good.description}</p>
+      <div style="margin-top:20px">
+        <h3 style="font-size:18px;margin-bottom:12px">商品特点</h3>
+        <ul style="line-height:2.2;color:var(--text-secondary)">
+          <li>✅ 官方直供，正品保障</li>
+          <li>✅ 秒速到账，即买即用</li>
+          <li>✅ 支持多设备登录使用</li>
+          <li>✅ 售后保障，放心购买</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">相关推荐</h2>
+    </div>
+    <div class="goods-grid">
+      {volist name="related" id="r"}
+      <a href="/goods/{$r.id}" class="goods-card">
+        <div class="goods-image">🎁</div>
+        <div class="goods-info">
+          <div class="goods-name">{$r.name}</div>
+          <div class="goods-price-row">
+            <span class="goods-price">{$r.price}</span>
+            <span class="goods-sales">已售{$r.sales}+</span>
+          </div>
+        </div>
+      </a>
+      {/volist}
+    </div>
+  </div>
+</section>
+{/block}

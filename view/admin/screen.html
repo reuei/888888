@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据大屏 - {$site_name}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0e27;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .screen-header {
+      text-align: center;
+      padding: 20px 0;
+      position: relative;
+      background: linear-gradient(180deg, rgba(99,102,241,0.3) 0%, transparent 100%);
+    }
+    .screen-title {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #60a5fa, #c084fc, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 4px;
+    }
+    .screen-subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+    .screen-time {
+      position: absolute;
+      right: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+    }
+    .screen-back {
+      position: absolute;
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #60a5fa;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .screen-body {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      gap: 16px;
+      padding: 0 16px 16px;
+      height: calc(100vh - 80px);
+    }
+    .screen-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .screen-card {
+      background: linear-gradient(135deg, rgba(30,27,75,0.8) 0%, rgba(49,46,129,0.6) 100%);
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+    .screen-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20px;
+      right: 20px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #6366f1, transparent);
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #a5b4fc;
+    }
+    .card-title::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: linear-gradient(180deg, #60a5fa, #c084fc);
+      border-radius: 2px;
+    }
+    .stat-big {
+      text-align: center;
+      padding: 8px 0;
+    }
+    .stat-big-value {
+      font-size: 42px;
+      font-weight: 800;
+      background: linear-gradient(180deg, #60a5fa 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+    .stat-big-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .stat-item {
+      text-align: center;
+      padding: 10px;
+      background: rgba(99,102,241,0.1);
+      border-radius: 8px;
+    }
+    .stat-item-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #60a5fa;
+    }
+    .stat-item-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+    }
+    .map-container {
+      height: 340px;
+      position: relative;
+      background: radial-gradient(ellipse at center, rgba(99,102,241,0.2) 0%, transparent 70%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .map-placeholder {
+      text-align: center;
+      color: rgba(255,255,255,0.4);
+    }
+    .map-placeholder-icon {
+      font-size: 80px;
+      margin-bottom: 12px;
+      opacity: 0.3;
+    }
+    .chart-bar {
+      height: 180px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 10px 0;
+      gap: 4px;
+    }
+    .bar-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .bar {
+      width: 100%;
+      max-width: 20px;
+      background: linear-gradient(180deg, #60a5fa 0%, #c084fc 100%);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      min-height: 10px;
+      transition: height 1s ease;
+    }
+    .bar-value {
+      font-size: 10px;
+      color: #a5b4fc;
+    }
+    .bar-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+    }
+    .rank-list {
+      list-style: none;
+    }
+    .rank-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 13px;
+    }
+    .rank-item:last-child { border-bottom: none; }
+    .rank-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .rank-item:nth-child(1) .rank-num { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    .rank-item:nth-child(2) .rank-num { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
+    .rank-item:nth-child(3) .rank-num { background: linear-gradient(135deg, #10b981, #059669); }
+    .rank-name { flex: 1; }
+    .rank-value { color: #60a5fa; font-weight: 600; }
+    .center-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .center-map {
+      flex: 1;
+      min-height: 280px;
+    }
+    .order-list {
+      list-style: none;
+      font-size: 12px;
+    }
+    .order-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .order-item:last-child { border-bottom: none; }
+    .order-no {
+      color: #a5b4fc;
+      font-family: monospace;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    .order-goods {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: rgba(255,255,255,0.7);
+    }
+    .order-amount {
+      color: #f472b6;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    .screen-card.small { padding: 12px; }
+  </style>
+</head>
+<body>
+  <div class="screen-header">
+    <div class="screen-back" onclick="window.location.href='/admin/dashboard'">← 返回仪表盘</div>
+    <div class="screen-title">数据可视化大屏</div>
+    <div class="screen-subtitle">{$site_name} · 实时运营数据监控</div>
+    <div class="screen-time" id="screenTime"></div>
+  </div>
+
+  <div class="screen-body">
+    <div class="screen-column">
+      <div class="screen-card">
+        <div class="card-title">核心指标</div>
+        <div class="stat-big">
+          <div class="stat-big-value">{$stats.total_amount}</div>
+          <div class="stat-big-label">总交易额（元）</div>
+        </div>
+        <div class="stat-row" style="margin-top:12px">
+          <div class="stat-item">
+            <div class="stat-item-value">{$stats.total_users}</div>
+            <div class="stat-item-label">总用户数</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-value">{$stats.total_orders}</div>
+            <div class="stat-item-label">总订单数</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-value">{$stats.conversion_rate}%</div>
+            <div class="stat-item-label">转化率</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-value">¥{$stats.avg_order}</div>
+            <div class="stat-item-label">客单价</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="card-title">24小时订单趋势</div>
+        <div class="chart-bar" id="hourlyChart">
+          {volist name="hourlyOrders" id="count" key="k"}
+          <div class="bar-item">
+            <div class="bar-value">{$count}</div>
+            <div class="bar" style="height:{$count * 4}px"></div>
+            <div class="bar-label">{$k-1}时</div>
+          </div>
+          {/volist}
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="card-title">热销商品TOP5</div>
+        <ul class="rank-list">
+          <li class="rank-item">
+            <span class="rank-num">1</span>
+            <span class="rank-name">腾讯视频VIP会员月卡</span>
+            <span class="rank-value">2345单</span>
+          </li>
+          <li class="rank-item">
+            <span class="rank-num">2</span>
+            <span class="rank-name">网易云音乐黑胶年卡</span>
+            <span class="rank-value">1876单</span>
+          </li>
+          <li class="rank-item">
+            <span class="rank-num">3</span>
+            <span class="rank-name">王者荣耀点券1000</span>
+            <span class="rank-value">1543单</span>
+          </li>
+          <li class="rank-item">
+            <span class="rank-num">4</span>
+            <span class="rank-name">爱奇艺黄金会员季卡</span>
+            <span class="rank-value">1234单</span>
+          </li>
+          <li class="rank-item">
+            <span class="rank-num">5</span>
+            <span class="rank-name">百度网盘超级会员月卡</span>
+            <span class="rank-value">987单</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="screen-column">
+      <div class="screen-card center-card center-map">
+        <div class="card-title">全国用户分布</div>
+        <div class="map-container">
+          <div class="map-placeholder">
+            <div class="map-placeholder-icon">🗺️</div>
+            <div>中国地图 · 用户地域分布</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card small">
+        <div class="card-title">实时订单</div>
+        <ul class="order-list">
+          {volist name="hourlyOrders" id="count" key="k"}
+          {if $k <= 8}
+          <li class="order-item">
+            <span class="order-no">ORD{:date('mdHis')}{:rand(100,999)}</span>
+            <span class="order-goods">商品订单 #{$k}</span>
+            <span class="order-amount">¥{:rand(10, 100)}.00</span>
+          </li>
+          {/if}
+          {/volist}
+        </ul>
+      </div>
+    </div>
+
+    <div class="screen-column">
+      <div class="screen-card">
+        <div class="card-title">省份销售TOP8</div>
+        <ul class="rank-list">
+          {volist name="provinceData" id="p"}
+          <li class="rank-item">
+            <span class="rank-num">{$i}</span>
+            <span class="rank-name">{$p.name}</span>
+            <span class="rank-value">{$p.value}</span>
+          </li>
+          {/volist}
+        </ul>
+      </div>
+
+      <div class="screen-card">
+        <div class="card-title">今日实时</div>
+        <div class="stat-row">
+          <div class="stat-item">
+            <div class="stat-item-value">{$stats.today_users}</div>
+            <div class="stat-item-label">今日新增用户</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-value">{$stats.today_orders}</div>
+            <div class="stat-item-label">今日订单</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-value">¥{$stats.today_amount}</div>
+            <div class="stat-item-label">今日金额</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-value">{$stats.online_users}</div>
+            <div class="stat-item-label">在线用户</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="card-title">系统状态</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px">
+            <span style="color:rgba(255,255,255,0.6)">服务器状态</span>
+            <span style="color:#10b981">● 运行正常</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px">
+            <span style="color:rgba(255,255,255,0.6)">数据库</span>
+            <span style="color:#10b981">● 正常</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px">
+            <span style="color:rgba(255,255,255,0.6)">支付通道</span>
+            <span style="color:#10b981">● 全部正常</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px">
+            <span style="color:rgba(255,255,255,0.6)">短信服务</span>
+            <span style="color:#10b981">● 正常</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px">
+            <span style="color:rgba(255,255,255,0.6)">API接口</span>
+            <span style="color:#f59e0b">● 部分限流</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="card-title">今日访问设备</div>
+        <div style="display:flex;justify-content:space-around;text-align:center">
+          <div>
+            <div style="font-size:28px;font-weight:700;color:#60a5fa">65%</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">手机端</div>
+          </div>
+          <div>
+            <div style="font-size:28px;font-weight:700;color:#c084fc">30%</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">PC端</div>
+          </div>
+          <div>
+            <div style="font-size:28px;font-weight:700;color:#f472b6">5%</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">平板</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const timeStr = now.toLocaleString('zh-CN', { 
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      const el = document.getElementById('screenTime');
+      if (el) el.textContent = timeStr;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户注册 - {$site_name}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .register-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+      max-width: 1000px;
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.25);
+    }
+    .register-banner {
+      background: var(--gradient-primary);
+      padding: 60px 48px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .register-banner::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .register-banner h2 {
+      font-size: 28px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .register-banner p {
+      opacity: 0.9;
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+    .benefits {
+      margin-top: 32px;
+      position: relative;
+      z-index: 1;
+    }
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .benefit-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .register-form-wrap {
+      padding: 48px;
+    }
+    .register-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .register-logo .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .register-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .register-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+    .form-input {
+      height: 46px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .password-strength {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .strength-bar {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--bg-tertiary);
+      transition: all 0.3s ease;
+    }
+    .strength-bar.weak { background: var(--danger); }
+    .strength-bar.medium { background: var(--warning); }
+    .strength-bar.strong { background: var(--success); }
+    .register-btn {
+      height: 50px;
+      font-size: 16px;
+    }
+    .register-switch {
+      text-align: center;
+      margin-top: 20px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .register-switch a {
+      color: var(--primary);
+      font-weight: 500;
+    }
+    .agree-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .agree-box input {
+      margin-top: 3px;
+    }
+    .agree-box a {
+      color: var(--primary);
+    }
+    @media (max-width: 768px) {
+      .register-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .register-banner {
+        display: none;
+      }
+      .register-form-wrap {
+        padding: 32px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">加载中...</div>
+    </div>
+  </div>
+
+  <div class="register-wrapper">
+    <div class="register-banner">
+      <h2>加入我们 🎉</h2>
+      <p>注册账号，开启您的数字购物之旅。新用户专享首单立减5元优惠！</p>
+      <div class="benefits">
+        <div class="benefit-item">
+          <div class="benefit-icon">⚡</div>
+          <div>
+            <div style="font-weight:600">极速发货</div>
+            <div style="font-size:12px;opacity:0.8">7x24小时自动发货</div>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">🎁</div>
+          <div>
+            <div style="font-weight:600">新用户优惠</div>
+            <div style="font-size:12px;opacity:0.8">首单立减5元</div>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">🔒</div>
+          <div>
+            <div style="font-weight:600">安全保障</div>
+            <div style="font-size:12px;opacity:0.8">正规渠道 售后无忧</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="register-form-wrap">
+      <div class="register-logo">
+        <div class="logo-icon">玄</div>
+        <strong style="font-size:20px">{$site_name}</strong>
+      </div>
+      <h1 class="register-title">创建新账号</h1>
+      <p class="register-subtitle">仅需几步，即可完成注册</p>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" name="username" class="form-input" placeholder="请输入用户名（3-20位字符）" autocomplete="username">
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">邮箱</label>
+          <input type="email" name="email" class="form-input" placeholder="请输入邮箱地址" autocomplete="email">
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" name="password" class="form-input" placeholder="请输入密码（至少6位）" id="passwordInput" autocomplete="new-password">
+          <div class="password-strength" id="passwordStrength">
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+          </div>
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">确认密码</label>
+          <input type="password" name="password2" class="form-input" placeholder="请再次输入密码" autocomplete="new-password">
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">人机验证</label>
+          <div class="slider-captcha" id="sliderCaptcha">
+            <div class="slider-track">
+              <div class="slider-fill"></div>
+              <div class="slider-btn">→</div>
+              <div class="slider-text">向右滑动完成验证</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="agree-box">
+          <input type="checkbox" name="agree" id="agree">
+          <label for="agree">我已阅读并同意 <a href="#">《用户协议》</a> 和 <a href="#">《隐私政策》</a></label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block register-btn" id="registerBtn">立即注册</button>
+      </form>
+
+      <div class="register-switch">
+        已有账号？<a href="/login">直接登录 →</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    let sliderVerified = false;
+    let sliderToken = '';
+
+    App.initSliderCaptcha('#sliderCaptcha', function(token) {
+      sliderVerified = true;
+      sliderToken = token;
+    });
+
+    const passwordInput = document.getElementById('passwordInput');
+    const strengthBars = document.querySelectorAll('#passwordStrength .strength-bar');
+    
+    passwordInput?.addEventListener('input', function() {
+      const pwd = this.value;
+      let strength = 0;
+      if (pwd.length >= 6) strength++;
+      if (pwd.length >= 10) strength++;
+      if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) strength++;
+      if (/\d/.test(pwd) && /[^A-Za-z0-9]/.test(pwd)) strength++;
+
+      strengthBars.forEach((bar, i) => {
+        bar.className = 'strength-bar';
+        if (i < strength) {
+          if (strength <= 1) bar.classList.add('weak');
+          else if (strength <= 2) bar.classList.add('medium');
+          else bar.classList.add('strong');
+        }
+      });
+    });
+
+    const rules = {
+      username: {
+        required: true,
+        minLength: 3,
+        maxLength: 20,
+        pattern: /^[a-zA-Z0-9_]+$/,
+        message: '用户名只能包含字母、数字、下划线（3-20位）'
+      },
+      email: {
+        required: true,
+        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message: '请输入正确的邮箱地址'
+      },
+      password: {
+        required: true,
+        minLength: 6,
+        message: '密码长度不能少于6位'
+      },
+      password2: {
+        required: true,
+        validator: function(val) {
+          const pwd = document.querySelector('[name="password"]').value;
+          if (val !== pwd) return '两次输入的密码不一致';
+          return '';
+        }
+      }
+    };
+
+    App.initLiveValidation('#registerForm', rules);
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('registerBtn');
+      
+      if (!App.validateForm('#registerForm', rules)) {
+        return;
+      }
+
+      if (!document.getElementById('agree').checked) {
+        App.toastError('请先同意用户协议和隐私政策');
+        return;
+      }
+
+      if (!sliderVerified) {
+        App.toastError('请先完成人机验证');
+        return;
+      }
+
+      App.setButtonLoading(btn, true);
+
+      const formData = new FormData(e.target);
+      const data = {};
+      formData.forEach((v, k) => data[k] = v);
+      data.slider_token = sliderToken;
+      data.slider_x = 1;
+
+      const result = await App.post('/register', data);
+      
+      App.setButtonLoading(btn, false);
+
+      if (result.code === 0) {
+        App.toastSuccess('注册成功，正在跳转...');
+        setTimeout(() => {
+          window.location.href = result.data?.url || '/user/center';
+        }, 800);
+      } else {
+        App.toastError(result.msg);
+        if (result.msg.includes('验证')) {
+          document.querySelector('#sliderCaptcha').refresh?.();
+          sliderVerified = false;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

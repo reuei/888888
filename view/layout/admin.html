@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{literal}{__CONTENT__}{/literal} - {$site_name} 管理后台</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <style>
+    body { background: var(--bg-secondary); }
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .admin-sidebar {
+      width: 240px;
+      background: #1e1b4b;
+      color: #cbd5e1;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      transition: width var(--transition);
+      z-index: 100;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--gradient-primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .sidebar-logo strong {
+      color: white;
+      font-size: 16px;
+    }
+    .sidebar-menu {
+      padding: 12px 0;
+    }
+    .menu-group {
+      margin-bottom: 4px;
+    }
+    .menu-title {
+      padding: 8px 20px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #64748b;
+      letter-spacing: 0.5px;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 20px;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+    .menu-item:hover {
+      background: rgba(99,102,241,0.1);
+      color: white;
+    }
+    .menu-item.active {
+      background: rgba(99,102,241,0.15);
+      color: #818cf8;
+    }
+    .menu-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--primary);
+    }
+    .menu-icon {
+      font-size: 18px;
+      width: 22px;
+      text-align: center;
+    }
+    .submenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .submenu.open {
+      max-height: 500px;
+    }
+    .submenu .menu-item {
+      padding-left: 54px;
+      font-size: 13px;
+    }
+    .admin-main {
+      flex: 1;
+      margin-left: 240px;
+      min-width: 0;
+    }
+    .admin-header {
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .page-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+    .header-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    .header-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: var(--danger);
+      border-radius: 50%;
+      border: 2px solid var(--bg-primary);
+    }
+    .admin-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .admin-body {
+      padding: 24px;
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      border: 1px solid var(--border);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .stat-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .stat-icon.purple {
+      background: rgba(139,92,246,0.1);
+      color: #8b5cf6;
+    }
+    .stat-icon.blue {
+      background: rgba(59,130,246,0.1);
+      color: #3b82f6;
+    }
+    .stat-icon.green {
+      background: rgba(16,185,129,0.1);
+      color: #10b981;
+    }
+    .stat-icon.orange {
+      background: rgba(245,158,11,0.1);
+      color: #f59e0b;
+    }
+    .stat-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .stat-trend {
+      font-size: 12px;
+      color: var(--success);
+      margin-top: 2px;
+    }
+    .stat-trend.down {
+      color: var(--danger);
+    }
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .card-body {
+      padding: 20px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+    .chart-placeholder {
+      height: 320px;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      position: relative;
+      overflow: hidden;
+    }
+    .chart-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 39px,
+        rgba(148,163,184,0.1) 40px
+      );
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .table th:first-child { border-top-left-radius: var(--radius); }
+    .table th:last-child { border-top-right-radius: var(--radius); }
+    .table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+    .table tr:hover {
+      background: var(--bg-tertiary);
+    }
+    @media (max-width: 1024px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">加载中...</div>
+    </div>
+  </div>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">玄</div>
+        <strong>管理后台</strong>
+      </div>
+
+      <div class="sidebar-menu">
+        <div class="menu-title">总概览</div>
+        <div class="menu-group">
+          <a href="/admin/dashboard" class="menu-item {if $current_menu == 'dashboard'}active{/if}">
+            <span class="menu-icon">📊</span>
+            <span>仪表盘</span>
+          </a>
+          <a href="/admin/screen" class="menu-item {if $current_menu == 'screen'}active{/if}">
+            <span class="menu-icon">🖥️</span>
+            <span>数据大屏</span>
+          </a>
+        </div>
+
+        <div class="menu-title">店铺管理</div>
+        <div class="menu-group">
+          <div class="menu-item" onclick="toggleSubmenu(this)">
+            <span class="menu-icon">🏪</span>
+            <span>用户管理</span>
+            <span style="margin-left:auto">▾</span>
+          </div>
+          <div class="submenu {if in_array($current_menu, ['shop_users', 'shop_funds', 'shop_info', 'shop_status'])}open{/if}">
+            <a href="/admin/shop/users" class="menu-item {if $current_menu == 'shop_users'}active{/if}">用户列表</a>
+            <a href="/admin/shop/users" class="menu-item">资金管理</a>
+            <a href="/admin/shop/users" class="menu-item">信息管理</a>
+            <a href="/admin/shop/users" class="menu-item">店铺状态</a>
+          </div>
+        </div>
+        <div class="menu-group">
+          <a href="/admin/shop/realname" class="menu-item {if $current_menu == 'shop_realname'}active{/if}">
+            <span class="menu-icon">🪪</span>
+            <span>实名管理</span>
+          </a>
+          <a href="/admin/shop/qualification" class="menu-item {if $current_menu == 'shop_qualification'}active{/if}">
+            <span class="menu-icon">📋</span>
+            <span>资质管理</span>
+          </a>
+          <a href="/admin/shop/certification" class="menu-item {if $current_menu == 'shop_certification'}active{/if}">
+            <span class="menu-icon">✅</span>
+            <span>认证管理</span>
+          </a>
+          <a href="/admin/shop/risk" class="menu-item {if $current_menu == 'shop_risk'}active{/if}">
+            <span class="menu-icon">🛡️</span>
+            <span>风控管理</span>
+          </a>
+          <a href="/admin/shop/service" class="menu-item {if $current_menu == 'shop_service'}active{/if}">
+            <span class="menu-icon">🎧</span>
+            <span>客服管理</span>
+          </a>
+        </div>
+
+        <div class="menu-title">消息管理</div>
+        <div class="menu-group">
+          <a href="/admin/message/publish" class="menu-item {if $current_menu == 'message_publish'}active{/if}">
+            <span class="menu-icon">✉️</span>
+            <span>发布消息</span>
+          </a>
+          <a href="/admin/message/list" class="menu-item {if $current_menu == 'message_list'}active{/if}">
+            <span class="menu-icon">📨</span>
+            <span>消息管理</span>
+          </a>
+        </div>
+
+        <div class="menu-title">公告管理</div>
+        <div class="menu-group">
+          <a href="/admin/notice/publish" class="menu-item {if $current_menu == 'notice_publish'}active{/if}">
+            <span class="menu-icon">📢</span>
+            <span>发布公告</span>
+          </a>
+          <a href="/admin/notice/list" class="menu-item {if $current_menu == 'notice_list'}active{/if}">
+            <span class="menu-icon">📰</span>
+            <span>公告管理</span>
+          </a>
+        </div>
+
+        <div class="menu-title">系统配置</div>
+        <div class="menu-group">
+          <a href="/admin/system/site" class="menu-item {if $current_menu == 'system_site'}active{/if}">
+            <span class="menu-icon">⚙️</span>
+            <span>站点配置</span>
+          </a>
+          <a href="/admin/system/update" class="menu-item {if $current_menu == 'system_update'}active{/if}">
+            <span class="menu-icon">🔄</span>
+            <span>系统更新</span>
+          </a>
+          <a href="/admin/system/withdraw" class="menu-item {if $current_menu == 'system_withdraw'}active{/if}">
+            <span class="menu-icon">💸</span>
+            <span>提现管理</span>
+          </a>
+          <a href="/admin/system/channel" class="menu-item {if $current_menu == 'system_channel'}active{/if}">
+            <span class="menu-icon">🔌</span>
+            <span>通道管理</span>
+          </a>
+        </div>
+
+        <div class="menu-title">数据管理</div>
+        <div class="menu-group">
+          <a href="/admin/data/log" class="menu-item {if $current_menu == 'data_log'}active{/if}">
+            <span class="menu-icon">📝</span>
+            <span>日志管理</span>
+          </a>
+          <a href="/admin/data/server" class="menu-item {if $current_menu == 'data_server'}active{/if}">
+            <span class="menu-icon">🖥️</span>
+            <span>服务器日志</span>
+          </a>
+          <a href="/admin/data/database" class="menu-item {if $current_menu == 'data_database'}active{/if}">
+            <span class="menu-icon">🗄️</span>
+            <span>数据库日志</span>
+          </a>
+          <a href="/admin/data/login" class="menu-item {if $current_menu == 'data_login'}active{/if}">
+            <span class="menu-icon">🔐</span>
+            <span>登录日志</span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-header">
+        <div class="header-left">
+          <span class="page-title">{$page_title|default='仪表盘'}</span>
+        </div>
+        <div class="header-right">
+          <div class="header-btn" title="通知">
+            🔔
+            <span class="header-badge"></span>
+          </div>
+          <div class="header-btn" title="首页">
+            <a href="/" style="color:inherit">🏠</a>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <div class="admin-avatar">管</div>
+            <div style="font-size:13px">
+              <div style="font-weight:500">admin</div>
+              <div style="font-size:11px;color:var(--text-muted)">超级管理员</div>
+            </div>
+            <a href="/admin/logout" style="font-size:12px;color:var(--text-muted);margin-left:8px">退出</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="admin-body">
+        {__CONTENT__}
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    function toggleSubmenu(el) {
+      const submenu = el.nextElementSibling;
+      submenu.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

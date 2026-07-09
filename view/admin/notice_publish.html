@@ -1,0 +1,39 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'notice_publish'; $page_title = '发布公告'; {/php}
+
+{block name="__CONTENT__"}
+<div class="card" style="max-width:800px">
+  <div class="card-header">
+    <h3 class="card-title">发布公告</h3>
+  </div>
+  <div class="card-body">
+    <form>
+      <div class="form-group">
+        <label class="form-label">公告类型</label>
+        <select name="type" class="form-select">
+          <option value="system">系统公告</option>
+          <option value="update">更新公告</option>
+          <option value="activity">活动公告</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">公告标题</label>
+        <input type="text" name="title" class="form-input" placeholder="请输入公告标题">
+      </div>
+      <div class="form-group">
+        <label class="form-label">公告内容</label>
+        <textarea name="content" class="form-textarea" rows="10" placeholder="请输入公告内容..."></textarea>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" checked> 首页置顶显示
+        </label>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button type="submit" class="btn btn-primary">立即发布</button>
+        <button type="button" class="btn btn-secondary">取消</button>
+      </div>
+    </form>
+  </div>
+</div>
+{/block}

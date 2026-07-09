@@ -1,0 +1,169 @@
+{extend name="layout/main"}
+
+{block name="__CONTENT__"}
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content fade-in">
+        <h1>专业的数字点卡<br>交易平台</h1>
+        <p>海量数字商品，7x24小时自动发货，即买即用。安全稳定的交易环境，让您购物无忧。支持游戏点卡、视频会员、音乐会员等多种品类。</p>
+        <div class="hero-buttons">
+          <a href="/category/1" class="btn btn-lg btn-primary">立即选购</a>
+          <a href="#" class="btn btn-lg btn-outline">了解更多</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <strong>10万+</strong>
+            <span>注册用户</span>
+          </div>
+          <div class="hero-stat">
+            <strong>100万+</strong>
+            <span>累计订单</span>
+          </div>
+          <div class="hero-stat">
+            <strong>99.9%</strong>
+            <span>发货成功率</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-illustration slide-up">
+        <svg viewBox="0 0 400 400" width="400" height="400">
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.2" />
+              <stop offset="100%" style="stop-color:#ec4899;stop-opacity:0.2" />
+            </linearGradient>
+            <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#6366f1" />
+              <stop offset="100%" style="stop-color:#8b5cf6" />
+            </linearGradient>
+          </defs>
+          
+          <circle cx="200" cy="200" r="150" fill="url(#grad1)" />
+          
+          <rect x="80" y="120" width="240" height="160" rx="20" fill="white" style="filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15))">
+            <animate attributeName="y" values="120;110;120" dur="3s" repeatCount="indefinite" />
+          </rect>
+          
+          <rect x="100" y="140" width="80" height="80" rx="12" fill="url(#cardGrad)" />
+          <text x="140" y="185" text-anchor="middle" fill="white" font-size="30" font-weight="bold">VIP</text>
+          
+          <rect x="190" y="145" width="110" height="16" rx="8" fill="#f1f5f9" />
+          <rect x="190" y="170" width="90" height="12" rx="6" fill="#e2e8f0" />
+          <rect x="190" y="190" width="70" height="12" rx="6" fill="#e2e8f0" />
+          
+          <rect x="100" y="230" width="200" height="35" rx="17" fill="url(#cardGrad)" />
+          <text x="200" y="252" text-anchor="middle" fill="white" font-size="14" font-weight="600">立即购买</text>
+          
+          <circle cx="320" cy="100" r="40" fill="#10b981" opacity="0.8">
+            <animate attributeName="r" values="40;45;40" dur="2s" repeatCount="indefinite" />
+          </circle>
+          <text x="320" y="107" text-anchor="middle" fill="white" font-size="14" font-weight="bold">热销</text>
+          
+          <rect x="30" y="250" width="70" height="50" rx="10" fill="white" style="filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1))">
+            <animate attributeName="y" values="250;240;250" dur="2.5s" repeatCount="indefinite" />
+          </rect>
+          <text x="65" y="280" text-anchor="middle" font-size="12" fill="#64748b">秒发</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="categories">
+  <div class="container">
+    <div class="categories-grid">
+      {volist name="categories" id="cat"}
+      <a href="/category/{$cat.id}" class="category-item fade-in">
+        <div class="category-icon">
+          {switch $cat.icon}
+          {case game}🎮{/case}
+          {case video}📺{/case}
+          {case music}🎵{/case}
+          {case software}💻{/case}
+          {case social}💬{/case}
+          {case education}📚{/case}
+          {case life}🏠{/case}
+          {default /}✨{/default}
+          {/switch}
+        </div>
+        <span>{$cat.name}</span>
+        {if $cat.count}<span style="font-size:11px;color:var(--text-muted)">{$cat.count}件商品</span>{/if}
+      </a>
+      {/volist}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">热门推荐</h2>
+      <a href="#" class="section-more">查看更多 →</a>
+    </div>
+    <div class="goods-grid">
+      {volist name="goods" id="good"}
+      <a href="/goods/{$good.id}" class="goods-card slide-up">
+        <div class="goods-image">🎁</div>
+        <div class="goods-info">
+          <div class="goods-name">{$good.name}</div>
+          <div class="goods-price-row">
+            <span class="goods-price">{$good.price}</span>
+            <span class="goods-original-price">¥{$good.original_price}</span>
+          </div>
+          <div class="goods-sales">已售 {$good.sales}+</div>
+        </div>
+      </a>
+      {/volist}
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--bg-tertiary)">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">最新公告</h2>
+      <a href="#" class="section-more">更多公告 →</a>
+    </div>
+    <div class="card" style="padding:8px 0">
+      {volist name="notices" id="notice"}
+      <div style="display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);last-child {border:none}}">
+        <span class="badge badge-primary" style="margin-right:12px">公告</span>
+        <a href="#" style="flex:1">{$notice.title}</a>
+        <span style="color:var(--text-muted);font-size:13px">{$notice.time}</span>
+      </div>
+      {/volist}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">平台优势</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+      <div class="card card-hover fade-in" style="padding:32px;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">⚡</div>
+        <h3 style="margin-bottom:8px">极速发货</h3>
+        <p style="font-size:13px;color:var(--text-secondary)">7x24小时自动发货，即买即用，无需等待</p>
+      </div>
+      <div class="card card-hover fade-in" style="padding:32px;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">🔒</div>
+        <h3 style="margin-bottom:8px">安全保障</h3>
+        <p style="font-size:13px;color:var(--text-secondary)">正规渠道货源，商品质量有保障，售后无忧</p>
+      </div>
+      <div class="card card-hover fade-in" style="padding:32px;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">💰</div>
+        <h3 style="margin-bottom:8px">优惠价格</h3>
+        <p style="font-size:13px;color:var(--text-secondary)">源头直供，价格优惠，让您省钱省心</p>
+      </div>
+      <div class="card card-hover fade-in" style="padding:32px;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">👨‍💼</div>
+        <h3 style="margin-bottom:8px">贴心客服</h3>
+        <p style="font-size:13px;color:var(--text-secondary)">专业客服团队，随时为您解决问题</p>
+      </div>
+    </div>
+  </div>
+</section>
+{/block}

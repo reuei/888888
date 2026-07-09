@@ -1,0 +1,46 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'system_channel'; $page_title = '通道管理'; {/php}
+
+{block name="__CONTENT__"}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">支付/短信通道</h3>
+    <button class="btn btn-sm btn-primary">+ 添加通道</button>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>通道名称</th>
+          <th>标识</th>
+          <th>类型</th>
+          <th>排序</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {volist name="channels" id="item"}
+        <tr>
+          <td>{$item.id}</td>
+          <td style="font-weight:500">{$item.name}</td>
+          <td style="font-family:monospace;color:var(--primary)">{$item.code}</td>
+          <td><span class="badge badge-secondary">{$item.type}</span></td>
+          <td>{$item.sort}</td>
+          <td>
+            <span class="badge badge-{$item.status == 1 ? 'success' : 'secondary'}">
+              {$item.status == 1 ? '启用' : '禁用'}
+            </span>
+          </td>
+          <td>
+            <a href="#" style="color:var(--primary);font-size:13px;margin-right:8px">配置</a>
+            <a href="#" style="color:var(--warning);font-size:13px">{$item.status == 1 ? '禁用' : '启用'}</a>
+          </td>
+        </tr>
+        {/volist}
+      </tbody>
+    </table>
+  </div>
+</div>
+{/block}

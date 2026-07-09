@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>账号设置 - {$site_name}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <style>
+    .user-layout { display: flex; gap: 24px; padding: 24px 0; min-height: calc(100vh - 68px - 300px); }
+    .user-sidebar { width: 240px; flex-shrink: 0; }
+    .user-card { background: var(--gradient-primary); border-radius: var(--radius-md); padding: 28px 20px; color: white; margin-bottom: 16px; text-align: center; }
+    .user-avatar-lg { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; font-weight: 700; border: 3px solid rgba(255,255,255,0.3); }
+    .user-menu { background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; }
+    .user-menu a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--text-secondary); border-left: 3px solid transparent; transition: all var(--transition-fast); }
+    .user-menu a:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .user-menu a.active { background: var(--bg-tertiary); color: var(--primary); border-left-color: var(--primary); font-weight: 500; }
+    .user-content { flex: 1; min-width: 0; }
+    .page-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+    .section-card { background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+    .section-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .section-title { font-size: 16px; font-weight: 600; }
+    .section-body { padding: 24px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .header-inner { display: flex; align-items: center; height: 68px; gap: 48px; max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; }
+    .logo-icon { width: 38px; height: 38px; background: var(--gradient-primary); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px; }
+    .nav { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .nav a { padding: 8px 16px; border-radius: var(--radius); font-weight: 500; color: var(--text-secondary); }
+    .footer { background: var(--text-primary); color: #cbd5e1; padding: 60px 0 24px; margin-top: 60px; }
+    .footer-bottom { border-top: 1px solid #334155; padding-top: 24px; text-align: center; font-size: 12px; color: #64748b; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; cursor: pointer; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .avatar-upload { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+    .avatar-big { width: 80px; height: 80px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content"><div class="loader-spinner"></div><div class="loader-text">加载中...</div></div>
+  </div>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo"><div class="logo-icon">玄</div><span>{$site_name}</span></a>
+      <nav class="nav"><a href="/">首页</a><a href="/user/center">用户中心</a><a href="/user/profile" style="color:var(--primary);background:var(--bg-tertiary)">账号设置</a></nav>
+      <div class="header-right"><div class="user-avatar">{$user.username|mb_substr=0,1}</div></div>
+    </div>
+  </header>
+
+  <div class="container" style="max-width:1280px;margin:0 auto;padding:0 24px">
+    <div class="user-layout">
+      <aside class="user-sidebar">
+        <div class="user-card">
+          <div class="user-avatar-lg">{$user.username|mb_substr=0,1}</div>
+          <h3>{$user.username}</h3>
+          <div style="font-size:12px;opacity:0.8">{$user.email}</div>
+        </div>
+        <div class="user-menu">
+          <a href="/user/center">🏠 个人中心</a>
+          <a href="/user/orders">📋 我的订单</a>
+          <a href="/user/recharge">💰 账户充值</a>
+          <a href="/user/messages">💬 消息中心</a>
+          <a href="/user/profile" class="active">⚙️ 账号设置</a>
+        </div>
+      </aside>
+
+      <main class="user-content">
+        <h1 class="page-title">账号设置</h1>
+
+        <div class="section-card">
+          <div class="section-header"><h2 class="section-title">基本信息</h2></div>
+          <div class="section-body">
+            <div class="avatar-upload">
+              <div class="avatar-big">{$user.username|mb_substr=0,1}</div>
+              <div>
+                <button class="btn btn-primary btn-sm">更换头像</button>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:8px">支持 JPG、PNG 格式，文件大小不超过 2MB</p>
+              </div>
+            </div>
+            <form>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">用户名</label>
+                  <input type="text" class="form-input" value="{$user.username}" disabled>
+                  <div class="form-hint">用户名不可修改</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">昵称</label>
+                  <input type="text" name="nickname" class="form-input" value="{$user.username}">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">邮箱</label>
+                  <input type="email" name="email" class="form-input" value="{$user.email}">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">手机号</label>
+                  <input type="text" class="form-input" placeholder="未绑定">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">保存修改</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header"><h2 class="section-title">安全设置</h2></div>
+          <div class="section-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-weight:500">登录密码</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px">定期更换密码可以提高账户安全性</div>
+              </div>
+              <button class="btn btn-outline btn-sm">修改密码</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-weight:500">支付密码</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px">设置支付密码后，使用余额支付需要验证</div>
+              </div>
+              <button class="btn btn-outline btn-sm">设置支付密码</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0">
+              <div>
+                <div style="font-weight:500">手机绑定</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px">绑定手机后可用于找回密码和接收通知</div>
+              </div>
+              <button class="btn btn-primary btn-sm">去绑定</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="footer" style="margin-top:0">
+    <div class="footer-bottom">© 2026 {$site_name} 版权所有 · 版本：v{$site_version}</div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

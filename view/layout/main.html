@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{$site_name} - {literal}{__CONTENT__}{/literal}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="https://unpkg.com/@icon-park/vue-next/styles/index.css">
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">加载中...</div>
+    </div>
+  </div>
+
+  <div class="notice-bar">
+    <div class="container">
+      <div class="notice-content">
+        <span class="notice-icon">📢</span>
+        【系统公告】欢迎使用{$site_name}，新用户首单立减5元，限时优惠中！
+      </div>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="/" class="logo">
+          <div class="logo-icon">玄</div>
+          <span>{$site_name}</span>
+        </a>
+
+        <nav class="nav">
+          <a href="/" class="active">首页</a>
+          <a href="/category/1">游戏点卡</a>
+          <a href="/category/2">视频会员</a>
+          <a href="/category/3">音乐会员</a>
+          <a href="/category/4">软件激活</a>
+          <a href="/category/7">生活服务</a>
+        </nav>
+
+        <div class="header-right">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <form action="/search" method="get">
+              <input type="text" name="keyword" placeholder="搜索商品...">
+            </form>
+          </div>
+
+          {if $userInfo}
+          <div class="user-menu">
+            <div class="user-avatar">{$userInfo.username|mb_substr=0,1}</div>
+            <div class="user-dropdown">
+              <a href="/user/center">👤 个人中心</a>
+              <a href="/user/orders">📋 我的订单</a>
+              <a href="/user/recharge">💰 账户充值</a>
+              <a href="/user/messages">💬 消息中心</a>
+              <a href="/logout" style="border-top:1px solid var(--border);color:var(--danger)">退出登录</a>
+            </div>
+          </div>
+          {else}
+          <div>
+            <a href="/login" class="btn btn-sm btn-outline">登录</a>
+            <a href="/register" class="btn btn-sm btn-primary">注册</a>
+          </div>
+          {/if}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    {__CONTENT__}
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo" style="color:white">
+            <div class="logo-icon">玄</div>
+            <span>{$site_name}</span>
+          </div>
+          <p>专业的数字点卡交易平台，提供安全、快捷、稳定的数字商品购买服务。7x24小时自动发货，即买即用。</p>
+        </div>
+        <div>
+          <h4>快速导航</h4>
+          <ul>
+            <li><a href="/">首页</a></li>
+            <li><a href="/category/1">游戏点卡</a></li>
+            <li><a href="/category/2">视频会员</a></li>
+            <li><a href="/category/3">音乐会员</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>帮助中心</h4>
+          <ul>
+            <li><a href="#">新手指南</a></li>
+            <li><a href="#">购买流程</a></li>
+            <li><a href="#">常见问题</a></li>
+            <li><a href="#">联系客服</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>关于我们</h4>
+          <ul>
+            <li><a href="#">关于平台</a></li>
+            <li><a href="#">入驻合作</a></li>
+            <li><a href="#">服务协议</a></li>
+            <li><a href="#">隐私政策</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>联系我们</h4>
+          <ul>
+            <li>工作时间：7x24小时</li>
+            <li>客服QQ：123456789</li>
+            <li>商务合作：biz@xuanwu.com</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2026 {$site_name} 版权所有</div>
+        <div>
+          <span>ICP备案号：京ICP备12345678号</span>
+          <span style="margin-left:20px">版本：v{$site_version}</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

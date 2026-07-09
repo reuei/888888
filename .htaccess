@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    Options +FollowSymlinks -Multiviews
+    RewriteEngine On
+
+    # 禁止直接访问敏感目录
+    RewriteRule ^(application|runtime|\.git|\.env)(/|$) - [F,L]
+
+    # 若 public 目录中存在对应静态资源，则直接提供（如 uploads）
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ public/index.php [QSA,PT,L]
+</IfModule>

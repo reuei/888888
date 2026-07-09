@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户登录 - {$site_name}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+      max-width: 960px;
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.25);
+    }
+    .login-banner {
+      background: var(--gradient-primary);
+      padding: 60px 48px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-banner::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .login-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: -60px;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .login-banner h2 {
+      font-size: 28px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .login-banner p {
+      opacity: 0.9;
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+    .banner-illus {
+      margin-top: 40px;
+      position: relative;
+      z-index: 1;
+    }
+    .login-form-wrap {
+      padding: 60px 48px;
+    }
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .login-logo .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .login-logo strong {
+      font-size: 22px;
+    }
+    .login-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .login-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      font-size: 14px;
+    }
+    .form-input {
+      height: 48px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      font-size: 13px;
+    }
+    .form-footer a {
+      color: var(--primary);
+    }
+    .login-btn {
+      height: 50px;
+      font-size: 16px;
+    }
+    .login-switch {
+      text-align: center;
+      margin-top: 24px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .login-switch a {
+      color: var(--primary);
+      font-weight: 500;
+    }
+    @media (max-width: 768px) {
+      .login-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .login-banner {
+        display: none;
+      }
+      .login-form-wrap {
+        padding: 40px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">加载中...</div>
+    </div>
+  </div>
+
+  <div class="login-wrapper">
+    <div class="login-banner">
+      <h2>欢迎回来 👋</h2>
+      <p>登录您的账户，畅享海量数字商品。7x24小时自动发货，即买即用，安全便捷。</p>
+      <div class="banner-illus">
+        <svg viewBox="0 0 300 200" width="100%" height="200">
+          <defs>
+            <linearGradient id="cardGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:rgba(255,255,255,0.9)" />
+              <stop offset="100%" style="stop-color:rgba(255,255,255,0.6)" />
+            </linearGradient>
+          </defs>
+          <rect x="30" y="60" width="180" height="100" rx="14" fill="url(#cardGrad2)">
+            <animate attributeName="y" values="60;50;60" dur="3s" repeatCount="indefinite" />
+          </rect>
+          <rect x="50" y="80" width="50" height="30" rx="6" fill="#6366f1" opacity="0.8" />
+          <rect x="50" y="120" width="100" height="8" rx="4" fill="rgba(99,102,241,0.3)" />
+          <rect x="50" y="135" width="80" height="6" rx="3" fill="rgba(99,102,241,0.2)" />
+          
+          <rect x="100" y="30" width="160" height="90" rx="14" fill="white" opacity="0.15" stroke="rgba(255,255,255,0.3)" stroke-width="1">
+            <animate attributeName="y" values="30;20;30" dur="2.5s" repeatCount="indefinite" />
+          </rect>
+          <text x="180" y="75" text-anchor="middle" fill="white" font-size="14" font-weight="600">极速发货</text>
+          <text x="180" y="95" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11">即买即用</text>
+          
+          <circle cx="260" cy="150" r="25" fill="#10b981" opacity="0.9">
+            <animate attributeName="r" values="25;30;25" dur="2s" repeatCount="indefinite" />
+          </circle>
+          <text x="260" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="bold">99.9%</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="login-form-wrap">
+      <div class="login-logo">
+        <div class="logo-icon">玄</div>
+        <strong>{$site_name}</strong>
+      </div>
+      <h1 class="login-title">用户登录</h1>
+      <p class="login-subtitle">请输入您的账号信息</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" name="username" class="form-input" placeholder="请输入用户名" autocomplete="username">
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" name="password" class="form-input" placeholder="请输入密码" autocomplete="current-password">
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">人机验证</label>
+          <div class="slider-captcha" id="sliderCaptcha">
+            <div class="slider-track">
+              <div class="slider-fill"></div>
+              <div class="slider-btn">→</div>
+              <div class="slider-text">向右滑动完成验证</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="checkbox" name="remember"> 记住我
+          </label>
+          <a href="#">忘记密码？</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block login-btn" id="loginBtn">登录</button>
+      </form>
+
+      <div class="login-switch">
+        还没有账号？<a href="/register">立即注册 →</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    let sliderVerified = false;
+    let sliderToken = '';
+
+    App.initSliderCaptcha('#sliderCaptcha', function(token) {
+      sliderVerified = true;
+      sliderToken = token;
+    });
+
+    const rules = {
+      username: {
+        required: true,
+        minLength: 3,
+        maxLength: 20,
+        message: '请输入正确的用户名（3-20位）'
+      },
+      password: {
+        required: true,
+        minLength: 6,
+        message: '密码长度不能少于6位'
+      }
+    };
+
+    App.initLiveValidation('#loginForm', rules);
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      
+      if (!App.validateForm('#loginForm', rules)) {
+        return;
+      }
+
+      if (!sliderVerified) {
+        App.toastError('请先完成人机验证');
+        return;
+      }
+
+      App.setButtonLoading(btn, true);
+
+      const formData = new FormData(e.target);
+      const data = {};
+      formData.forEach((v, k) => data[k] = v);
+      data.slider_token = sliderToken;
+      data.slider_x = 1;
+
+      const result = await App.post('/login', data);
+      
+      App.setButtonLoading(btn, false);
+
+      if (result.code === 0) {
+        App.toastSuccess('登录成功');
+        setTimeout(() => {
+          window.location.href = result.data?.url || '/user/center';
+        }, 800);
+      } else {
+        App.toastError(result.msg);
+        if (result.msg.includes('验证')) {
+          document.querySelector('#sliderCaptcha').refresh?.();
+          sliderVerified = false;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

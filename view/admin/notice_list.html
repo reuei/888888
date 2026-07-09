@@ -1,0 +1,46 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'notice_list'; $page_title = '公告管理'; {/php}
+
+{block name="__CONTENT__"}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">公告管理</h3>
+    <a href="/admin/notice/publish" class="btn btn-sm btn-primary">+ 发布公告</a>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>标题</th>
+          <th>类型</th>
+          <th>浏览量</th>
+          <th>发布时间</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {volist name="list" id="item"}
+        <tr>
+          <td>{$item.id}</td>
+          <td style="font-weight:500">{$item.title}</td>
+          <td><span class="badge badge-primary">{$item.type}</span></td>
+          <td>{$item.views}</td>
+          <td style="color:var(--text-muted)">{$item.create_time}</td>
+          <td>
+            <span class="badge badge-{$item.status == 1 ? 'success' : 'secondary'}">
+              {$item.status == 1 ? '已发布' : '已下架'}
+            </span>
+          </td>
+          <td>
+            <a href="#" style="color:var(--primary);font-size:13px;margin-right:8px">编辑</a>
+            <a href="#" style="color:var(--danger);font-size:13px">删除</a>
+          </td>
+        </tr>
+        {/volist}
+      </tbody>
+    </table>
+  </div>
+</div>
+{/block}

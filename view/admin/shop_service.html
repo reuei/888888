@@ -1,0 +1,46 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'shop_service'; $page_title = '客服管理'; {/php}
+
+{block name="__CONTENT__"}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">客服管理</h3>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>店铺名称</th>
+          <th>客服QQ</th>
+          <th>响应时间</th>
+          <th>评分</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {volist name="list" id="item"}
+        <tr>
+          <td>{$item.id}</td>
+          <td style="font-weight:500">{$item.shop_name}</td>
+          <td style="font-family:monospace">{$item.service_qq}</td>
+          <td>{$item.response_time}</td>
+          <td>
+            <span style="color:var(--warning)">★</span> {$item.rating}
+          </td>
+          <td>
+            <span class="badge badge-{$item.status == 1 ? 'success' : 'secondary'}">
+              {$item.status == 1 ? '在线' : '离线'}
+            </span>
+          </td>
+          <td>
+            <a href="#" style="color:var(--primary);font-size:13px">详情</a>
+          </td>
+        </tr>
+        {/volist}
+      </tbody>
+    </table>
+  </div>
+</div>
+{/block}

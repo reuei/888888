@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>账户充值 - {$site_name}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <style>
+    .user-layout { display: flex; gap: 24px; padding: 24px 0; min-height: calc(100vh - 68px - 300px); }
+    .user-sidebar { width: 240px; flex-shrink: 0; }
+    .user-card { background: var(--gradient-primary); border-radius: var(--radius-md); padding: 28px 20px; color: white; margin-bottom: 16px; text-align: center; }
+    .user-avatar-lg { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; font-weight: 700; border: 3px solid rgba(255,255,255,0.3); }
+    .user-menu { background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; }
+    .user-menu a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--text-secondary); border-left: 3px solid transparent; transition: all var(--transition-fast); }
+    .user-menu a:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .user-menu a.active { background: var(--bg-tertiary); color: var(--primary); border-left-color: var(--primary); font-weight: 500; }
+    .user-content { flex: 1; min-width: 0; }
+    .page-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+    .section-card { background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .section-body { padding: 24px; }
+    .balance-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: var(--radius-md); padding: 32px; color: white; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+    .balance-info h3 { font-size: 14px; opacity: 0.8; margin-bottom: 8px; }
+    .balance-info strong { font-size: 36px; font-weight: 700; }
+    .amount-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 24px; }
+    .amount-item { padding: 18px; border: 2px solid var(--border); border-radius: var(--radius); text-align: center; cursor: pointer; transition: all var(--transition-fast); }
+    .amount-item:hover, .amount-item.active { border-color: var(--primary); background: rgb(99 102 241 / 0.05); }
+    .amount-item strong { font-size: 22px; color: var(--danger); display: block; margin-bottom: 4px; }
+    .amount-item span { font-size: 12px; color: var(--text-muted); }
+    .payment-methods { display: flex; gap: 12px; margin-bottom: 24px; }
+    .pay-method { flex: 1; padding: 16px; border: 2px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all var(--transition-fast); font-weight: 500; }
+    .pay-method.active { border-color: var(--primary); background: rgb(99 102 241 / 0.05); color: var(--primary); }
+    .header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .header-inner { display: flex; align-items: center; height: 68px; gap: 48px; max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; }
+    .logo-icon { width: 38px; height: 38px; background: var(--gradient-primary); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px; }
+    .nav { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .nav a { padding: 8px 16px; border-radius: var(--radius); font-weight: 500; color: var(--text-secondary); }
+    .footer { background: var(--text-primary); color: #cbd5e1; padding: 60px 0 24px; margin-top: 60px; }
+    .footer-bottom { border-top: 1px solid #334155; padding-top: 24px; text-align: center; font-size: 12px; color: #64748b; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; cursor: pointer; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+  </style>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content"><div class="loader-spinner"></div><div class="loader-text">加载中...</div></div>
+  </div>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo"><div class="logo-icon">玄</div><span>{$site_name}</span></a>
+      <nav class="nav"><a href="/">首页</a><a href="/user/center">用户中心</a><a href="/user/recharge" style="color:var(--primary);background:var(--bg-tertiary)">账户充值</a></nav>
+      <div class="header-right"><div class="user-avatar">{$user.username|mb_substr=0,1}</div></div>
+    </div>
+  </header>
+
+  <div class="container" style="max-width:1280px;margin:0 auto;padding:0 24px">
+    <div class="user-layout">
+      <aside class="user-sidebar">
+        <div class="user-card">
+          <div class="user-avatar-lg">{$user.username|mb_substr=0,1}</div>
+          <h3>{$user.username}</h3>
+          <div style="font-size:12px;opacity:0.8">账户余额：¥{$user.balance|format_money}</div>
+        </div>
+        <div class="user-menu">
+          <a href="/user/center">🏠 个人中心</a>
+          <a href="/user/orders">📋 我的订单</a>
+          <a href="/user/recharge" class="active">💰 账户充值</a>
+          <a href="/user/messages">💬 消息中心</a>
+          <a href="/user/profile">⚙️ 账号设置</a>
+        </div>
+      </aside>
+
+      <main class="user-content">
+        <h1 class="page-title">账户充值</h1>
+
+        <div class="balance-card">
+          <div class="balance-info">
+            <h3>当前余额</h3>
+            <strong>¥{$user.balance|format_money}</strong>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:14px;opacity:0.8;margin-bottom:8px">充值享优惠</div>
+            <button class="btn" style="background:white;color:var(--primary);font-weight:600">充值记录</button>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header"><h3 class="card-title" style="font-size:16px;font-weight:600">选择充值金额</h3></div>
+          <div class="section-body">
+            <div class="amount-grid">
+              {volist name="amounts" id="amt"}
+              <div class="amount-item {$amt == 50 ? 'active' : ''}">
+                <strong>¥{$amt}</strong>
+                {if $amt >= 100}<span>送{$amt * 0.05}元</span>{else}<span>推荐</span>{/if}
+              </div>
+              {/volist}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">自定义金额</label>
+              <input type="number" class="form-input" placeholder="输入其他金额，最低10元">
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header"><h3 class="card-title" style="font-size:16px;font-weight:600">选择支付方式</h3></div>
+          <div class="section-body">
+            <div class="payment-methods">
+              <div class="pay-method active"><span style="font-size:24px">💳</span>支付宝</div>
+              <div class="pay-method"><span style="font-size:24px">💚</span>微信支付</div>
+              <div class="pay-method"><span style="font-size:24px">🐧</span>QQ钱包</div>
+            </div>
+            <button class="btn btn-primary btn-lg btn-block">立即充值</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="footer" style="margin-top:0">
+    <div class="footer-bottom">© 2026 {$site_name} 版权所有 · 版本：v{$site_version}</div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

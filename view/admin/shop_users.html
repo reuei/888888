@@ -1,0 +1,61 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'shop_users'; $page_title = '用户管理'; {/php}
+
+{block name="__CONTENT__"}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">店铺用户列表</h3>
+    <div style="display:flex;gap:10px">
+      <input type="text" placeholder="搜索店铺名称..." style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;width:200px">
+      <button class="btn btn-sm btn-primary">搜索</button>
+    </div>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>店铺名称</th>
+          <th>用户名</th>
+          <th>余额</th>
+          <th>订单数</th>
+          <th>状态</th>
+          <th>注册时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {volist name="users" id="u"}
+        <tr>
+          <td>{$u.id}</td>
+          <td style="font-weight:500">{$u.shop_name}</td>
+          <td>{$u.username}</td>
+          <td style="color:var(--danger);font-weight:600">¥{$u.balance}</td>
+          <td>{$u.orders}</td>
+          <td>
+            <span class="badge badge-{$u.status == 1 ? 'success' : 'warning'}">
+              {$u.status == 1 ? '正常' : '禁用'}
+            </span>
+          </td>
+          <td style="color:var(--text-muted)">{$u.register_time}</td>
+          <td>
+            <a href="#" style="color:var(--primary);font-size:13px;margin-right:10px">详情</a>
+            <a href="#" style="color:var(--warning);font-size:13px;margin-right:10px">编辑</a>
+            <a href="#" style="color:var(--danger);font-size:13px">禁用</a>
+          </td>
+        </tr>
+        {/volist}
+      </tbody>
+    </table>
+  </div>
+  <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+    <div class="pagination">
+      <a href="#">上一页</a>
+      <span class="current">1</span>
+      <a href="#">2</a>
+      <a href="#">3</a>
+      <a href="#">下一页</a>
+    </div>
+  </div>
+</div>
+{/block}

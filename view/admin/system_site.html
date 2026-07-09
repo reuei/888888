@@ -1,0 +1,59 @@
+{extend name="layout/admin"}
+{php} $current_menu = 'system_site'; $page_title = '站点配置'; {/php}
+
+{block name="__CONTENT__"}
+<div class="card" style="max-width:900px">
+  <div class="card-header">
+    <h3 class="card-title">站点配置</h3>
+  </div>
+  <div class="card-body">
+    <form id="siteForm">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="form-group">
+          <label class="form-label">站点名称</label>
+          <input type="text" name="site_name" class="form-input" value="{$config.site_name}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">站点标题</label>
+          <input type="text" name="site_title" class="form-input" value="{$config.site_title}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">站点关键词</label>
+        <input type="text" name="site_keywords" class="form-input" value="{$config.site_keywords}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">站点描述</label>
+        <textarea name="site_description" class="form-textarea" rows="3">{$config.site_description}</textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="form-group">
+          <label class="form-label">ICP备案号</label>
+          <input type="text" name="site_icp" class="form-input" value="{$config.site_icp}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">版权信息</label>
+          <input type="text" name="site_copyright" class="form-input" value="{$config.site_copyright}">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="form-group">
+          <label class="form-label">注册开关</label>
+          <select name="register_open" class="form-select">
+            <option value="1" {$config.register_open == 1 ? 'selected' : ''}>开启注册</option>
+            <option value="0" {$config.register_open == 0 ? 'selected' : ''}>关闭注册</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">站点状态</label>
+          <select name="site_status" class="form-select">
+            <option value="1" {$config.site_status == 1 ? 'selected' : ''}>正常运行</option>
+            <option value="0" {$config.site_status == 0 ? 'selected' : ''}>维护中</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">保存配置</button>
+    </form>
+  </div>
+</div>
+{/block}

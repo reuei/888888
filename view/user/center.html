@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户中心 - {$site_name}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <style>
+    .user-layout {
+      display: flex;
+      gap: 24px;
+      padding: 24px 0;
+      min-height: calc(100vh - 68px - 300px);
+    }
+    .user-sidebar {
+      width: 240px;
+      flex-shrink: 0;
+    }
+    .user-card {
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md);
+      padding: 28px 20px;
+      color: white;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .user-avatar-lg {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 24px;
+      font-weight: 700;
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+    .user-card h3 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    .user-card .balance {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+    .user-card .balance strong {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .user-menu {
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .user-menu a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      color: var(--text-secondary);
+      border-left: 3px solid transparent;
+      transition: all var(--transition-fast);
+    }
+    .user-menu a:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    .user-menu a.active {
+      background: var(--bg-tertiary);
+      color: var(--primary);
+      border-left-color: var(--primary);
+      font-weight: 500;
+    }
+    .user-menu-icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+    .user-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .page-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      border: 1px solid var(--border);
+    }
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .section-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .section-body {
+      padding: 20px;
+    }
+    .order-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .order-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .order-item:first-child {
+      padding-top: 0;
+    }
+    .order-info {
+      flex: 1;
+    }
+    .order-name {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .order-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .order-price {
+      font-weight: 600;
+      color: var(--danger);
+      margin-right: 16px;
+    }
+    .message-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .message-item:last-child {
+      border-bottom: none;
+    }
+    .message-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .message-dot.read {
+      background: var(--text-muted);
+    }
+    .message-content {
+      flex: 1;
+    }
+    .message-title {
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .message-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .message-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .quick-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 20px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius);
+      transition: all var(--transition-fast);
+    }
+    .quick-btn:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+    .quick-btn-icon {
+      font-size: 28px;
+    }
+    .quick-btn span {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    @media (max-width: 768px) {
+      .user-layout {
+        flex-direction: column;
+      }
+      .user-sidebar {
+        width: 100%;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">加载中...</div>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="/" class="logo">
+          <div class="logo-icon">玄</div>
+          <span>{$site_name}</span>
+        </a>
+        <nav class="nav">
+          <a href="/">首页</a>
+          <a href="/user/center" class="active">用户中心</a>
+          <a href="/user/orders">我的订单</a>
+        </nav>
+        <div class="header-right">
+          <div class="user-menu">
+            <div class="user-avatar">{$user.username|mb_substr=0,1}</div>
+            <div class="user-dropdown">
+              <a href="/user/center">👤 个人中心</a>
+              <a href="/user/profile">⚙️ 账号设置</a>
+              <a href="/logout" style="border-top:1px solid var(--border);color:var(--danger)">退出登录</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="user-layout">
+      <aside class="user-sidebar">
+        <div class="user-card">
+          <div class="user-avatar-lg">{$user.username|mb_substr=0,1}</div>
+          <h3>{$user.username}</h3>
+          <div style="font-size:12px;opacity:0.8">{$user.email}</div>
+          <div class="balance">
+            <div style="font-size:12px;opacity:0.8;margin-bottom:4px">账户余额</div>
+            <strong>¥{$user.balance|format_money}</strong>
+          </div>
+        </div>
+
+        <div class="user-menu">
+          <a href="/user/center" class="active">
+            <span class="user-menu-icon">🏠</span>
+            个人中心
+          </a>
+          <a href="/user/orders">
+            <span class="user-menu-icon">📋</span>
+            我的订单
+          </a>
+          <a href="/user/recharge">
+            <span class="user-menu-icon">💰</span>
+            账户充值
+          </a>
+          <a href="/user/messages">
+            <span class="user-menu-icon">💬</span>
+            消息中心
+          </a>
+          <a href="/user/profile">
+            <span class="user-menu-icon">⚙️</span>
+            账号设置
+          </a>
+        </div>
+      </aside>
+
+      <main class="user-content">
+        <h1 class="page-title">个人中心</h1>
+
+        <div class="stats-grid fade-in">
+          <div class="stat-card">
+            <div class="stat-value">{$stats.orders}</div>
+            <div class="stat-label">累计订单</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{$stats.pending}</div>
+            <div class="stat-label">待处理</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">¥{$stats.total_spent}</div>
+            <div class="stat-label">累计消费</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">5.0</div>
+            <div class="stat-label">信誉评分</div>
+          </div>
+        </div>
+
+        <div class="section-card slide-up">
+          <div class="section-header">
+            <h2 class="section-title">快捷操作</h2>
+          </div>
+          <div class="section-body">
+            <div class="quick-actions">
+              <a href="/category/1" class="quick-btn">
+                <span class="quick-btn-icon">🎮</span>
+                <span>游戏点卡</span>
+              </a>
+              <a href="/category/2" class="quick-btn">
+                <span class="quick-btn-icon">📺</span>
+                <span>视频会员</span>
+              </a>
+              <a href="/user/recharge" class="quick-btn">
+                <span class="quick-btn-icon">💳</span>
+                <span>账户充值</span>
+              </a>
+              <a href="#" class="quick-btn">
+                <span class="quick-btn-icon">👨‍💼</span>
+                <span>联系客服</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card slide-up">
+          <div class="section-header">
+            <h2 class="section-title">最近订单</h2>
+            <a href="/user/orders" style="font-size:13px;color:var(--primary)">查看全部 →</a>
+          </div>
+          <div class="section-body">
+            {volist name="recentOrders" id="order"}
+            <div class="order-item">
+              <div class="order-info">
+                <div class="order-name">{$order.goods_name}</div>
+                <div class="order-meta">订单号：{$order.order_no} · {$order.create_time}</div>
+              </div>
+              <span class="order-price">¥{$order.amount}</span>
+              <span class="badge badge-{$order.status == 1 ? 'success' : 'warning'}">
+                {$order.status == 1 ? '已完成' : '待付款'}
+              </span>
+            </div>
+            {/volist}
+          </div>
+        </div>
+
+        <div class="section-card slide-up">
+          <div class="section-header">
+            <h2 class="section-title">消息通知</h2>
+            <a href="/user/messages" style="font-size:13px;color:var(--primary)">全部消息 →</a>
+          </div>
+          <div class="section-body">
+            {volist name="messages" id="msg"}
+            <div class="message-item">
+              <div class="message-dot {$msg.read == 1 ? 'read' : ''}"></div>
+              <div class="message-content">
+                <div class="message-title">
+                  <span>{$msg.title}</span>
+                  <span class="message-time">{$msg.time}</span>
+                </div>
+                <div class="message-desc">{$msg.content}</div>
+              </div>
+            </div>
+            {/volist}
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="footer" style="margin-top:0">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none;padding-top:0">
+        <div>© 2026 {$site_name} 版权所有</div>
+        <div>版本：v{$site_version}</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# 玄武发卡 v1.0.5 Apache 配置
+RewriteEngine On
+
+# 安全设置
+<FilesMatch "\.(env|sql|log|md|yml|yaml|ini)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# 公共目录直接访问
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 转发到根 index.php
+RewriteRule ^(.*)$ ../index.php [L]

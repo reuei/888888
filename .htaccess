@@ -1,0 +1,12 @@
+# 玄武发卡 v1.0.5 Apache 配置
+RewriteEngine On
+
+# 安全设置
+<FilesMatch "\.(env|sql|log|md|yml|yaml|ini)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L]

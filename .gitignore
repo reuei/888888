@@ -1,0 +1,20 @@
+# 编译/缓存
+*.log
+.env
+*.zip
+*.tar.gz
+*.rar
+
+# 运行时
+/runtime/*
+!/runtime/.gitkeep
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# IDE
+.idea
+.vscode
+.DS_Store
+
+# 系统
+Thumbs.db

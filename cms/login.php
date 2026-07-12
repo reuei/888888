@@ -53,14 +53,14 @@ include __DIR__ . '/includes/header.php';
             <?php echo e($error); ?>
         </div>
         <?php endif; ?>
-        <form method="post">
+        <form method="post" data-toast-form>
             <div class="form-group">
                 <label>用户名</label>
-                <input type="text" name="username" value="<?php echo e($_POST['username'] ?? $_COOKIE['remember_user'] ?? ''); ?>" required placeholder="请输入用户名">
+                <input type="text" name="username" value="<?php echo e($_POST['username'] ?? $_COOKIE['remember_user'] ?? ''); ?>" required placeholder="请输入用户名" data-validate="username">
             </div>
             <div class="form-group">
                 <label>密码</label>
-                <input type="password" name="password" required placeholder="请输入密码">
+                <input type="password" name="password" required placeholder="请输入密码" data-validate="password" data-password-strength>
             </div>
             <div class="form-group" style="display:flex; align-items:center; justify-content:space-between;">
                 <label style="display:flex; align-items:center; cursor:pointer;">

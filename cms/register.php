@@ -67,10 +67,10 @@ include __DIR__ . '/includes/header.php';
             <a href="login.php" style="color:#52c41a; margin-left:10px;">去登录 &raquo;</a>
         </div>
         <?php endif; ?>
-        <form method="post">
+        <form method="post" data-toast-form>
             <div class="form-group">
                 <label>用户名 *</label>
-                <input type="text" name="username" value="<?php echo e($_POST['username'] ?? ''); ?>" required placeholder="3-20个字符，字母数字下划线中文">
+                <input type="text" name="username" value="<?php echo e($_POST['username'] ?? ''); ?>" required placeholder="3-20个字符，字母数字下划线中文" data-validate="username">
             </div>
             <div class="form-group">
                 <label>昵称</label>
@@ -78,15 +78,15 @@ include __DIR__ . '/includes/header.php';
             </div>
             <div class="form-group">
                 <label>邮箱</label>
-                <input type="email" name="email" value="<?php echo e($_POST['email'] ?? ''); ?>" placeholder="选填">
+                <input type="email" name="email" value="<?php echo e($_POST['email'] ?? ''); ?>" placeholder="选填" data-validate="email">
             </div>
             <div class="form-group">
                 <label>密码 *</label>
-                <input type="password" name="password" required placeholder="至少6位">
+                <input type="password" name="password" required placeholder="至少6位" data-validate="password" data-password-strength>
             </div>
             <div class="form-group">
                 <label>确认密码 *</label>
-                <input type="password" name="password2" required placeholder="再次输入密码">
+                <input type="password" name="password2" required placeholder="再次输入密码" data-validate="confirm_password">
             </div>
             <button type="submit" class="btn btn-block">注册</button>
             <p style="text-align:center; margin-top:15px; font-size:13px; color:#999;">

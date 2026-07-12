@@ -63,14 +63,14 @@ include __DIR__ . '/includes/header.php';
                     </div>
                     <?php endif; ?>
 
-                    <form method="post">
+                    <form method="post" data-toast-form>
                         <div class="form-group">
                             <label>举报标题 *</label>
-                            <input type="text" name="title" value="<?php echo e($_POST['title'] ?? ''); ?>" required placeholder="请简要描述举报事项">
+                            <input type="text" name="title" value="<?php echo e($_POST['title'] ?? ''); ?>" required placeholder="请简要描述举报事项" data-validate="title">
                         </div>
                         <div class="form-group">
                             <label>举报内容 *</label>
-                            <textarea name="content" rows="8" required placeholder="请详细描述举报内容，包括时间、地点、人物、事件经过等"><?php echo e($_POST['content'] ?? ''); ?></textarea>
+                            <textarea name="content" rows="8" required placeholder="请详细描述举报内容，包括时间、地点、人物、事件经过等" data-validate="content"><?php echo e($_POST['content'] ?? ''); ?></textarea>
                         </div>
                         <div class="form-group">
                             <label>您的姓名（选填）</label>
@@ -78,7 +78,7 @@ include __DIR__ . '/includes/header.php';
                         </div>
                         <div class="form-group">
                             <label>联系方式（选填）</label>
-                            <input type="text" name="contact" value="<?php echo e($_POST['contact'] ?? ''); ?>" placeholder="手机号或邮箱，方便我们联系您">
+                            <input type="text" name="contact" value="<?php echo e($_POST['contact'] ?? ''); ?>" placeholder="手机号或邮箱，方便我们联系您" data-validate="contact">
                         </div>
                         <button type="submit" class="btn btn-block">提交举报</button>
                     </form>

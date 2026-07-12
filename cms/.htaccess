@@ -1,0 +1,18 @@
+Options -Indexes
+<FilesMatch "\.(db|sqlite)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+<Files ~ "^(\.|inc\.php)">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^category/([a-zA-Z0-9_-]+)/?$ category.php?slug=$1 [L]
+    RewriteRule ^article/(\d+)\.html$ article.php?id=$1 [L]
+    RewriteRule ^page/(\d+)\.html$ page.php?id=$1 [L]
+</IfModule>

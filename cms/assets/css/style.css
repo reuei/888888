@@ -1278,3 +1278,126 @@ ul, ol { list-style: none; }
     animation: shimmer 1.5s infinite;
     border-radius: var(--radius-sm);
 }
+
+/* ===== V5 政府权威风格增强 ===== */
+.gov-header {
+    background: linear-gradient(135deg, #8b0000 0%, #b80000 50%, #a00 100%);
+    position: relative;
+    overflow: hidden;
+}
+.gov-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30z' fill='%23fff' fill-opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+.gov-title-block {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(to bottom, #fff5f5, #fff);
+    border-bottom: 3px solid #b80000;
+}
+.gov-title-block h1 {
+    font-family: 'SimSun', 'Songti SC', serif;
+    font-size: 32px;
+    color: #8b0000;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+}
+.gov-title-block p {
+    color: #666;
+    font-size: 14px;
+}
+
+.report-btn-large {
+    display: block;
+    padding: 20px;
+    background: linear-gradient(135deg, #b80000, #8b0000);
+    color: #fff;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(184, 0, 0, 0.3);
+    transition: all 0.3s;
+    text-decoration: none;
+}
+.report-btn-large:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(184, 0, 0, 0.4);
+    color: #fff;
+}
+
+.case-card {
+    background: #fff;
+    border-left: 4px solid #b80000;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.3s;
+    border-radius: 0 8px 8px 0;
+}
+.case-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    transform: translateX(5px);
+}
+.case-card .case-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+    text-decoration: none;
+}
+.case-card .case-title:hover { color: #b80000; }
+.case-card .case-meta {
+    font-size: 13px;
+    color: #999;
+}
+.case-card .case-result {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #fff5f5;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #b80000;
+    line-height: 1.6;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #b80000, #d4a017);
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+.timeline-dot {
+    position: absolute;
+    left: -24px; top: 5px;
+    width: 12px; height: 12px;
+    background: #b80000;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 3px rgba(184,0,0,0.2);
+}
+.timeline-content {
+    padding-left: 10px;
+}
+
+@media (max-width: 768px) {
+    .gov-title-block h1 { font-size: 24px; letter-spacing: 2px; }
+    .report-btn-large { padding: 15px; font-size: 16px; }
+    .case-card { padding: 15px; }
+    .timeline { padding-left: 20px; }
+    .timeline-dot { left: -14px; width: 10px; height: 10px; }
+}

@@ -239,4 +239,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== 页面加载完成动画 =====
     document.body.classList.add('loaded');
+
+    // ===== 图片预加载 =====
+    function preloadImages(urls, callback) {
+        var loaded = 0;
+        var total = urls.length;
+        if (total === 0) { if (callback) callback(); return; }
+        urls.forEach(function(url) {
+            var img = new Image();
+            img.onload = function() { loaded++; if (loaded === total && callback) callback(); };
+            img.onerror = function() { loaded++; if (loaded === total && callback) callback(); };
+            img.src = url;
+        });
+    }
+
+    // 预加载轮播图
+    var slideItems = document.querySelectorAll('.slide-item');
+    var urls = [];
+    slideItems.forEach(function(item) {
+        var bg = item.style.backgroundImage;
+        if (bg) {
+            var match = bg.match(/url\(['"]?([^'"]+)['"]?\)/);
+            if (match && match[1]) urls.push(match[1]);
+        }
+    });
+    preloadImages(urls);
+
+    // 预加载侧边栏图片
+    var sideImages = document.querySelectorAll('.side-block img, .article-card img');
+    sideImages.forEach(function(img) {
+        if (img.src) urls.push(img.src);
+    });
 });

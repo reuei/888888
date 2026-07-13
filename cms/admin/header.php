@@ -5,7 +5,6 @@ if (!defined('IN_ADMIN')) {
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/functions.php';
-require_once __DIR__ . '/../includes/icons.php';
 
 if (!isLoggedIn() || !isAdmin()) {
     header('Location: login.php');
@@ -21,6 +20,7 @@ $activeMenu = $activeMenu ?? 'dashboard';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? e($pageTitle) . ' - ' : ''; ?>管理后台 - 清廉在线</title>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_3171436_xc6n6a4nd8r.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         body { background: #f0f2f5; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
@@ -141,22 +141,22 @@ $activeMenu = $activeMenu ?? 'dashboard';
             <div class="admin-logo">清廉在线</div>
             <nav class="admin-menu">
                 <div class="menu-group">概览</div>
-                <a href="index.php" class="<?php echo $activeMenu == 'dashboard' ? 'active' : ''; ?>"><?php echo icon('dashboard'); ?> 仪表盘</a>
+                <a href="index.php" class="<?php echo $activeMenu == 'dashboard' ? 'active' : ''; ?>"><i class="iconfont icon-dashboard"></i> 仪表盘</a>
 
                 <div class="menu-group">内容管理</div>
-                <a href="articles.php" class="<?php echo $activeMenu == 'articles' ? 'active' : ''; ?>"><?php echo icon('article'); ?> 文章管理</a>
-                <a href="categories.php" class="<?php echo $activeMenu == 'categories' ? 'active' : ''; ?>"><?php echo icon('folder'); ?> 栏目管理</a>
-                <a href="pages.php" class="<?php echo $activeMenu == 'pages' ? 'active' : ''; ?>"><?php echo icon('page'); ?> 单页管理</a>
-                <a href="slides.php" class="<?php echo $activeMenu == 'slides' ? 'active' : ''; ?>"><?php echo icon('image'); ?> 轮播图管理</a>
+                <a href="articles.php" class="<?php echo $activeMenu == 'articles' ? 'active' : ''; ?>"><i class="iconfont icon-article"></i> 文章管理</a>
+                <a href="categories.php" class="<?php echo $activeMenu == 'categories' ? 'active' : ''; ?>"><i class="iconfont icon-folder"></i> 栏目管理</a>
+                <a href="pages.php" class="<?php echo $activeMenu == 'pages' ? 'active' : ''; ?>"><i class="iconfont icon-page"></i> 单页管理</a>
+                <a href="slides.php" class="<?php echo $activeMenu == 'slides' ? 'active' : ''; ?>"><i class="iconfont icon-image"></i> 轮播图管理</a>
 
                 <div class="menu-group">用户与互动</div>
-                <a href="users.php" class="<?php echo $activeMenu == 'users' ? 'active' : ''; ?>"><?php echo icon('user'); ?> 用户管理</a>
-                <a href="messages.php" class="<?php echo $activeMenu == 'messages' ? 'active' : ''; ?>"><?php echo icon('message'); ?> 留言举报</a>
+                <a href="users.php" class="<?php echo $activeMenu == 'users' ? 'active' : ''; ?>"><i class="iconfont icon-user"></i> 用户管理</a>
+                <a href="messages.php" class="<?php echo $activeMenu == 'messages' ? 'active' : ''; ?>"><i class="iconfont icon-message"></i> 留言举报</a>
 
                 <div class="menu-group">系统设置</div>
-                <a href="settings.php" class="<?php echo $activeMenu == 'settings' ? 'active' : ''; ?>"><?php echo icon('setting'); ?> 系统设置</a>
+                <a href="settings.php" class="<?php echo $activeMenu == 'settings' ? 'active' : ''; ?>"><i class="iconfont icon-setting"></i> 系统设置</a>
                 <?php if (isSuperAdmin()): ?>
-                <a href="admins.php" class="<?php echo $activeMenu == 'admins' ? 'active' : ''; ?>"><?php echo icon('admin'); ?> 管理员管理</a>
+                <a href="admins.php" class="<?php echo $activeMenu == 'admins' ? 'active' : ''; ?>"><i class="iconfont icon-admin"></i> 管理员管理</a>
                 <?php endif; ?>
             </nav>
         </aside>
@@ -164,7 +164,7 @@ $activeMenu = $activeMenu ?? 'dashboard';
             <div class="admin-mobile-overlay" id="adminMobileOverlay"></div>
             <header class="admin-header">
                 <div style="display:flex; align-items:center;">
-                    <button class="admin-mobile-toggle" id="adminMobileToggle"><?php echo icon('menu'); ?></button>
+                    <button class="admin-mobile-toggle" id="adminMobileToggle">☰</button>
                     <h2><?php echo isset($pageTitle) ? e($pageTitle) : '管理后台'; ?></h2>
                 </div>
                 <div class="admin-header-right">

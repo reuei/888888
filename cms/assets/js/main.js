@@ -1,273 +1,275 @@
-// ========================================
-// 清廉在线 V2.0 - 前端增强脚本
-// 实时表单检测 + Toast动画 + 滚动动画 + 交互增强
-// ========================================
+/**
+ * 清廉在线 V6.0 - 前端交互脚本
+ * 完全重写，去AI味，原生JS无依赖
+ */
 
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
+    'use strict';
 
-    // ===== 移动端汉堡菜单 =====
-    var mobileToggle = document.getElementById('mobileToggle');
-    var mobileMenu = document.getElementById('mobileMenu');
-    var mobileOverlay = document.getElementById('mobileOverlay');
-    var mobileClose = document.getElementById('mobileClose');
+    var doc = document;
 
-    function openMobileMenu() {
-        if (mobileMenu) mobileMenu.classList.add('open');
-        if (mobileOverlay) mobileOverlay.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+    // === DOM就绪 ===
+    function ready(fn) {
+        if (doc.readyState !== 'loading') {
+            fn();
+        } else {
+            doc.addEventListener('DOMContentLoaded', fn);
+        }
     }
-    function closeMobileMenu() {
-        if (mobileMenu) mobileMenu.classList.remove('open');
-        if (mobileOverlay) mobileOverlay.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-    if (mobileToggle) mobileToggle.addEventListener('click', openMobileMenu);
-    if (mobileClose) mobileClose.addEventListener('click', closeMobileMenu);
-    if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
 
-    // 移动端子菜单折叠
-    var submenuToggles = document.querySelectorAll('.mobile-nav .has-submenu > a');
-    submenuToggles.forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            var submenu = link.nextElementSibling;
-            if (submenu && submenu.classList.contains('submenu')) {
-                e.preventDefault();
-                submenu.style.display = submenu.style.display === 'none' ? 'block' : 'none';
-            }
-        });
-    });
-
-    // ===== Toast 通知系统 =====
-    window.showToast = function(message, type) {
+    // === Toast通知 ===
+    window.showToast = function(msg, type) {
         type = type || 'info';
-        var container = document.querySelector('.toast-container');
+        var container = doc.querySelector('.toast-container');
         if (!container) {
-            container = document.createElement('div');
+            container = doc.createElement('div');
             container.className = 'toast-container';
-            document.body.appendChild(container);
+            doc.body.appendChild(container);
         }
-        var icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
-        var toast = document.createElement('div');
+        var toast = doc.createElement('div');
         toast.className = 'toast ' + type;
-        toast.innerHTML = '<span class="toast-icon">' + (icons[type] || 'ℹ') + '</span><span>' + message + '</span>';
+        toast.textContent = msg;
         container.appendChild(toast);
-        setTimeout(function() { toast.remove(); }, 3000);
+        setTimeout(function() {
+            toast.remove();
+        }, 3000);
     };
 
-    // ===== 实时表单验证 =====
-    var validators = {
-        username: function(val) {
-            if (!val) return { valid: false, msg: '用户名不能为空' };
-            if (val.length < 3) return { valid: false, msg: '用户名至少3个字符' };
-            if (val.length > 20) return { valid: false, msg: '用户名最多20个字符' };
-            if (!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(val)) return { valid: false, msg: '只能含字母、数字、下划线、中文' };
-            return { valid: true, msg: '用户名可用' };
-        },
-        password: function(val) {
-            if (!val) return { valid: false, msg: '密码不能为空' };
-            if (val.length < 6) return { valid: false, msg: '密码至少6位' };
-            return { valid: true, msg: '密码有效' };
-        },
-        email: function(val) {
-            if (!val) return { valid: true, msg: '' };
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return { valid: false, msg: '邮箱格式不正确' };
-            return { valid: true, msg: '邮箱格式正确' };
-        },
-        confirm_password: function(val) {
-            var original = document.querySelector('input[name="password"], input[name="new_password"]');
-            if (!original) return { valid: true, msg: '' };
-            if (val !== original.value) return { valid: false, msg: '两次密码不一致' };
-            return { valid: true, msg: '密码一致' };
-        },
-        title: function(val) {
-            if (!val || val.trim().length < 2) return { valid: false, msg: '标题至少2个字符' };
-            return { valid: true, msg: '标题有效' };
-        },
-        content: function(val) {
-            if (!val || val.trim().length < 10) return { valid: false, msg: '内容至少10个字符' };
-            return { valid: true, msg: '内容有效' };
-        },
-        contact: function(val) {
-            if (!val) return { valid: true, msg: '' };
-            if (!/^1[3-9]\d{9}$|^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return { valid: false, msg: '请输入正确的手机号或邮箱' };
-            return { valid: true, msg: '联系方式有效' };
+    // === B2弹窗 ===
+    window.showModal = function(title, content, opts) {
+        opts = opts || {};
+        var overlay = doc.createElement('div');
+        overlay.className = 'modal-overlay active';
+        var html = '<div class="modal-box">' +
+            '<div class="modal-header"><h3>' + (title || '提示') + '</h3><button class="modal-close">&times;</button></div>' +
+            '<div class="modal-body">' + content + '</div>';
+        if (opts.type === 'confirm') {
+            html += '<div class="modal-footer"><button class="btn modal-btn-default" data-action="cancel">' + (opts.cancelText || '取消') + '</button><button class="btn" data-action="ok">' + (opts.okText || '确定') + '</button></div>';
+        }
+        html += '</div>';
+        overlay.innerHTML = html;
+        doc.body.appendChild(overlay);
+
+        overlay.querySelector('.modal-close').onclick = close;
+        overlay.onclick = function(e) {
+            if (e.target === overlay) close();
+        };
+
+        var okBtn = overlay.querySelector('[data-action="ok"]');
+        var cancelBtn = overlay.querySelector('[data-action="cancel"]');
+        if (okBtn) okBtn.onclick = function() { close(); if (opts.onOk) opts.onOk(); };
+        if (cancelBtn) cancelBtn.onclick = function() { close(); if (opts.onCancel) opts.onCancel(); };
+
+        doc.addEventListener('keydown', escHandler);
+
+        function close() {
+            overlay.remove();
+            doc.removeEventListener('keydown', escHandler);
+        }
+        function escHandler(e) {
+            if (e.key === 'Escape') close();
         }
     };
 
-    // 为所有带 data-validate 属性的输入框绑定实时验证
-    document.querySelectorAll('input[data-validate], textarea[data-validate]').forEach(function(input) {
-        var feedback = document.createElement('div');
-        feedback.className = 'field-feedback';
-        input.parentNode.appendChild(feedback);
+    // === 实时表单验证 ===
+    var validators = {
+        username: function(v) {
+            if (!v) return { ok: false, msg: '请输入用户名' };
+            if (v.length < 3) return { ok: false, msg: '用户名至少3个字符' };
+            if (v.length > 20) return { ok: false, msg: '用户名最多20个字符' };
+            if (!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(v)) return { ok: false, msg: '只能含字母数字下划线中文' };
+            return { ok: true, msg: '用户名可用' };
+        },
+        password: function(v) {
+            if (!v) return { ok: false, msg: '请输入密码' };
+            if (v.length < 6) return { ok: false, msg: '密码至少6位' };
+            return { ok: true, msg: '密码有效' };
+        },
+        email: function(v) {
+            if (!v) return { ok: true, msg: '' };
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return { ok: false, msg: '邮箱格式不正确' };
+            return { ok: true, msg: '邮箱格式正确' };
+        },
+        confirm_password: function(v) {
+            var pwd = doc.querySelector('input[name="password"], input[name="new_password"]');
+            if (!pwd) return { ok: true, msg: '' };
+            if (v !== pwd.value) return { ok: false, msg: '两次密码不一致' };
+            return { ok: true, msg: '密码一致' };
+        },
+        title: function(v) {
+            if (!v || v.length < 2) return { ok: false, msg: '标题至少2个字符' };
+            return { ok: true, msg: '标题有效' };
+        },
+        content: function(v) {
+            if (!v || v.length < 10) return { ok: false, msg: '内容至少10个字符' };
+            return { ok: true, msg: '内容有效' };
+        },
+        phone: function(v) {
+            if (!v) return { ok: true, msg: '' };
+            if (!/^1[3-9]\d{9}$/.test(v)) return { ok: false, msg: '手机号格式不正确' };
+            return { ok: true, msg: '手机号正确' };
+        }
+    };
 
-        input.addEventListener('input', function() {
-            var type = input.getAttribute('data-validate');
-            var validator = validators[type];
-            if (!validator) return;
-            var result = validator(input.value);
-            input.classList.remove('valid', 'invalid');
-            feedback.classList.remove('show', 'success', 'error');
-            if (input.value.length > 0) {
-                feedback.classList.add('show');
-                if (result.valid) {
-                    input.classList.add('valid');
-                    feedback.classList.add('success');
-                    feedback.innerHTML = '<span>✓</span> ' + result.msg;
-                } else {
-                    input.classList.add('invalid');
-                    feedback.classList.add('error');
-                    feedback.innerHTML = '<span>✕</span> ' + result.msg;
+    // === 初始化 ===
+    ready(function() {
+
+        // 移动端菜单
+        var mobileToggle = doc.getElementById('mobileToggle');
+        var mobileMenu = doc.getElementById('mobileMenu');
+        var mobileOverlay = doc.getElementById('mobileOverlay');
+        var mobileClose = doc.getElementById('mobileClose');
+
+        if (mobileToggle && mobileMenu) {
+            mobileToggle.onclick = function() {
+                mobileMenu.classList.add('open');
+                if (mobileOverlay) mobileOverlay.style.display = 'block';
+            };
+        }
+        if (mobileClose) {
+            mobileClose.onclick = closeMobile;
+        }
+        if (mobileOverlay) {
+            mobileOverlay.onclick = closeMobile;
+        }
+        function closeMobile() {
+            if (mobileMenu) mobileMenu.classList.remove('open');
+            if (mobileOverlay) mobileOverlay.style.display = 'none';
+        }
+
+        // 轮播图
+        var slider = doc.querySelector('.slider-container');
+        if (slider) {
+            var wrapper = slider.querySelector('.slider-wrapper');
+            var items = slider.querySelectorAll('.slide-item');
+            var dots = slider.querySelectorAll('.slider-dots .dot');
+            var progressBar = slider.querySelector('.progress-bar');
+            var prevBtn = slider.querySelector('.slider-prev');
+            var nextBtn = slider.querySelector('.slider-next');
+
+            var total = items.length;
+            var current = 0;
+            var timer = null;
+            var duration = 5000;
+            var startTime = 0;
+
+            if (total > 0) {
+                function goTo(index) {
+                    current = index;
+                    if (current >= total) current = 0;
+                    if (current < 0) current = total - 1;
+                    wrapper.style.transform = 'translateX(-' + (current * 100) + '%)';
+                    dots.forEach(function(d, i) {
+                        d.classList.toggle('active', i === current);
+                    });
+                    resetProgress();
                 }
+
+                function resetProgress() {
+                    startTime = Date.now();
+                    progressBar.style.transition = 'none';
+                    progressBar.style.width = '0';
+                    setTimeout(function() {
+                        progressBar.style.transition = 'width ' + duration + 'ms linear';
+                        progressBar.style.width = '100%';
+                    }, 20);
+                }
+
+                function next() { goTo(current + 1); }
+                function prev() { goTo(current - 1); }
+
+                timer = setInterval(next, duration);
+
+                slider.onmouseenter = function() { clearInterval(timer); };
+                slider.onmouseleave = function() { timer = setInterval(next, duration); };
+
+                if (prevBtn) prevBtn.onclick = prev;
+                if (nextBtn) nextBtn.onclick = next;
+
+                dots.forEach(function(dot, i) {
+                    dot.onclick = function() { goTo(i); };
+                });
+
+                goTo(0);
             }
-        });
-    });
+        }
 
-    // ===== 密码强度检测 =====
-    document.querySelectorAll('input[data-password-strength]').forEach(function(input) {
-        var strengthContainer = document.createElement('div');
-        strengthContainer.innerHTML = '<div class="password-strength"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div><div class="strength-text" style="font-size:12px;color:#999;"></div>';
-        input.parentNode.appendChild(strengthContainer);
+        // 表单验证
+        doc.querySelectorAll('input[data-validate], textarea[data-validate]').forEach(function(input) {
+            var tip = input.parentNode.querySelector('.field-tip');
+            if (!tip) {
+                tip = doc.createElement('div');
+                tip.className = 'field-tip';
+                input.parentNode.appendChild(tip);
+            }
 
-        input.addEventListener('input', function() {
-            var val = input.value;
-            var score = 0;
-            if (val.length >= 6) score++;
-            if (val.length >= 10) score++;
-            if (/[a-z]/.test(val) && /[A-Z]/.test(val)) score++;
-            if (/\d/.test(val) && /[^a-zA-Z\d]/.test(val)) score++;
-
-            var bars = strengthContainer.querySelectorAll('.bar');
-            var text = strengthContainer.querySelector('.strength-text');
-            var labels = ['弱', '一般', '中等', '强'];
-            var classes = ['weak', 'weak', 'medium', 'strong'];
-
-            bars.forEach(function(bar, i) {
-                bar.className = 'bar';
-                if (i < score) bar.classList.add('active', classes[score - 1]);
-            });
-            text.textContent = val ? '密码强度：' + labels[Math.max(0, score - 1)] : '';
-            text.style.color = score >= 3 ? '#52c41a' : score >= 2 ? '#faad14' : '#ff4d4f';
-        });
-    });
-
-    // ===== 表单提交拦截 + Toast =====
-    document.querySelectorAll('form[data-toast-form]').forEach(function(form) {
-        form.addEventListener('submit', function(e) {
-            var inputs = form.querySelectorAll('input[data-validate], textarea[data-validate]');
-            var allValid = true;
-            inputs.forEach(function(input) {
+            input.addEventListener('input', function() {
                 var type = input.getAttribute('data-validate');
                 var validator = validators[type];
-                if (validator) {
-                    var result = validator(input.value);
-                    if (!result.valid) {
-                        allValid = false;
+                if (!validator) return;
+
+                var result = validator(input.value);
+                input.classList.remove('valid', 'invalid');
+                tip.classList.remove('error', 'success');
+
+                if (input.value.length > 0) {
+                    if (result.ok) {
+                        input.classList.add('valid');
+                        tip.classList.add('success');
+                        tip.textContent = result.msg;
+                    } else {
                         input.classList.add('invalid');
+                        tip.classList.add('error');
+                        tip.textContent = result.msg;
+                    }
+                } else {
+                    tip.textContent = '';
+                }
+
+                // 密码强度检测
+                if (type === 'password') {
+                    var strengthEl = input.parentNode.querySelector('.password-strength');
+                    if (strengthEl) {
+                        var pwd = input.value;
+                        strengthEl.classList.remove('weak', 'medium', 'strong');
+                        if (pwd.length >= 6) {
+                            var score = 0;
+                            if (pwd.length >= 8) score++;
+                            if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score++;
+                            if (/\d/.test(pwd)) score++;
+                            if (/[^a-zA-Z0-9]/.test(pwd)) score++;
+                            if (score <= 1) strengthEl.classList.add('weak');
+                            else if (score <= 2) strengthEl.classList.add('medium');
+                            else strengthEl.classList.add('strong');
+                        }
                     }
                 }
             });
-            if (!allValid) {
-                e.preventDefault();
-                showToast('请检查表单填写是否正确', 'error');
-            }
-        });
-    });
 
-    // ===== 滚动揭示动画 =====
-    var revealElements = document.querySelectorAll('.scroll-reveal');
-    var observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('revealed');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1 });
-    revealElements.forEach(function(el) { observer.observe(el); });
-
-    // ===== 返回顶部按钮 =====
-    var scrollTopBtn = document.createElement('button');
-    scrollTopBtn.className = 'scroll-top';
-    scrollTopBtn.innerHTML = '↑';
-    scrollTopBtn.title = '返回顶部';
-    document.body.appendChild(scrollTopBtn);
-
-    window.addEventListener('scroll', function() {
-        if (window.pageYOffset > 300) {
-            scrollTopBtn.classList.add('visible');
-        } else {
-            scrollTopBtn.classList.remove('visible');
-        }
-    });
-    scrollTopBtn.addEventListener('click', function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // ===== 数字滚动动画 =====
-    document.querySelectorAll('[data-count]').forEach(function(el) {
-        var target = parseInt(el.getAttribute('data-count'));
-        var observer2 = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    var current = 0;
-                    var step = Math.ceil(target / 50);
-                    var timer = setInterval(function() {
-                        current += step;
-                        if (current >= target) {
-                            current = target;
-                            clearInterval(timer);
-                        }
-                        el.textContent = current.toLocaleString();
-                    }, 30);
-                    observer2.unobserve(el);
+            // 确认密码需要监听原密码变化
+            if (input.getAttribute('data-validate') === 'confirm_password') {
+                var pwdInput = doc.querySelector('input[name="password"]');
+                if (pwdInput) {
+                    pwdInput.addEventListener('input', function() {
+                        input.dispatchEvent(new Event('input'));
+                    });
                 }
-            });
-        }, { threshold: 0.5 });
-        observer2.observe(el);
-    });
-
-    // ===== 搜索框增强 =====
-    var searchInputs = document.querySelectorAll('.search-box input, .mobile-search input');
-    searchInputs.forEach(function(input) {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                var form = input.closest('form');
-                if (form) form.submit();
             }
         });
-    });
 
-    // ===== 页面加载完成动画 =====
-    document.body.classList.add('loaded');
+        // 返回顶部
+        var scrollTop = doc.createElement('button');
+        scrollTop.className = 'scroll-top';
+        scrollTop.textContent = '↑';
+        scrollTop.onclick = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        doc.body.appendChild(scrollTop);
 
-    // ===== 图片预加载 =====
-    function preloadImages(urls, callback) {
-        var loaded = 0;
-        var total = urls.length;
-        if (total === 0) { if (callback) callback(); return; }
-        urls.forEach(function(url) {
-            var img = new Image();
-            img.onload = function() { loaded++; if (loaded === total && callback) callback(); };
-            img.onerror = function() { loaded++; if (loaded === total && callback) callback(); };
-            img.src = url;
+        window.addEventListener('scroll', function() {
+            scrollTop.classList.toggle('visible', window.pageYOffset > 300);
         });
-    }
 
-    // 预加载轮播图
-    var slideItems = document.querySelectorAll('.slide-item');
-    var urls = [];
-    slideItems.forEach(function(item) {
-        var bg = item.style.backgroundImage;
-        if (bg) {
-            var match = bg.match(/url\(['"]?([^'"]+)['"]?\)/);
-            if (match && match[1]) urls.push(match[1]);
-        }
     });
-    preloadImages(urls);
 
-    // 预加载侧边栏图片
-    var sideImages = document.querySelectorAll('.side-block img, .article-card img');
-    sideImages.forEach(function(img) {
-        if (img.src) urls.push(img.src);
-    });
-});
+})();

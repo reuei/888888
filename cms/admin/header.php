@@ -111,6 +111,7 @@ $activeMenu = $activeMenu ?? 'dashboard';
                 <a href="articles.php" class="<?php echo $activeMenu == 'articles' ? 'active' : ''; ?>">📝 文章管理</a>
                 <a href="categories.php" class="<?php echo $activeMenu == 'categories' ? 'active' : ''; ?>">📁 栏目管理</a>
                 <a href="pages.php" class="<?php echo $activeMenu == 'pages' ? 'active' : ''; ?>">📄 单页管理</a>
+                <a href="slides.php" class="<?php echo $activeMenu == 'slides' ? 'active' : ''; ?>">🖼️ 轮播图管理</a>
 
                 <div class="menu-group">用户与互动</div>
                 <a href="users.php" class="<?php echo $activeMenu == 'users' ? 'active' : ''; ?>">👥 用户管理</a>

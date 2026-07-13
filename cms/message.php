@@ -63,17 +63,19 @@ include __DIR__ . '/includes/header.php';
                             <?php endif; ?>
 
                             <form method="post" data-toast-form style="margin-bottom:30px;">
-                                <div class="form-group">
+                                <div class="form-item">
                                     <label>昵称（选填）</label>
                                     <input type="text" name="name" value="<?php echo e($_POST['name'] ?? ''); ?>" placeholder="请输入您的昵称">
                                 </div>
-                                <div class="form-group">
+                                <div class="form-item">
                                     <label>留言标题（选填）</label>
                                     <input type="text" name="title" value="<?php echo e($_POST['title'] ?? ''); ?>" placeholder="留言标题" data-validate="title">
+                                    <div class="field-tip"></div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-item">
                                     <label>留言内容 *</label>
                                     <textarea name="content" rows="4" required placeholder="请输入留言内容" data-validate="content"><?php echo e($_POST['content'] ?? ''); ?></textarea>
+                                    <div class="field-tip"></div>
                                 </div>
                                 <button type="submit" class="btn">提交留言</button>
                             </form>

@@ -57,42 +57,44 @@ include __DIR__ . '/includes/header.php';
     <div class="form-box">
         <h2>用户注册</h2>
         <?php if ($error): ?>
-        <div style="background:#fff1f0; color:#f5222d; padding:10px 15px; border-radius:4px; margin-bottom:20px; border:1px solid #ffa39e;">
-            <?php echo e($error); ?>
-        </div>
+        <div class="alert alert-error"><?php echo e($error); ?></div>
         <?php endif; ?>
         <?php if ($success): ?>
-        <div style="background:#f6ffed; color:#52c41a; padding:10px 15px; border-radius:4px; margin-bottom:20px; border:1px solid #b7eb8f;">
-            <?php echo e($success); ?>
-            <a href="login.php" style="color:#52c41a; margin-left:10px;">去登录 &raquo;</a>
-        </div>
+        <div class="alert alert-success"><?php echo e($success); ?> <a href="login.php" style="color:#52c41a; margin-left:10px;">去登录 &raquo;</a></div>
         <?php endif; ?>
-        <form method="post" data-toast-form>
-            <div class="form-group">
-                <label>用户名 *</label>
-                <input type="text" name="username" value="<?php echo e($_POST['username'] ?? ''); ?>" required placeholder="3-20个字符，字母数字下划线中文" data-validate="username">
-            </div>
-            <div class="form-group">
-                <label>昵称</label>
-                <input type="text" name="nickname" value="<?php echo e($_POST['nickname'] ?? ''); ?>" placeholder="选填">
-            </div>
-            <div class="form-group">
-                <label>邮箱</label>
-                <input type="email" name="email" value="<?php echo e($_POST['email'] ?? ''); ?>" placeholder="选填" data-validate="email">
-            </div>
-            <div class="form-group">
-                <label>密码 *</label>
-                <input type="password" name="password" required placeholder="至少6位" data-validate="password" data-password-strength>
-            </div>
-            <div class="form-group">
-                <label>确认密码 *</label>
-                <input type="password" name="password2" required placeholder="再次输入密码" data-validate="confirm_password">
-            </div>
-            <button type="submit" class="btn btn-block">注册</button>
-            <p style="text-align:center; margin-top:15px; font-size:13px; color:#999;">
-                已有账号？<a href="login.php" style="color:#c20000;">立即登录</a>
-            </p>
-        </form>
+        <div class="form-body">
+            <form method="post" data-toast-form>
+                <div class="form-item">
+                    <label>用户名 *</label>
+                    <input type="text" name="username" value="<?php echo e($_POST['username'] ?? ''); ?>" required placeholder="3-20个字符，字母数字下划线中文" data-validate="username">
+                    <div class="field-tip"></div>
+                </div>
+                <div class="form-item">
+                    <label>昵称</label>
+                    <input type="text" name="nickname" value="<?php echo e($_POST['nickname'] ?? ''); ?>" placeholder="选填">
+                </div>
+                <div class="form-item">
+                    <label>邮箱</label>
+                    <input type="email" name="email" value="<?php echo e($_POST['email'] ?? ''); ?>" placeholder="选填" data-validate="email">
+                    <div class="field-tip"></div>
+                </div>
+                <div class="form-item">
+                    <label>密码 *</label>
+                    <input type="password" name="password" required placeholder="至少6位" data-validate="password">
+                    <div class="field-tip"></div>
+                    <div class="password-strength"><span></span><span></span><span></span></div>
+                </div>
+                <div class="form-item">
+                    <label>确认密码 *</label>
+                    <input type="password" name="password2" required placeholder="再次输入密码" data-validate="confirm_password">
+                    <div class="field-tip"></div>
+                </div>
+                <button type="submit" class="btn btn-block">注册</button>
+                <p style="text-align:center; margin-top:15px; font-size:13px; color:#999;">
+                    已有账号？<a href="login.php" style="color:#c20000;">立即登录</a>
+                </p>
+            </form>
+        </div>
     </div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

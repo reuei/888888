@@ -49,27 +49,29 @@ include __DIR__ . '/includes/header.php';
     <div class="form-box">
         <h2>用户登录</h2>
         <?php if ($error): ?>
-        <div style="background:#fff1f0; color:#f5222d; padding:10px 15px; border-radius:4px; margin-bottom:20px; border:1px solid #ffa39e;">
-            <?php echo e($error); ?>
-        </div>
+        <div class="alert alert-error"><?php echo e($error); ?></div>
         <?php endif; ?>
-        <form method="post" data-toast-form>
-            <div class="form-group">
-                <label>用户名</label>
-                <input type="text" name="username" value="<?php echo e($_POST['username'] ?? $_COOKIE['remember_user'] ?? ''); ?>" required placeholder="请输入用户名" data-validate="username">
-            </div>
-            <div class="form-group">
-                <label>密码</label>
-                <input type="password" name="password" required placeholder="请输入密码" data-validate="password" data-password-strength>
-            </div>
-            <div class="form-group" style="display:flex; align-items:center; justify-content:space-between;">
-                <label style="display:flex; align-items:center; cursor:pointer;">
-                    <input type="checkbox" name="remember" style="width:auto; margin-right:5px;"> 记住我
-                </label>
-                <a href="register.php" style="color:#c20000; font-size:13px;">还没有账号？立即注册</a>
-            </div>
-            <button type="submit" class="btn btn-block">登录</button>
-        </form>
+        <div class="form-body">
+            <form method="post" data-toast-form>
+                <div class="form-item">
+                    <label>用户名</label>
+                    <input type="text" name="username" value="<?php echo e($_POST['username'] ?? $_COOKIE['remember_user'] ?? ''); ?>" required placeholder="请输入用户名" data-validate="username">
+                    <div class="field-tip"></div>
+                </div>
+                <div class="form-item">
+                    <label>密码</label>
+                    <input type="password" name="password" required placeholder="请输入密码" data-validate="password">
+                    <div class="field-tip"></div>
+                </div>
+                <div class="form-item" style="display:flex; align-items:center; justify-content:space-between;">
+                    <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" name="remember" style="width:auto; margin-right:5px;"> 记住我
+                    </label>
+                    <a href="register.php" style="color:#c20000; font-size:13px;">还没有账号？立即注册</a>
+                </div>
+                <button type="submit" class="btn btn-block">登录</button>
+            </form>
+        </div>
     </div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

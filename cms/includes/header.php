@@ -50,7 +50,6 @@ if (!function_exists('resolve_nav_icon')) {
     <title><?php echo isset($pageTitle) ? e($pageTitle) . ' - ' : ''; ?><?php echo e($siteTitle); ?></title>
     <meta name="keywords" content="<?php echo e(getSetting('site_keywords', SITE_KEYWORDS)); ?>">
     <meta name="description" content="<?php echo e(getSetting('site_description', SITE_DESCRIPTION)); ?>">
-    <link rel="stylesheet" href="//at.alicdn.com/t/font_3171436_xc6n6a4nd8r.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
     <style>
         :root{

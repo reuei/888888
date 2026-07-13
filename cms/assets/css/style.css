@@ -439,12 +439,28 @@ ul, ol { list-style: none; }
     color: #fff;
     border-color: var(--primary);
 }
-.quick-links .iconfont {
+.icon-svg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+}
+.icon-svg svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.quick-links .icon-svg {
     font-size: 24px;
     margin-bottom: 5px;
     color: var(--primary);
 }
-.quick-links a:hover .iconfont {
+.quick-links a:hover .icon-svg {
     color: #fff;
 }
 

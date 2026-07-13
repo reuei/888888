@@ -36,27 +36,27 @@ include __DIR__ . '/includes/header.php';
             <div class="side-block-body">
                 <div class="quick-links">
                     <a href="<?php echo BASE_URL; ?>report.php">
-                        <span class="icon">📝</span>
+                        <i class="iconfont icon-report"></i>
                         <span>监督举报</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>anticorruption.php">
-                        <span class="icon">⚖</span>
+                        <i class="iconfont icon-anticorruption"></i>
                         <span>反腐倡廉</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>laws.php">
-                        <span class="icon">📚</span>
+                        <i class="iconfont icon-law"></i>
                         <span>党纪法规</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>video.php">
-                        <span class="icon">▶</span>
+                        <i class="iconfont icon-video"></i>
                         <span>视频中心</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>cases.php">
-                        <span class="icon">🔔</span>
+                        <i class="iconfont icon-case"></i>
                         <span>典型案例</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>policy.php">
-                        <span class="icon">📄</span>
+                        <i class="iconfont icon-policy"></i>
                         <span>政策解读</span>
                     </a>
                 </div>

@@ -20,6 +20,7 @@ $activeMenu = $activeMenu ?? 'dashboard';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? e($pageTitle) . ' - ' : ''; ?>管理后台 - 清廉在线</title>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_3171436_xc6n6a4nd8r.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         body { background: #f0f2f5; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
@@ -87,15 +88,50 @@ $activeMenu = $activeMenu ?? 'dashboard';
         .badge-danger { background: #fff1f0; color: #f5222d; border: 1px solid #ffa39e; }
         .badge-info { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
 
+        /* 后台手机端汉堡菜单 */
+        .admin-mobile-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: #1a1a2e;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px 10px;
+            margin-right: 12px;
+            border-radius: 4px;
+        }
+        .admin-mobile-toggle:hover { background: rgba(184,0,0,0.08); color: #b80000; }
+        .admin-mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 90;
+        }
+        .admin-mobile-overlay.active { display: block; }
+        .admin-sidebar.mobile-open {
+            transform: translateX(0);
+        }
+
         @media (max-width: 768px) {
-            .admin-sidebar { width: 60px; }
-            .admin-logo { font-size: 12px; padding: 15px 5px; letter-spacing: 0; }
-            .admin-menu a { padding: 12px 10px; text-align: center; font-size: 12px; justify-content: center; }
-            .admin-menu a span { display: none; }
-            .admin-menu .menu-group { display: none; }
+            .admin-mobile-toggle { display: inline-flex; align-items: center; justify-content: center; }
+            .admin-sidebar {
+                position: fixed;
+                top: 0; left: 0;
+                height: 100vh;
+                width: 230px;
+                z-index: 100;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .admin-main { margin-left: 0; }
+            .admin-menu a { padding: 12px 24px; justify-content: flex-start; }
+            .admin-menu a span { display: inline; }
+            .admin-menu .menu-group { display: block; }
             .stat-grid { grid-template-columns: repeat(2, 1fr); }
             .form-row { flex-direction: column; gap: 12px; }
             .admin-header-right a { padding: 4px 8px; font-size: 12px; }
+            .admin-header-right span { display: none; }
         }
     </style>
 </head>
@@ -105,28 +141,32 @@ $activeMenu = $activeMenu ?? 'dashboard';
             <div class="admin-logo">清廉在线</div>
             <nav class="admin-menu">
                 <div class="menu-group">概览</div>
-                <a href="index.php" class="<?php echo $activeMenu == 'dashboard' ? 'active' : ''; ?>">📊 仪表盘</a>
+                <a href="index.php" class="<?php echo $activeMenu == 'dashboard' ? 'active' : ''; ?>"><i class="iconfont icon-dashboard"></i> 仪表盘</a>
 
                 <div class="menu-group">内容管理</div>
-                <a href="articles.php" class="<?php echo $activeMenu == 'articles' ? 'active' : ''; ?>">📝 文章管理</a>
-                <a href="categories.php" class="<?php echo $activeMenu == 'categories' ? 'active' : ''; ?>">📁 栏目管理</a>
-                <a href="pages.php" class="<?php echo $activeMenu == 'pages' ? 'active' : ''; ?>">📄 单页管理</a>
-                <a href="slides.php" class="<?php echo $activeMenu == 'slides' ? 'active' : ''; ?>">🖼️ 轮播图管理</a>
+                <a href="articles.php" class="<?php echo $activeMenu == 'articles' ? 'active' : ''; ?>"><i class="iconfont icon-article"></i> 文章管理</a>
+                <a href="categories.php" class="<?php echo $activeMenu == 'categories' ? 'active' : ''; ?>"><i class="iconfont icon-folder"></i> 栏目管理</a>
+                <a href="pages.php" class="<?php echo $activeMenu == 'pages' ? 'active' : ''; ?>"><i class="iconfont icon-page"></i> 单页管理</a>
+                <a href="slides.php" class="<?php echo $activeMenu == 'slides' ? 'active' : ''; ?>"><i class="iconfont icon-image"></i> 轮播图管理</a>
 
                 <div class="menu-group">用户与互动</div>
-                <a href="users.php" class="<?php echo $activeMenu == 'users' ? 'active' : ''; ?>">👥 用户管理</a>
-                <a href="messages.php" class="<?php echo $activeMenu == 'messages' ? 'active' : ''; ?>">💬 留言举报</a>
+                <a href="users.php" class="<?php echo $activeMenu == 'users' ? 'active' : ''; ?>"><i class="iconfont icon-user"></i> 用户管理</a>
+                <a href="messages.php" class="<?php echo $activeMenu == 'messages' ? 'active' : ''; ?>"><i class="iconfont icon-message"></i> 留言举报</a>
 
                 <div class="menu-group">系统设置</div>
-                <a href="settings.php" class="<?php echo $activeMenu == 'settings' ? 'active' : ''; ?>">⚙️ 系统设置</a>
+                <a href="settings.php" class="<?php echo $activeMenu == 'settings' ? 'active' : ''; ?>"><i class="iconfont icon-setting"></i> 系统设置</a>
                 <?php if (isSuperAdmin()): ?>
-                <a href="admins.php" class="<?php echo $activeMenu == 'admins' ? 'active' : ''; ?>">🔐 管理员管理</a>
+                <a href="admins.php" class="<?php echo $activeMenu == 'admins' ? 'active' : ''; ?>"><i class="iconfont icon-admin"></i> 管理员管理</a>
                 <?php endif; ?>
             </nav>
         </aside>
         <div class="admin-main">
+            <div class="admin-mobile-overlay" id="adminMobileOverlay"></div>
             <header class="admin-header">
-                <h2><?php echo isset($pageTitle) ? e($pageTitle) : '管理后台'; ?></h2>
+                <div style="display:flex; align-items:center;">
+                    <button class="admin-mobile-toggle" id="adminMobileToggle">☰</button>
+                    <h2><?php echo isset($pageTitle) ? e($pageTitle) : '管理后台'; ?></h2>
+                </div>
                 <div class="admin-header-right">
                     <span>欢迎，<?php echo e($currentUser['nickname'] ?: $currentUser['username']); ?></span>
                     <a href="../index.php" target="_blank">前台首页</a>
@@ -134,3 +174,23 @@ $activeMenu = $activeMenu ?? 'dashboard';
                 </div>
             </header>
             <div class="admin-content">
+            <script>
+            (function(){
+                var toggle = document.getElementById('adminMobileToggle');
+                var overlay = document.getElementById('adminMobileOverlay');
+                var sidebar = document.querySelector('.admin-sidebar');
+                if(toggle && sidebar){
+                    toggle.onclick = function(){
+                        sidebar.classList.toggle('mobile-open');
+                        if(overlay) overlay.classList.toggle('active');
+                    };
+                }
+                if(overlay && sidebar){
+                    overlay.onclick = function(){
+                        sidebar.classList.remove('mobile-open');
+                        overlay.classList.remove('active');
+                    };
+                }
+            })();
+            </script>
+

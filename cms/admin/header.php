@@ -20,7 +20,7 @@ $activeMenu = $activeMenu ?? 'dashboard';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? e($pageTitle) . ' - ' : ''; ?>管理后台 - 清廉在线</title>
-    <link rel="stylesheet" href="//at.alicdn.com/t/font_3171436_xc6n6a4nd8r.css">
+    <link rel="stylesheet" href="../assets/css/iconfont.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         body { background: #f0f2f5; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
@@ -164,7 +164,7 @@ $activeMenu = $activeMenu ?? 'dashboard';
             <div class="admin-mobile-overlay" id="adminMobileOverlay"></div>
             <header class="admin-header">
                 <div style="display:flex; align-items:center;">
-                    <button class="admin-mobile-toggle" id="adminMobileToggle">☰</button>
+                    <button class="admin-mobile-toggle" id="adminMobileToggle"><i class="iconfont icon-menu" style="font-size:22px;"></i></button>
                     <h2><?php echo isset($pageTitle) ? e($pageTitle) : '管理后台'; ?></h2>
                 </div>
                 <div class="admin-header-right">

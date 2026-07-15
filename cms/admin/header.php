@@ -19,7 +19,7 @@ $activeMenu = $activeMenu ?? 'dashboard';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($pageTitle) ? e($pageTitle) . ' - ' : ''; ?>管理后台 - 清廉在线</title>
+    <title><?php echo isset($pageTitle) ? e($pageTitle) . ' - ' : ''; ?>管理后台 - 人民检察</title>
     <link rel="stylesheet" href="../assets/css/iconfont.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
@@ -138,7 +138,7 @@ $activeMenu = $activeMenu ?? 'dashboard';
 <body>
     <div class="admin-layout">
         <aside class="admin-sidebar">
-            <div class="admin-logo">清廉在线</div>
+            <div class="admin-logo">人民检察</div>
             <nav class="admin-menu">
                 <div class="menu-group">概览</div>
                 <a href="index.php" class="<?php echo $activeMenu == 'dashboard' ? 'active' : ''; ?>"><i class="iconfont icon-dashboard"></i> 仪表盘</a>

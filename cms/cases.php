@@ -7,18 +7,17 @@ $page = max(1, intval($_GET['page'] ?? 1));
 $perPage = 10;
 $offset = ($page - 1) * $perPage;
 
-$total = @DB::fetchOne("SELECT COUNT(*) as cnt FROM articles WHERE status=1 AND (title LIKE '%案例%' OR title LIKE '%通报%' OR title LIKE '%处分%')")['cnt'] ?: 0;
-$cases = @DB::fetchAll("SELECT * FROM articles WHERE status=1 AND (title LIKE '%案例%' OR title LIKE '%通报%' OR title LIKE '%处分%') ORDER BY publish_time DESC LIMIT $offset, $perPage") ?: [];
+$total = @DB::fetchOne("SELECT COUNT(*) as cnt FROM articles WHERE status=1 AND (title LIKE '%案例%' OR title LIKE '%通报%' OR title LIKE '%起诉%' OR title LIKE '%审判%')")['cnt'] ?: 0;
+$cases = @DB::fetchAll("SELECT * FROM articles WHERE status=1 AND (title LIKE '%案例%' OR title LIKE '%通报%' OR title LIKE '%起诉%' OR title LIKE '%审判%') ORDER BY publish_time DESC LIMIT $offset, $perPage") ?: [];
 
-$pageTitle = '典型案例通报';
+$pageTitle = '检察案例';
 include __DIR__ . '/includes/header.php';
 ?>
 
     <div class="gov-header">
         <div class="container" style="padding:50px 20px;text-align:center;position:relative;">
-            <span style="position:absolute;top:20px;left:20px;font-size:48px;opacity:0.2;">⚖</span>
-            <h1 style="font-family:'SimSun','Songti SC',serif;font-size:36px;color:#fff;letter-spacing:6px;margin-bottom:15px;">典型案例通报</h1>
-            <p style="color:rgba(255,255,255,0.9);font-size:16px;">以案为鉴 以案促改 以案促治</p>
+            <h1 style="font-family:'SimSun','Songti SC',serif;font-size:36px;color:#fff;letter-spacing:6px;margin-bottom:15px;">检察案例发布</h1>
+            <p style="color:rgba(255,255,255,0.9);font-size:16px;">以案释法 以案明理 维护社会公平正义</p>
         </div>
     </div>
 
@@ -26,9 +25,9 @@ include __DIR__ . '/includes/header.php';
         <div class="breadcrumb" style="padding:15px 0;">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
-            <a href="<?php echo BASE_URL; ?>anticorruption.php">反腐倡廉</a>
+            <a href="<?php echo BASE_URL; ?>anticorruption.php">检察反腐</a>
             <span class="sep">/</span>
-            <span>典型案例通报</span>
+            <span>检察案例</span>
         </div>
     </div>
 

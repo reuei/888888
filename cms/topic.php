@@ -3,16 +3,16 @@ require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 
-$slug = $_GET['slug'] ?? 'bainian';
+$slug = $_GET['slug'] ?? 'zhuanzhi';
 $topicMap = [
-    'bainian' => ['name' => '百年纪事', 'desc' => '回顾党的纪律建设百年光辉历程', 'icon' => '📋'],
-    'fubai' => ['name' => '正风反腐在身边', 'desc' => '聚焦群众身边的不正之风和腐败问题', 'icon' => '⚖'],
-    'zhuitao' => ['name' => '国际追逃追赃', 'desc' => '天网恢恢，疏而不漏，海外追逃追踪报道', 'icon' => '🌐'],
-    'jiaoyu' => ['name' => '警示教育', 'desc' => '以案为鉴、以案促改，深入开展警示教育', 'icon' => '📚'],
-    'zhengzhi' => ['name' => '政治巡视', 'desc' => '深化政治巡视，发挥利剑作用', 'icon' => '🔍'],
+    'zhuanzhi' => ['name' => '检察史话', 'desc' => '回顾人民检察制度发展光辉历程', 'icon' => '检'],
+    'gongyi' => ['name' => '公益诉讼', 'desc' => '聚焦生态环境、食药安全等领域公益诉讼', 'icon' => '公'],
+    'jiancha' => ['name' => '检察办案', 'desc' => '检察机关依法履职办案实录', 'icon' => '案'],
+    'jiaoyu' => ['name' => '警示教育', 'desc' => '以案为鉴、警钟长鸣，深入开展警示教育', 'icon' => '警'],
+    'fuwu' => ['name' => '便民服务', 'desc' => '深化检察为民办实事举措', 'icon' => '服'],
 ];
 
-$topicInfo = $topicMap[$slug] ?? ['name' => '专题报道', 'desc' => '专题新闻报道集粹', 'icon' => '📋'];
+$topicInfo = $topicMap[$slug] ?? ['name' => '专题报道', 'desc' => '检察专题新闻报道集粹', 'icon' => '检'];
 
 $page = max(1, intval($_GET['page'] ?? 1));
 $perPage = 12;

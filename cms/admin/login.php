@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="admin-login-wrap">
         <div class="admin-login-header">
-            <h1>清廉在线管理系统</h1>
+            <h1>人民检察管理系统</h1>
             <p>后台管理登录</p>
         </div>
         <div class="admin-login-body">

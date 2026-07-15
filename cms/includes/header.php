@@ -231,10 +231,15 @@ if (!function_exists('resolve_nav_icon')) {
         <div class="container">
             <div class="header-main">
                 <div class="site-logo">
-                    <div class="logo-icon">廉</div>
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:46px;height:46px;">
+                            <path d="M50 8 L62 22 L82 22 L82 44 L92 50 L82 56 L82 78 L62 78 L50 92 L38 78 L18 78 L18 56 L8 50 L18 44 L18 22 L38 22 Z" fill="#9a0006" stroke="#d4af37" stroke-width="1.5"/>
+                            <text x="50" y="58" text-anchor="middle" fill="#d4af37" font-size="22" font-weight="bold" font-family="SimSun, serif">检</text>
+                        </svg>
+                    </div>
                     <div class="logo-text">
                         <h1><?php echo e($siteName); ?></h1>
-                        <p>党风廉政建设门户网站</p>
+                        <p>人民检察院法律监督信息公开平台</p>
                     </div>
                 </div>
                 <div class="header-right">

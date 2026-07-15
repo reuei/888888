@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = '监督举报';
+$pageTitle = '信访举报';
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -39,7 +39,7 @@ include __DIR__ . '/includes/header.php';
         <div class="breadcrumb">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
-            <span>监督举报</span>
+            <span>信访举报</span>
         </div>
     </div>
 
@@ -47,14 +47,15 @@ include __DIR__ . '/includes/header.php';
         <div class="container">
             <div class="section" style="max-width:700px; margin:0 auto;">
                 <div class="section-header">
-                    <h3>监督举报</h3>
+                    <h3>人民检察院信访举报</h3>
                 </div>
                 <div class="section-body">
                     <div style="background:#fff7e6; border:1px solid #ffd591; padding:15px; border-radius:4px; margin-bottom:20px; font-size:13px; color:#d46b08;">
                         <p><strong>举报须知：</strong></p>
-                        <p style="margin-top:8px;">1. 请如实提供举报信息，对所举报内容的真实性负责；</p>
-                        <p>2. 我们将严格保护举报人的个人信息；</p>
-                        <p>3. 请勿诬告陷害他人，否则将承担相应法律责任。</p>
+                        <p style="margin-top:8px;">1. 受理范围：检察机关管辖的职务犯罪、刑事犯罪、民事行政申诉、公益诉讼线索等举报事项；</p>
+                        <p>2. 提倡实名举报，我们将依法严格保护举报人个人信息；</p>
+                        <p>3. 举报内容应客观真实，不得捏造事实诬告陷害他人，否则依法追究法律责任；</p>
+                        <p>4. 受理电话：12309（检察机关统一举报热线）</p>
                     </div>
 
                     <?php if ($msg): ?>
@@ -71,7 +72,7 @@ include __DIR__ . '/includes/header.php';
                         </div>
                         <div class="form-item">
                             <label>举报内容 *</label>
-                            <textarea name="content" rows="8" required placeholder="请详细描述举报内容，包括时间、地点、人物、事件经过等" data-validate="content"><?php echo e($_POST['content'] ?? ''); ?></textarea>
+                            <textarea name="content" rows="8" required placeholder="请详细描述被举报对象、违法事实、相关证据等情况" data-validate="content"><?php echo e($_POST['content'] ?? ''); ?></textarea>
                             <div class="field-tip"></div>
                         </div>
                         <div class="form-item">

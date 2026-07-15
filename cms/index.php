@@ -23,33 +23,42 @@ include __DIR__ . '/includes/header.php';
     <div class="home-left">
         <?php echo getSliderHtml(); ?>
     </div>
-    
+
     <div class="home-center">
-        <div class="banner-image" style="background-image: linear-gradient(135deg, #8b0000 0%, #b80000 100%);">
-            <h2>坚定不移推进<br>党风廉政建设</h2>
+        <div class="banner-image">
+            <div class="banner-emblem">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:80px; height:80px;">
+                    <circle cx="50" cy="50" r="46" fill="none" stroke="#c9a227" stroke-width="2"/>
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#fff" stroke-width="1"/>
+                    <path d="M50 18 L58 28 L70 24 L66 36 L78 42 L66 50 L70 62 L58 60 L50 72 L42 60 L30 62 L34 50 L22 42 L34 36 L30 24 L42 28 Z" fill="#c9a227" opacity="0.9"/>
+                    <text x="50" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold" font-family="SimSun, serif">检察</text>
+                </svg>
+            </div>
+            <h2>忠诚 担当<br>公正 清廉</h2>
+            <p class="banner-sub">人民检察院是国家的法律监督机关</p>
         </div>
     </div>
-    
+
     <div class="home-right">
         <div class="side-block">
-            <div class="side-block-title">快捷入口</div>
+            <div class="side-block-title">检务直通车</div>
             <div class="side-block-body">
                 <div class="quick-links">
                     <a href="<?php echo BASE_URL; ?>report.php">
                         <i class="iconfont icon-report"></i>
-                        <span>监督举报</span>
+                        <span>信访举报</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>anticorruption.php">
                         <i class="iconfont icon-anticorruption"></i>
-                        <span>反腐倡廉</span>
+                        <span>反腐肃贪</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>laws.php">
                         <i class="iconfont icon-law"></i>
-                        <span>党纪法规</span>
+                        <span>法律法规</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>video.php">
                         <i class="iconfont icon-video"></i>
-                        <span>视频中心</span>
+                        <span>检察视频</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>cases.php">
                         <i class="iconfont icon-case"></i>
@@ -57,7 +66,7 @@ include __DIR__ . '/includes/header.php';
                     </a>
                     <a href="<?php echo BASE_URL; ?>policy.php">
                         <i class="iconfont icon-policy"></i>
-                        <span>政策解读</span>
+                        <span>检务公开</span>
                     </a>
                 </div>
             </div>
@@ -70,7 +79,7 @@ include __DIR__ . '/includes/header.php';
         <div style="flex:1;">
             <div class="section">
                 <div class="section-header">
-                    <h3>要闻动态</h3>
+                    <h3>检察要闻</h3>
                     <a href="<?php echo BASE_URL; ?>category.php?slug=yaowen" class="more">更多 &raquo;</a>
                 </div>
                 <div class="section-body">
@@ -89,10 +98,10 @@ include __DIR__ . '/includes/header.php';
                 </div>
             </div>
         </div>
-        
+
         <div style="width:300px;">
             <div class="side-block">
-                <div class="side-block-title">热门排行</div>
+                <div class="side-block-title">关注排行</div>
                 <div class="side-block-body">
                     <ul class="hot-list">
                         <?php foreach ($hotArticles as $idx => $art): ?>

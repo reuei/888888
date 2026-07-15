@@ -35,11 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $defaultSettings = [
-                'site_name' => '清廉在线',
-                'site_title' => '清廉在线 - 党风廉政建设门户网站',
-                'site_keywords' => '党风廉政,反腐倡廉,纪检监察,纪律检查',
-                'site_description' => '清廉在线是党风廉政建设和反腐败工作的综合性门户网站',
-                'footer_copyright' => '© ' . date('Y') . ' 清廉在线 版权所有',
+                'site_name' => '人民检察',
+                'site_title' => '人民检察 - 人民检察院法律监督信息公开平台',
+                'site_keywords' => '人民检察,人民检察院,检察监督,公益诉讼,检务公开,职务犯罪,刑事检察,民事检察,行政检察',
+                'site_description' => '人民检察网是人民检察院面向社会公众的官方信息公开平台，提供检察新闻、检务公开、信访举报、典型案例发布、检察普法等服务',
+                'footer_copyright' => '© ' . date('Y') . ' 人民检察 版权所有  主办：人民检察院',
                 'footer_image' => '',
                 'icp' => '',
                 'contact_email' => 'contact@example.com',
@@ -49,13 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $categories = [
-                ['name' => '要闻动态', 'slug' => 'yaowen', 'sort_order' => 1, 'type' => 'article'],
-                ['name' => '审查调查', 'slug' => 'shencha', 'sort_order' => 2, 'type' => 'article'],
-                ['name' => '巡视巡察', 'slug' => 'xunshi', 'sort_order' => 3, 'type' => 'article'],
-                ['name' => '党纪法规', 'slug' => 'fagui', 'sort_order' => 4, 'type' => 'article'],
-                ['name' => '监督举报', 'slug' => 'jubao', 'sort_order' => 5, 'type' => 'page'],
-                ['name' => '视频中心', 'slug' => 'video', 'sort_order' => 6, 'type' => 'article'],
-                ['name' => '文化之约', 'slug' => 'wenhua', 'sort_order' => 7, 'type' => 'article'],
+                ['name' => '检察要闻', 'slug' => 'yaowen', 'sort_order' => 1, 'type' => 'article'],
+                ['name' => '审查起诉', 'slug' => 'shencha', 'sort_order' => 2, 'type' => 'article'],
+                ['name' => '公益诉讼', 'slug' => 'xunshi', 'sort_order' => 3, 'type' => 'article'],
+                ['name' => '法律法规', 'slug' => 'fagui', 'sort_order' => 4, 'type' => 'article'],
+                ['name' => '信访举报', 'slug' => 'jubao', 'sort_order' => 5, 'type' => 'page'],
+                ['name' => '检察视频', 'slug' => 'video', 'sort_order' => 6, 'type' => 'article'],
+                ['name' => '检察文化', 'slug' => 'wenhua', 'sort_order' => 7, 'type' => 'article'],
             ];
             foreach ($categories as $cat) {
                 DB::insert('categories', array_merge($cat, ['parent_id' => 0, 'show_in_menu' => 1]));
@@ -63,18 +63,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $subCats = [
                 'shencha' => [
-                    ['name' => '执纪审查', 'slug' => 'zhiji', 'sort_order' => 1],
-                    ['name' => '党纪政务处分', 'slug' => 'chufen', 'sort_order' => 2],
-                    ['name' => '国际追逃', 'slug' => 'zhuitao', 'sort_order' => 3],
+                    ['name' => '职务犯罪检察', 'slug' => 'zhiji', 'sort_order' => 1],
+                    ['name' => '刑事检察', 'slug' => 'chufen', 'sort_order' => 2],
+                    ['name' => '民事行政检察', 'slug' => 'zhuitao', 'sort_order' => 3],
                 ],
                 'xunshi' => [
-                    ['name' => '巡视工作', 'slug' => 'xunshigz', 'sort_order' => 1],
-                    ['name' => '巡察工作', 'slug' => 'xunshacg', 'sort_order' => 2],
+                    ['name' => '生态环境领域', 'slug' => 'xunshigz', 'sort_order' => 1],
+                    ['name' => '食品药品安全', 'slug' => 'xunshacg', 'sort_order' => 2],
                 ],
                 'fagui' => [
-                    ['name' => '党内法规', 'slug' => 'dangnei', 'sort_order' => 1],
-                    ['name' => '国家法律', 'slug' => 'guojia', 'sort_order' => 2],
-                    ['name' => '纪法百科', 'slug' => 'baike', 'sort_order' => 3],
+                    ['name' => '检察法律', 'slug' => 'dangnei', 'sort_order' => 1],
+                    ['name' => '司法解释', 'slug' => 'guojia', 'sort_order' => 2],
+                    ['name' => '普法专栏', 'slug' => 'baike', 'sort_order' => 3],
                 ],
             ];
             foreach ($subCats as $parentSlug => $subs) {
@@ -101,12 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             $sampleTitles = [
-                '省纪委监委召开全体干部大会 传达学习重要会议精神',
-                '某市原副市长严重违纪违法被开除党籍和公职',
-                '中央巡视组对多地开展巡视"回头看"反馈情况通报',
-                '中国共产党纪律处分条例全文解读',
-                '关于新形势下党内政治生活的若干准则学习要点',
-                '追逃追赃工作取得新进展 多名外逃人员归案',
+                '最高人民检察院召开新闻发布会通报公益诉讼工作开展情况',
+                '某厅级干部涉嫌受贿案一审宣判 检察机关依法履行法律监督职责',
+                '检察机关开展司法救助专项活动 切实保障困难群众合法权益',
+                '中华人民共和国刑事诉讼法（修订）要点解读',
+                '关于深入推进检察公开听证工作的实施意见',
+                '检察机关依法对职务犯罪案件提起公诉 多名被告人获刑',
             ];
             $catIds = DB::fetchAll("SELECT id FROM categories WHERE parent_id=0 LIMIT 6");
             foreach ($sampleTitles as $idx => $title) {
@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>系统安装 - 清廉在线</title>
+    <title>系统安装 - 人民检察</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #f5f5f5; color: #333; }
@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="install-wrap">
         <div class="install-header">
-            <h1>清廉在线 CMS 系统安装向导</h1>
+            <h1>人民检察 CMS 系统安装向导</h1>
         </div>
         <div class="install-body">
             <div class="steps">

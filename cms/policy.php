@@ -7,19 +7,19 @@ $page = max(1, intval($_GET['page'] ?? 1));
 $perPage = 15;
 $offset = ($page - 1) * $perPage;
 
-$total = @DB::fetchOne("SELECT COUNT(*) as cnt FROM articles WHERE status=1 AND (title LIKE '%政策%' OR title LIKE '%解读%' OR title LIKE '%规定%' OR title LIKE '%办法%')")['cnt'] ?: 0;
-$policies = @DB::fetchAll("SELECT * FROM articles WHERE status=1 AND (title LIKE '%政策%' OR title LIKE '%解读%' OR title LIKE '%规定%' OR title LIKE '%办法%') ORDER BY publish_time DESC LIMIT $offset, $perPage") ?: [];
+$total = @DB::fetchOne("SELECT COUNT(*) as cnt FROM articles WHERE status=1 AND (title LIKE '%意见%' OR title LIKE '%解释%' OR title LIKE '%规定%' OR title LIKE '%办法%' OR title LIKE '%准则%')")['cnt'] ?: 0;
+$policies = @DB::fetchAll("SELECT * FROM articles WHERE status=1 AND (title LIKE '%意见%' OR title LIKE '%解释%' OR title LIKE '%规定%' OR title LIKE '%办法%' OR title LIKE '%准则%') ORDER BY publish_time DESC LIMIT $offset, $perPage") ?: [];
 
 $hotPolicies = @DB::fetchAll("SELECT * FROM articles WHERE status=1 ORDER BY views DESC LIMIT 10") ?: [];
 
-$pageTitle = '政策解读';
+$pageTitle = '检务公开';
 include __DIR__ . '/includes/header.php';
 ?>
 
     <div class="gov-header" style="background:linear-gradient(135deg,#d4a017 0%,#b8860b 50%,#a67c00 100%);">
         <div class="container" style="padding:50px 20px;text-align:center;">
-            <h1 style="font-family:'SimSun','Songti SC',serif;font-size:36px;color:#fff;letter-spacing:6px;margin-bottom:15px;">政策解读</h1>
-            <p style="color:rgba(255,255,255,0.9);font-size:16px;">权威解读党纪法规 深入领会政策精神</p>
+            <h1 style="font-family:'SimSun','Songti SC',serif;font-size:36px;color:#fff;letter-spacing:6px;margin-bottom:15px;">检务公开</h1>
+            <p style="color:rgba(255,255,255,0.9);font-size:16px;">深化检务公开 保障群众知情权参与权监督权</p>
         </div>
     </div>
 
@@ -27,9 +27,7 @@ include __DIR__ . '/includes/header.php';
         <div class="breadcrumb" style="padding:15px 0;">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
-            <a href="<?php echo BASE_URL; ?>anticorruption.php">反腐倡廉</a>
-            <span class="sep">/</span>
-            <span>政策解读</span>
+            <span>检务公开</span>
         </div>
     </div>
 

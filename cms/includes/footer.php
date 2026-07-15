@@ -178,24 +178,24 @@
             <div class="container">
                 <div class="illustration-3d">
                     <div class="illust-card" style="--d:0s">
-                        <svg class="illust-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 6.9H22l-6 4.4 2.3 7.1L12 16.2 5.7 20.4 8 13.3 2 8.9h7.6z"/></svg>
-                        <span class="illust-char">廉</span>
-                        <span class="illust-en">INTEGRITY</span>
+                        <svg class="illust-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span class="illust-char">忠</span>
+                        <span class="illust-en">LOYALTY</span>
                     </div>
                     <div class="illust-card" style="--d:.5s">
                         <svg class="illust-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><line x1="7" y1="21" x2="17" y2="21"/><line x1="5" y1="7" x2="19" y2="7"/><path d="M5 7L2 13a3 3 0 0 0 6 0L5 7z"/><path d="M19 7l-3 6a3 3 0 0 0 6 0l-3-6z"/></svg>
-                        <span class="illust-char">正</span>
+                        <span class="illust-char">公</span>
                         <span class="illust-en">JUSTICE</span>
                     </div>
                     <div class="illust-card" style="--d:1s">
                         <svg class="illust-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
-                        <span class="illust-char">纪</span>
-                        <span class="illust-en">DISCIPLINE</span>
+                        <span class="illust-char">清</span>
+                        <span class="illust-en">CLEAN</span>
                     </div>
                     <div class="illust-card" style="--d:1.5s">
                         <svg class="illust-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="11"/><line x1="11" y1="11" x2="13" y2="11"/></svg>
                         <span class="illust-char">察</span>
-                        <span class="illust-en">SUPERVISION</span>
+                        <span class="illust-en">SUPERVISE</span>
                     </div>
                 </div>
 
@@ -257,7 +257,7 @@
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p><?php echo e(getSetting('footer_copyright', '© ' . date('Y') . ' 清廉在线 版权所有')); ?></p>
+                    <p><?php echo e(getSetting('footer_copyright', '© ' . date('Y') . ' 人民检察 版权所有  主办：人民检察院')); ?></p>
                     <?php if (getSetting('icp', '')): ?>
                         <p><a href="https://beian.miit.gov.cn/" target="_blank"><?php echo e(getSetting('icp')); ?></a></p>
                     <?php endif; ?>

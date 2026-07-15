@@ -1,8 +1,8 @@
 <?php
-define('SITE_NAME', '清廉在线');
-define('SITE_TITLE', '清廉在线 - 党风廉政建设门户网站');
-define('SITE_KEYWORDS', '党风廉政,反腐倡廉,纪检监察,纪律检查');
-define('SITE_DESCRIPTION', '清廉在线是党风廉政建设和反腐败工作的综合性门户网站');
+define('SITE_NAME', '人民检察');
+define('SITE_TITLE', '人民检察 - 人民检察院监督举报与检察信息公开平台');
+define('SITE_KEYWORDS', '人民检察,人民检察院,检察监督,公益诉讼,检务公开,职务犯罪,刑事检察,民事检察,行政检察');
+define('SITE_DESCRIPTION', '人民检察网是人民检察院面向社会公众的官方信息公开平台，提供检察新闻、检务公开、信访举报、典型案例发布、检察普法等服务');
 
 define('DB_PATH', __DIR__ . '/../data/cms.db');
 define('DATA_DIR', __DIR__ . '/../data');

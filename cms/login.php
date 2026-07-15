@@ -38,40 +38,46 @@ $pageTitle = '用户登录';
 include __DIR__ . '/includes/header.php';
 ?>
 
-    <div class="container">
-        <div class="breadcrumb">
-            <a href="<?php echo BASE_URL; ?>index.php">首页</a>
-            <span class="sep">/</span>
-            <span>登录</span>
-        </div>
+<div class="container">
+    <div class="crumbs">
+        <a href="<?php echo BASE_URL; ?>index.php">首页</a>
+        <span class="sep">/</span>
+        <span>用户登录</span>
     </div>
+</div>
 
-    <div class="form-box">
-        <h2>用户登录</h2>
-        <?php if ($error): ?>
-        <div class="alert alert-error"><?php echo e($error); ?></div>
-        <?php endif; ?>
-        <div class="form-body">
+<div class="container" style="padding-bottom:60px;">
+    <div class="form-card">
+        <div class="form-card-head">
+            <h2>用户登录</h2>
+            <p>USER LOGIN</p>
+        </div>
+        <div class="form-card-body">
+            <?php if ($error): ?>
+            <div class="alert alert-error"><?php echo e($error); ?></div>
+            <?php endif; ?>
+
             <form method="post" data-toast-form>
-                <div class="form-item">
-                    <label>用户名</label>
+                <div class="form-row">
+                    <label>账号</label>
                     <input type="text" name="username" value="<?php echo e($_POST['username'] ?? $_COOKIE['remember_user'] ?? ''); ?>" required placeholder="请输入用户名" data-validate="username">
-                    <div class="field-tip"></div>
+                    <div class="form-tip"></div>
                 </div>
-                <div class="form-item">
+                <div class="form-row">
                     <label>密码</label>
-                    <input type="password" name="password" required placeholder="请输入密码" data-validate="password">
-                    <div class="field-tip"></div>
+                    <input type="password" name="password" required placeholder="请输入登录密码" data-validate="password">
+                    <div class="form-tip"></div>
                 </div>
-                <div class="form-item" style="display:flex; align-items:center; justify-content:space-between;">
-                    <label style="display:flex; align-items:center; cursor:pointer;">
-                        <input type="checkbox" name="remember" style="width:auto; margin-right:5px;"> 记住我
+                <div class="form-row" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+                    <label style="display:flex; align-items:center; cursor:pointer; font-weight:normal;">
+                        <input type="checkbox" name="remember" style="width:auto; margin-right:6px;"> 记住账号
                     </label>
-                    <a href="register.php" style="color:#c20000; font-size:13px;">还没有账号？立即注册</a>
+                    <a href="register.php" style="color:var(--pk-gold-deep); font-size:13px;">立即注册 &raquo;</a>
                 </div>
-                <button type="submit" class="btn btn-block">登录</button>
+                <button type="submit" class="btn btn-block">登 录</button>
             </form>
         </div>
     </div>
+</div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

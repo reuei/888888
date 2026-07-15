@@ -20,7 +20,7 @@ DB::update('articles', ['views' => $article['views'] + 1], 'id=?', [$id]);
 $category = getCategory($article['category_id']);
 $currentCatId = $article['category_id'];
 $pageTitle = $article['title'];
-$breadcrumb = $category ? getBreadcrumb($category['id']) : [];
+$crums = $category ? getBreadcrumb($category['id']) : [];
 
 $relatedArticles = $category ? DB::fetchAll("SELECT * FROM articles WHERE category_id=? AND id!=? AND status=1 ORDER BY publish_time DESC LIMIT 8", [$category['id'], $id]) : [];
 
@@ -31,9 +31,9 @@ include __DIR__ . '/includes/header.php';
 ?>
 
     <div class="container">
-        <div class="breadcrumb">
+        <div class="crums">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
-            <?php foreach ($breadcrumb as $bc): ?>
+            <?php foreach ($crums as $bc): ?>
                 <span class="sep">/</span>
                 <a href="<?php echo BASE_URL; ?>category.php?slug=<?php echo e($bc['slug']); ?>"><?php echo e($bc['name']); ?></a>
             <?php endforeach; ?>
@@ -42,10 +42,10 @@ include __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="">
         <div class="container">
-            <div class="content-wrap">
-                <div class="main-col">
+            <div class="two-col">
+                <div class="">
                     <div class="article-detail">
                         <h1><?php echo e($article['title']); ?></h1>
                         <div class="article-meta">
@@ -69,10 +69,10 @@ include __DIR__ . '/includes/header.php';
                     </div>
                 </div>
 
-                <div class="side-col">
-                    <div class="side-block">
-                        <div class="side-block-title">相关文章</div>
-                        <div class="side-block-body">
+                <div class="">
+                    <div class="block">
+                        <div class="block-title">相关文章</div>
+                        <div class="block-body">
                             <ul class="news-list">
                                 <?php foreach ($relatedArticles as $rel): ?>
                                 <li>
@@ -85,9 +85,9 @@ include __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <div class="side-block">
-                        <div class="side-block-title">热点推荐</div>
-                        <div class="side-block-body">
+                    <div class="block">
+                        <div class="block-title">热点推荐</div>
+                        <div class="block-body">
                             <ul class="hot-list">
                                 <?php
                                 $hotList = DB::fetchAll("SELECT * FROM articles WHERE status=1 ORDER BY views DESC LIMIT 8");

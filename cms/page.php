@@ -20,17 +20,17 @@ include __DIR__ . '/includes/header.php';
 ?>
 
     <div class="container">
-        <div class="breadcrumb">
+        <div class="crums">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
             <span><?php echo e($page['title']); ?></span>
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="">
         <div class="container">
             <div class="section" style="max-width:900px; margin:0 auto;">
-                <div class="section-body" style="padding:30px 40px;">
+                <div class="block-body" style="padding:30px 40px;">
                     <h1 style="text-align:center; font-size:26px; margin-bottom:20px;"><?php echo e($page['title']); ?></h1>
                     <div class="article-content">
                         <?php echo $page['content']; ?>

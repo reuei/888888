@@ -43,7 +43,7 @@ include __DIR__ . '/includes/header.php';
     </section>
 
     <div class="container">
-        <div class="breadcrumb">
+        <div class="crums">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
             <span>专题集粹</span>
@@ -52,16 +52,16 @@ include __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="">
         <div class="container">
-            <div class="content-wrap">
-                <div class="main-col">
+            <div class="two-col">
+                <div class="">
                     <div class="section scroll-reveal">
-                        <div class="section-header">
+                        <div class="block-head">
                             <h3><?php echo e($topicInfo['name']); ?> - 文章列表</h3>
                             <span style="font-size:13px; color:#999;">共 <?php echo $total; ?> 篇</span>
                         </div>
-                        <div class="section-body">
+                        <div class="block-body">
                             <?php if ($articles): ?>
                             <div class="article-grid">
                                 <?php foreach ($articles as $idx => $art): ?>
@@ -89,7 +89,7 @@ include __DIR__ . '/includes/header.php';
                     </div>
 
                     <div class="section scroll-reveal">
-                        <div class="section-header">
+                        <div class="block-head">
                             <h3>更多专题</h3>
                         </div>
                         <div class="topic-grid">
@@ -109,10 +109,10 @@ include __DIR__ . '/includes/header.php';
                     </div>
                 </div>
 
-                <div class="side-col">
-                    <div class="side-block scroll-reveal">
-                        <div class="side-block-title">热门排行</div>
-                        <div class="side-block-body">
+                <div class="">
+                    <div class="block scroll-reveal">
+                        <div class="block-title">热门排行</div>
+                        <div class="block-body">
                             <ul class="hot-list">
                                 <?php foreach ($hotArticles as $index => $article): ?>
                                 <li>
@@ -126,9 +126,9 @@ include __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <div class="side-block scroll-reveal">
-                        <div class="side-block-title">3D廉洁宣言</div>
-                        <div class="side-block-body">
+                    <div class="block scroll-reveal">
+                        <div class="block-title">3D廉洁宣言</div>
+                        <div class="block-body">
                             <div class="illustration-3d">
                                 <div class="illust-card">
                                     <span class="illust-text">廉</span>

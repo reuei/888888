@@ -16,7 +16,7 @@ $pageTitle = '检务公开';
 include __DIR__ . '/includes/header.php';
 ?>
 
-    <div class="gov-header" style="background:linear-gradient(135deg,#d4a017 0%,#b8860b 50%,#a67c00 100%);">
+    <div class="" style="background:linear-gradient(135deg,#d4a017 0%,#b8860b 50%,#a67c00 100%);">
         <div class="container" style="padding:50px 20px;text-align:center;">
             <h1 style="font-family:'SimSun','Songti SC',serif;font-size:36px;color:#fff;letter-spacing:6px;margin-bottom:15px;">检务公开</h1>
             <p style="color:rgba(255,255,255,0.9);font-size:16px;">深化检务公开 保障群众知情权参与权监督权</p>
@@ -24,23 +24,23 @@ include __DIR__ . '/includes/header.php';
     </div>
 
     <div class="container">
-        <div class="breadcrumb" style="padding:15px 0;">
+        <div class="crums" style="padding:15px 0;">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
             <span>检务公开</span>
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="">
         <div class="container">
-            <div class="content-wrap">
-                <div class="main-col">
+            <div class="two-col">
+                <div class="">
                     <div class="section scroll-reveal">
-                        <div class="section-header">
+                        <div class="block-head">
                             <h3>政策文件</h3>
                             <span style="font-size:13px;color:#999;">共 <?php echo $total; ?> 条</span>
                         </div>
-                        <div class="section-body">
+                        <div class="block-body">
                             <?php if ($policies): ?>
                             <ul class="news-list">
                                 <?php foreach ($policies as $p): ?>
@@ -63,10 +63,10 @@ include __DIR__ . '/includes/header.php';
                     </div>
                 </div>
 
-                <div class="side-col">
-                    <div class="side-block scroll-reveal">
-                        <div class="side-block-title">热门政策</div>
-                        <div class="side-block-body">
+                <div class="">
+                    <div class="block scroll-reveal">
+                        <div class="block-title">热门政策</div>
+                        <div class="block-body">
                             <ul class="hot-list">
                                 <?php foreach ($hotPolicies as $idx => $hp): ?>
                                 <li>
@@ -78,9 +78,9 @@ include __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <div class="side-block scroll-reveal">
-                        <div class="side-block-title">法规检索</div>
-                        <div class="side-block-body">
+                    <div class="block scroll-reveal">
+                        <div class="block-title">法规检索</div>
+                        <div class="block-body">
                             <form action="<?php echo BASE_URL; ?>laws.php" method="get">
                                 <input type="text" name="q" placeholder="搜索法规..." style="width:100%;padding:10px;border:2px solid #ddd;border-radius:6px;">
                                 <button type="submit" class="btn btn-block" style="margin-top:10px;">搜索</button>

@@ -22,21 +22,21 @@ include __DIR__ . '/includes/header.php';
 ?>
 
     <div class="container">
-        <div class="breadcrumb">
+        <div class="crums">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
             <span>搜索结果</span>
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="">
         <div class="container">
             <div class="section">
-                <div class="section-header">
+                <div class="block-head">
                     <h3>搜索结果</h3>
                     <span style="font-size:13px; color:#999;">共找到 <?php echo $total; ?> 条关于 "<?php echo e($q); ?>" 的结果</span>
                 </div>
-                <div class="section-body">
+                <div class="block-body">
                     <?php if ($articles): ?>
                     <ul class="news-list">
                         <?php foreach ($articles as $article): ?>

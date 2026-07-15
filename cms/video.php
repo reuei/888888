@@ -35,22 +35,22 @@ include __DIR__ . '/includes/header.php';
     </section>
 
     <div class="container">
-        <div class="breadcrumb">
+        <div class="crums">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
             <span>视频中心</span>
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="">
         <div class="container">
-            <div class="content-wrap">
-                <div class="main-col">
+            <div class="two-col">
+                <div class="">
                     <div class="section scroll-reveal">
-                        <div class="section-header">
+                        <div class="block-head">
                             <h3>最新视频</h3>
                         </div>
-                        <div class="section-body">
+                        <div class="block-body">
                             <?php if ($videos): ?>
                             <div class="video-grid">
                                 <?php foreach ($videos as $idx => $video): ?>
@@ -82,10 +82,10 @@ include __DIR__ . '/includes/header.php';
                     </div>
                 </div>
 
-                <div class="side-col">
-                    <div class="side-block scroll-reveal">
-                        <div class="side-block-title">视频分类</div>
-                        <div class="side-block-body">
+                <div class="">
+                    <div class="block scroll-reveal">
+                        <div class="block-title">视频分类</div>
+                        <div class="block-body">
                             <ul class="news-list">
                                 <li><a href="<?php echo BASE_URL; ?>video.php" class="title">全部视频</a></li>
                                 <?php
@@ -98,9 +98,9 @@ include __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <div class="side-block scroll-reveal">
-                        <div class="side-block-title">热门视频</div>
-                        <div class="side-block-body">
+                    <div class="block scroll-reveal">
+                        <div class="block-title">热门视频</div>
+                        <div class="block-body">
                             <ul class="hot-list">
                                 <?php foreach (array_slice($hotArticles, 0, 8) as $index => $article): ?>
                                 <li>

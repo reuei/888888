@@ -31,30 +31,30 @@ $total = DB::fetchOne("SELECT COUNT(*) as cnt FROM articles WHERE category_id IN
 $articles = DB::fetchAll("SELECT * FROM articles WHERE category_id IN ($placeholders) AND status=1 ORDER BY is_top DESC, publish_time DESC LIMIT $offset, $perPage", $catIds);
 
 $pageTitle = $category['name'];
-$breadcrumb = getBreadcrumb($category['id']);
+$crums = getBreadcrumb($category['id']);
 
 include __DIR__ . '/includes/header.php';
 ?>
 
     <div class="container">
-        <div class="breadcrumb">
+        <div class="crums">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
-            <?php foreach ($breadcrumb as $bc): ?>
+            <?php foreach ($crums as $bc): ?>
                 <span class="sep">/</span>
                 <a href="<?php echo BASE_URL; ?>category.php?slug=<?php echo e($bc['slug']); ?>"><?php echo e($bc['name']); ?></a>
             <?php endforeach; ?>
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="">
         <div class="container">
-            <div class="content-wrap">
-                <div class="main-col">
+            <div class="two-col">
+                <div class="">
                     <div class="section">
-                        <div class="section-header">
+                        <div class="block-head">
                             <h3><?php echo e($category['name']); ?></h3>
                         </div>
-                        <div class="section-body">
+                        <div class="block-body">
                             <?php if ($articles): ?>
                             <ul class="news-list">
                                 <?php foreach ($articles as $article): ?>
@@ -74,10 +74,10 @@ include __DIR__ . '/includes/header.php';
                     </div>
                 </div>
 
-                <div class="side-col">
-                    <div class="side-block">
-                        <div class="side-block-title">栏目导航</div>
-                        <div class="side-block-body">
+                <div class="">
+                    <div class="block">
+                        <div class="block-title">栏目导航</div>
+                        <div class="block-body">
                             <ul class="news-list">
                                 <?php if ($childCats): ?>
                                     <?php foreach ($childCats as $child): ?>
@@ -104,9 +104,9 @@ include __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <div class="side-block">
-                        <div class="side-block-title">热门文章</div>
-                        <div class="side-block-body">
+                    <div class="block">
+                        <div class="block-title">热门文章</div>
+                        <div class="block-body">
                             <ul class="hot-list">
                                 <?php
                                 $hotList = DB::fetchAll("SELECT * FROM articles WHERE category_id IN ($placeholders) AND status=1 ORDER BY views DESC LIMIT 8", $catIds);

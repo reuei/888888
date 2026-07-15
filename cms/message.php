@@ -40,22 +40,22 @@ include __DIR__ . '/includes/header.php';
 ?>
 
     <div class="container">
-        <div class="breadcrumb">
+        <div class="crums">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
             <span>留言板</span>
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="">
         <div class="container">
-            <div class="content-wrap">
-                <div class="main-col">
+            <div class="two-col">
+                <div class="">
                     <div class="section">
-                        <div class="section-header">
+                        <div class="block-head">
                             <h3>留言板</h3>
                         </div>
-                        <div class="section-body">
+                        <div class="block-body">
                             <?php if ($msg): ?>
                             <div style="padding:10px 15px; border-radius:4px; margin-bottom:20px; <?php echo $msgType == 'success' ? 'background:#f6ffed; color:#52c41a; border:1px solid #b7eb8f;' : 'background:#fff1f0; color:#f5222d; border:1px solid #ffa39e;'; ?>">
                                 <?php echo e($msg); ?>
@@ -102,10 +102,10 @@ include __DIR__ . '/includes/header.php';
                     </div>
                 </div>
 
-                <div class="side-col">
-                    <div class="side-block">
-                        <div class="side-block-title">留言须知</div>
-                        <div class="side-block-body" style="font-size:13px; color:#666; line-height:1.8;">
+                <div class="">
+                    <div class="block">
+                        <div class="block-title">留言须知</div>
+                        <div class="block-body" style="font-size:13px; color:#666; line-height:1.8;">
                             <p>1. 请文明留言，遵守相关法律法规；</p>
                             <p style="margin-top:5px;">2. 留言经审核后显示；</p>
                             <p style="margin-top:5px;">3. 请勿发布违法违规内容。</p>

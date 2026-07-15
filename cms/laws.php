@@ -56,22 +56,22 @@ include __DIR__ . '/includes/header.php';
     </section>
 
     <div class="container">
-        <div class="breadcrumb">
+        <div class="crums">
             <a href="<?php echo BASE_URL; ?>index.php">首页</a>
             <span class="sep">/</span>
             <span>党纪法规</span>
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="">
         <div class="container">
-            <div class="content-wrap">
-                <div class="main-col">
+            <div class="two-col">
+                <div class="">
                     <div class="section scroll-reveal">
-                        <div class="section-header">
+                        <div class="block-head">
                             <h3>法规检索</h3>
                         </div>
-                        <div class="section-body">
+                        <div class="block-body">
                             <form method="get" style="display:flex; gap:10px; margin-bottom:20px;">
                                 <input type="text" name="q" value="<?php echo e($keyword); ?>" placeholder="搜索法规标题或内容..." data-validate="title"
                                        style="flex:1; padding:10px 14px; border:2px solid #ddd; border-radius:8px; font-size:14px;">
@@ -108,11 +108,11 @@ include __DIR__ . '/includes/header.php';
                     <?php if ($subCats && !$keyword): ?>
                     <?php foreach ($subCats as $sc): ?>
                     <div class="section scroll-reveal">
-                        <div class="section-header">
+                        <div class="block-head">
                             <h3><?php echo e($sc['name']); ?></h3>
                             <a href="<?php echo BASE_URL; ?>category.php?slug=<?php echo e($sc['slug']); ?>" class="more">更多 &raquo;</a>
                         </div>
-                        <div class="section-body">
+                        <div class="block-body">
                             <?php
                             $subArticles = DB::fetchAll("SELECT * FROM articles WHERE category_id=? AND status=1 ORDER BY publish_time DESC LIMIT 5", [$sc['id']]);
                             ?>
@@ -136,10 +136,10 @@ include __DIR__ . '/includes/header.php';
                     <?php endif; ?>
                 </div>
 
-                <div class="side-col">
-                    <div class="side-block scroll-reveal">
-                        <div class="side-block-title">法规分类</div>
-                        <div class="side-block-body">
+                <div class="">
+                    <div class="block scroll-reveal">
+                        <div class="block-title">法规分类</div>
+                        <div class="block-body">
                             <ul class="news-list">
                                 <?php foreach ($subCats as $sc): ?>
                                 <li class="<?php echo $subCatId == $sc['id'] ? 'top' : ''; ?>">
@@ -152,9 +152,9 @@ include __DIR__ . '/includes/header.php';
                         </div>
                     </div>
 
-                    <div class="side-block scroll-reveal">
-                        <div class="side-block-title">热门文章</div>
-                        <div class="side-block-body">
+                    <div class="block scroll-reveal">
+                        <div class="block-title">热门文章</div>
+                        <div class="block-body">
                             <ul class="hot-list">
                                 <?php foreach ($hotArticles as $index => $article): ?>
                                 <li>

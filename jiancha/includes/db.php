@@ -11,38 +11,53 @@ class DB {
         return self::$pdo;
     }
     public static function exec($sql, $params = []) {
-        $st = self::init()->prepare($sql);
-        $st->execute($params);
-        return $st->rowCount();
+        try {
+            $st = self::init()->prepare($sql);
+            $st->execute($params);
+            return $st->rowCount();
+        } catch (Exception $e) { return 0; }
     }
     public static function query($sql, $params = []) {
-        $st = self::init()->prepare($sql);
-        $st->execute($params);
-        return $st;
+        try {
+            $st = self::init()->prepare($sql);
+            $st->execute($params);
+            return $st;
+        } catch (Exception $e) { return null; }
     }
     public static function fetchAll($sql, $params = []) {
-        return self::query($sql, $params)->fetchAll();
+        try {
+            $st = self::query($sql, $params);
+            return $st ? $st->fetchAll() : [];
+        } catch (Exception $e) { return []; }
     }
     public static function fetchOne($sql, $params = []) {
-        $r = self::query($sql, $params)->fetch();
-        return $r ?: null;
+        try {
+            $st = self::query($sql, $params);
+            return $st ? ($st->fetch() ?: null) : null;
+        } catch (Exception $e) { return null; }
     }
     public static function insert($table, $data) {
-        $cols = implode(',', array_keys($data));
-        $ph = implode(',', array_fill(0, count($data), '?'));
-        $st = self::init()->prepare("INSERT INTO {$table} ({$cols}) VALUES ({$ph})");
-        $st->execute(array_values($data));
-        return (int) self::init()->lastInsertId();
+        try {
+            $cols = implode(',', array_keys($data));
+            $ph = implode(',', array_fill(0, count($data), '?'));
+            $st = self::init()->prepare("INSERT INTO {$table} ({$cols}) VALUES ({$ph})");
+            $st->execute(array_values($data));
+            return (int) self::init()->lastInsertId();
+        } catch (Exception $e) { return 0; }
     }
     public static function update($table, $data, $where, $wparams = []) {
-        $set = implode(',', array_map(fn($k) => "{$k}=?", array_keys($data)));
-        $st = self::init()->prepare("UPDATE {$table} SET {$set} WHERE {$where}");
-        $st->execute(array_merge(array_values($data), $wparams));
-        return $st->rowCount();
+        try {
+            $set = implode(',', array_map(fn($k) => "{$k}=?", array_keys($data)));
+            $st = self::init()->prepare("UPDATE {$table} SET {$set} WHERE {$where}");
+            $st->execute(array_merge(array_values($data), $wparams));
+            return $st->rowCount();
+        } catch (Exception $e) { return 0; }
     }
     public static function delete($table, $where, $params = []) {
-        $st = self::init()->prepare("DELETE FROM {$table} WHERE {$where}");
-        $st->execute($params);
-        return $st->rowCount();
+        try {
+            $st = self::init()->prepare("DELETE FROM {$table} WHERE {$where}");
+            $st->execute($params);
+            return $st->rowCount();
+        } catch (Exception $e) { return 0; }
     }
 }

@@ -1,9 +1,11 @@
 <?php
-session_start();
+if (!headers_sent()) {
+    session_start();
+    header('Content-Type: text/html; charset=utf-8');
+}
 ini_set('display_errors', '0');
 error_reporting(0);
 date_default_timezone_set('Asia/Shanghai');
-header('Content-Type: text/html; charset=utf-8');
 
 $basePath = dirname(__DIR__) . '/';
 $baseUrl = '/' . basename(dirname(__DIR__)) . '/';

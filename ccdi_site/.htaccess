@@ -1,0 +1,59 @@
+# 中央纪委国家监委网站风格 CMS - Apache 伪静态规则
+# 适用于虚拟主机环境
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # 禁止访问 data 目录
+    RewriteRule ^data/ - [F,L]
+
+    # 禁止访问 includes 目录
+    RewriteRule ^includes/ - [F,L]
+
+    # 禁止访问 templates 目录
+    RewriteRule ^templates/ - [F,L]
+
+    # 伪静态规则
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^category/([a-zA-Z0-9_-]+)$ category.php?slug=$1 [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^article/([0-9]+)$ article.php?id=$1 [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^search/(.*)$ search.php?q=$1 [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^page/([0-9]+)$ index.php?page=$1 [L,QSA]
+</IfModule>
+
+# 安全设置
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# 禁止访问敏感文件
+<FilesMatch "\.(db|sqlite|sql|log|ini)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# 禁止目录浏览
+Options -Indexes
+
+# 默认首页
+DirectoryIndex index.php
+
+# 字符编码
+AddDefaultCharset UTF-8
+
+# 错误页面
+ErrorDocument 404 /index.php
+ErrorDocument 500 /index.php

@@ -6,15 +6,10 @@ require_once __DIR__ . '/includes/slide.php';
 
 if (!file_exists(DB_PATH)) redirect('install.php');
 
-$pageTitle = '首页';
-
-$yaowen = []; $hot = []; $totalArt = 0; $totalCat = 0;
-try {
-    $yaowen = DB::fetchAll("SELECT * FROM articles WHERE status=1 ORDER BY is_top DESC, publish_time DESC LIMIT 8");
-    $hot = DB::fetchAll("SELECT * FROM articles WHERE status=1 ORDER BY views DESC LIMIT 8");
-    $totalArt = DB::fetchOne("SELECT COUNT(*) as c FROM articles WHERE status=1")['c'] ?? 0;
-    $totalCat = DB::fetchOne("SELECT COUNT(*) as c FROM categories")['c'] ?? 0;
-} catch (Exception $e) {}
+$yaowen = DB::fetchAll("SELECT * FROM articles WHERE status=1 ORDER BY is_top DESC, publish_time DESC LIMIT 8");
+$hot = DB::fetchAll("SELECT * FROM articles WHERE status=1 ORDER BY views DESC LIMIT 8");
+$totalArt = DB::fetchOne("SELECT COUNT(*) as c FROM articles WHERE status=1")['c'] ?? 0;
+$totalCat = DB::fetchOne("SELECT COUNT(*) as c FROM categories")['c'] ?? 0;
 $pageTitle = '';
 include __DIR__ . '/includes/header.php';
 ?>

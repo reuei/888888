@@ -28,14 +28,14 @@ include __DIR__ . '/header.php';
 <?php if ($error): ?><div class="alert alert-error"><?php echo e($error); ?></div><?php endif; ?>
 <div class="admin-card">
 <h4>管理员列表</h4>
-<div class="admin-table-wrap"><table class="admin-table">
+<table class="admin-table">
 <thead><tr><th>ID</th><th>用户名</th><th>角色</th><th>创建时间</th></tr></thead>
 <tbody>
 <?php foreach ($admins as $a): ?>
 <tr><td><?php echo $a['id']; ?></td><td><?php echo e($a['username']); ?></td><td><?php echo $a['role'] === 'super_admin' ? '超级管理员' : '管理员'; ?></td><td><?php echo formatDate($a['create_time']); ?></td></tr>
 <?php endforeach; ?>
 </tbody>
-</table></div>
+</table>
 </div>
 <div class="admin-card">
 <h4>添加管理员</h4>

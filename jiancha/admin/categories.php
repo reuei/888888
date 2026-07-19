@@ -35,7 +35,7 @@ include __DIR__ . '/header.php';
 <?php if ($error): ?><div class="alert alert-error"><?php echo e($error); ?></div><?php endif; ?>
 <div class="admin-card">
 <h4>栏目列表</h4>
-<div class="admin-table-wrap"><table class="admin-table">
+<table class="admin-table">
 <thead><tr><th>排序</th><th>名称</th><th>别名</th><th>菜单</th><th>操作</th></tr></thead>
 <tbody>
 <?php foreach ($cats as $c): ?>
@@ -48,7 +48,7 @@ include __DIR__ . '/header.php';
 </tr>
 <?php endforeach; ?>
 </tbody>
-</table></div>
+</table>
 </div>
 <div class="admin-card">
 <h4>添加栏目</h4>

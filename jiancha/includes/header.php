@@ -20,7 +20,7 @@ $currentSlug = $currentSlug ?? '';
       <?php echo e(siteName()); ?>
     </a>
     <ul class="nav-links">
-      <li><a href="<?php echo SITE_URL; ?>index.php" class="<?php echo basename($_SERVER['SCRIPT_NAME']) == 'index.php' ? 'active' : ''; ?>">首页</a></li>
+      <li><a href="<?php echo SITE_URL; ?>index.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>">首页</a></li>
       <?php foreach ($cats as $c): ?>
       <li><a href="<?php echo SITE_URL; ?>category.php?slug=<?php echo $c['slug']; ?>" class="<?php echo $currentSlug == $c['slug'] ? 'active' : ''; ?>"><?php echo e($c['name']); ?></a></li>
       <?php endforeach; ?>
@@ -35,13 +35,13 @@ $currentSlug = $currentSlug ?? '';
         <li><a href="<?php echo SITE_URL; ?>login.php">登录</a></li>
       <?php endif; ?>
     </ul>
-    <button class="nav-btn" id="menuBtn" aria-label="菜单">&#9776;</button>
+    <button class="nav-btn" id="menuBtn">&#9776;</button>
   </div>
 </nav>
 
 <aside class="mobile-menu" id="mobileMenu">
   <div class="mobile-menu-panel">
-    <button class="mobile-close" id="mobileClose" aria-label="关闭">&times;</button>
+    <button class="mobile-close" id="mobileClose">&times;</button>
     <div style="margin-top:40px">
       <a href="<?php echo SITE_URL; ?>index.php">首页</a>
       <?php foreach ($cats as $c): ?>

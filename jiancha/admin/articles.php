@@ -15,7 +15,7 @@ include __DIR__ . '/header.php';
 <h4 style="margin:0;padding:0;border:0">文章列表</h4>
 <a href="article_edit.php" class="btn btn-primary btn-sm">+ 新增文章</a>
 </div>
-<div class="admin-table-wrap"><table class="admin-table">
+<table class="admin-table">
 <thead><tr><th>ID</th><th>标题</th><th>栏目</th><th>时间</th><th>操作</th></tr></thead>
 <tbody>
 <?php foreach ($articles as $a): ?>
@@ -28,7 +28,7 @@ include __DIR__ . '/header.php';
 </tr>
 <?php endforeach; ?>
 </tbody>
-</table></div>
+</table>
 <?php echo paginate($total, $page, $perPage, 'articles.php'); ?>
 </div>
 <?php

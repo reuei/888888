@@ -7,13 +7,11 @@
   function initMobile() {
     var btn = d.getElementById('menuBtn');
     var menu = d.getElementById('mobileMenu');
-    var closeBtn = d.getElementById('mobileClose');
+    var close = d.getElementById('mobileClose');
     if (!btn || !menu) return;
-    btn.onclick = function() { menu.classList.add('open'); d.body.style.overflow = 'hidden'; };
-    closeBtn.onclick = function() { menu.classList.remove('open'); d.body.style.overflow = ''; };
-    menu.onclick = function(e) {
-      if (e.target === menu) { menu.classList.remove('open'); d.body.style.overflow = ''; }
-    };
+    btn.onclick = function() { menu.classList.add('open'); };
+    close.onclick = function() { menu.classList.remove('open'); };
+    menu.onclick = function(e) { if (e.target === menu) menu.classList.remove('open'); };
   }
 
   /* Slider */
@@ -33,44 +31,31 @@
     function go(n) {
       idx = (n + items.length) % items.length;
       track.style.transform = 'translateX(-' + (idx * 100) + '%)';
-      dots.forEach(function(dot, i) { dot.classList.toggle('on', i === idx); });
+      dots.forEach(function(d, i) { d.classList.toggle('on', i === idx); });
       start = Date.now();
       if (bar) bar.style.width = '0';
     }
-
     function tick() {
       if (paused) return;
       var el = Date.now() - start;
-      if (el >= dur) { go(idx + 1); }
-      else { if (bar) bar.style.width = (el / dur * 100) + '%'; }
+      if (el >= dur) { go(idx + 1); } else { if (bar) bar.style.width = (el / dur * 100) + '%'; }
       timer = requestAnimationFrame(tick);
     }
+    function play() { paused = false; start = Date.now() - (bar ? parseFloat(bar.style.width) / 100 * dur : 0); timer = requestAnimationFrame(tick); }
+    function stop() { paused = true; if (timer) cancelAnimationFrame(timer); }
 
-    function play() {
-      paused = false;
-      start = Date.now() - (bar ? parseFloat(bar.style.width) / 100 * dur : 0);
-      timer = requestAnimationFrame(tick);
-    }
-
-    function stop() {
-      paused = true;
-      if (timer) cancelAnimationFrame(timer);
-    }
-
-    if (prev) prev.onclick = function() { go(idx - 1); };
-    if (next) next.onclick = function() { go(idx + 1); };
-    dots.forEach(function(dot, i) { dot.onclick = function() { go(i); }; });
+    prev.onclick = function() { go(idx - 1); };
+    next.onclick = function() { go(idx + 1); };
+    dots.forEach(function(d, i) { d.onclick = function() { go(i); }; });
     sl.addEventListener('mouseenter', stop);
     sl.addEventListener('mouseleave', play);
-
     var sx = 0;
-    sl.addEventListener('touchstart', function(e) { sx = e.touches[0].clientX; stop(); }, { passive: true });
+    sl.addEventListener('touchstart', function(e) { sx = e.touches[0].clientX; stop(); });
     sl.addEventListener('touchend', function(e) {
       var ex = e.changedTouches[0].clientX;
       if (Math.abs(ex - sx) > 40) go(idx + (ex < sx ? 1 : -1));
       play();
-    }, { passive: true });
-
+    });
     go(0); play();
   }
 
@@ -128,8 +113,7 @@
         el.classList.remove('ok', 'err');
         tip.classList.remove('ok', 'err');
         if (el.value) {
-          if (r.ok) { el.classList.add('ok'); tip.classList.add('ok'); }
-          else { el.classList.add('err'); tip.classList.add('err'); }
+          if (r.ok) { el.classList.add('ok'); tip.classList.add('ok'); } else { el.classList.add('err'); tip.classList.add('err'); }
           tip.textContent = r.msg;
         } else { tip.textContent = ''; }
       });
@@ -142,11 +126,7 @@
     t.className = 'toast ' + (type || '');
     t.textContent = msg;
     d.body.appendChild(t);
-    setTimeout(function() {
-      t.style.opacity = '0';
-      t.style.transition = 'opacity .3s';
-      setTimeout(function() { if (t.parentNode) t.remove(); }, 300);
-    }, 2500);
+    setTimeout(function() { t.style.opacity = '0'; t.style.transition = '.3s'; setTimeout(function() { t.remove(); }, 300); }, 2500);
   };
 
   /* Modal */
@@ -158,28 +138,6 @@
     m.onclick = function(e) { if (e.target === m) m.remove(); };
   };
 
-  /* Back to top */
-  function initBackTop() {
-    var btn = d.createElement('button');
-    btn.className = 'back-top';
-    btn.innerHTML = '&#9650;';
-    btn.title = '返回顶部';
-    btn.onclick = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); };
-    d.body.appendChild(btn);
-
-    var ticking = false;
-    window.addEventListener('scroll', function() {
-      if (!ticking) {
-        requestAnimationFrame(function() {
-          if (window.scrollY > 300) { btn.classList.add('show'); }
-          else { btn.classList.remove('show'); }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    }, { passive: true });
-  }
-
   /* Admin mobile */
   function initAdmin() {
     var btn = d.getElementById('adminMenuBtn');
@@ -187,24 +145,14 @@
     if (!btn || !side) return;
     btn.onclick = function() { side.classList.toggle('open'); };
     d.addEventListener('click', function(e) {
-      if (side.classList.contains('open') && !side.contains(e.target) && e.target !== btn) {
-        side.classList.remove('open');
-      }
+      if (side.classList.contains('open') && !side.contains(e.target) && e.target !== btn) side.classList.remove('open');
     });
   }
 
-  /* Init on DOM ready */
-  if (d.readyState === 'loading') {
-    d.addEventListener('DOMContentLoaded', initAll);
-  } else {
-    initAll();
-  }
-
-  function initAll() {
+  d.addEventListener('DOMContentLoaded', function() {
     initMobile();
     initSlider();
     initForms();
     initAdmin();
-    initBackTop();
-  }
+  });
 })();

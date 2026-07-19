@@ -10,8 +10,7 @@ $pageTitle = '典型案例';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="page-hero"><h1>典型案例</h1><p>以案释法 · 警示教育</p></div>
-<div class="section">
-<div class="container">
+<div class="section"><div class="container">
 <div class="case-grid">
 <?php if ($articles): foreach ($articles as $a): ?>
 <a href="article.php?id=<?php echo $a['id']; ?>" class="case-item">

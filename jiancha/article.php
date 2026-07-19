@@ -4,7 +4,14 @@ require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 $id = intval($_GET['id'] ?? 0);
 $article = DB::fetchOne("SELECT * FROM articles WHERE id=? AND status=1", [$id]);
-if (!$article) { http_response_code(404); $pageTitle = '404'; include __DIR__ . '/includes/header.php'; echo '<div class="section"><div class="container"><div class="empty">文章不存在</div></div></div>'; include __DIR__ . '/includes/footer.php'; exit; }
+if (!$article) {
+    http_response_code(404);
+    $pageTitle = '404';
+    include __DIR__ . '/includes/header.php';
+    echo '<div class="section"><div class="container"><div class="empty">文章不存在</div></div></div>';
+    include __DIR__ . '/includes/footer.php';
+    exit;
+}
 DB::exec("UPDATE articles SET views=views+1 WHERE id=" . $id);
 $cat = DB::fetchOne("SELECT * FROM categories WHERE id=?", [$article['category_id']]);
 $pageTitle = $article['title'];

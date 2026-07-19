@@ -4,7 +4,13 @@ require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 $slug = $_GET['slug'] ?? '';
 $cat = getCategoryBySlug($slug);
-if (!$cat) { $pageTitle = '404'; include __DIR__ . '/includes/header.php'; echo '<div class="section"><div class="container"><div class="empty">栏目不存在</div></div></div>'; include __DIR__ . '/includes/footer.php'; exit; }
+if (!$cat) {
+    $pageTitle = '404';
+    include __DIR__ . '/includes/header.php';
+    echo '<div class="section"><div class="container"><div class="empty">栏目不存在</div></div></div>';
+    include __DIR__ . '/includes/footer.php';
+    exit;
+}
 $page = max(1, intval($_GET['page'] ?? 1));
 $perPage = 10;
 $total = DB::fetchOne("SELECT COUNT(*) as c FROM articles WHERE category_id=? AND status=1", [$cat['id']])['c'] ?? 0;

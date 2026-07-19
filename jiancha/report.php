@@ -14,9 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         elseif (strlen($title) < 4) { $error = '标题至少4个字符'; }
         elseif (strlen($content) < 10) { $error = '内容至少10个字符'; }
         else {
-            try {
-                DB::exec("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, title TEXT, content TEXT, name TEXT, phone TEXT, status INTEGER DEFAULT 0, reply TEXT, create_time DATETIME DEFAULT CURRENT_TIMESTAMP)");
-            } catch (Exception $e) {}
+            try { DB::exec("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, title TEXT, content TEXT, name TEXT, phone TEXT, status INTEGER DEFAULT 0, reply TEXT, create_time DATETIME DEFAULT CURRENT_TIMESTAMP)"); } catch (Exception $e) {}
             DB::insert('messages', ['user_id' => $_SESSION['user_id'] ?? 0, 'title' => $title, 'content' => $content, 'name' => $name, 'phone' => $phone]);
             $ok = '举报信息已提交，我们将尽快处理。';
         }
@@ -26,8 +24,7 @@ $pageTitle = '信访举报';
 include __DIR__ . '/includes/header.php';
 ?>
 <div class="page-hero"><h1>信访举报</h1><p>12309 检察服务热线 · 依法受理群众举报</p></div>
-<div class="section">
-<div class="container" style="max-width:700px">
+<div class="section"><div class="container" style="max-width:700px">
 <?php if ($ok): ?><div class="alert alert-success"><?php echo e($ok); ?></div><?php endif; ?>
 <?php if ($error): ?><div class="alert alert-error"><?php echo e($error); ?></div><?php endif; ?>
 <div class="card"><div class="card-body">

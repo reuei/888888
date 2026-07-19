@@ -4,7 +4,13 @@ require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 $slug = $_GET['slug'] ?? '';
 $page = DB::fetchOne("SELECT * FROM pages WHERE slug=? AND status=1", [$slug]);
-if (!$page) { $pageTitle = '404'; include __DIR__ . '/includes/header.php'; echo '<div class="section"><div class="container"><div class="empty">页面不存在</div></div></div>'; include __DIR__ . '/includes/footer.php'; exit; }
+if (!$page) {
+    $pageTitle = '404';
+    include __DIR__ . '/includes/header.php';
+    echo '<div class="section"><div class="container"><div class="empty">页面不存在</div></div></div>';
+    include __DIR__ . '/includes/footer.php';
+    exit;
+}
 $pageTitle = $page['title'];
 include __DIR__ . '/includes/header.php';
 ?>

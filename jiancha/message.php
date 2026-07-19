@@ -10,9 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $content = trim($_POST['content'] ?? '');
         if (!$title || !$content) { $error = '请填写标题和内容'; }
         else {
-            try {
-                DB::exec("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, title TEXT, content TEXT, name TEXT, phone TEXT, status INTEGER DEFAULT 0, reply TEXT, create_time DATETIME DEFAULT CURRENT_TIMESTAMP)");
-            } catch (Exception $e) {}
+            try { DB::exec("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, title TEXT, content TEXT, name TEXT, phone TEXT, status INTEGER DEFAULT 0, reply TEXT, create_time DATETIME DEFAULT CURRENT_TIMESTAMP)"); } catch (Exception $e) {}
             DB::insert('messages', ['user_id' => $_SESSION['user_id'] ?? 0, 'title' => $title, 'content' => $content, 'name' => trim($_POST['name'] ?? ''), 'phone' => trim($_POST['phone'] ?? '')]);
             $ok = '留言已提交，感谢您的反馈。';
         }

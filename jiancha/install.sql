@@ -1,4 +1,3 @@
--- 人民检察 数据库结构
 CREATE TABLE IF NOT EXISTS settings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     key TEXT UNIQUE NOT NULL,
@@ -71,7 +70,6 @@ CREATE TABLE IF NOT EXISTS messages (
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 默认数据
 INSERT OR IGNORE INTO settings (key, value) VALUES ('site_name', '人民检察');
 INSERT OR IGNORE INTO settings (key, value) VALUES ('footer_copyright', '© 2026 人民检察 版权所有');
 INSERT OR IGNORE INTO settings (key, value) VALUES ('icp', '');

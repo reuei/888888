@@ -35,7 +35,7 @@ include __DIR__ . '/header.php';
 <div class="admin-form"><label>版权信息</label><input type="text" name="footer_copyright" value="<?php echo e(getSetting('footer_copyright')); ?>"></div>
 <div class="admin-form"><label>ICP备案号</label><input type="text" name="icp" value="<?php echo e(getSetting('icp')); ?>"></div>
 <div class="admin-form"><label>页脚二维码</label><input type="file" name="footer_image" accept="image/*"></div>
-<?php $fi = getSetting('footer_image'); if ($fi): ?><div style="margin-bottom:16px"><img src="<?php echo SITE_URL . UPLOAD_URL . e($fi); ?>" style="width:90px;height:90px;border-radius:6px;object-fit:cover"></div><?php endif; ?>
+<?php $fi = getSetting('footer_image'); if ($fi): ?><div style="margin-bottom:16px"><img src="<?php echo SITE_URL . UPLOAD_URL . e($fi); ?>" style="width:90px;height:90px;border-radius:6px;object-fit:cover;border:1px solid var(--border)"></div><?php endif; ?>
 <div class="admin-form"><button type="submit" class="btn btn-primary">保存设置</button></div>
 </form>
 </div>

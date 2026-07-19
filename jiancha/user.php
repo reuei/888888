@@ -35,7 +35,7 @@ include __DIR__ . '/includes/header.php';
 <div class="card"><div class="card-body">
 <form method="post">
 <?php echo csrfField(); ?>
-<div class="auth-field"><label>用户名</label><input type="text" value="<?php echo e($user['username']); ?>" disabled></div>
+<div class="auth-field"><label>用户名</label><input type="text" value="<?php echo e($user['username']); ?>" disabled style="opacity:.5"></div>
 <div class="auth-field"><label>昵称</label><input type="text" name="nickname" value="<?php echo e($user['nickname'] ?: ''); ?>" placeholder="显示名称"></div>
 <div class="auth-field"><label>邮箱</label><input type="email" name="email" value="<?php echo e($user['email'] ?: ''); ?>" data-v="email"></div>
 <div class="auth-field"><label>原密码（修改密码时填写）</label><input type="password" name="old_password" data-v="password"></div>

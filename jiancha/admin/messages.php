@@ -32,11 +32,11 @@ include __DIR__ . '/header.php';
 <td><?php echo $m['status'] ? '<span style="color:var(--green)">已回复</span>' : '<span style="color:var(--red)">未处理</span>'; ?></td>
 <td><a href="?delete=<?php echo $m['id']; ?>" onclick="return confirm('确定删除？')" class="btn btn-sm btn-danger">删除</a></td>
 </tr>
-<tr><td colspan="6" style="background:#f8fafc;font-size:12px;padding:8px 16px">
-<strong>内容：</strong><?php echo e($m['content']); ?><?php if ($m['phone']): ?> <strong>电话：</strong><?php echo e($m['phone']); ?><?php endif; ?>
+<tr><td colspan="6" style="background:rgba(255,255,255,0.02);font-size:12px;padding:8px 16px">
+<strong style="color:var(--text2)">内容：</strong><?php echo e($m['content']); ?><?php if ($m['phone']): ?> <strong style="color:var(--text2)">电话：</strong><?php echo e($m['phone']); ?><?php endif; ?>
 <?php if ($m['reply']): ?><br><strong style="color:var(--green)">回复：</strong><?php echo e($m['reply']); ?><?php endif; ?>
-<details style="margin-top:4px"><summary>回复</summary>
-<form method="post" style="margin-top:8px"><input type="hidden" name="id" value="<?php echo $m['id']; ?>"><textarea name="reply" rows="3" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px"><?php echo e($m['reply'] ?? ''); ?></textarea><button type="submit" class="btn btn-primary btn-sm" style="margin-top:6px">保存回复</button></form>
+<details style="margin-top:4px"><summary style="color:var(--gold);cursor:pointer">回复</summary>
+<form method="post" style="margin-top:8px"><input type="hidden" name="id" value="<?php echo $m['id']; ?>"><textarea name="reply" rows="3" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:rgba(255,255,255,0.03);color:var(--text1)"><?php echo e($m['reply'] ?? ''); ?></textarea><button type="submit" class="btn btn-primary btn-sm" style="margin-top:6px">保存回复</button></form>
 </details>
 </td></tr>
 <?php endforeach; ?>

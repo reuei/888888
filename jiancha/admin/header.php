@@ -19,7 +19,7 @@ $admin = currentUser();
 <ul class="admin-side-nav">
 <li class="group">内容管理</li>
 <li><a href="index.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'on' : ''; ?>">首页概览</a></li>
-<li><a href="articles.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'articles.php' || basename($_SERVER['PHP_SELF']) == 'article_edit.php' ? 'on' : ''; ?>">文章管理</a></li>
+<li><a href="articles.php" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['articles.php','article_edit.php']) ? 'on' : ''; ?>">文章管理</a></li>
 <li><a href="categories.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'categories.php' ? 'on' : ''; ?>">栏目管理</a></li>
 <li><a href="pages.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'pages.php' ? 'on' : ''; ?>">单页管理</a></li>
 <li><a href="slides.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'slides.php' ? 'on' : ''; ?>">轮播图</a></li>

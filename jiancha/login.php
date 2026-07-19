@@ -19,13 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-$pageTitle = '登录';
 ?><!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title><?php echo e($pageTitle); ?> - <?php echo e(siteName()); ?></title>
+<title>登录 - <?php echo e(siteName()); ?></title>
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css">
 </head>
 <body>
@@ -36,11 +35,11 @@ $pageTitle = '登录';
 <?php if ($error): ?><div class="alert alert-error"><?php echo e($error); ?></div><?php endif; ?>
 <form method="post">
 <?php echo csrfField(); ?>
-<div class="auth-field"><label>用户名 / 邮箱</label><input type="text" name="username" data-v="username" required></div>
+<div class="auth-field"><label>用户名 / 邮箱</label><input type="text" name="username" data-v="username" required autofocus></div>
 <div class="auth-field"><label>密码</label><input type="password" name="password" data-v="password" required></div>
 <div class="auth-field"><button type="submit" class="btn btn-primary btn-block">登 录</button></div>
 </form>
-<p style="text-align:center;font-size:13px;color:var(--text2)">没有账号？<a href="register.php">立即注册</a></p>
+<p style="text-align:center;font-size:13px;color:var(--text2);margin-top:12px">没有账号？<a href="register.php">立即注册</a></p>
 </div></div></div>
 <script src="<?php echo SITE_URL; ?>assets/js/main.js"></script>
 </body>

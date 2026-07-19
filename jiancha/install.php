@@ -48,13 +48,13 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="auth-card-body">
 <?php if ($ok): ?>
 <div class="alert alert-success">安装成功！</div>
-<p style="line-height:2;font-size:14px">系统已安装完成。<br>请点击下方按钮进入网站首页。</p>
+<p style="line-height:2;font-size:14px;color:var(--text2)">系统已安装完成。<br>请点击下方按钮进入网站首页。</p>
 <div style="margin-top:16px"><a href="index.php" class="btn btn-primary btn-block">进入网站</a> <a href="admin/login.php" class="btn btn-gold btn-block" style="margin-top:8px">进入后台</a></div>
 <?php elseif ($step === 0 && $error): ?>
 <div class="alert alert-warn"><?php echo $error; ?></div>
 <p style="text-align:center;margin-top:16px"><a href="index.php" class="btn btn-primary">进入网站</a></p>
 <?php elseif ($step === 1): ?>
-<h4 style="margin-bottom:16px;text-align:center">环境检查</h4>
+<h4 style="margin-bottom:16px;text-align:center;color:var(--text1)">环境检查</h4>
 <table style="width:100%;font-size:13px;border-collapse:collapse">
 <?php
 $checks = [
@@ -69,7 +69,7 @@ $allOk = true;
 foreach ($checks as $c):
     $allOk = $allOk && $c[1];
 ?>
-<tr><td style="padding:6px 0"><?php echo $c[0]; ?></td><td style="color:<?php echo $c[1] ? 'var(--green)' : 'var(--red)'; ?>"><?php echo $c[2]; ?></td></tr>
+<tr><td style="padding:6px 0;color:var(--text1)"><?php echo $c[0]; ?></td><td style="color:<?php echo $c[1] ? 'var(--green)' : 'var(--red)'; ?>"><?php echo $c[2]; ?></td></tr>
 <?php endforeach; ?>
 </table>
 <?php if ($allOk): ?>
@@ -79,7 +79,7 @@ foreach ($checks as $c):
 <?php endif; ?>
 <?php elseif ($step === 2): ?>
 <?php if ($error): ?><div class="alert alert-error"><?php echo e($error); ?></div><?php endif; ?>
-<h4 style="margin-bottom:16px;text-align:center">创建管理员账号</h4>
+<h4 style="margin-bottom:16px;text-align:center;color:var(--text1)">创建管理员账号</h4>
 <form method="post">
 <div class="auth-field"><label>用户名</label><input type="text" name="username" required></div>
 <div class="auth-field"><label>密码</label><input type="password" name="password" required></div>

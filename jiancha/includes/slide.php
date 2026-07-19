@@ -1,21 +1,24 @@
 <?php
 function getSliderHtml() {
     try {
-        $slides = DB::fetchAll("SELECT * FROM slides WHERE status=1 ORDER BY sort_order ASC, id ASC");
-    } catch (Exception $e) {
-        try { DB::getInstance()->exec("CREATE TABLE IF NOT EXISTS slides (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, image TEXT, link TEXT, sort_order INTEGER DEFAULT 0, status INTEGER DEFAULT 1, create_time DATETIME DEFAULT CURRENT_TIMESTAMP)"); } catch (Exception $e2) {}
-        return '';
-    }
-    if (empty($slides)) return '';
-    $h = '<div class="slider"><div class="slider-track">';
+        $slides = DB::fetchAll("SELECT * FROM slides WHERE status=1 ORDER BY sort_order ASC");
+    } catch (Exception $e) { $slides = []; }
+    if (!$slides) return '';
+    $html = '<div class="slider" id="slider">';
+    $html .= '<div class="slider-track" id="sliderTrack">';
     foreach ($slides as $s) {
-        $bg = $s['image'] ? ' style="background-image:url(' . SITE_URL . UPLOAD_URL . e($s['image']) . ')"' : '';
-        $h .= '<div class="slider-item"' . $bg . '><div class="slider-cap"><h3>' . e($s['title']) . '</h3>';
-        if ($s['link']) $h .= '<p>' . e($s['link']) . '</p>';
-        $h .= '</div></div>';
+        $link = $s['link'] ?: 'javascript:void(0)';
+        $html .= '<a href="' . e($link) . '" class="slider-item">';
+        if ($s['image']) $html .= '<img src="' . SITE_URL . UPLOAD_URL . e($s['image']) . '" alt="' . e($s['title']) . '" loading="lazy">';
+        if ($s['title']) $html .= '<div class="slider-caption">' . e($s['title']) . '</div>';
+        $html .= '</a>';
     }
-    $h .= '</div><div class="slider-progress"><div class="slider-progress-bar"></div></div><div class="slider-dots">';
-    foreach ($slides as $i => $s) $h .= '<span class="' . ($i === 0 ? 'on' : '') . '"></span>';
-    $h .= '</div><button class="slider-arrow prev">&lsaquo;</button><button class="slider-arrow next">&rsaquo;</button></div>';
-    return $h;
+    $html .= '</div>';
+    if (count($slides) > 1) {
+        $html .= '<div class="slider-progress"><div class="slider-progress-bar" id="sliderBar"></div></div>';
+        $html .= '<button class="slider-arrow slider-prev" id="sliderPrev">&#8249;</button>';
+        $html .= '<button class="slider-arrow slider-next" id="sliderNext">&#8250;</button>';
+    }
+    $html .= '</div>';
+    return $html;
 }

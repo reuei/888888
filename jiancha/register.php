@@ -26,13 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-$pageTitle = '注册';
 ?><!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title><?php echo e($pageTitle); ?> - <?php echo e(siteName()); ?></title>
+<title>注册 - <?php echo e(siteName()); ?></title>
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css">
 </head>
 <body>
@@ -50,7 +49,7 @@ $pageTitle = '注册';
 <div class="auth-field"><label>邮箱</label><input type="email" name="email" data-v="email"></div>
 <div class="auth-field"><button type="submit" class="btn btn-primary btn-block">注 册</button></div>
 </form>
-<p style="text-align:center;font-size:13px;color:var(--text2)">已有账号？<a href="login.php">立即登录</a></p>
+<p style="text-align:center;font-size:13px;color:var(--text2);margin-top:12px">已有账号？<a href="login.php">立即登录</a></p>
 </div></div></div>
 <script src="<?php echo SITE_URL; ?>assets/js/main.js"></script>
 </body>

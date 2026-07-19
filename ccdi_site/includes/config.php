@@ -61,8 +61,8 @@ define('SECURITY_KEY', get_site_config('security_key', ''));
 define('CSRF_TOKEN_NAME', 'csrf_token');
 
 // 版本号
-define('CMS_VERSION', '2.0.0');
-define('CMS_BUILD', '20260719');
+define('CMS_VERSION', '3.0.0');
+define('CMS_BUILD', '20260720');
 
 // 数据库连接函数
 function get_site_config($key, $default = '') {

@@ -55,5 +55,6 @@ DirectoryIndex index.php
 AddDefaultCharset UTF-8
 
 # 错误页面
-ErrorDocument 404 /index.php
-ErrorDocument 500 /index.php
+ErrorDocument 403 /403.php
+ErrorDocument 404 /404.php
+ErrorDocument 500 /500.php

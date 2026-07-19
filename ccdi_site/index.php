@@ -56,13 +56,11 @@ include TEMPLATES_PATH . 'header.php';
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <!-- 进度条 -->
-                <div class="carousel-progress">
-                    <?php foreach ($carousel_items as $index => $item): ?>
-                    <div class="carousel-progress-bar" data-index="<?php echo $index; ?>">
-                        <div class="progress-fill"></div>
+                <div class="carousel-controls">
+                    <span class="carousel-counter"><span class="current">1</span> / <?php echo count($carousel_items); ?></span>
+                    <div class="carousel-progress-track">
+                        <div class="carousel-progress-fill" id="carouselProgressFill"></div>
                     </div>
-                    <?php endforeach; ?>
                 </div>
                 <button class="carousel-prev" id="carouselPrev"><i class="fas fa-chevron-left"></i></button>
                 <button class="carousel-next" id="carouselNext"><i class="fas fa-chevron-right"></i></button>

@@ -1,251 +1,158 @@
 /**
- * 主脚本文件
- * 中央纪委国家监委网站风格 CMS
+ * 主脚本 v3.0.0
+ * 中央纪委国家监委网站
  */
 (function() {
     'use strict';
 
-    // DOM 加载完成后初始化
-    document.addEventListener('DOMContentLoaded', function() {
-        initPreloader();
+    var D = document;
+    var W = window;
+
+    D.addEventListener('DOMContentLoaded', function() {
+        initLoader();
         initMobileMenu();
         initCarousel();
         initBackToTop();
         initPopup();
-        initFormValidation();
     });
 
-    // 预载动画
-    function initPreloader() {
-        var preloader = document.getElementById('preloader');
-        if (!preloader) return;
-        window.addEventListener('load', function() {
+    /* ========== 加载动画 ========== */
+    function initLoader() {
+        var loader = D.getElementById('pageLoader');
+        if (!loader) return;
+        W.addEventListener('load', function() {
             setTimeout(function() {
-                preloader.classList.add('hide');
-                setTimeout(function() { preloader.style.display = 'none'; }, 500);
-            }, 800);
+                loader.classList.add('hidden');
+            }, 600);
         });
     }
 
-    // 手机端汉堡菜单
-    function initMobileMenu() {
-        var hamburger = document.getElementById('hamburgerBtn');
-        var sidebar = document.getElementById('mobileSidebar');
-        var overlay = document.getElementById('mobileOverlay');
-        var closeBtn = document.getElementById('mobileSidebarClose');
+    /* ========== Toast 全局提示 ========== */
+    W.showToast = function(msg, type) {
+        type = type || 'info';
+        var container = D.getElementById('toastContainer');
+        if (!container) return;
+        var icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+        var toast = D.createElement('div');
+        toast.className = 'toast toast-' + type;
+        toast.innerHTML = '<span class="toast-icon"><i class="fas ' + (icons[type] || icons.info) + '"></i></span><span class="toast-content">' + msg + '</span>';
+        container.appendChild(toast);
+        setTimeout(function() {
+            toast.classList.add('removing');
+            setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+        }, 3500);
+    };
 
+    /* ========== 手机端汉堡菜单 ========== */
+    function initMobileMenu() {
+        var hamburger = D.getElementById('hamburgerBtn');
+        var sidebar = D.getElementById('mobileSidebar');
+        var overlay = D.getElementById('mobileOverlay');
+        var closeBtn = D.getElementById('mobileSidebarClose');
         if (!hamburger || !sidebar) return;
 
         function openMenu() {
             sidebar.classList.add('active');
             if (overlay) overlay.classList.add('active');
             hamburger.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            D.body.style.overflow = 'hidden';
         }
-
         function closeMenu() {
             sidebar.classList.remove('active');
             if (overlay) overlay.classList.remove('active');
             hamburger.classList.remove('active');
-            document.body.style.overflow = '';
+            D.body.style.overflow = '';
         }
 
         hamburger.addEventListener('click', function() {
-            if (sidebar.classList.contains('active')) {
-                closeMenu();
-            } else {
-                openMenu();
-            }
+            sidebar.classList.contains('active') ? closeMenu() : openMenu();
         });
-
         if (closeBtn) closeBtn.addEventListener('click', closeMenu);
         if (overlay) overlay.addEventListener('click', closeMenu);
-
-        // ESC 关闭
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
-                closeMenu();
-            }
+        D.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('active')) closeMenu();
         });
     }
 
-    // 轮播图
+    /* ========== 轮播图 v3.0 ========== */
     function initCarousel() {
-        var carousel = document.getElementById('carousel');
+        var carousel = D.getElementById('carousel');
         if (!carousel) return;
 
-        var track = document.getElementById('carouselTrack');
-        var slides = track.querySelectorAll('.carousel-slide');
-        var progressBars = document.querySelectorAll('.carousel-progress-bar');
-        var prevBtn = document.getElementById('carouselPrev');
-        var nextBtn = document.getElementById('carouselNext');
-        var currentIndex = 0;
-        var totalSlides = slides.length;
-        var intervalId = null;
-        var isTransitioning = false;
+        var slides = carousel.querySelectorAll('.carousel-slide');
+        var total = slides.length;
+        if (total <= 1) return;
 
-        if (totalSlides <= 1) return;
+        var current = 0;
+        var counterEl = carousel.querySelector('.carousel-counter .current');
+        var progressFill = D.getElementById('carouselProgressFill');
+        var prevBtn = D.getElementById('carouselPrev');
+        var nextBtn = D.getElementById('carouselNext');
+        var timer = null;
+        var duration = 3000; // 3秒
 
-        function goToSlide(index) {
-            if (isTransitioning || index === currentIndex) return;
-            isTransitioning = true;
+        function goTo(idx) {
+            if (idx === current) return;
+            slides[current].classList.remove('active');
+            current = idx;
+            slides[current].classList.add('active');
+            if (counterEl) counterEl.textContent = current + 1;
+            resetProgress();
+            resetTimer();
+        }
 
-            // 移除当前
-            slides[currentIndex].classList.remove('active');
-            progressBars[currentIndex].classList.remove('active');
-            var oldFill = progressBars[currentIndex].querySelector('.progress-fill');
-            if (oldFill) oldFill.style.transition = 'none';
-            if (oldFill) oldFill.style.width = '0';
+        function next() { goTo((current + 1) % total); }
+        function prev() { goTo((current - 1 + total) % total); }
 
-            // 设置新
-            currentIndex = index;
-            slides[currentIndex].classList.add('active');
-            progressBars[currentIndex].classList.add('active');
-            var newFill = progressBars[currentIndex].querySelector('.progress-fill');
-            if (newFill) {
-                newFill.style.transition = 'none';
-                newFill.style.width = '0';
+        function resetProgress() {
+            if (!progressFill) return;
+            progressFill.style.transition = 'none';
+            progressFill.style.width = '0';
+            requestAnimationFrame(function() {
                 requestAnimationFrame(function() {
-                    requestAnimationFrame(function() {
-                        newFill.style.transition = 'width 5s linear';
-                        newFill.style.width = '100%';
-                    });
+                    progressFill.style.transition = 'width ' + duration + 'ms linear';
+                    progressFill.style.width = '100%';
                 });
-            }
-
-            setTimeout(function() { isTransitioning = false; }, 300);
-            resetAutoPlay();
+            });
         }
 
-        function nextSlide() {
-            var next = (currentIndex + 1) % totalSlides;
-            goToSlide(next);
+        function resetTimer() {
+            clearTimeout(timer);
+            timer = setTimeout(next, duration + 200);
         }
 
-        function prevSlide() {
-            var prev = (currentIndex - 1 + totalSlides) % totalSlides;
-            goToSlide(prev);
-        }
+        if (prevBtn) prevBtn.addEventListener('click', function(e) { e.preventDefault(); prev(); });
+        if (nextBtn) nextBtn.addEventListener('click', function(e) { e.preventDefault(); next(); });
 
-        function resetAutoPlay() {
-            if (intervalId) clearInterval(intervalId);
-            intervalId = setInterval(nextSlide, 5200);
-        }
-
-        if (prevBtn) prevBtn.addEventListener('click', function(e) { e.preventDefault(); prevSlide(); });
-        if (nextBtn) nextBtn.addEventListener('click', function(e) { e.preventDefault(); nextSlide(); });
-
-        // 进度条点击
-        progressBars.forEach(function(bar, index) {
-            bar.addEventListener('click', function() { goToSlide(index); });
-        });
-
-        // 触摸滑动支持
-        var touchStartX = 0;
-        var touchEndX = 0;
-        carousel.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; });
+        // 触摸滑动
+        var touchX = 0;
+        carousel.addEventListener('touchstart', function(e) { touchX = e.changedTouches[0].screenX; });
         carousel.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            var diff = touchStartX - touchEndX;
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) nextSlide();
-                else prevSlide();
-            }
+            var diff = touchX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 40) { diff > 0 ? next() : prev(); }
         });
 
-        // 启动自动播放
-        resetAutoPlay();
-        // 初始化第一个进度条
-        var firstFill = progressBars[0].querySelector('.progress-fill');
-        if (firstFill) {
-            firstFill.style.transition = 'width 5s linear';
-            firstFill.style.width = '100%';
-        }
+        resetTimer();
+        resetProgress();
     }
 
-    // 返回顶部
+    /* ========== 返回顶部 ========== */
     function initBackToTop() {
-        var btn = document.getElementById('backToTop');
+        var btn = D.getElementById('backToTop');
         if (!btn) return;
-
-        function toggleBtn() {
-            if (window.pageYOffset > 300) {
-                btn.classList.add('visible');
-            } else {
-                btn.classList.remove('visible');
-            }
-        }
-
-        window.addEventListener('scroll', toggleBtn);
-        btn.addEventListener('click', function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-        toggleBtn();
+        function toggle() { btn.classList.toggle('visible', W.pageYOffset > 300); }
+        W.addEventListener('scroll', toggle);
+        btn.addEventListener('click', function() { W.scrollTo({ top: 0, behavior: 'smooth' }); });
+        toggle();
     }
 
-    // B2弹窗
+    /* ========== B2弹窗 ========== */
     function initPopup() {
-        var overlay = document.getElementById('popupOverlay');
+        var overlay = D.getElementById('popupOverlay');
         if (!overlay) return;
-
-        var closeBtn = document.getElementById('popupClose');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', function() {
-                overlay.style.display = 'none';
-            });
-        }
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                overlay.style.display = 'none';
-            }
-        });
-    }
-
-    // 表单验证
-    function initFormValidation() {
-        // 通用输入框实时验证
-        document.querySelectorAll('input[data-validate]').forEach(function(input) {
-            var type = input.dataset.validate;
-            var feedback = input.parentElement.nextElementSibling;
-            
-            input.addEventListener('input', function() {
-                var val = input.value.trim();
-                var valid = true;
-                var msg = '';
-
-                switch (type) {
-                    case 'required':
-                        valid = val !== '';
-                        msg = valid ? '' : '此项为必填';
-                        break;
-                    case 'email':
-                        valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-                        msg = valid ? '' : '邮箱格式不正确';
-                        break;
-                    case 'username':
-                        valid = val.length >= 3 && val.length <= 20;
-                        msg = valid ? '' : '用户名需3-20位';
-                        break;
-                    case 'password':
-                        valid = val.length >= 6;
-                        msg = valid ? '' : '密码至少6位';
-                        break;
-                }
-
-                if (val === '' && type !== 'required') {
-                    input.classList.remove('invalid', 'valid');
-                    if (feedback) { feedback.textContent = ''; feedback.className = 'form-feedback'; }
-                } else if (valid) {
-                    input.classList.add('valid');
-                    input.classList.remove('invalid');
-                    if (feedback && msg) { feedback.textContent = '格式正确'; feedback.className = 'form-feedback success'; }
-                } else {
-                    input.classList.add('invalid');
-                    input.classList.remove('valid');
-                    if (feedback) { feedback.textContent = msg; feedback.className = 'form-feedback error'; }
-                }
-            });
-        });
+        var closeBtn = D.getElementById('popupClose');
+        if (closeBtn) closeBtn.addEventListener('click', function() { overlay.style.display = 'none'; });
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.style.display = 'none'; });
     }
 
 })();

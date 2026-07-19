@@ -1,4 +1,4 @@
-# 中央纪委国家监委网站风格 CMS - Apache 伪静态规则
+# 中央纪委国家监委网站风格 CMS - Apache 伪静态规则 v4.0.0
 # 适用于虚拟主机环境
 
 <IfModule mod_rewrite.c>
@@ -13,6 +13,9 @@
 
     # 禁止访问 templates 目录
     RewriteRule ^templates/ - [F,L]
+
+    # 安装目录重定向
+    RewriteRule ^install/?$ install/index.php [L]
 
     # 伪静态规则
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -58,3 +61,4 @@ AddDefaultCharset UTF-8
 ErrorDocument 403 /403.php
 ErrorDocument 404 /404.php
 ErrorDocument 500 /500.php
+ErrorDocument 501 /500.php

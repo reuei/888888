@@ -59,9 +59,13 @@ function require_login() {
 
 /**
  * 要求管理员权限
+ * 在重定向到登录页之前，显式设置 redirect_after_login 确保登录后能正确跳回管理页面
  */
 function require_admin() {
-    require_login();
+    if (!is_logged_in()) {
+        $_SESSION['redirect_after_login'] = current_url();
+        redirect(site_url('login.php'));
+    }
     if (!is_admin()) {
         redirect(site_url('index.php'));
     }
@@ -71,7 +75,10 @@ function require_admin() {
  * 要求超级管理员权限
  */
 function require_super_admin() {
-    require_login();
+    if (!is_logged_in()) {
+        $_SESSION['redirect_after_login'] = current_url();
+        redirect(site_url('login.php'));
+    }
     if (!is_super_admin()) {
         redirect(admin_url('index.php'));
     }

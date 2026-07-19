@@ -1,6 +1,7 @@
 <?php
 /**
- * 网站首页
+ * 网站首页 v4.0.0
+ * 中央纪委国家监委网站 CMS 系统
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';
@@ -11,7 +12,7 @@ $current_page = 'index';
 // 获取轮播图
 $carousel_items = get_carousel();
 
-// 获取要闻（置顶+最新）
+// 获取要闻（置顶 + 最新）
 $top_articles = db_fetch_all("SELECT * FROM articles WHERE status = 'publish' AND is_top = 1 ORDER BY publish_time DESC LIMIT 5");
 $latest_articles = db_fetch_all("SELECT * FROM articles WHERE status = 'publish' ORDER BY publish_time DESC LIMIT 10");
 
@@ -44,6 +45,7 @@ include TEMPLATES_PATH . 'header.php';
                     <div class="carousel-slide <?php echo $index === 0 ? 'active' : ''; ?>">
                         <?php if ($item['link']): ?><a href="<?php echo htmlspecialchars($item['link']); ?>"><?php endif; ?>
                         <img src="<?php echo site_url('uploads/' . $item['image']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>">
+                        <?php if ($item['link']): ?></a><?php endif; ?>
                         <?php if ($item['title']): ?>
                         <div class="carousel-caption">
                             <h3><?php echo htmlspecialchars($item['title']); ?></h3>
@@ -52,7 +54,6 @@ include TEMPLATES_PATH . 'header.php';
                             <?php endif; ?>
                         </div>
                         <?php endif; ?>
-                        <?php if ($item['link']): ?></a><?php endif; ?>
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -93,7 +94,7 @@ include TEMPLATES_PATH . 'header.php';
                     </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
-                
+
                 <?php foreach ($latest_articles as $article): ?>
                 <div class="news-item">
                     <a href="<?php echo site_url('article.php?id=' . $article['id']); ?>">
@@ -107,15 +108,14 @@ include TEMPLATES_PATH . 'header.php';
         </div>
     </div>
 
-    <!-- 中间：横幅图片 -->
+    <!-- 中间：横幅图片 + 分类文章 -->
     <div class="home-center">
         <?php if ($banner_img): ?>
         <div class="banner-section">
             <img src="<?php echo $banner_img; ?>" alt="宣传横幅" class="banner-image">
         </div>
         <?php endif; ?>
-        
-        <!-- 工作动态 -->
+
         <?php if (!empty($category_articles)): ?>
         <?php foreach ($categories as $cat): ?>
         <?php if (!empty($category_articles[$cat['id']])): ?>
@@ -141,7 +141,7 @@ include TEMPLATES_PATH . 'header.php';
         <?php endif; ?>
     </div>
 
-    <!-- 右侧：快捷入口 + 专题 -->
+    <!-- 右侧：快捷入口 + 举报方式 -->
     <div class="home-right">
         <!-- 快捷入口 -->
         <div class="sidebar-widget quick-links">
@@ -174,7 +174,7 @@ include TEMPLATES_PATH . 'header.php';
             </div>
         </div>
 
-        <!-- 举报通道 -->
+        <!-- 举报方式 -->
         <div class="sidebar-widget report-widget">
             <h3 class="widget-title"><i class="fas fa-phone-alt"></i> 举报方式</h3>
             <div class="report-info">

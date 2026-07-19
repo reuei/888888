@@ -1,6 +1,7 @@
 <?php
 /**
- * 网站头部模板 v3.0.0
+ * 网站头部模板 v4.0.0
+ * 中央纪委国家监委网站 CMS 系统
  */
 if (!defined('SYSTEM_INIT')) { require_once __DIR__ . '/../includes/init.php'; }
 
@@ -16,13 +17,14 @@ $popup = $show_popup ? get_popup() : null;
     <meta name="description" content="<?php echo $site_description; ?>">
     <meta name="keywords" content="<?php echo $site_keywords; ?>">
     <title><?php echo isset($page_title) ? $page_title . ' - ' . SITE_NAME : SITE_NAME; ?></title>
-    <link rel="stylesheet" href="<?php echo site_url('assets/css/style.css?v=3.0.0'); ?>">
+    <link rel="stylesheet" href="<?php echo site_url('assets/css/style.css?v=4.0.0'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_4346459_iconfont.css">
+    <link rel="stylesheet" href="https://lf1-cdn-tos.bytegoofy.com/obj/iconpark/icons_19336_228_1.svg">
 </head>
 <body>
 
-<!-- 加载动画：红色圆柱跳动 -->
+<!-- 加载动画 -->
 <div class="page-loader" id="pageLoader">
     <div class="loader-cylinders">
         <div class="cyl"></div>
@@ -31,6 +33,7 @@ $popup = $show_popup ? get_popup() : null;
         <div class="cyl"></div>
         <div class="cyl"></div>
     </div>
+    <p class="loader-text">加载中</p>
 </div>
 
 <!-- Toast 全局提示容器 -->
@@ -60,7 +63,7 @@ $popup = $show_popup ? get_popup() : null;
     <div class="container">
         <div class="header-main">
             <div class="logo-section">
-                <div class="logo-icon"><i class="fas fa-landmark"></i></div>
+                <div class="logo-icon"><i class="iconfont icon-huizhang"></i></div>
                 <div class="logo-text">
                     <h1 class="site-title"><?php echo htmlspecialchars(site_config('site_name', SITE_NAME)); ?></h1>
                     <p class="site-subtitle">中共中央纪律检查委员会 中华人民共和国国家监察委员会</p>
@@ -76,7 +79,7 @@ $popup = $show_popup ? get_popup() : null;
     </div>
 </header>
 
-<!-- 主导航 -->
+<!-- 主导航（吸顶） -->
 <nav class="main-nav" id="mainNav">
     <div class="container">
         <button class="hamburger" id="hamburgerBtn" aria-label="菜单">
@@ -130,4 +133,4 @@ $popup = $show_popup ? get_popup() : null;
 <?php endif; ?>
 
 <main class="site-main">
-    <div class="container"><?php
+    <div class="container">

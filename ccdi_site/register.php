@@ -1,6 +1,6 @@
 <?php
 /**
- * 用户注册 v3.0.0
+ * 用户注册 v4.0.0
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';

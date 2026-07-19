@@ -1,6 +1,7 @@
 <?php
 /**
- * 网站底部模板
+ * 网站底部模板 v4.0.0
+ * 中央纪委国家监委网站 CMS 系统
  */
 ?>
     </div><!-- .container -->
@@ -14,7 +15,7 @@
             <img src="<?php echo $footer_img; ?>" alt="机关标识" class="footer-image">
         </div>
         <?php endif; ?>
-        
+
         <div class="footer-links">
             <div class="footer-column">
                 <h4>关于我们</h4>
@@ -53,7 +54,7 @@
                 </ul>
             </div>
         </div>
-        
+
         <div class="footer-bottom">
             <p><?php echo htmlspecialchars(site_config('footer_text', '版权所有 © 中央纪委国家监委')); ?></p>
             <?php $icp = site_config('icp_number', ''); ?>
@@ -73,6 +74,6 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
-<script src="<?php echo site_url('assets/js/main.js?v=' . CMS_BUILD); ?>"></script>
+<script src="<?php echo site_url('assets/js/main.js?v=4.0.0'); ?>"></script>
 </body>
 </html>

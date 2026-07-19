@@ -20,7 +20,7 @@ include __DIR__ . '/header.php';
 ?>
 <div class="admin-card">
 <h4>留言列表</h4>
-<table class="admin-table">
+<div class="admin-table-wrap"><table class="admin-table">
 <thead><tr><th>ID</th><th>标题</th><th>姓名</th><th>时间</th><th>状态</th><th>操作</th></tr></thead>
 <tbody>
 <?php foreach ($msgs as $m): ?>
@@ -41,7 +41,7 @@ include __DIR__ . '/header.php';
 </td></tr>
 <?php endforeach; ?>
 </tbody>
-</table>
+</table></div>
 <?php echo paginate($total, $page, $perPage, 'messages.php'); ?>
 </div>
 <?php include __DIR__ . '/footer.php'; ?>

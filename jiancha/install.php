@@ -3,12 +3,13 @@ require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 
-if (file_exists(DB_PATH)) {
+$installed = file_exists(DB_PATH);
+$step = $installed ? 0 : intval($_GET['step'] ?? 1);
+$error = '';
+$ok = false;
+
+if ($installed && $step === 0) {
     $error = '系统已安装。如需重新安装，请删除 data/jiancha.db 文件。';
-    $step = 0;
-} else {
-    $step = intval($_GET['step'] ?? 1);
-    $error = $ok = '';
 }
 
 if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -50,7 +51,7 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="alert alert-success">安装成功！</div>
 <p style="line-height:2;font-size:14px">系统已安装完成。<br>请点击下方按钮进入网站首页。</p>
 <div style="margin-top:16px"><a href="index.php" class="btn btn-primary btn-block">进入网站</a> <a href="admin/login.php" class="btn btn-gold btn-block" style="margin-top:8px">进入后台</a></div>
-<?php elseif ($step === 0 && $error): ?>
+<?php elseif ($installed): ?>
 <div class="alert alert-warn"><?php echo $error; ?></div>
 <p style="text-align:center;margin-top:16px"><a href="index.php" class="btn btn-primary">进入网站</a></p>
 <?php elseif ($step === 1): ?>
@@ -62,8 +63,8 @@ $checks = [
     ['PDO 扩展', class_exists('PDO'), '已安装'],
     ['SQLite 扩展', extension_loaded('pdo_sqlite'), extension_loaded('pdo_sqlite') ? '已安装' : '未安装'],
     ['GD 扩展', extension_loaded('gd'), extension_loaded('gd') ? '已安装' : '未安装'],
-    ['data/ 目录可写', is_writable(__DIR__ . '/data') || !file_exists(__DIR__ . '/data'), is_writable(__DIR__ . '/data') ? '可写' : '不可写'],
-    ['uploads/ 目录可写', is_writable(__DIR__ . '/uploads') || !file_exists(__DIR__ . '/uploads'), is_writable(__DIR__ . '/uploads') ? '可写' : '不可写'],
+    ['data/ 目录可写', is_writable(__DIR__ . '/data') || !file_exists(__DIR__ . '/data'), file_exists(__DIR__ . '/data') ? (is_writable(__DIR__ . '/data') ? '可写' : '不可写') : '将创建'],
+    ['uploads/ 目录可写', is_writable(__DIR__ . '/uploads') || !file_exists(__DIR__ . '/uploads'), file_exists(__DIR__ . '/uploads') ? (is_writable(__DIR__ . '/uploads') ? '可写' : '不可写') : '将创建'],
 ];
 $allOk = true;
 foreach ($checks as $c):
@@ -81,7 +82,7 @@ foreach ($checks as $c):
 <?php if ($error): ?><div class="alert alert-error"><?php echo e($error); ?></div><?php endif; ?>
 <h4 style="margin-bottom:16px;text-align:center">创建管理员账号</h4>
 <form method="post">
-<div class="auth-field"><label>用户名</label><input type="text" name="username" required></div>
+<div class="auth-field"><label>用户名</label><input type="text" name="username" required autofocus></div>
 <div class="auth-field"><label>密码</label><input type="password" name="password" required></div>
 <div class="auth-field"><label>确认密码</label><input type="password" name="confirm_password" required></div>
 <div class="auth-field"><button type="submit" class="btn btn-primary btn-block">完成安装</button></div>

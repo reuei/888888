@@ -37,7 +37,7 @@ include __DIR__ . '/header.php';
 <?php if ($error): ?><div class="alert alert-error"><?php echo e($error); ?></div><?php endif; ?>
 <div class="admin-card">
 <h4>轮播图列表</h4>
-<table class="admin-table">
+<div class="admin-table-wrap"><table class="admin-table">
 <thead><tr><th>排序</th><th>标题</th><th>图片</th><th>状态</th><th>操作</th></tr></thead>
 <tbody>
 <?php foreach ($slides as $s): ?>
@@ -45,7 +45,7 @@ include __DIR__ . '/header.php';
 <td><a href="?delete=<?php echo $s['id']; ?>" onclick="return confirm('确定删除？')" class="btn btn-sm btn-danger">删除</a></td></tr>
 <?php endforeach; ?>
 </tbody>
-</table>
+</table></div>
 </div>
 <div class="admin-card">
 <h4>添加轮播图</h4>

@@ -11,19 +11,22 @@ function isAdmin() { $u = currentUser(); return $u && in_array($u['role'], ['adm
 function isSuperAdmin() { $u = currentUser(); return $u && $u['role'] === 'super_admin'; }
 
 function getSetting($key, $default = '') {
-    $r = DB::fetchOne("SELECT value FROM settings WHERE key=?", [$key]);
-    return $r ? $r['value'] : $default;
+    try { $r = DB::fetchOne("SELECT value FROM settings WHERE key=?", [$key]); return $r ? $r['value'] : $default; }
+    catch (Exception $e) { return $default; }
 }
 function siteName() { return getSetting('site_name', SITE_NAME); }
 
 function getCategories() {
-    return DB::fetchAll("SELECT * FROM categories WHERE parent_id=0 AND show_in_menu=1 ORDER BY sort_order ASC");
+    try { return DB::fetchAll("SELECT * FROM categories WHERE parent_id=0 AND show_in_menu=1 ORDER BY sort_order ASC"); }
+    catch (Exception $e) { return []; }
 }
 function getChildCategories($parentId) {
-    return DB::fetchAll("SELECT * FROM categories WHERE parent_id=? AND show_in_menu=1 ORDER BY sort_order ASC", [$parentId]);
+    try { return DB::fetchAll("SELECT * FROM categories WHERE parent_id=? AND show_in_menu=1 ORDER BY sort_order ASC", [$parentId]); }
+    catch (Exception $e) { return []; }
 }
 function getCategoryBySlug($slug) {
-    return DB::fetchOne("SELECT * FROM categories WHERE slug=?", [$slug]);
+    try { return DB::fetchOne("SELECT * FROM categories WHERE slug=?", [$slug]); }
+    catch (Exception $e) { return null; }
 }
 
 function formatDate($d, $fmt = 'Y-m-d') {

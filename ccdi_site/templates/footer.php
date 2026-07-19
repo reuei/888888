@@ -1,6 +1,6 @@
 <?php
 /**
- * 网站底部模板 v5.0.0
+ * 网站底部模板 v6.0.0
  * 中央纪委国家监委网站 CMS 系统
  */
 ?>
@@ -60,10 +60,10 @@
             <?php $icp = site_config('icp_number', ''); ?>
             <?php if ($icp): ?><p><?php echo htmlspecialchars($icp); ?></p><?php endif; ?>
             <p>
-                <a href="#" class="footer-links__link">设为首页</a> |
-                <a href="#" class="footer-links__link">网站声明</a> |
-                <a href="#" class="footer-links__link">联系我们</a> |
-                <a href="#" class="footer-links__link">站点地图</a>
+                <a href="#">设为首页</a> |
+                <a href="#">网站声明</a> |
+                <a href="#">联系我们</a> |
+                <a href="#">站点地图</a>
             </p>
         </div>
     </div>
@@ -74,6 +74,6 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
-<script src="<?php echo site_url('assets/js/main.js?v=5.0.0'); ?>"></script>
+<script src="<?php echo site_url('assets/js/main.js?v=6.0.0'); ?>"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /**
- * CCDI Site - Government Discipline Inspection Website CMS v5.0.0
+ * CCDI Site - Government Discipline Inspection Website CMS v6.0.0
  * Main JavaScript
  */
 (function () {
@@ -14,7 +14,7 @@
         window.addEventListener('load', function () {
             setTimeout(function () {
                 loader.classList.add('page-loader--hidden');
-            }, 600);
+            }, 500);
         });
     }
 
@@ -106,7 +106,6 @@
         var carousel = document.getElementById('carousel');
         if (!carousel) return;
 
-        var track = carousel.querySelector('.carousel-track');
         var slides = carousel.querySelectorAll('.carousel-slide');
         var prevBtn = document.getElementById('carouselPrev');
         var nextBtn = document.getElementById('carouselNext');
@@ -122,16 +121,28 @@
         var progressStart = null;
         var autoDuration = 3200;
         var progressDuration = 3000;
+        var isTransitioning = false;
 
         function goToSlide(index) {
-            if (index === currentIndex) return;
-            slides[currentIndex].classList.remove('active');
+            if (index === currentIndex || isTransitioning) return;
+            isTransitioning = true;
+
+            var currentSlide = slides[currentIndex];
+            var nextSlide = slides[((index % totalSlides) + totalSlides) % totalSlides];
+
+            currentSlide.classList.remove('active');
             currentIndex = ((index % totalSlides) + totalSlides) % totalSlides;
-            slides[currentIndex].classList.add('active');
+            nextSlide.classList.add('active');
+
             if (counterCurrent) {
                 counterCurrent.textContent = currentIndex + 1;
             }
+
             resetProgress();
+
+            setTimeout(function () {
+                isTransitioning = false;
+            }, 600);
         }
 
         function nextSlide() {
@@ -149,7 +160,11 @@
             }
             progressStart = null;
             if (progressFill) {
+                progressFill.style.transition = 'none';
                 progressFill.style.width = '0%';
+                // Force reflow
+                progressFill.offsetHeight;
+                progressFill.style.transition = 'width 0.1s linear';
             }
             startProgress();
         }
@@ -235,11 +250,19 @@
         var btn = document.getElementById('backToTop');
         if (!btn) return;
 
+        var ticking = false;
+
         window.addEventListener('scroll', function () {
-            if (window.scrollY > 300) {
-                btn.classList.add('back-to-top--visible');
-            } else {
-                btn.classList.remove('back-to-top--visible');
+            if (!ticking) {
+                requestAnimationFrame(function () {
+                    if (window.scrollY > 300) {
+                        btn.classList.add('back-to-top--visible');
+                    } else {
+                        btn.classList.remove('back-to-top--visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
             }
         }, { passive: true });
 
@@ -257,7 +280,6 @@
 
         var closeBtn = document.getElementById('popupClose');
 
-        // Show popup after a short delay
         setTimeout(function () {
             overlay.classList.add('popup-overlay--active');
         }, 800);
@@ -275,6 +297,12 @@
                 closePopup();
             }
         });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && overlay.classList.contains('popup-overlay--active')) {
+                closePopup();
+            }
+        });
     }
 
     /* ============================================================
@@ -289,7 +317,6 @@
                 var targetPanel = this.getAttribute('data-tab');
                 if (!targetPanel) return;
 
-                // Deactivate all tabs and panels
                 tabBtns.forEach(function (b) {
                     b.classList.remove('active');
                 });
@@ -298,7 +325,6 @@
                     p.classList.remove('active');
                 });
 
-                // Activate clicked tab and target panel
                 this.classList.add('active');
                 var panel = document.getElementById(targetPanel);
                 if (panel) {
@@ -317,12 +343,19 @@
 
         var scrollThreshold = 50;
         var scrolledClass = 'main-nav--scrolled';
+        var ticking = false;
 
         window.addEventListener('scroll', function () {
-            if (window.scrollY > scrollThreshold) {
-                nav.classList.add(scrolledClass);
-            } else {
-                nav.classList.remove(scrolledClass);
+            if (!ticking) {
+                requestAnimationFrame(function () {
+                    if (window.scrollY > scrollThreshold) {
+                        nav.classList.add(scrolledClass);
+                    } else {
+                        nav.classList.remove(scrolledClass);
+                    }
+                    ticking = false;
+                });
+                ticking = true;
             }
         }, { passive: true });
     }

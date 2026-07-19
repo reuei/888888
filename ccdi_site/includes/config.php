@@ -12,7 +12,14 @@ if (!defined('SYSTEM_INIT')) {
 // 网站基本信息
 define('SITE_NAME', '中央纪委国家监委网站');
 define('SITE_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']);
-define('SITE_PATH', rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\'));
+// 计算站点子目录路径（相对于文档根目录）
+$site_root = realpath(dirname(__DIR__));
+$doc_root = realpath($_SERVER['DOCUMENT_ROOT'] ?? dirname(__DIR__));
+$site_path = '';
+if ($site_root && $doc_root && $site_root !== $doc_root && strpos($site_root, $doc_root) === 0) {
+    $site_path = str_replace('\\', '/', substr($site_root, strlen($doc_root)));
+}
+define('SITE_PATH', $site_path);
 define('SITE_FULL_URL', SITE_URL . SITE_PATH);
 
 // 路径定义
@@ -61,8 +68,8 @@ define('SECURITY_KEY', get_site_config('security_key', ''));
 define('CSRF_TOKEN_NAME', 'csrf_token');
 
 // 版本号
-define('CMS_VERSION', '5.0.0');
-define('CMS_BUILD', '20260722');
+define('CMS_VERSION', '6.0.0');
+define('CMS_BUILD', '20260728');
 
 // 数据库连接函数
 function get_site_config($key, $default = '') {

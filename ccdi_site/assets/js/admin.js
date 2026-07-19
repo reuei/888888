@@ -1,32 +1,13 @@
 /**
- * 后台管理脚本 v5.0.0
+ * 后台管理脚本 v6.0.0
  */
 (function() {
     'use strict';
 
     document.addEventListener('DOMContentLoaded', function() {
-        initSidebarToggle();
         initDeleteConfirm();
         initImagePreview();
     });
-
-    // 侧边栏切换
-    function initSidebarToggle() {
-        var toggle = document.getElementById('sidebarToggle');
-        var sidebar = document.querySelector('.admin-sidebar');
-        if (!toggle || !sidebar) return;
-
-        toggle.addEventListener('click', function() {
-            sidebar.classList.toggle('open');
-        });
-
-        // 点击内容区关闭侧边栏
-        document.querySelector('.admin-main').addEventListener('click', function() {
-            if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-            }
-        });
-    }
 
     // 删除确认
     function initDeleteConfirm() {

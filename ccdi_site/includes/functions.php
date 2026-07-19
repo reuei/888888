@@ -86,7 +86,7 @@ function site_url($path = '') {
  * 生成管理员URL
  */
 function admin_url($path = '') {
-    return SITE_FULL_URL . '/admin/' . ltrim($path, '/');
+    return SITE_URL . '/admin/' . ltrim($path, '/');
 }
 
 /**

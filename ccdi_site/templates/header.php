@@ -1,7 +1,7 @@
 <?php
 /**
- * 网站头部模板 v5.0.0
- * 中央纪委国家监委网站 CMS 系统
+ * 网站头部模板 v6.0.0
+ * 中央纪委国家监委网站 CMS 系统 - 极简政府风格
  */
 if (!defined('SYSTEM_INIT')) { require_once __DIR__ . '/../includes/init.php'; }
 
@@ -17,9 +17,8 @@ $popup = $show_popup ? get_popup() : null;
     <meta name="description" content="<?php echo $site_description; ?>">
     <meta name="keywords" content="<?php echo $site_keywords; ?>">
     <title><?php echo isset($page_title) ? $page_title . ' - ' . SITE_NAME : SITE_NAME; ?></title>
-    <link rel="stylesheet" href="<?php echo site_url('assets/css/style.css?v=5.0.0'); ?>">
+    <link rel="stylesheet" href="<?php echo site_url('assets/css/style.css?v=6.0.0'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_4346459_iconfont.css">
 </head>
 <body>
 
@@ -49,7 +48,7 @@ $popup = $show_popup ? get_popup() : null;
                 <span class="top-bar__link"><?php echo htmlspecialchars(current_username()); ?></span>
                 <span class="top-bar__divider">|</span>
                 <?php if (is_admin()): ?>
-                <a href="<?php echo admin_url(); ?>" class="top-bar__link">后台</a>
+                <a href="<?php echo admin_url(); ?>" class="top-bar__link">后台管理</a>
                 <span class="top-bar__divider">|</span>
                 <?php endif; ?>
                 <a href="<?php echo site_url('logout.php'); ?>" class="top-bar__link">退出</a>
@@ -67,7 +66,7 @@ $popup = $show_popup ? get_popup() : null;
     <div class="site-header__inner">
         <div class="site-header__brand">
             <div class="site-header__logo">
-                <i class="iconfont icon-huizhang"></i>
+                <i class="fas fa-shield-alt"></i>
             </div>
             <div class="site-header__titles">
                 <h1 class="site-header__title"><?php echo htmlspecialchars(site_config('site_name', SITE_NAME)); ?></h1>
@@ -86,15 +85,15 @@ $popup = $show_popup ? get_popup() : null;
 <!-- 主导航（吸顶） -->
 <nav class="main-nav" id="mainNav">
     <div class="main-nav__inner">
-        <button class="hamburger" id="hamburgerBtn" aria-label="菜单">
-            <span></span><span></span><span></span>
-        </button>
         <ul class="nav-list" id="navList">
             <li><a href="<?php echo site_url(); ?>" class="<?php echo $current_page == 'index' ? 'active' : ''; ?>">首页</a></li>
             <?php foreach ($nav_menu as $item): ?>
             <li><a href="<?php echo !empty($item['url']) ? (strpos($item['url'], 'http') === 0 ? $item['url'] : site_url($item['url'])) : site_url('category.php?slug=' . $item['name']); ?>"><?php echo htmlspecialchars($item['name']); ?></a></li>
             <?php endforeach; ?>
         </ul>
+        <button class="hamburger" id="hamburgerBtn" aria-label="菜单">
+            <span></span><span></span><span></span>
+        </button>
     </div>
 </nav>
 
@@ -112,7 +111,7 @@ $popup = $show_popup ? get_popup() : null;
         <?php foreach ($nav_menu as $item): ?>
         <li class="mobile-nav-list__item"><a href="<?php echo !empty($item['url']) ? (strpos($item['url'], 'http') === 0 ? $item['url'] : site_url($item['url'])) : site_url('category.php?slug=' . $item['name']); ?>" class="mobile-nav-list__link"><?php echo htmlspecialchars($item['name']); ?></a></li>
         <?php endforeach; ?>
-        <li class="mobile-nav-list__item" style="border-top:1px solid var(--color-border);margin-top:8px;padding-top:8px;"></li>
+        <li class="mobile-nav-list__item mobile-nav-list__item--divider"></li>
         <?php if (is_logged_in()): ?>
             <?php if (is_admin()): ?>
             <li class="mobile-nav-list__item"><a href="<?php echo admin_url(); ?>" class="mobile-nav-list__link">后台管理</a></li>

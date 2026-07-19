@@ -1,7 +1,7 @@
 <?php
 /**
- * 网站首页 v5.0.0
- * 中央纪委国家监委网站 CMS 系统
+ * 网站首页 v6.0.0
+ * 中央纪委国家监委网站 CMS 系统 - 极简政府风格
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';
@@ -31,7 +31,7 @@ foreach ($categories as $cat) {
     );
 }
 
-// 获取要闻和公共动态类别的文章（用于Tab切换）
+// 获取要闻类文章（用于Tab切换）
 $yaowen_articles = db_fetch_all(
     "SELECT a.* FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE c.slug = 'yaowen' AND a.status = 'publish' ORDER BY a.publish_time DESC LIMIT 8"
 );
@@ -45,9 +45,9 @@ include TEMPLATES_PATH . 'header.php';
 <!-- 首页布局：三栏 -->
 <div class="home-layout">
     <!-- 主内容区：左栏 + 中栏 -->
-    <div class="home-layout__main" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-lg);">
+    <div class="home-layout__main">
         <!-- 左栏：轮播图 + 标签页新闻 -->
-        <div style="display:flex;flex-direction:column;gap:var(--spacing-lg);">
+        <div class="home-layout__col">
             <!-- 轮播图 -->
             <?php if (!empty($carousel_items)): ?>
             <div class="carousel-container" id="carousel">
@@ -127,7 +127,7 @@ include TEMPLATES_PATH . 'header.php';
         </div>
 
         <!-- 中栏：横幅图片 + 分类文章 -->
-        <div style="display:flex;flex-direction:column;gap:var(--spacing-lg);">
+        <div class="home-layout__col">
             <?php if ($banner_img): ?>
             <div class="banner-section">
                 <img src="<?php echo $banner_img; ?>" alt="宣传横幅" class="banner-section__img">

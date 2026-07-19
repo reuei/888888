@@ -238,7 +238,7 @@ include TEMPLATES_PATH . 'header.php';
 <div class="auth-page">
     <div class="auth-card">
         <div class="auth-icon-square">
-            <i class="fas fa-shield-haltered"></i>
+            <i class="fas fa-shield-alt"></i>
         </div>
         <h2>登录</h2>
         <p class="auth-subtitle">中央纪委国家监委网站后台管理系统</p>

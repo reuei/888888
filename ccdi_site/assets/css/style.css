@@ -1500,6 +1500,12 @@ table { border-collapse: collapse; width: 100%; }
   color: #fff;
 }
 
+.article-detail__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
 .article-detail__related { margin-top: var(--spacing-2xl); }
 
 .article-detail__related-title {

@@ -1,6 +1,6 @@
 <?php
 /**
- * 搜索页面
+ * 搜索页面 v6.0.0
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';
@@ -23,47 +23,42 @@ if ($q) {
 include TEMPLATES_PATH . 'header.php';
 ?>
 
-<div class="page-content">
-    <div class="container">
-        <div class="search-header">
-            <h1>站内搜索</h1>
-            <form action="<?php echo site_url('search.php'); ?>" method="get" class="search-form-large">
-                <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="请输入搜索关键词...">
-                <button type="submit"><i class="fas fa-search"></i> 搜索</button>
-            </form>
-        </div>
-        
-        <?php if ($q): ?>
-        <div class="search-results">
-            <p class="search-info">搜索 "<strong><?php echo htmlspecialchars($q); ?></strong>" ，共找到 <strong><?php echo $total; ?></strong> 条结果</p>
-            
-            <?php if (empty($articles)): ?>
-            <div class="empty-state">
-                <i class="fas fa-search"></i>
-                <p>未找到相关内容</p>
-            </div>
-            <?php else: ?>
-            <div class="article-list">
-                <?php foreach ($articles as $article): ?>
-                <div class="article-card">
-                    <div class="article-card-body">
-                        <h3 class="article-card-title">
-                            <a href="<?php echo site_url('article.php?id=' . $article['id']); ?>"><?php echo htmlspecialchars($article['title']); ?></a>
-                        </h3>
-                        <p class="article-card-summary"><?php echo str_cut($article['summary'] ?: strip_tags($article['content']), 200); ?></p>
-                        <div class="article-card-meta">
-                            <span><i class="far fa-clock"></i> <?php echo format_time($article['publish_time']); ?></span>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-            
-            <?php echo pagination($total, $page, site_url('search.php?q=' . urlencode($q) . '&'), ITEMS_PER_PAGE); ?>
-            <?php endif; ?>
-        </div>
-        <?php endif; ?>
+<div class="search-page">
+    <div class="search-page__header">
+        <h1 class="search-page__title">站内搜索</h1>
+        <form action="<?php echo site_url('search.php'); ?>" method="get" class="search-page__form">
+            <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="请输入搜索关键词..." class="search-page__input">
+            <button type="submit" class="search-page__btn"><i class="fas fa-search"></i> 搜索</button>
+        </form>
     </div>
+
+    <?php if ($q): ?>
+    <p class="search-page__info">搜索 "<strong><?php echo htmlspecialchars($q); ?></strong>" ，共找到 <strong><?php echo $total; ?></strong> 条结果</p>
+
+    <?php if (empty($articles)): ?>
+    <div class="empty-state">
+        <div class="empty-state__icon"><i class="fas fa-search"></i></div>
+        <h3 class="empty-state__title">未找到相关内容</h3>
+        <p class="empty-state__desc">请尝试其他关键词搜索</p>
+    </div>
+    <?php else: ?>
+    <div class="search-page__results">
+        <?php foreach ($articles as $article): ?>
+        <div class="search-result-item">
+            <h3 class="search-result-item__title">
+                <a href="<?php echo site_url('article.php?id=' . $article['id']); ?>"><?php echo htmlspecialchars($article['title']); ?></a>
+            </h3>
+            <p class="search-result-item__text"><?php echo str_cut($article['summary'] ?: strip_tags($article['content']), 200); ?></p>
+            <div class="search-result-item__meta">
+                <span><i class="far fa-clock"></i> <?php echo format_time($article['publish_time']); ?></span>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+
+    <?php echo pagination($total, $page, site_url('search.php?q=' . urlencode($q) . '&'), ITEMS_PER_PAGE); ?>
+    <?php endif; ?>
+    <?php endif; ?>
 </div>
 
 <?php include TEMPLATES_PATH . 'footer.php'; ?>

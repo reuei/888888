@@ -1,319 +1,343 @@
 /**
- * 主脚本 v4.0.0
- * 中央纪委国家监委网站
+ * CCDI Site - Government Discipline Inspection Website CMS v5.0.0
+ * Main JavaScript
  */
-(function() {
+(function () {
     'use strict';
 
-    var D = document;
-    var W = window;
-
-    /* ================================================================
-       DOMContentLoaded — 初始化所有模块
-       ================================================================ */
-    D.addEventListener('DOMContentLoaded', function() {
-        initLoader();
-        initMobileMenu();
-        initCarousel();
-        initBackToTop();
-        initPopup();
-        initFormValidation();
-    });
-
-    /* ================================================================
-       1. 加载动画 (.page-loader)
-       ================================================================ */
+    /* ============================================================
+       1. Page Loader
+       ============================================================ */
     function initLoader() {
-        var loader = D.getElementById('pageLoader');
+        var loader = document.getElementById('pageLoader');
         if (!loader) return;
-        W.addEventListener('load', function() {
-            setTimeout(function() {
+        window.addEventListener('load', function () {
+            setTimeout(function () {
                 loader.classList.add('page-loader--hidden');
             }, 600);
         });
     }
 
-    /* ================================================================
-       2. Toast 全局提示系统
-       ================================================================ */
-    W.showToast = function(msg, type) {
+    /* ============================================================
+       2. Toast Notifications
+       ============================================================ */
+    window.showToast = function (msg, type) {
         type = type || 'info';
-        var container = D.getElementById('toastContainer');
+        var container = document.getElementById('toastContainer');
         if (!container) return;
 
-        var icons = {
+        var iconMap = {
             success: 'fa-check-circle',
-            error: 'fa-exclamation-circle',
+            error: 'fa-times-circle',
             warning: 'fa-exclamation-triangle',
             info: 'fa-info-circle'
         };
+        var iconClass = iconMap[type] || iconMap.info;
 
-        var toast = D.createElement('div');
+        var toast = document.createElement('div');
         toast.className = 'toast toast--' + type;
-        toast.innerHTML = '<span class="toast__icon"><i class="fas ' + (icons[type] || icons.info) + '"></i></span><span class="toast__content">' + msg + '</span>';
+        toast.innerHTML = '<span class="toast__icon"><i class="fas ' + iconClass + '"></i></span>' +
+                          '<span class="toast__content">' + msg + '</span>';
+
         container.appendChild(toast);
 
-        // 3.5s 后自动移除（带滑出动画）
-        setTimeout(function() {
+        var removeTimer = setTimeout(function () {
             toast.classList.add('toast--removing');
-            toast.addEventListener('transitionend', function() {
-                if (toast.parentNode) toast.parentNode.removeChild(toast);
-            }, { once: true });
         }, 3500);
+
+        toast.addEventListener('transitionend', function () {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        });
     };
 
-    /* ================================================================
-       3. 手机端汉堡菜单
-       ================================================================ */
+    /* ============================================================
+       3. Mobile Menu
+       ============================================================ */
     function initMobileMenu() {
-        var hamburger = D.getElementById('hamburgerBtn');
-        var sidebar   = D.getElementById('mobileSidebar');
-        var overlay   = D.getElementById('mobileOverlay');
-        var closeBtn  = D.getElementById('mobileSidebarClose');
-        if (!hamburger || !sidebar) return;
+        var hamburgerBtn = document.getElementById('hamburgerBtn');
+        var mobileSidebar = document.getElementById('mobileSidebar');
+        var mobileOverlay = document.getElementById('mobileOverlay');
+        var closeBtn = document.getElementById('mobileSidebarClose');
+        var body = document.body;
+
+        if (!hamburgerBtn || !mobileSidebar || !mobileOverlay) return;
 
         function openMenu() {
-            sidebar.classList.add('mobile-sidebar--active');
-            if (overlay) overlay.classList.add('mobile-overlay--active');
-            hamburger.classList.add('hamburger--active');
-            D.body.style.overflow = 'hidden';
+            mobileSidebar.classList.add('mobile-sidebar--active');
+            mobileOverlay.classList.add('mobile-overlay--active');
+            hamburgerBtn.classList.add('hamburger--active');
+            body.style.overflow = 'hidden';
         }
 
         function closeMenu() {
-            sidebar.classList.remove('mobile-sidebar--active');
-            if (overlay) overlay.classList.remove('mobile-overlay--active');
-            hamburger.classList.remove('hamburger--active');
-            D.body.style.overflow = '';
+            mobileSidebar.classList.remove('mobile-sidebar--active');
+            mobileOverlay.classList.remove('mobile-overlay--active');
+            hamburgerBtn.classList.remove('hamburger--active');
+            body.style.overflow = '';
         }
 
-        hamburger.addEventListener('click', function() {
-            sidebar.classList.contains('mobile-sidebar--active') ? closeMenu() : openMenu();
+        hamburgerBtn.addEventListener('click', function () {
+            if (mobileSidebar.classList.contains('mobile-sidebar--active')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
         });
 
-        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
-        if (overlay) overlay.addEventListener('click', closeMenu);
+        mobileOverlay.addEventListener('click', closeMenu);
 
-        D.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && sidebar.classList.contains('mobile-sidebar--active')) {
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeMenu);
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && mobileSidebar.classList.contains('mobile-sidebar--active')) {
                 closeMenu();
             }
         });
     }
 
-    /* ================================================================
-       4. 轮播图 v4.0 — 淡入淡出 + 进度条 + 触摸滑动
-       ================================================================ */
+    /* ============================================================
+       4. Carousel
+       ============================================================ */
     function initCarousel() {
-        var carousel = D.getElementById('carousel');
+        var carousel = document.getElementById('carousel');
         if (!carousel) return;
 
+        var track = carousel.querySelector('.carousel-track');
         var slides = carousel.querySelectorAll('.carousel-slide');
-        var total = slides.length;
-        if (total <= 1) return;
+        var prevBtn = document.getElementById('carouselPrev');
+        var nextBtn = document.getElementById('carouselNext');
+        var progressFill = document.getElementById('carouselProgressFill');
+        var counterCurrent = carousel.querySelector('.carousel-counter .current');
 
-        var current     = 0;
-        var counterEl   = carousel.querySelector('.carousel-counter .current');
-        var progressFill = D.getElementById('carouselProgressFill');
-        var prevBtn     = D.getElementById('carouselPrev');
-        var nextBtn     = D.getElementById('carouselNext');
-        var timer       = null;
+        if (!slides.length) return;
+
+        var totalSlides = slides.length;
+        var currentIndex = 0;
+        var autoTimer = null;
         var progressTimer = null;
-        var autoDuration = 3200;   // 3.2s 自动切换
-        var progressDuration = 3000; // 3s 进度条走完
+        var progressStart = null;
+        var autoDuration = 3200;
+        var progressDuration = 3000;
 
-        /* ---- 切换幻灯片 ---- */
-        function goTo(idx) {
-            if (idx === current) return;
-            slides[current].classList.remove('active');
-            current = idx;
-            slides[current].classList.add('active');
-            if (counterEl) counterEl.textContent = current + 1;
+        function goToSlide(index) {
+            if (index === currentIndex) return;
+            slides[currentIndex].classList.remove('active');
+            currentIndex = ((index % totalSlides) + totalSlides) % totalSlides;
+            slides[currentIndex].classList.add('active');
+            if (counterCurrent) {
+                counterCurrent.textContent = currentIndex + 1;
+            }
             resetProgress();
-            resetTimer();
         }
 
-        function next() { goTo((current + 1) % total); }
-        function prev() { goTo((current - 1 + total) % total); }
+        function nextSlide() {
+            goToSlide(currentIndex + 1);
+        }
 
-        /* ---- 进度条 ---- */
+        function prevSlide() {
+            goToSlide(currentIndex - 1);
+        }
+
         function resetProgress() {
+            if (progressTimer) {
+                cancelAnimationFrame(progressTimer);
+                progressTimer = null;
+            }
+            progressStart = null;
+            if (progressFill) {
+                progressFill.style.width = '0%';
+            }
+            startProgress();
+        }
+
+        function startProgress() {
             if (!progressFill) return;
-            clearTimeout(progressTimer);
-            // 重置 → 立即归零
-            progressFill.style.transition = 'none';
-            progressFill.style.width = '0';
-            // 强制回流后启动线性过渡
-            progressFill.offsetWidth; // eslint-disable-line no-unused-expressions
-            progressFill.style.transition = 'width ' + progressDuration + 'ms linear';
-            progressFill.style.width = '100%';
+            progressStart = performance.now();
+            function step(timestamp) {
+                if (!progressStart) return;
+                var elapsed = timestamp - progressStart;
+                var pct = Math.min((elapsed / progressDuration) * 100, 100);
+                progressFill.style.width = pct + '%';
+                if (pct < 100) {
+                    progressTimer = requestAnimationFrame(step);
+                }
+            }
+            progressTimer = requestAnimationFrame(step);
         }
 
-        /* ---- 自动轮播 ---- */
-        function resetTimer() {
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                next();
-            }, autoDuration);
+        function startAuto() {
+            stopAuto();
+            autoTimer = setInterval(nextSlide, autoDuration);
         }
 
-        // 前后按钮
-        if (prevBtn) prevBtn.addEventListener('click', function(e) { e.preventDefault(); prev(); });
-        if (nextBtn) nextBtn.addEventListener('click', function(e) { e.preventDefault(); next(); });
+        function stopAuto() {
+            if (autoTimer) {
+                clearInterval(autoTimer);
+                autoTimer = null;
+            }
+        }
 
-        /* ---- 触摸滑动 ---- */
+        function resetAuto() {
+            stopAuto();
+            startAuto();
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function () {
+                prevSlide();
+                resetAuto();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () {
+                nextSlide();
+                resetAuto();
+            });
+        }
+
+        // Touch swipe
         var touchStartX = 0;
-        carousel.addEventListener('touchstart', function(e) {
+        var touchEndX = 0;
+        var swipeThreshold = 40;
+
+        carousel.addEventListener('touchstart', function (e) {
             touchStartX = e.changedTouches[0].screenX;
+            stopAuto();
         }, { passive: true });
 
-        carousel.addEventListener('touchend', function(e) {
-            var diff = touchStartX - e.changedTouches[0].screenX;
-            if (Math.abs(diff) > 40) {
-                diff > 0 ? next() : prev();
+        carousel.addEventListener('touchend', function (e) {
+            touchEndX = e.changedTouches[0].screenX;
+            var diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
             }
-        });
+            resetAuto();
+        }, { passive: true });
 
-        // 启动
-        resetTimer();
-        resetProgress();
+        // Initialize
+        startProgress();
+        startAuto();
     }
 
-    /* ================================================================
-       5. 返回顶部
-       ================================================================ */
+    /* ============================================================
+       5. Back to Top
+       ============================================================ */
     function initBackToTop() {
-        var btn = D.getElementById('backToTop');
+        var btn = document.getElementById('backToTop');
         if (!btn) return;
 
-        function toggle() {
-            btn.classList.toggle('back-to-top--visible', W.pageYOffset > 300);
-        }
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 300) {
+                btn.classList.add('back-to-top--visible');
+            } else {
+                btn.classList.remove('back-to-top--visible');
+            }
+        }, { passive: true });
 
-        W.addEventListener('scroll', toggle, { passive: true });
-        btn.addEventListener('click', function() {
-            W.scrollTo({ top: 0, behavior: 'smooth' });
+        btn.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-        toggle();
     }
 
-    /* ================================================================
-       6. B2弹窗
-       ================================================================ */
+    /* ============================================================
+       6. Popup
+       ============================================================ */
     function initPopup() {
-        var overlay = D.getElementById('popupOverlay');
+        var overlay = document.getElementById('popupOverlay');
         if (!overlay) return;
 
-        var closeBtn = D.getElementById('popupClose');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', function() {
-                overlay.classList.remove('popup-overlay--active');
-            });
+        var closeBtn = document.getElementById('popupClose');
+
+        // Show popup after a short delay
+        setTimeout(function () {
+            overlay.classList.add('popup-overlay--active');
+        }, 800);
+
+        function closePopup() {
+            overlay.classList.remove('popup-overlay--active');
         }
 
-        overlay.addEventListener('click', function(e) {
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closePopup);
+        }
+
+        overlay.addEventListener('click', function (e) {
             if (e.target === overlay) {
-                overlay.classList.remove('popup-overlay--active');
+                closePopup();
             }
         });
     }
 
-    /* ================================================================
-       7. 表单验证（data-validate 属性）
-       ================================================================ */
-    function initFormValidation() {
-        var inputs = D.querySelectorAll('input[data-validate], textarea[data-validate]');
-        if (!inputs.length) return;
+    /* ============================================================
+       7. Homepage Tabs
+       ============================================================ */
+    function initHomeTabs() {
+        var tabBtns = document.querySelectorAll('.home-tab-btn');
+        if (!tabBtns.length) return;
 
-        var validators = {
-            required: function(val) {
-                return val.trim().length > 0 ? '' : '此项为必填';
-            },
-            email: function(val) {
-                if (!val.trim()) return '';
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ? '' : '请输入有效的邮箱地址';
-            },
-            username: function(val) {
-                if (!val.trim()) return '';
-                return /^[a-zA-Z0-9_\u4e00-\u9fa5]{3,20}$/.test(val) ? '' : '用户名需3-20位字母、数字、下划线或中文';
-            },
-            password: function(val) {
-                if (!val.trim()) return '';
-                return val.length >= 6 ? '' : '密码长度不能少于6位';
-            }
-        };
+        tabBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var targetPanel = this.getAttribute('data-tab');
+                if (!targetPanel) return;
 
-        function showFeedback(input, message) {
-            // 移除旧反馈
-            var existing = input.parentNode.querySelector('.form-feedback--error');
-            if (existing) existing.parentNode.removeChild(existing);
-
-            input.classList.remove('form-input--error', 'form-input--success');
-
-            if (message) {
-                input.classList.add('form-input--error');
-                var feedback = D.createElement('div');
-                feedback.className = 'form-feedback form-feedback--error';
-                feedback.textContent = message;
-                input.parentNode.appendChild(feedback);
-            } else {
-                input.classList.add('form-input--success');
-            }
-        }
-
-        function validateInput(input) {
-            var rules = input.getAttribute('data-validate').split(/\s+/);
-            var val = input.value;
-            var firstError = '';
-
-            for (var i = 0; i < rules.length; i++) {
-                var rule = rules[i];
-                var validator = validators[rule];
-                if (validator) {
-                    var error = validator(val);
-                    if (error) {
-                        firstError = error;
-                        break;
-                    }
-                }
-            }
-
-            showFeedback(input, firstError);
-            return !firstError;
-        }
-
-        // 失焦校验
-        for (var i = 0; i < inputs.length; i++) {
-            inputs[i].addEventListener('blur', function() {
-                validateInput(this);
-            });
-
-            inputs[i].addEventListener('input', function() {
-                // 如果已有错误状态，实时清除
-                if (this.classList.contains('form-input--error')) {
-                    validateInput(this);
-                }
-            });
-        }
-
-        // 表单提交时校验全部
-        for (var j = 0; j < inputs.length; j++) {
-            var form = inputs[j].closest('form');
-            if (form && !form._validationBound) {
-                form._validationBound = true;
-                form.addEventListener('submit', function(e) {
-                    var allValid = true;
-                    var formInputs = this.querySelectorAll('input[data-validate], textarea[data-validate]');
-                    for (var k = 0; k < formInputs.length; k++) {
-                        if (!validateInput(formInputs[k])) {
-                            allValid = false;
-                        }
-                    }
-                    if (!allValid) {
-                        e.preventDefault();
-                    }
+                // Deactivate all tabs and panels
+                tabBtns.forEach(function (b) {
+                    b.classList.remove('active');
                 });
-            }
-        }
+                var panels = document.querySelectorAll('.home-tab-panel');
+                panels.forEach(function (p) {
+                    p.classList.remove('active');
+                });
+
+                // Activate clicked tab and target panel
+                this.classList.add('active');
+                var panel = document.getElementById(targetPanel);
+                if (panel) {
+                    panel.classList.add('active');
+                }
+            });
+        });
     }
+
+    /* ============================================================
+       8. Sticky Nav Shadow
+       ============================================================ */
+    function initStickyNavShadow() {
+        var nav = document.getElementById('mainNav');
+        if (!nav) return;
+
+        var scrollThreshold = 50;
+        var scrolledClass = 'main-nav--scrolled';
+
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > scrollThreshold) {
+                nav.classList.add(scrolledClass);
+            } else {
+                nav.classList.remove(scrolledClass);
+            }
+        }, { passive: true });
+    }
+
+    /* ============================================================
+       Init All Modules
+       ============================================================ */
+    document.addEventListener('DOMContentLoaded', function () {
+        initLoader();
+        initMobileMenu();
+        initCarousel();
+        initBackToTop();
+        initPopup();
+        initHomeTabs();
+        initStickyNavShadow();
+    });
 
 })();

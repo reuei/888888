@@ -103,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     content TEXT,
                     summary TEXT DEFAULT '',
                     cover_image TEXT DEFAULT '',
+                    video TEXT DEFAULT '',
                     author TEXT DEFAULT '',
                     source TEXT DEFAULT '',
                     keywords TEXT DEFAULT '',

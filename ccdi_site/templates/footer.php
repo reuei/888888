@@ -7,6 +7,33 @@
     </div><!-- .container -->
 </main><!-- .site-main -->
 
+<!-- 页脚轮播 -->
+<?php $footer_carousel = get_footer_carousel(); ?>
+<?php if (!empty($footer_carousel)): ?>
+<div class="footer-carousel-section">
+    <div class="container">
+        <div class="footer-carousel" id="footerCarousel">
+            <div class="footer-carousel__track">
+                <?php foreach ($footer_carousel as $index => $fc): ?>
+                <div class="footer-carousel__slide<?php echo $index === 0 ? ' active' : ''; ?>">
+                    <?php if ($fc['link']): ?><a href="<?php echo htmlspecialchars($fc['link']); ?>"><?php endif; ?>
+                    <img src="<?php echo site_url('uploads/' . $fc['image']); ?>" alt="<?php echo htmlspecialchars($fc['title']); ?>">
+                    <?php if ($fc['link']): ?></a><?php endif; ?>
+                    <?php if ($fc['title']): ?>
+                    <div class="footer-carousel__caption">
+                        <span><?php echo htmlspecialchars($fc['title']); ?></span>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <button class="footer-carousel__prev" id="footerCarouselPrev"><i class="fas fa-chevron-left"></i></button>
+            <button class="footer-carousel__next" id="footerCarouselNext"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <footer class="site-footer">
     <div class="site-footer__inner">
         <?php $footer_img = get_footer_image(); ?>

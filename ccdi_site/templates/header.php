@@ -90,6 +90,7 @@ $popup = $show_popup ? get_popup() : null;
             <?php foreach ($nav_menu as $item): ?>
             <li><a href="<?php echo !empty($item['url']) ? (strpos($item['url'], 'http') === 0 ? $item['url'] : site_url($item['url'])) : site_url('category.php?slug=' . $item['name']); ?>"><?php echo htmlspecialchars($item['name']); ?></a></li>
             <?php endforeach; ?>
+            <li><a href="<?php echo site_url('staff.php'); ?>" class="<?php echo $current_page == 'staff' ? 'active' : ''; ?>">工作人员</a></li>
         </ul>
         <button class="hamburger" id="hamburgerBtn" aria-label="菜单">
             <span></span><span></span><span></span>
@@ -111,6 +112,7 @@ $popup = $show_popup ? get_popup() : null;
         <?php foreach ($nav_menu as $item): ?>
         <li class="mobile-nav-list__item"><a href="<?php echo !empty($item['url']) ? (strpos($item['url'], 'http') === 0 ? $item['url'] : site_url($item['url'])) : site_url('category.php?slug=' . $item['name']); ?>" class="mobile-nav-list__link"><?php echo htmlspecialchars($item['name']); ?></a></li>
         <?php endforeach; ?>
+        <li class="mobile-nav-list__item"><a href="<?php echo site_url('staff.php'); ?>" class="mobile-nav-list__link<?php echo $current_page == 'staff' ? ' mobile-nav-list__link--active' : ''; ?>">工作人员</a></li>
         <li class="mobile-nav-list__item mobile-nav-list__item--divider"></li>
         <?php if (is_logged_in()): ?>
             <?php if (is_admin()): ?>

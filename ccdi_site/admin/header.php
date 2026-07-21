@@ -42,6 +42,15 @@ $admin_page = basename($_SERVER['SCRIPT_NAME'], '.php');
                 <li class="<?php echo $admin_page === 'carousel' ? 'active' : ''; ?>">
                     <a href="<?php echo admin_url('carousel.php'); ?>"><i class="fas fa-images"></i> 轮播图管理</a>
                 </li>
+                <li class="<?php echo $admin_page === 'videos' ? 'active' : ''; ?>">
+                    <a href="<?php echo admin_url('videos.php'); ?>"><i class="fas fa-video"></i> 视频管理</a>
+                </li>
+                <li class="<?php echo $admin_page === 'staff' ? 'active' : ''; ?>">
+                    <a href="<?php echo admin_url('staff.php'); ?>"><i class="fas fa-user-tie"></i> 工作者管理</a>
+                </li>
+                <li class="<?php echo $admin_page === 'footer_carousel' ? 'active' : ''; ?>">
+                    <a href="<?php echo admin_url('footer_carousel.php'); ?>"><i class="fas fa-images"></i> 页脚轮播</a>
+                </li>
                 <li class="<?php echo $admin_page === 'popups' ? 'active' : ''; ?>">
                     <a href="<?php echo admin_url('popups.php'); ?>"><i class="fas fa-window-maximize"></i> 弹窗管理</a>
                 </li>

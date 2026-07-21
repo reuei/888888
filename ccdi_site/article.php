@@ -64,6 +64,15 @@ include TEMPLATES_PATH . 'header.php';
         <img src="<?php echo site_url('uploads/' . $article['cover_image']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="article-detail__cover">
         <?php endif; ?>
 
+        <?php if (!empty($article['video'])): ?>
+        <div class="article-detail__video">
+            <video controls style="width:100%;max-width:720px;border-radius:8px;display:block;margin:0 auto 20px;">
+                <source src="<?php echo site_url('uploads/' . $article['video']); ?>" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+        </div>
+        <?php endif; ?>
+
         <div class="article-detail__content">
             <?php echo nl2br(htmlspecialchars($article['content'])); ?>
         </div>

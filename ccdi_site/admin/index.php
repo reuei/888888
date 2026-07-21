@@ -62,6 +62,27 @@ include __DIR__ . '/header.php';
                 <p>总浏览量</p>
             </div>
         </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#e6f7ff;color:#1890ff;"><i class="fas fa-video"></i></div>
+            <div class="stat-info">
+                <h3><?php echo db_count('videos'); ?></h3>
+                <p>视频总数</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#fff7e6;color:#fa8c16;"><i class="fas fa-user-tie"></i></div>
+            <div class="stat-info">
+                <h3><?php echo db_count('staff'); ?></h3>
+                <p>工作者</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#f6ffed;color:#52c41a;"><i class="fas fa-sliders-h"></i></div>
+            <div class="stat-info">
+                <h3><?php echo db_count('footer_carousel'); ?></h3>
+                <p>页脚轮播</p>
+            </div>
+        </div>
     </div>
     
     <div class="dashboard-grid">

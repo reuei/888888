@@ -260,10 +260,13 @@ function get_article($id) {
 }
 
 /**
- * 获取轮播图
+ * 获取轮播图列表（支持类型筛选）
  */
-function get_carousel() {
-    return db_fetch_all("SELECT * FROM carousel WHERE status = 1 ORDER BY sort_order ASC");
+function get_carousel($type = '') {
+    if ($type) {
+        return db_fetch_all("SELECT * FROM carousel WHERE status = 1 AND type = ? ORDER BY sort_order ASC, id DESC", [$type]);
+    }
+    return db_fetch_all("SELECT * FROM carousel WHERE status = 1 ORDER BY sort_order ASC, id DESC");
 }
 
 /**
@@ -351,3 +354,33 @@ function get_banner_image() {
     }
     return '';
 }
+
+/**
+ * 获取页脚轮播图列表
+ */
+function get_footer_carousel() {
+    return db_fetch_all("SELECT * FROM footer_carousel WHERE status = 1 ORDER BY sort_order ASC, id DESC");
+}
+
+/**
+ * 获取视频列表
+ */
+function get_videos($limit = 12, $category_id = 0) {
+    $sql = "SELECT * FROM videos WHERE status = 1";
+    $params = [];
+    if ($category_id > 0) {
+        $sql .= " AND category_id = ?";
+        $params[] = $category_id;
+    }
+    $sql .= " ORDER BY sort_order ASC, id DESC LIMIT ?";
+    $params[] = $limit;
+    return db_fetch_all($sql, $params);
+}
+
+/**
+ * 获取工作人员列表
+ */
+function get_staff($limit = 20) {
+    return db_fetch_all("SELECT * FROM staff WHERE status = 1 ORDER BY sort_order ASC, id ASC LIMIT ?", [$limit]);
+}
+

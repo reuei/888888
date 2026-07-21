@@ -32,6 +32,13 @@ if ($action === 'delete' && $id > 0) {
                     @unlink($cover_path);
                 }
             }
+            // 删除视频文件
+            if (!empty($article['video'])) {
+                $video_path = UPLOADS_PATH . $article['video'];
+                if (file_exists($video_path)) {
+                    @unlink($video_path);
+                }
+            }
             $result = db_delete('articles', 'id = ?', [$id]);
             if ($result !== false) {
                 add_log('article_delete', "删除文章：{$article['title']}");
@@ -64,6 +71,7 @@ if ($action === 'save') {
         $status = in_array(post('status', 'draft'), ['draft', 'publish']) ? post('status') : 'draft';
         $publish_time = trim(post('publish_time', ''));
         $cover_image = '';
+        $video = '';
 
         // 验证标题
         if (empty($title)) {
@@ -111,6 +119,25 @@ if ($action === 'save') {
             }
         }
 
+        // 处理视频文件上传
+        if (empty($error) && isset($_FILES['video_file']) && $_FILES['video_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload_result = upload_file($_FILES['video_file'], 'videos');
+            if (isset($upload_result['success']) && $upload_result['success']) {
+                if ($id > 0) {
+                    $old_article = db_fetch("SELECT video FROM articles WHERE id = ?", [$id]);
+                    if ($old_article && !empty($old_article['video'])) {
+                        $old_path = UPLOADS_PATH . $old_article['video'];
+                        if (file_exists($old_path)) {
+                            @unlink($old_path);
+                        }
+                    }
+                }
+                $video = $upload_result['path'];
+            } elseif (isset($upload_result['error'])) {
+                $error = $upload_result['error'];
+            }
+        }
+
         // 处理发布时间
         if (empty($publish_time)) {
             $publish_time = date('Y-m-d H:i:s');
@@ -135,6 +162,10 @@ if ($action === 'save') {
 
             if (!empty($cover_image)) {
                 $data['cover_image'] = $cover_image;
+            }
+
+            if (!empty($video)) {
+                $data['video'] = $video;
             }
 
             if ($id > 0) {
@@ -310,6 +341,7 @@ if ($action === 'add' || $action === 'edit') {
         'content' => '',
         'summary' => '',
         'cover_image' => '',
+        'video' => '',
         'source' => '',
         'author' => '',
         'keywords' => '',
@@ -435,6 +467,20 @@ if ($action === 'add' || $action === 'edit') {
                 <label for="publish_time">发布时间</label>
                 <input type="datetime-local" id="publish_time" name="publish_time" value="<?php echo date('Y-m-d\TH:i', strtotime($article['publish_time'])); ?>">
             </div>
+        </div>
+
+        <div class="form-group">
+            <label for="video_file">视频文件</label>
+            <input type="file" id="video_file" name="video_file" accept="video/mp4,video/webm,video/ogg">
+            <span class="form-hint">支持 MP4、WebM、OGG 格式，最大 50MB</span>
+            <?php if ($is_edit && !empty($article['video'])): ?>
+                <div class="current-image">
+                    <span>当前视频：</span>
+                    <video controls style="max-width:300px;max-height:200px;margin-top:8px;">
+                        <source src="<?php echo site_url('uploads/' . $article['video']); ?>" type="video/mp4">
+                    </video>
+                </div>
+            <?php endif; ?>
         </div>
 
         <div class="form-row">

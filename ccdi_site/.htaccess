@@ -1,4 +1,4 @@
-# 中央纪委国家监委网站风格 CMS - Apache 伪静态规则 v5.0.0
+# 中央纪委国家监委网站风格 CMS - Apache 伪静态规则 v7.0.0
 # 适用于虚拟主机环境
 
 <IfModule mod_rewrite.c>
@@ -33,6 +33,10 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^page/([0-9]+)$ index.php?page=$1 [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^staff\.php$ staff.php [L,QSA]
 </IfModule>
 
 # 安全设置

@@ -1,6 +1,6 @@
 <?php
 /**
- * 网站底部模板 v6.0.0
+ * 网站底部模板 v7.0.0
  * 中央纪委国家监委网站 CMS 系统
  */
 ?>
@@ -15,7 +15,7 @@
         <div class="footer-carousel" id="footerCarousel">
             <div class="footer-carousel__track">
                 <?php foreach ($footer_carousel as $index => $fc): ?>
-                <div class="footer-carousel__slide<?php echo $index === 0 ? ' active' : ''; ?>">
+                <div class="footer-carousel__slide<?php echo $index === 0 ? ' footer-carousel__slide--active' : ''; ?>">
                     <?php if ($fc['link']): ?><a href="<?php echo htmlspecialchars($fc['link']); ?>"><?php endif; ?>
                     <img src="<?php echo site_url('uploads/' . $fc['image']); ?>" alt="<?php echo htmlspecialchars($fc['title']); ?>">
                     <?php if ($fc['link']): ?></a><?php endif; ?>
@@ -101,6 +101,6 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
-<script src="<?php echo site_url('assets/js/main.js?v=6.0.0'); ?>"></script>
+<script src="<?php echo site_url('assets/js/main.js?v=7.0.0'); ?>"></script>
 </body>
 </html>

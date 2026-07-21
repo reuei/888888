@@ -1468,6 +1468,23 @@ table {
   right: var(--spacing-sm);
 }
 
+.footer-carousel__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  color: #fff;
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.footer-carousel-section {
+  padding: var(--spacing-2xl) 0;
+  background-color: var(--color-bg);
+}
+
 /* ============================================================
    16. Section Cards
    ============================================================ */
@@ -1529,7 +1546,58 @@ table {
 }
 
 /* ============================================================
-   17. Section Divider
+   17. Section Heading (Generic centered heading)
+   ============================================================ */
+.section-heading {
+  text-align: center;
+  margin-bottom: var(--spacing-3xl);
+}
+
+.section-heading__title {
+  font-size: var(--font-size-4xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+  position: relative;
+  display: inline-block;
+}
+
+.section-heading__title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 3px;
+  background-color: var(--color-primary);
+  border-radius: 2px;
+}
+
+.section-heading__desc {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  margin: var(--spacing-lg) auto 0;
+}
+
+.section-heading__more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  margin-top: var(--spacing-sm);
+}
+
+.section-heading__more:hover {
+  color: var(--color-primary);
+  transform: translateX(3px);
+}
+
+/* ============================================================
+   18. Section Divider
    ============================================================ */
 .section-divider {
   max-width: var(--container-max-width);
@@ -2433,6 +2501,17 @@ table {
   gap: var(--spacing-base);
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+}
+
+.home-card-grid__item-summary {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-top: var(--spacing-sm);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* ============================================================

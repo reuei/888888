@@ -197,144 +197,139 @@ include TEMPLATES_PATH . 'header.php';
 </div>
 
 <!-- Section 2: Home Features -->
-<section class="home-features-section">
-    <div class="container">
-        <div class="section-heading">
-            <h2 class="section-heading__title">工作重点</h2>
-            <p class="section-heading__desc">全面从严治党 永远在路上</p>
+<section class="home-features">
+    <div class="home-features__header">
+        <h2 class="home-features__title">工作重点</h2>
+        <p class="home-features__subtitle">全面从严治党 永远在路上</p>
+    </div>
+    <div class="home-features__grid">
+        <div class="home-features__item animate-on-scroll">
+            <div class="home-features__icon"><i class="fas fa-gavel"></i></div>
+            <h3 class="home-features__item-title">纪律审查</h3>
+            <p class="home-features__item-desc">坚持无禁区、全覆盖、零容忍</p>
         </div>
-        <div class="home-features">
-            <div class="home-feature-card animate-on-scroll">
-                <div class="home-feature-card__icon"><i class="fas fa-gavel"></i></div>
-                <h3>纪律审查</h3>
-                <p>坚持无禁区、全覆盖、零容忍</p>
-            </div>
-            <div class="home-feature-card animate-on-scroll">
-                <div class="home-feature-card__icon"><i class="fas fa-shield-alt"></i></div>
-                <h3>监督执纪</h3>
-                <p>强化监督执纪问责</p>
-            </div>
-            <div class="home-feature-card animate-on-scroll">
-                <div class="home-feature-card__icon"><i class="fas fa-search"></i></div>
-                <h3>巡视巡察</h3>
-                <p>发现问题、形成震慑</p>
-            </div>
-            <div class="home-feature-card animate-on-scroll">
-                <div class="home-feature-card__icon"><i class="fas fa-bullhorn"></i></div>
-                <h3>警示曝光</h3>
-                <p>以案为鉴、以案促改</p>
-            </div>
+        <div class="home-features__item animate-on-scroll">
+            <div class="home-features__icon"><i class="fas fa-shield-alt"></i></div>
+            <h3 class="home-features__item-title">监督执纪</h3>
+            <p class="home-features__item-desc">强化监督执纪问责</p>
+        </div>
+        <div class="home-features__item animate-on-scroll">
+            <div class="home-features__icon"><i class="fas fa-search"></i></div>
+            <h3 class="home-features__item-title">巡视巡察</h3>
+            <p class="home-features__item-desc">发现问题、形成震慑</p>
+        </div>
+        <div class="home-features__item animate-on-scroll">
+            <div class="home-features__icon"><i class="fas fa-bullhorn"></i></div>
+            <h3 class="home-features__item-title">警示曝光</h3>
+            <p class="home-features__item-desc">以案为鉴、以案促改</p>
         </div>
     </div>
 </section>
 
 <!-- Section 3: Statistics -->
-<section class="home-stats-section">
-    <div class="container">
-        <div class="home-stats">
-            <div class="home-stat-item animate-on-scroll">
-                <span class="home-stat-item__number counter" data-count="<?php echo db_count('articles', 'status = ?', ['publish']); ?>">0</span>
-                <span class="home-stat-item__label">文章总数</span>
-            </div>
-            <div class="home-stat-item animate-on-scroll">
-                <span class="home-stat-item__number counter" data-count="<?php echo db_count('categories'); ?>">0</span>
-                <span class="home-stat-item__label">分类栏目</span>
-            </div>
-            <div class="home-stat-item animate-on-scroll">
-                <span class="home-stat-item__number counter" data-count="<?php echo db_count('users'); ?>">0</span>
-                <span class="home-stat-item__label">注册用户</span>
-            </div>
-            <div class="home-stat-item animate-on-scroll">
-                <span class="home-stat-item__number counter" data-count="<?php echo db_count('videos'); ?>">0</span>
-                <span class="home-stat-item__label">视频资源</span>
-            </div>
+<section class="home-stats">
+    <div class="home-stats__inner">
+        <div class="home-stats__item animate-on-scroll">
+            <div class="home-stats__number"><span class="counter" data-count="<?php echo db_count('articles', 'status = ?', ['publish']); ?>">0</span></div>
+            <div class="home-stats__label">文章总数</div>
+        </div>
+        <div class="home-stats__item animate-on-scroll">
+            <div class="home-stats__number"><span class="counter" data-count="<?php echo db_count('categories'); ?>">0</span></div>
+            <div class="home-stats__label">分类栏目</div>
+        </div>
+        <div class="home-stats__item animate-on-scroll">
+            <div class="home-stats__number"><span class="counter" data-count="<?php echo db_count('users'); ?>">0</span></div>
+            <div class="home-stats__label">注册用户</div>
+        </div>
+        <div class="home-stats__item animate-on-scroll">
+            <div class="home-stats__number"><span class="counter" data-count="<?php echo db_count('videos'); ?>">0</span></div>
+            <div class="home-stats__label">视频资源</div>
         </div>
     </div>
 </section>
 
 <!-- Section 4: Split Hero -->
-<section class="home-hero-split-section">
-    <div class="container">
-        <div class="home-hero-split animate-on-scroll">
-            <div class="home-hero-split__image">
-                <img src="<?php echo get_banner_image(); ?>" alt="中央纪委国家监委" onerror="this.style.display='none'">
-            </div>
-            <div class="home-hero-split__content">
-                <h2>忠诚 干净 担当</h2>
-                <p>中央纪委国家监委是党中央领导下管党治党的重要力量，忠实履行党章和宪法赋予的职责，紧紧围绕党和国家工作大局，持之以恒正风肃纪，坚定不移惩治腐败，推动全面从严治党向纵深发展。</p>
-                <a href="<?php echo site_url('category.php?slug=yaowen'); ?>" class="btn btn-primary">了解更多</a>
-            </div>
+<section class="home-hero-split animate-on-scroll">
+    <div class="home-hero-split__image">
+        <img src="<?php echo get_banner_image(); ?>" alt="中央纪委国家监委" onerror="this.style.display='none'">
+    </div>
+    <div class="home-hero-split__content">
+        <h2 class="home-hero-split__title"><span>忠诚</span> 干净 担当</h2>
+        <p class="home-hero-split__text">中央纪委国家监委是党中央领导下管党治党的重要力量，忠实履行党章和宪法赋予的职责，紧紧围绕党和国家工作大局，持之以恒正风肃纪，坚定不移惩治腐败，推动全面从严治党向纵深发展。</p>
+        <div class="home-hero-split__actions">
+            <a href="<?php echo site_url('category.php?slug=yaowen'); ?>" class="btn btn-primary">了解更多</a>
         </div>
     </div>
 </section>
 
 <!-- Section 5: Latest News Cards -->
-<section class="home-news-section">
-    <div class="container">
-        <div class="section-heading">
-            <h2 class="section-heading__title">最新资讯</h2>
-            <a href="<?php echo site_url('category.php?slug=yaowen'); ?>" class="section-heading__more">查看更多 <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="home-card-grid">
-            <?php 
-            $latest = db_fetch_all("SELECT * FROM articles WHERE status = 'publish' ORDER BY publish_time DESC LIMIT 6");
-            foreach ($latest as $a): ?>
-            <div class="home-card animate-on-scroll">
-                <?php if ($a['cover_image']): ?>
-                <div class="home-card__image">
-                    <img src="<?php echo site_url('uploads/' . $a['cover_image']); ?>" alt="<?php echo htmlspecialchars($a['title']); ?>">
+<section class="home-card-grid">
+    <div class="home-card-grid__header">
+        <h2 class="home-card-grid__title">最新资讯</h2>
+        <a href="<?php echo site_url('category.php?slug=yaowen'); ?>" class="home-card-grid__more">查看更多 <i class="fas fa-angle-right"></i></a>
+    </div>
+    <div class="home-card-grid__grid">
+        <?php 
+        $latest = db_fetch_all("SELECT * FROM articles WHERE status = 'publish' ORDER BY publish_time DESC LIMIT 6");
+        foreach ($latest as $a): ?>
+        <div class="home-card-grid__item animate-on-scroll">
+            <?php if ($a['cover_image']): ?>
+            <a href="<?php echo site_url('article.php?id=' . $a['id']); ?>">
+                <img class="home-card-grid__item-image" src="<?php echo site_url('uploads/' . $a['cover_image']); ?>" alt="<?php echo htmlspecialchars($a['title']); ?>">
+            </a>
+            <?php endif; ?>
+            <div class="home-card-grid__item-body">
+                <div class="home-card-grid__item-meta">
+                    <span><i class="far fa-clock"></i> <?php echo format_time($a['publish_time'], 'Y-m-d'); ?></span>
                 </div>
+                <h3 class="home-card-grid__item-title">
+                    <a href="<?php echo site_url('article.php?id=' . $a['id']); ?>"><?php echo htmlspecialchars($a['title']); ?></a>
+                </h3>
+                <?php $summary = $a['summary'] ?: strip_tags($a['content']); ?>
+                <?php if ($summary): ?>
+                <p class="home-card-grid__item-summary"><?php echo htmlspecialchars(str_cut($summary, 80)); ?></p>
                 <?php endif; ?>
-                <div class="home-card__body">
-                    <span class="home-card__date"><?php echo format_time($a['publish_time'], 'Y-m-d'); ?></span>
-                    <h3 class="home-card__title">
-                        <a href="<?php echo site_url('article.php?id=' . $a['id']); ?>"><?php echo htmlspecialchars($a['title']); ?></a>
-                    </h3>
-                    <p class="home-card__summary"><?php echo htmlspecialchars(str_cut($a['summary'] ?: strip_tags($a['content']), 80)); ?></p>
-                </div>
             </div>
-            <?php endforeach; ?>
         </div>
+        <?php endforeach; ?>
     </div>
 </section>
 
 <!-- Section 6: Staff Showcase -->
 <?php if (!empty($staff_members)): ?>
-<section class="home-staff-section">
-    <div class="container">
-        <div class="section-heading">
-            <h2 class="section-heading__title">工作人员</h2>
-            <a href="<?php echo site_url('staff.php'); ?>" class="section-heading__more">查看全部 <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="staff-grid">
-            <?php foreach ($staff_members as $s): ?>
-            <div class="staff-card animate-on-scroll">
-                <?php if ($s['avatar']): ?>
-                <img src="<?php echo site_url('uploads/' . $s['avatar']); ?>" alt="<?php echo htmlspecialchars($s['name']); ?>" class="staff-card__avatar">
-                <?php else: ?>
-                <div class="staff-card__avatar staff-card__avatar--placeholder">
-                    <span><?php echo mb_substr($s['name'], 0, 1); ?></span>
-                </div>
-                <?php endif; ?>
-                <h4 class="staff-card__name"><?php echo htmlspecialchars($s['name']); ?></h4>
-                <p class="staff-card__title"><?php echo htmlspecialchars($s['title']); ?></p>
-                <?php if ($s['department']): ?>
-                <p class="staff-card__dept"><?php echo htmlspecialchars($s['department']); ?></p>
-                <?php endif; ?>
+<section class="home-card-grid">
+    <div class="home-card-grid__header">
+        <h2 class="home-card-grid__title">工作人员</h2>
+        <a href="<?php echo site_url('staff.php'); ?>" class="home-card-grid__more">查看全部 <i class="fas fa-angle-right"></i></a>
+    </div>
+    <div class="staff-grid">
+        <?php foreach ($staff_members as $s): ?>
+        <div class="staff-card animate-on-scroll">
+            <?php if ($s['avatar']): ?>
+            <img src="<?php echo site_url('uploads/' . $s['avatar']); ?>" alt="<?php echo htmlspecialchars($s['name']); ?>" class="staff-card__avatar">
+            <?php else: ?>
+            <div class="staff-placeholder">
+                <?php echo mb_substr($s['name'], 0, 1); ?>
             </div>
-            <?php endforeach; ?>
+            <?php endif; ?>
+            <h4 class="staff-card__name"><?php echo htmlspecialchars($s['name']); ?></h4>
+            <p class="staff-card__title"><?php echo htmlspecialchars($s['title']); ?></p>
+            <?php if ($s['department']): ?>
+            <p class="staff-card__department"><?php echo htmlspecialchars($s['department']); ?></p>
+            <?php endif; ?>
         </div>
+        <?php endforeach; ?>
     </div>
 </section>
 <?php endif; ?>
 
 <!-- Section 7: CTA -->
-<section class="home-cta-section">
-    <div class="container">
-        <div class="home-cta animate-on-scroll">
-            <h2>监督举报</h2>
-            <p>欢迎广大人民群众对党员干部违纪违法行为进行监督举报</p>
-            <a href="<?php echo site_url('report.php'); ?>" class="btn btn-report">在线举报</a>
+<section class="home-cta">
+    <div class="home-cta__inner">
+        <h2 class="home-cta__title">监督<span>举报</span></h2>
+        <p class="home-cta__text">欢迎广大人民群众对党员干部违纪违法行为进行监督举报</p>
+        <div class="home-cta__actions">
+            <a href="<?php echo site_url('report.php'); ?>" class="btn btn-primary btn-lg">在线举报</a>
         </div>
     </div>
 </section>

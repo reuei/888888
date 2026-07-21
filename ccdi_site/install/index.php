@@ -1,6 +1,6 @@
 <?php
 /**
- * CCDI CMS v5.0.0 安装向导
+ * CCDI CMS v8.0.0 安装向导
  * 中央纪委国家监委网站风格 CMS 安装程序
  */
 
@@ -118,9 +118,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 CREATE TABLE IF NOT EXISTS carousel (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT DEFAULT '',
-                    image TEXT NOT NULL,
+                    type TEXT DEFAULT 'image',
+                    image TEXT DEFAULT '',
+                    video_url TEXT DEFAULT '',
                     link TEXT DEFAULT '',
                     description TEXT DEFAULT '',
+                    sort_order INTEGER DEFAULT 0,
+                    status INTEGER DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TABLE IF NOT EXISTS videos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL,
+                    cover TEXT DEFAULT '',
+                    video_url TEXT DEFAULT '',
+                    video_file TEXT DEFAULT '',
+                    description TEXT DEFAULT '',
+                    category_id INTEGER DEFAULT 0,
+                    view_count INTEGER DEFAULT 0,
+                    sort_order INTEGER DEFAULT 0,
+                    status INTEGER DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TABLE IF NOT EXISTS staff (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    title TEXT DEFAULT '',
+                    avatar TEXT DEFAULT '',
+                    department TEXT DEFAULT '',
+                    bio TEXT DEFAULT '',
+                    sort_order INTEGER DEFAULT 0,
+                    status INTEGER DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TABLE IF NOT EXISTS footer_carousel (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT DEFAULT '',
+                    type TEXT DEFAULT 'image',
+                    image TEXT DEFAULT '',
+                    link TEXT DEFAULT '',
                     sort_order INTEGER DEFAULT 0,
                     status INTEGER DEFAULT 1,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -308,7 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>系统安装 - CCDI CMS v4.0.0</title>
+    <title>系统安装 - CCDI CMS v8.0.0</title>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -622,7 +661,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="install-card">
         <div class="install-header">
             <h1>CCDI CMS 安装向导</h1>
-            <div class="version">v4.0.0 · 中央纪委国家监委网站内容管理系统</div>
+            <div class="version">v8.0.0 · 中央纪委国家监委网站内容管理系统</div>
         </div>
 
         <div class="steps-bar">
@@ -704,7 +743,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php elseif ($step === 2): ?>
                 <h3>许可协议</h3>
                 <div class="license-box">
-                    <p><strong>CCDI CMS v4.0.0 —— 中央纪委国家监委网站内容管理系统</strong></p>
+                    <p><strong>CCDI CMS v8.0.0 —— 中央纪委国家监委网站内容管理系统</strong></p>
                     <p>本系统仅供学习研究使用，不得用于任何违法活动。</p>
                     <p>1. 您可以在遵守法律法规的前提下自由使用、修改本系统。</p>
                     <p>2. 本系统采用 PHP + SQLite 架构，无需 MySQL 数据库，开箱即用。</p>
@@ -765,7 +804,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h3>安装完成</h3>
                 <div class="complete-icon">✅</div>
                 <div class="alert alert-success">
-                    <strong>CCDI CMS v4.0.0 安装成功！</strong><br>
+                    <strong>CCDI CMS v8.0.0 安装成功！</strong><br>
                     系统已准备就绪，请妥善保管您的管理员账户信息。
                 </div>
                 <div class="alert alert-info">
@@ -783,7 +822,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div class="install-footer">
-        CCDI CMS v4.0.0 &copy; <?php echo date('Y'); ?> 中央纪委国家监委网站
+        CCDI CMS v8.0.0 &copy; <?php echo date('Y'); ?> 中央纪委国家监委网站
     </div>
 </div>
 </body>

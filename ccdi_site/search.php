@@ -1,6 +1,6 @@
 <?php
 /**
- * 搜索页面 v6.0.0
+ * 搜索页面 v8.0.0
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';

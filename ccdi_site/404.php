@@ -1,6 +1,6 @@
 <?php
 /**
- * 404 页面未找到 v6.0.0
+ * 404 页面未找到 v8.0.0
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';

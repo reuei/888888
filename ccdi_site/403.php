@@ -1,6 +1,6 @@
 <?php
 /**
- * 403 禁止访问 v6.0.0
+ * 403 禁止访问 v8.0.0
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';

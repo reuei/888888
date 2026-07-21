@@ -1,6 +1,6 @@
 <?php
 /**
- * 网站首页 v7.0.0
+ * 网站首页 v8.0.0
  * 中央纪委国家监委网站 CMS 系统
  */
 define('SYSTEM_INIT', true);
@@ -32,9 +32,25 @@ include TEMPLATES_PATH . 'header.php';
                 <div class="carousel-track">
                     <?php foreach ($carousel_items as $index => $item): ?>
                     <div class="carousel-slide<?php echo $index === 0 ? ' active' : ''; ?>">
-                        <?php if ($item['link']): ?><a href="<?php echo htmlspecialchars($item['link']); ?>"><?php endif; ?>
-                        <img src="<?php echo site_url('uploads/' . $item['image']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>">
-                        <?php if ($item['link']): ?></a><?php endif; ?>
+                        <?php if ($item['type'] === 'video' && !empty($item['video_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($item['video_url']); ?>" target="_blank" class="carousel-video-link">
+                                <?php if (!empty($item['image'])): ?>
+                                    <img src="<?php echo site_url('uploads/' . $item['image']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>">
+                                    <div class="carousel-video-overlay"><i class="fas fa-play-circle"></i></div>
+                                <?php else: ?>
+                                    <div class="carousel-video-placeholder">
+                                        <i class="fas fa-video"></i>
+                                        <span>点击播放视频</span>
+                                    </div>
+                                <?php endif; ?>
+                            </a>
+                        <?php else: ?>
+                            <?php if ($item['link']): ?><a href="<?php echo htmlspecialchars($item['link']); ?>"><?php endif; ?>
+                            <?php if (!empty($item['image'])): ?>
+                                <img src="<?php echo site_url('uploads/' . $item['image']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>">
+                            <?php endif; ?>
+                            <?php if ($item['link']): ?></a><?php endif; ?>
+                        <?php endif; ?>
                         <?php if ($item['title']): ?>
                         <div class="carousel-caption">
                             <h3 class="carousel-caption__title"><?php echo htmlspecialchars($item['title']); ?></h3>

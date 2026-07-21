@@ -1,6 +1,6 @@
 <?php
 /**
- * 500 服务器错误 v6.0.0
+ * 500 服务器错误 v8.0.0
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';

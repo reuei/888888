@@ -1,4 +1,4 @@
-# 中央纪委国家监委网站风格 CMS - Apache 伪静态规则 v7.0.0
+# 中央纪委国家监委网站风格 CMS - Apache 伪静态规则 v8.0.0
 # 适用于虚拟主机环境
 
 <IfModule mod_rewrite.c>

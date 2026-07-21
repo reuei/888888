@@ -1,6 +1,6 @@
 <?php
 /**
- * 用户注册 v6.0.0
+ * 用户注册 v8.0.0
  * 中央纪委国家监委网站 CMS 系统
  */
 define('SYSTEM_INIT', true);

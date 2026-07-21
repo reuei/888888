@@ -7,6 +7,6 @@
     </div><!-- .admin-main -->
 </div><!-- .admin-wrapper -->
 
-<script src="<?php echo site_url('assets/js/admin.js?v=' . CMS_BUILD); ?>"></script>
+<script src="<?php echo site_url('assets/js/admin.js?v=' . CMS_VERSION); ?>"></script>
 </body>
 </html>

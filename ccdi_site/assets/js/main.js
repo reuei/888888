@@ -1,5 +1,5 @@
 /**
- * CCDI Site - Government Discipline Inspection Website CMS v7.0.0
+ * CCDI Site - Government Discipline Inspection Website CMS v8.0.0
  * Main JavaScript
  */
 (function () {

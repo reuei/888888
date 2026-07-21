@@ -1,6 +1,6 @@
 <?php
 /**
- * 网站头部模板 v7.0.0
+ * 网站头部模板 v8.0.0
  * 中央纪委国家监委网站 CMS 系统 - 极简政府风格
  */
 if (!defined('SYSTEM_INIT')) { require_once __DIR__ . '/../includes/init.php'; }
@@ -17,7 +17,7 @@ $popup = $show_popup ? get_popup() : null;
     <meta name="description" content="<?php echo $site_description; ?>">
     <meta name="keywords" content="<?php echo $site_keywords; ?>">
     <title><?php echo isset($page_title) ? $page_title . ' - ' . SITE_NAME : SITE_NAME; ?></title>
-    <link rel="stylesheet" href="<?php echo site_url('assets/css/style.css?v=7.0.0'); ?>">
+    <link rel="stylesheet" href="<?php echo site_url('assets/css/style.css?v=8.0.0'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>

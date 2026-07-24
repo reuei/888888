@@ -1,6 +1,6 @@
 <?php
 /**
- * 用户注册 v8.0.0
+ * 用户注册 v9.0.0
  * 中央纪委国家监委网站 CMS 系统
  */
 define('SYSTEM_INIT', true);
@@ -88,6 +88,7 @@ include TEMPLATES_PATH . 'header.php';
 
         <div class="auth-card__footer">
             已有账号？<a href="<?php echo site_url('login.php'); ?>">立即登录</a>
+            <p class="auth-card__build">重构于2026072405</p>
         </div>
     </div>
 </div>

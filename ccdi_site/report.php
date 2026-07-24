@@ -1,6 +1,6 @@
 <?php
 /**
- * 监督举报 / 在线留言页面 v8.0.0
+ * 监督举报 / 在线留言页面 v9.0.0
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';

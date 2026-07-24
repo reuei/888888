@@ -1,6 +1,6 @@
 <?php
 /**
- * 网站首页 v8.0.0
+ * 网站首页 v9.0.0
  * 中央纪委国家监委网站 CMS 系统
  */
 define('SYSTEM_INIT', true);
@@ -63,13 +63,19 @@ include TEMPLATES_PATH . 'header.php';
                     <?php endforeach; ?>
                 </div>
                 <div class="carousel-controls">
-                    <span class="carousel-counter"><span class="current">1</span> / <?php echo count($carousel_items); ?></span>
-                    <div class="carousel-progress-track">
-                        <div class="carousel-progress-fill" id="carouselProgressFill"></div>
+                    <div class="carousel-progress-track" id="carouselProgressTrack">
+                        <?php foreach ($carousel_items as $i => $item): ?>
+                        <span class="carousel-progress-dot<?php echo $i === 0 ? ' carousel-progress-dot--active' : ''; ?>" data-index="<?php echo $i; ?>"></span>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <button class="carousel-prev" id="carouselPrev"><i class="fas fa-chevron-left"></i></button>
                 <button class="carousel-next" id="carouselNext"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="carousel-page-indicator">
+                <span class="carousel-page-indicator__current" id="carouselPageCurrent">1</span>
+                <span class="carousel-page-indicator__sep">/</span>
+                <span class="carousel-page-indicator__total"><?php echo count($carousel_items); ?></span>
             </div>
             <?php endif; ?>
 
@@ -212,7 +218,41 @@ include TEMPLATES_PATH . 'header.php';
     </div>
 </div>
 
-<!-- Section 2: Home Features -->
+<!-- Section 2: Illustration Showcase -->
+<section class="home-illustration">
+    <div class="home-illustration__inner">
+        <div class="home-illustration__item animate-on-scroll">
+            <div class="home-illustration__icon">
+                <i class="fas fa-balance-scale"></i>
+            </div>
+            <h3 class="home-illustration__title">公正廉洁</h3>
+            <p class="home-illustration__desc">秉公执法、廉洁自律</p>
+        </div>
+        <div class="home-illustration__item animate-on-scroll">
+            <div class="home-illustration__icon">
+                <i class="fas fa-handcuffs"></i>
+            </div>
+            <h3 class="home-illustration__title">反腐倡廉</h3>
+            <p class="home-illustration__desc">严厉打击腐败行为</p>
+        </div>
+        <div class="home-illustration__item animate-on-scroll">
+            <div class="home-illustration__icon">
+                <i class="fas fa-landmark"></i>
+            </div>
+            <h3 class="home-illustration__title">法治建设</h3>
+            <p class="home-illustration__desc">推进全面依法治国</p>
+        </div>
+        <div class="home-illustration__item animate-on-scroll">
+            <div class="home-illustration__icon">
+                <i class="fas fa-dove"></i>
+            </div>
+            <h3 class="home-illustration__title">清风正气</h3>
+            <p class="home-illustration__desc">营造风清气正政治生态</p>
+        </div>
+    </div>
+</section>
+
+<!-- Section 3: Home Features -->
 <section class="home-features">
     <div class="home-features__header">
         <h2 class="home-features__title">工作重点</h2>

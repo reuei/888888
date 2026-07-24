@@ -1,6 +1,6 @@
 <?php
 /**
- * 网站底部模板 v8.0.0
+ * 网站底部模板 v9.0.0
  * 中央纪委国家监委网站 CMS 系统
  */
 ?>
@@ -92,6 +92,9 @@
                 <a href="#">联系我们</a> |
                 <a href="#">站点地图</a>
             </p>
+            <p class="footer-tech-support">
+                <a href="https://yuyunjz.jo3.org" target="_blank" rel="noopener">本站由语云建站提供技术支持与维护</a>
+            </p>
         </div>
     </div>
 </footer>
@@ -101,6 +104,6 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
-<script src="<?php echo site_url('assets/js/main.js?v=8.0.0'); ?>"></script>
+<script src="<?php echo site_url('assets/js/main.js?v=9.0.0'); ?>"></script>
 </body>
 </html>

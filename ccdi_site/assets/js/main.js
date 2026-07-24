@@ -1,5 +1,5 @@
 /**
- * CCDI Site - Government Discipline Inspection Website CMS v8.0.0
+ * CCDI Site - Government Discipline Inspection Website CMS v9.0.0
  * Main JavaScript
  */
 (function () {
@@ -143,6 +143,26 @@
                 closeMenu();
             }
         });
+
+        // Submenu toggle for 2-3 level menus
+        var parentLinks = mobileSidebar.querySelectorAll('.mobile-nav-list__link--parent');
+        parentLinks.forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                var parentItem = this.parentNode;
+                var isOpen = parentItem.classList.contains('mobile-nav-list__item--sub-open');
+                // Close all other submenus at same level
+                var siblings = parentItem.parentNode.querySelectorAll('.mobile-nav-list__item--sub-open');
+                siblings.forEach(function (s) {
+                    if (s !== parentItem) s.classList.remove('mobile-nav-list__item--sub-open');
+                });
+                if (isOpen) {
+                    parentItem.classList.remove('mobile-nav-list__item--sub-open');
+                } else {
+                    parentItem.classList.add('mobile-nav-list__item--sub-open');
+                }
+            });
+        });
     }
 
     /* ============================================================
@@ -157,19 +177,17 @@
         var slides = carousel.querySelectorAll('.carousel-slide');
         var prevBtn = document.getElementById('carouselPrev');
         var nextBtn = document.getElementById('carouselNext');
-        var progressFill = document.getElementById('carouselProgressFill');
-        var counterCurrent = carousel.querySelector('.carousel-counter .current');
+        var progressTrack = document.getElementById('carouselProgressTrack');
+        var progressDots = progressTrack ? progressTrack.querySelectorAll('.carousel-progress-dot') : [];
+        var pageCurrent = document.getElementById('carouselPageCurrent');
 
         if (!slides.length) return;
 
         var totalSlides = slides.length;
         var currentIndex = 0;
         var autoTimer = null;
-        var progressTimer = null;
-        var progressStart = null;
-        var autoDuration = 3200;
-        var progressDuration = 3000;
         var isTransitioning = false;
+        var autoDuration = 4000;
 
         /**
          * Handle video playback when a slide becomes active/inactive
@@ -178,7 +196,6 @@
             var video = slide.querySelector('video');
             if (!video) return;
             if (isActive) {
-                // Reset and play
                 video.currentTime = 0;
                 var playPromise = video.play();
                 if (playPromise !== undefined) {
@@ -189,6 +206,16 @@
             } else {
                 video.pause();
             }
+        }
+
+        function updateDots() {
+            progressDots.forEach(function (dot, i) {
+                if (i === currentIndex) {
+                    dot.classList.add('carousel-progress-dot--active');
+                } else {
+                    dot.classList.remove('carousel-progress-dot--active');
+                }
+            });
         }
 
         function goToSlide(index) {
@@ -206,11 +233,11 @@
             nextSlide.classList.add('active');
             handleVideoForSlide(nextSlide, true);
 
-            if (counterCurrent) {
-                counterCurrent.textContent = currentIndex + 1;
-            }
+            updateDots();
 
-            resetProgress();
+            if (pageCurrent) {
+                pageCurrent.textContent = currentIndex + 1;
+            }
 
             setTimeout(function () {
                 isTransitioning = false;
@@ -223,37 +250,6 @@
 
         function prevSlide() {
             goToSlide(currentIndex - 1);
-        }
-
-        function resetProgress() {
-            if (progressTimer) {
-                cancelAnimationFrame(progressTimer);
-                progressTimer = null;
-            }
-            progressStart = null;
-            if (progressFill) {
-                progressFill.style.transition = 'none';
-                progressFill.style.width = '0%';
-                // Force reflow
-                progressFill.offsetHeight;
-                progressFill.style.transition = 'width 0.1s linear';
-            }
-            startProgress();
-        }
-
-        function startProgress() {
-            if (!progressFill) return;
-            progressStart = performance.now();
-            function step(timestamp) {
-                if (!progressStart) return;
-                var elapsed = timestamp - progressStart;
-                var pct = Math.min((elapsed / progressDuration) * 100, 100);
-                progressFill.style.width = pct + '%';
-                if (pct < 100) {
-                    progressTimer = requestAnimationFrame(step);
-                }
-            }
-            progressTimer = requestAnimationFrame(step);
         }
 
         function startAuto() {
@@ -288,6 +284,17 @@
             });
         }
 
+        // Dot click navigation
+        progressDots.forEach(function (dot) {
+            dot.addEventListener('click', function () {
+                var idx = parseInt(this.getAttribute('data-index'), 10);
+                if (!isNaN(idx)) {
+                    goToSlide(idx);
+                    resetAuto();
+                }
+            });
+        });
+
         // Touch swipe support
         var touchStartX = 0;
         var touchStartY = 0;
@@ -306,7 +313,6 @@
             touchEndY = e.changedTouches[0].screenY;
             var diffX = touchStartX - touchEndX;
             var diffY = touchStartY - touchEndY;
-            // Only handle horizontal swipes
             if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
                 if (diffX > 0) {
                     nextSlide();
@@ -318,7 +324,6 @@
         }, { passive: true });
 
         // Initialize
-        startProgress();
         startAuto();
     }
 

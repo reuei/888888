@@ -1,6 +1,6 @@
 <?php
 /**
- * 网站头部模板 v8.0.0
+ * 网站头部模板 v9.0.0
  * 中央纪委国家监委网站 CMS 系统 - 极简政府风格
  */
 if (!defined('SYSTEM_INIT')) { require_once __DIR__ . '/../includes/init.php'; }
@@ -8,6 +8,11 @@ if (!defined('SYSTEM_INIT')) { require_once __DIR__ . '/../includes/init.php'; }
 $nav_menu = db_fetch_all("SELECT * FROM nav_menu WHERE parent_id = 0 AND status = 1 ORDER BY sort_order ASC");
 $show_popup = site_config('popup_enabled', '0') === '1';
 $popup = $show_popup ? get_popup() : null;
+
+// 获取子菜单
+function get_submenus($parent_id) {
+    return db_fetch_all("SELECT * FROM nav_menu WHERE parent_id = ? AND status = 1 ORDER BY sort_order ASC", [$parent_id]);
+}
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -17,7 +22,7 @@ $popup = $show_popup ? get_popup() : null;
     <meta name="description" content="<?php echo $site_description; ?>">
     <meta name="keywords" content="<?php echo $site_keywords; ?>">
     <title><?php echo isset($page_title) ? $page_title . ' - ' . SITE_NAME : SITE_NAME; ?></title>
-    <link rel="stylesheet" href="<?php echo site_url('assets/css/style.css?v=8.0.0'); ?>">
+    <link rel="stylesheet" href="<?php echo site_url('assets/css/style.css?v=9.0.0'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -32,6 +37,9 @@ $popup = $show_popup ? get_popup() : null;
         <div class="cyl"></div>
     </div>
     <p class="loader-text">加载中</p>
+    <div class="loader-progress">
+        <div class="loader-progress__bar"></div>
+    </div>
 </div>
 
 <!-- Toast 全局提示容器 -->
@@ -110,7 +118,38 @@ $popup = $show_popup ? get_popup() : null;
     <ul class="mobile-nav-list">
         <li class="mobile-nav-list__item"><a href="<?php echo site_url(); ?>" class="mobile-nav-list__link<?php echo $current_page == 'index' ? ' mobile-nav-list__link--active' : ''; ?>">首页</a></li>
         <?php foreach ($nav_menu as $item): ?>
+        <?php $subs = get_submenus($item['id']); ?>
+        <?php if (!empty($subs)): ?>
+        <li class="mobile-nav-list__item mobile-nav-list__item--has-sub">
+            <a href="<?php echo !empty($item['url']) ? (strpos($item['url'], 'http') === 0 ? $item['url'] : site_url($item['url'])) : site_url('category.php?slug=' . $item['name']); ?>" class="mobile-nav-list__link mobile-nav-list__link--parent">
+                <?php echo htmlspecialchars($item['name']); ?>
+                <span class="mobile-nav-list__arrow"><i class="fas fa-chevron-down"></i></span>
+            </a>
+            <ul class="mobile-sub-nav">
+                <?php foreach ($subs as $sub): ?>
+                <li class="mobile-sub-nav__item">
+                    <a href="<?php echo !empty($sub['url']) ? (strpos($sub['url'], 'http') === 0 ? $sub['url'] : site_url($sub['url'])) : site_url('category.php?slug=' . $sub['name']); ?>" class="mobile-sub-nav__link">
+                        <?php echo htmlspecialchars($sub['name']); ?>
+                    </a>
+                    <?php $subs2 = get_submenus($sub['id']); ?>
+                    <?php if (!empty($subs2)): ?>
+                    <ul class="mobile-sub-nav mobile-sub-nav--level3">
+                        <?php foreach ($subs2 as $sub2): ?>
+                        <li class="mobile-sub-nav__item">
+                            <a href="<?php echo !empty($sub2['url']) ? (strpos($sub2['url'], 'http') === 0 ? $sub2['url'] : site_url($sub2['url'])) : site_url('category.php?slug=' . $sub2['name']); ?>" class="mobile-sub-nav__link">
+                                - <?php echo htmlspecialchars($sub2['name']); ?>
+                            </a>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <?php endif; ?>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+        <?php else: ?>
         <li class="mobile-nav-list__item"><a href="<?php echo !empty($item['url']) ? (strpos($item['url'], 'http') === 0 ? $item['url'] : site_url($item['url'])) : site_url('category.php?slug=' . $item['name']); ?>" class="mobile-nav-list__link"><?php echo htmlspecialchars($item['name']); ?></a></li>
+        <?php endif; ?>
         <?php endforeach; ?>
         <li class="mobile-nav-list__item"><a href="<?php echo site_url('staff.php'); ?>" class="mobile-nav-list__link<?php echo $current_page == 'staff' ? ' mobile-nav-list__link--active' : ''; ?>">工作人员</a></li>
         <li class="mobile-nav-list__item mobile-nav-list__item--divider"></li>
@@ -153,3 +192,34 @@ $popup = $show_popup ? get_popup() : null;
 
 <main class="site-main">
     <div class="container">
+
+<?php if (site_config('anti_theft_enabled', '0') === '1'): ?>
+<script>
+(function(){
+    'use strict';
+    // 禁止右键菜单
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+    // 禁止拖拽
+    document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
+    // 禁止选择文本
+    document.addEventListener('selectstart', function(e) { e.preventDefault(); return false; });
+    // 禁止复制
+    document.addEventListener('copy', function(e) { e.preventDefault(); return false; });
+    document.addEventListener('cut', function(e) { e.preventDefault(); return false; });
+    // 禁止快捷键
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+S, Ctrl+U, Ctrl+Shift+I, Ctrl+Shift+J, F12
+        if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.key === 'u' || e.key === 'U')) {
+            e.preventDefault(); return false;
+        }
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j'))) {
+            e.preventDefault(); return false;
+        }
+    });
+    // CSS 禁止选择
+    var style = document.createElement('style');
+    style.textContent = '* { -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; } img, video { -webkit-user-drag: none !important; pointer-events: none; }';
+    document.head.appendChild(style);
+})();
+</script>
+<?php endif; ?>

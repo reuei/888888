@@ -59,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'footer_text'      => trim(post('footer_text', '')),
             'preloader_enabled' => post('preloader_enabled', '0'),
             'popup_enabled'    => post('popup_enabled', '0'),
+            'anti_theft_enabled' => post('anti_theft_enabled', '0'),
             'icp_number'       => trim(post('icp_number', '')),
             'contact_email'    => trim(post('contact_email', '')),
             'report_email'     => trim(post('report_email', '')),
@@ -282,6 +283,36 @@ include __DIR__ . '/header.php';
         </div>
     </div>
 
+    <!-- ==================== 防盗设置 ==================== -->
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-shield-halting"></i> 防盗保护设置</h3>
+        <div class="form-section-body">
+            <div class="form-group">
+                <label>启用防盗保护</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="anti_theft_enabled" value="1" <?php echo config_val_raw('anti_theft_enabled', '0') === '1' ? 'checked' : ''; ?>>
+                        <span class="radio-mark"></span> 启用
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="anti_theft_enabled" value="0" <?php echo config_val_raw('anti_theft_enabled', '0') !== '1' ? 'checked' : ''; ?>>
+                        <span class="radio-mark"></span> 禁用
+                    </label>
+                </div>
+                <span class="form-hint">开启后，将禁止用户在网站上右键复制、保存图片、下载视频等操作，保护网站内容安全</span>
+            </div>
+            <div class="anti-theft-desc">
+                <p><i class="fas fa-check-circle" style="color:#52c41a;"></i> 启用后将自动生效以下保护：</p>
+                <ul>
+                    <li><i class="fas fa-ban"></i> 禁止右键菜单</li>
+                    <li><i class="fas fa-ban"></i> 禁止文本选择与复制</li>
+                    <li><i class="fas fa-ban"></i> 禁止图片/视频拖拽保存</li>
+                    <li><i class="fas fa-ban"></i> 禁止 Ctrl+S / Ctrl+U / F12 等快捷键</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== 联系与备案信息 ==================== -->
     <div class="form-section">
         <h3 class="form-section-title"><i class="fas fa-address-card"></i> 联系与备案信息</h3>
@@ -421,6 +452,13 @@ include __DIR__ . '/header.php';
     .db-backup-row { flex-direction: column; align-items: stretch; }
     .db-backup-row .btn { text-align: center; }
 }
+
+/* ========== 防盗设置描述 ========== */
+.anti-theft-desc { background: #fafafa; border: 1px solid #e8e8e8; border-radius: 6px; padding: 16px 20px; margin-top: 12px; }
+.anti-theft-desc p { font-size: 13px; color: #333; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.anti-theft-desc ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.anti-theft-desc li { font-size: 12px; color: #666; display: flex; align-items: center; gap: 4px; }
+.anti-theft-desc li i { color: #c41230; font-size: 11px; }
 </style>
 
 <?php

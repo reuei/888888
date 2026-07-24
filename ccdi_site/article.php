@@ -1,6 +1,6 @@
 <?php
 /**
- * 文章详情页 v8.0.0
+ * 文章详情页 v9.0.0
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';

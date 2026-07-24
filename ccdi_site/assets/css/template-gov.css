@@ -1,0 +1,11 @@
+/* CCDI Site - Template: 政府红 v10.0.0 */
+:root {
+  --color-primary: #c41230;
+  --color-primary-dark: #9b0e24;
+  --color-primary-light: rgba(196, 18, 48, 0.06);
+  --color-primary-bg: #fef2f2;
+  --color-bg-dark: #1f1f1f;
+  --color-accent: #c41230;
+  --color-accent-light: #fef2f2;
+  --color-nav-hover: rgba(196, 18, 48, 0.06);
+}

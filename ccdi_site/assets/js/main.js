@@ -1,5 +1,5 @@
 /**
- * CCDI Site - Government Discipline Inspection Website CMS v9.0.0
+ * CCDI Site - Government Discipline Inspection Website CMS v10.0.0
  * Main JavaScript
  */
 (function () {
@@ -97,6 +97,7 @@
         var mobileOverlay = document.getElementById('mobileOverlay');
         var closeBtn = document.getElementById('mobileSidebarClose');
         var body = document.body;
+        var mainContent = document.querySelector('.main-nav__inner') || document.querySelector('.main-nav');
 
         if (!hamburgerBtn || !mobileSidebar || !mobileOverlay) return;
 
@@ -110,6 +111,10 @@
                 mobileOverlay.classList.add('mobile-overlay--active');
                 hamburgerBtn.classList.add('hamburger--active');
                 body.style.overflow = 'hidden';
+                if (mainContent) {
+                    mainContent.style.transform = 'translateX(-20px)';
+                    mainContent.style.transition = 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)';
+                }
             });
         }
 
@@ -121,6 +126,9 @@
                 mobileOverlay.classList.remove('mobile-overlay--active');
                 hamburgerBtn.classList.remove('hamburger--active');
                 body.style.overflow = '';
+                if (mainContent) {
+                    mainContent.style.transform = '';
+                }
             });
         }
 
@@ -140,9 +148,31 @@
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && isOpen) {
-                closeMenu();
+                // Close open submenus first, then the sidebar
+                var openSubmenus = mobileSidebar.querySelectorAll('.mobile-nav-list__item--sub-open');
+                if (openSubmenus.length > 0) {
+                    openSubmenus.forEach(function (item) {
+                        item.classList.remove('mobile-nav-list__item--sub-open');
+                    });
+                } else {
+                    closeMenu();
+                }
             }
         });
+
+        // Swipe-to-close on mobile sidebar (swipe right to close)
+        var touchStartX = 0;
+        mobileSidebar.addEventListener('touchstart', function (e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        mobileSidebar.addEventListener('touchend', function (e) {
+            var touchEndX = e.changedTouches[0].screenX;
+            var diffX = touchEndX - touchStartX;
+            if (diffX > 60) {
+                closeMenu();
+            }
+        }, { passive: true });
 
         // Submenu toggle for 2-3 level menus
         var parentLinks = mobileSidebar.querySelectorAll('.mobile-nav-list__link--parent');
@@ -188,6 +218,7 @@
         var autoTimer = null;
         var isTransitioning = false;
         var autoDuration = 4000;
+        var direction = 1; // 1 = forward, -1 = backward
 
         /**
          * Handle video playback when a slide becomes active/inactive
@@ -226,6 +257,28 @@
             var currentSlide = slides[currentIndex];
             var nextSlide = slides[normIndex];
 
+            if (!currentSlide || !nextSlide) {
+                isTransitioning = false;
+                return;
+            }
+
+            // Direction detection
+            var goingForward = normIndex > currentIndex || (currentIndex === totalSlides - 1 && normIndex === 0);
+            if (currentIndex === totalSlides - 1 && normIndex === 0) goingForward = true;
+            if (currentIndex === 0 && normIndex === totalSlides - 1) goingForward = false;
+            direction = goingForward ? 1 : -1;
+
+            // Remove old direction classes
+            currentSlide.classList.remove('carousel-slide--from-left', 'carousel-slide--from-right');
+            nextSlide.classList.remove('carousel-slide--from-left', 'carousel-slide--from-right');
+
+            // Add direction class to next slide
+            if (goingForward) {
+                nextSlide.classList.add('carousel-slide--from-right');
+            } else {
+                nextSlide.classList.add('carousel-slide--from-left');
+            }
+
             currentSlide.classList.remove('active');
             handleVideoForSlide(currentSlide, false);
 
@@ -239,7 +292,9 @@
                 pageCurrent.textContent = currentIndex + 1;
             }
 
+            // Remove direction classes after transition
             setTimeout(function () {
+                nextSlide.classList.remove('carousel-slide--from-left', 'carousel-slide--from-right');
                 isTransitioning = false;
             }, 600);
         }
@@ -295,6 +350,27 @@
             });
         });
 
+        // Pause on hover
+        carousel.addEventListener('mouseenter', function () {
+            stopAuto();
+        });
+
+        carousel.addEventListener('mouseleave', function () {
+            startAuto();
+        });
+
+        // Video ended event handler - auto-advance when video ends
+        slides.forEach(function (slide) {
+            var video = slide.querySelector('video');
+            if (video) {
+                video.addEventListener('ended', function () {
+                    if (slides[currentIndex] === slide) {
+                        nextSlide();
+                    }
+                });
+            }
+        });
+
         // Touch swipe support
         var touchStartX = 0;
         var touchStartY = 0;
@@ -325,6 +401,10 @@
 
         // Initialize
         startAuto();
+
+        // Store reference for cleanup
+        carousel._autoTimer = autoTimer;
+        carousel._stopAuto = stopAuto;
     }
 
     /* ============================================================
@@ -605,9 +685,13 @@
 
             var normIndex = ((index % totalSlides) + totalSlides) % totalSlides;
 
-            slides[currentIndex].classList.remove('footer-carousel__slide--active');
+            if (slides[currentIndex]) {
+                slides[currentIndex].classList.remove('footer-carousel__slide--active');
+            }
             currentIndex = normIndex;
-            slides[currentIndex].classList.add('footer-carousel__slide--active');
+            if (slides[currentIndex]) {
+                slides[currentIndex].classList.add('footer-carousel__slide--active');
+            }
 
             setTimeout(function () {
                 isTransitioning = false;
@@ -660,26 +744,41 @@
         var touchEndY = 0;
         var swipeThreshold = 40;
 
-        wrapper.addEventListener('touchstart', function (e) {
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-            stopAuto();
-        }, { passive: true });
+        if (wrapper) {
+            wrapper.addEventListener('touchstart', function (e) {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+                stopAuto();
+            }, { passive: true });
 
-        wrapper.addEventListener('touchend', function (e) {
-            touchEndX = e.changedTouches[0].screenX;
-            touchEndY = e.changedTouches[0].screenY;
-            var diffX = touchStartX - touchEndX;
-            var diffY = touchStartY - touchEndY;
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
-                if (diffX > 0) {
-                    nextSlide();
-                } else {
-                    prevSlide();
+            wrapper.addEventListener('touchend', function (e) {
+                touchEndX = e.changedTouches[0].screenX;
+                touchEndY = e.changedTouches[0].screenY;
+                var diffX = touchStartX - touchEndX;
+                var diffY = touchStartY - touchEndY;
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
+                    if (diffX > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
                 }
-            }
-            resetAuto();
-        }, { passive: true });
+                resetAuto();
+            }, { passive: true });
+        }
+
+        // Pause on hover
+        footerCarousel.addEventListener('mouseenter', function () {
+            stopAuto();
+        });
+
+        footerCarousel.addEventListener('mouseleave', function () {
+            startAuto();
+        });
+
+        // Store reference for cleanup
+        footerCarousel._autoTimer = autoTimer;
+        footerCarousel._stopAuto = stopAuto;
 
         // Initialize autoplay
         startAuto();
@@ -823,6 +922,18 @@
         initSmoothScroll();
         initLazyLoad();
         initResizeHandler();
+    });
+
+    // Cleanup intervals on page unload to prevent memory leaks
+    window.addEventListener('beforeunload', function () {
+        var carousel = document.getElementById('carousel');
+        if (carousel && carousel._autoTimer) {
+            clearInterval(carousel._autoTimer);
+        }
+        var footerCarousel = document.querySelector('.footer-carousel');
+        if (footerCarousel && footerCarousel._autoTimer) {
+            clearInterval(footerCarousel._autoTimer);
+        }
     });
 
 })();

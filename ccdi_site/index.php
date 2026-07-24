@@ -1,6 +1,6 @@
 <?php
 /**
- * 网站首页 v9.0.0
+ * 网站首页 v10.0.0
  * 中央纪委国家监委网站 CMS 系统
  */
 define('SYSTEM_INIT', true);
@@ -9,24 +9,23 @@ $page_title = '首页';
 $current_page = 'index';
 
 // Fetch data
-$carousel_items = get_carousel(); // all carousel items (image + video)
+$carousel_items = get_carousel();
 $yaowen_articles = db_fetch_all("SELECT a.* FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE c.slug = 'yaowen' AND a.status = 'publish' ORDER BY a.publish_time DESC LIMIT 8");
 $gongzuodongtai_articles = db_fetch_all("SELECT a.* FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE c.slug = 'gongzuodongtai' AND a.status = 'publish' ORDER BY a.publish_time DESC LIMIT 8");
 $categories = get_categories();
 $staff_members = get_staff(4);
 $footer_carousel = get_footer_carousel();
 $videos = get_videos(4);
+$total_articles = db_count('articles', 'status = ?', ['publish']);
 
 include TEMPLATES_PATH . 'header.php';
 ?>
 
-<!-- Section 1: Main Carousel -->
+<!-- ====== Section 1: Main Layout (Carousel + News + Sidebar) ====== -->
 <div class="home-layout">
-    <!-- 主内容区：左栏 + 中栏 -->
     <div class="home-layout__main">
         <!-- 左栏：轮播图 + 标签页新闻 -->
         <div class="home-layout__col">
-            <!-- 轮播图 -->
             <?php if (!empty($carousel_items)): ?>
             <div class="carousel-container" id="carousel">
                 <div class="carousel-track">
@@ -86,7 +85,6 @@ include TEMPLATES_PATH . 'header.php';
                         <button class="home-tab-btn active" data-tab="tab-yaowen">要闻</button>
                         <button class="home-tab-btn" data-tab="tab-gongzuodongtai">工作动态</button>
                     </div>
-                    <!-- 要闻面板 -->
                     <div class="home-tab-panel active" id="tab-yaowen">
                         <div class="news-list">
                             <?php if (!empty($yaowen_articles)): ?>
@@ -104,7 +102,6 @@ include TEMPLATES_PATH . 'header.php';
                             <?php endif; ?>
                         </div>
                     </div>
-                    <!-- 工作动态面板 -->
                     <div class="home-tab-panel" id="tab-gongzuodongtai">
                         <div class="news-list">
                             <?php if (!empty($gongzuodongtai_articles)): ?>
@@ -126,7 +123,7 @@ include TEMPLATES_PATH . 'header.php';
             </div>
         </div>
 
-        <!-- 中栏：横幅图片 + 分类文章 -->
+        <!-- 中栏：横幅 + 分类文章 -->
         <div class="home-layout__col">
             <?php $banner_img = get_banner_image(); ?>
             <?php if ($banner_img): ?>
@@ -167,7 +164,6 @@ include TEMPLATES_PATH . 'header.php';
 
     <!-- 右栏：快捷入口 + 举报方式 -->
     <div class="home-layout__sidebar">
-        <!-- 快捷入口网格 -->
         <div class="sidebar-widget">
             <div class="sidebar-widget__header">
                 <span class="sidebar-widget__header-icon"><i class="fas fa-bolt"></i></span>
@@ -203,7 +199,6 @@ include TEMPLATES_PATH . 'header.php';
             </div>
         </div>
 
-        <!-- 举报方式 -->
         <div class="report-widget">
             <div class="report-widget__title">
                 <i class="fas fa-phone-alt"></i> 举报方式
@@ -218,41 +213,33 @@ include TEMPLATES_PATH . 'header.php';
     </div>
 </div>
 
-<!-- Section 2: Illustration Showcase -->
+<!-- ====== Section 2: Illustration Showcase ====== -->
 <section class="home-illustration">
     <div class="home-illustration__inner">
         <div class="home-illustration__item animate-on-scroll">
-            <div class="home-illustration__icon">
-                <i class="fas fa-balance-scale"></i>
-            </div>
+            <div class="home-illustration__icon"><i class="fas fa-balance-scale"></i></div>
             <h3 class="home-illustration__title">公正廉洁</h3>
             <p class="home-illustration__desc">秉公执法、廉洁自律</p>
         </div>
         <div class="home-illustration__item animate-on-scroll">
-            <div class="home-illustration__icon">
-                <i class="fas fa-handcuffs"></i>
-            </div>
+            <div class="home-illustration__icon"><i class="fas fa-handcuffs"></i></div>
             <h3 class="home-illustration__title">反腐倡廉</h3>
             <p class="home-illustration__desc">严厉打击腐败行为</p>
         </div>
         <div class="home-illustration__item animate-on-scroll">
-            <div class="home-illustration__icon">
-                <i class="fas fa-landmark"></i>
-            </div>
+            <div class="home-illustration__icon"><i class="fas fa-landmark"></i></div>
             <h3 class="home-illustration__title">法治建设</h3>
             <p class="home-illustration__desc">推进全面依法治国</p>
         </div>
         <div class="home-illustration__item animate-on-scroll">
-            <div class="home-illustration__icon">
-                <i class="fas fa-dove"></i>
-            </div>
+            <div class="home-illustration__icon"><i class="fas fa-dove"></i></div>
             <h3 class="home-illustration__title">清风正气</h3>
             <p class="home-illustration__desc">营造风清气正政治生态</p>
         </div>
     </div>
 </section>
 
-<!-- Section 3: Home Features -->
+<!-- ====== Section 3: Home Features ====== -->
 <section class="home-features">
     <div class="home-features__header">
         <h2 class="home-features__title">工作重点</h2>
@@ -282,11 +269,11 @@ include TEMPLATES_PATH . 'header.php';
     </div>
 </section>
 
-<!-- Section 3: Statistics -->
+<!-- ====== Section 4: Statistics ====== -->
 <section class="home-stats">
     <div class="home-stats__inner">
         <div class="home-stats__item animate-on-scroll">
-            <div class="home-stats__number"><span class="counter" data-count="<?php echo db_count('articles', 'status = ?', ['publish']); ?>">0</span></div>
+            <div class="home-stats__number"><span class="counter" data-count="<?php echo $total_articles; ?>">0</span></div>
             <div class="home-stats__label">文章总数</div>
         </div>
         <div class="home-stats__item animate-on-scroll">
@@ -304,7 +291,7 @@ include TEMPLATES_PATH . 'header.php';
     </div>
 </section>
 
-<!-- Section 4: Split Hero -->
+<!-- ====== Section 5: Split Hero ====== -->
 <section class="home-hero-split animate-on-scroll">
     <div class="home-hero-split__image">
         <img src="<?php echo get_banner_image(); ?>" alt="中央纪委国家监委" onerror="this.style.display='none'">
@@ -318,7 +305,7 @@ include TEMPLATES_PATH . 'header.php';
     </div>
 </section>
 
-<!-- Section 5: Latest News Cards -->
+<!-- ====== Section 6: Latest News Cards ====== -->
 <section class="home-card-grid">
     <div class="home-card-grid__header">
         <h2 class="home-card-grid__title">最新资讯</h2>
@@ -351,7 +338,47 @@ include TEMPLATES_PATH . 'header.php';
     </div>
 </section>
 
-<!-- Section 6: Staff Showcase -->
+<!-- ====== Section 7: Video Showcase ====== -->
+<?php if (!empty($videos)): ?>
+<section class="home-card-grid">
+    <div class="home-card-grid__header">
+        <h2 class="home-card-grid__title">视频中心</h2>
+        <a href="<?php echo site_url('category.php?slug=shipin'); ?>" class="home-card-grid__more">查看全部 <i class="fas fa-angle-right"></i></a>
+    </div>
+    <div class="video-grid">
+        <?php foreach ($videos as $v): ?>
+        <div class="video-card animate-on-scroll">
+            <div class="video-card__thumbnail">
+                <?php if ($v['thumbnail']): ?>
+                <img src="<?php echo site_url('uploads/' . $v['thumbnail']); ?>" alt="<?php echo htmlspecialchars($v['title']); ?>">
+                <?php else: ?>
+                <div class="video-card__thumbnail" style="background:linear-gradient(135deg, #1a1a2e, #16213e);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-video" style="font-size:48px;color:rgba(255,255,255,0.3);"></i>
+                </div>
+                <?php endif; ?>
+                <a href="<?php echo htmlspecialchars($v['url'] ?: '#'); ?>" class="video-card__play" target="_blank"></a>
+                <?php if ($v['duration']): ?>
+                <span class="video-card__duration"><?php echo htmlspecialchars($v['duration']); ?></span>
+                <?php endif; ?>
+            </div>
+            <div class="video-card__body">
+                <h3 class="video-card__title">
+                    <a href="<?php echo htmlspecialchars($v['url'] ?: '#'); ?>" target="_blank"><?php echo htmlspecialchars($v['title']); ?></a>
+                </h3>
+                <div class="video-card__meta">
+                    <span><i class="far fa-clock"></i> <?php echo format_time($v['created_at'], 'Y-m-d'); ?></span>
+                    <?php if ($v['views']): ?>
+                    <span class="video-card__views"><i class="far fa-eye"></i> <?php echo (int)$v['views']; ?></span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<!-- ====== Section 8: Staff Showcase ====== -->
 <?php if (!empty($staff_members)): ?>
 <section class="home-card-grid">
     <div class="home-card-grid__header">
@@ -364,9 +391,7 @@ include TEMPLATES_PATH . 'header.php';
             <?php if ($s['avatar']): ?>
             <img src="<?php echo site_url('uploads/' . $s['avatar']); ?>" alt="<?php echo htmlspecialchars($s['name']); ?>" class="staff-card__avatar">
             <?php else: ?>
-            <div class="staff-placeholder">
-                <?php echo mb_substr($s['name'], 0, 1); ?>
-            </div>
+            <div class="staff-placeholder"><?php echo mb_substr($s['name'], 0, 1); ?></div>
             <?php endif; ?>
             <h4 class="staff-card__name"><?php echo htmlspecialchars($s['name']); ?></h4>
             <p class="staff-card__title"><?php echo htmlspecialchars($s['title']); ?></p>
@@ -379,7 +404,7 @@ include TEMPLATES_PATH . 'header.php';
 </section>
 <?php endif; ?>
 
-<!-- Section 7: CTA -->
+<!-- ====== Section 9: CTA ====== -->
 <section class="home-cta">
     <div class="home-cta__inner">
         <h2 class="home-cta__title">监督<span>举报</span></h2>

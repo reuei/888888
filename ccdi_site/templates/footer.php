@@ -1,6 +1,6 @@
 <?php
 /**
- * 网站底部模板 v9.0.0
+ * 网站底部模板 v10.0.0
  * 中央纪委国家监委网站 CMS 系统
  */
 ?>
@@ -104,6 +104,6 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
-<script src="<?php echo site_url('assets/js/main.js?v=9.0.0'); ?>"></script>
+<script src="<?php echo site_url('assets/js/main.js?v=10.0.0'); ?>"></script>
 </body>
 </html>

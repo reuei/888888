@@ -1,0 +1,11 @@
+/* CCDI Site - Template: 现代蓝 v10.0.0 */
+:root {
+  --color-primary: #1a56db;
+  --color-primary-dark: #1e40af;
+  --color-primary-light: rgba(26, 86, 219, 0.06);
+  --color-primary-bg: #eff6ff;
+  --color-bg-dark: #1a1f36;
+  --color-accent: #1a56db;
+  --color-accent-light: #eff6ff;
+  --color-nav-hover: rgba(26, 86, 219, 0.06);
+}

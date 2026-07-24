@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'icp_number'       => trim(post('icp_number', '')),
             'contact_email'    => trim(post('contact_email', '')),
             'report_email'     => trim(post('report_email', '')),
+            'site_template'    => trim(post('site_template', 'gov')),
         ];
 
         // 验证基本字段
@@ -361,6 +362,42 @@ include __DIR__ . '/header.php';
         </div>
     </div>
 
+    <!-- ==================== 模板设置 ==================== -->
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-paint-brush"></i> 模板设置</h3>
+        <div class="form-section-body">
+            <div class="form-group">
+                <label>选择网站模板</label>
+                <div class="template-selector">
+                    <label class="template-card <?php echo config_val_raw('site_template', 'gov') === 'gov' ? 'template-card--active' : ''; ?>">
+                        <input type="radio" name="site_template" value="gov" <?php echo config_val_raw('site_template', 'gov') === 'gov' ? 'checked' : ''; ?>>
+                        <div class="template-card__preview template-card__preview--gov">
+                            <div class="template-card__preview-bar"></div>
+                            <div class="template-card__preview-content">
+                                <div class="template-card__preview-block"></div>
+                                <div class="template-card__preview-block"></div>
+                            </div>
+                        </div>
+                        <span class="template-card__name">政府红</span>
+                        <span class="template-card__desc">经典政府风格，红色主色调</span>
+                    </label>
+                    <label class="template-card <?php echo config_val_raw('site_template', 'gov') === 'blue' ? 'template-card--active' : ''; ?>">
+                        <input type="radio" name="site_template" value="blue" <?php echo config_val_raw('site_template', 'gov') === 'blue' ? 'checked' : ''; ?>>
+                        <div class="template-card__preview template-card__preview--blue">
+                            <div class="template-card__preview-bar"></div>
+                            <div class="template-card__preview-content">
+                                <div class="template-card__preview-block"></div>
+                                <div class="template-card__preview-block"></div>
+                            </div>
+                        </div>
+                        <span class="template-card__name">现代蓝</span>
+                        <span class="template-card__desc">现代简约风格，蓝色主色调</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== 提交按钮 ==================== -->
     <div class="form-actions">
         <button type="submit" class="btn btn-primary btn-lg">
@@ -459,6 +496,21 @@ include __DIR__ . '/header.php';
 .anti-theft-desc ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; }
 .anti-theft-desc li { font-size: 12px; color: #666; display: flex; align-items: center; gap: 4px; }
 .anti-theft-desc li i { color: #c41230; font-size: 11px; }
+
+/* Template Selector */
+.template-selector { display: flex; gap: 20px; flex-wrap: wrap; }
+.template-card { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px; border: 2px solid #e8e8e8; border-radius: 8px; cursor: pointer; transition: all 0.3s; min-width: 180px; }
+.template-card:hover { border-color: #c41230; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.template-card--active { border-color: #c41230; background: #fef5f6; }
+.template-card input[type="radio"] { display: none; }
+.template-card__preview { width: 160px; height: 100px; border-radius: 4px; overflow: hidden; border: 1px solid #e8e8e8; }
+.template-card__preview-bar { height: 16px; }
+.template-card__preview--gov .template-card__preview-bar { background: #c41230; }
+.template-card__preview--blue .template-card__preview-bar { background: #1a56db; }
+.template-card__preview-content { display: flex; gap: 8px; padding: 8px; }
+.template-card__preview-block { flex: 1; height: 40px; background: #f0f0f0; border-radius: 2px; }
+.template-card__name { font-size: 14px; font-weight: 600; color: #333; }
+.template-card__desc { font-size: 12px; color: #999; }
 </style>
 
 <?php

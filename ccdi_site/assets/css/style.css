@@ -1,5 +1,5 @@
 /* ============================================================
-   CCDI Site - Government Discipline Inspection Website CMS v9.0.0
+   CCDI Site - Government Discipline Inspection Website CMS v10.0.0
    Main Stylesheet - Minimalist Government Design
    ============================================================ */
 
@@ -67,11 +67,11 @@
 
   /* Layout */
   --container-max-width: 1200px;
-  --border-radius-sm: 4px;
-  --border-radius: 6px;
-  --border-radius-lg: 8px;
-  --border-radius-xl: 12px;
-  --border-radius-2xl: 16px;
+  --border-radius-sm: 2px;
+  --border-radius: 3px;
+  --border-radius-lg: 4px;
+  --border-radius-xl: 6px;
+  --border-radius-2xl: 8px;
 
   /* Transitions */
   --transition-fast: 0.15s ease;
@@ -772,12 +772,13 @@ table {
   border-radius: var(--border-radius-lg);
   color: #fff;
   font-size: 28px;
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base);
 }
 
 .site-header__logo:hover {
   transform: scale(1.05);
   box-shadow: var(--shadow-md);
+  background-color: var(--color-primary-dark);
 }
 
 .site-header__titles {
@@ -930,15 +931,20 @@ table {
   border: none;
   position: relative;
   z-index: calc(var(--z-overlay) + 1);
+  transition: transform var(--transition-base);
+}
+
+.hamburger:hover {
+  transform: scale(1.1);
 }
 
 .hamburger span {
   display: block;
   width: 22px;
-  height: 2px;
+  height: 3px;
   background-color: var(--color-text);
-  border-radius: 1px;
-  transition: transform var(--transition-base), opacity var(--transition-base);
+  border-radius: 2px;
+  transition: transform var(--transition-base), opacity var(--transition-base), background-color var(--transition-base);
   position: absolute;
 }
 
@@ -949,14 +955,36 @@ table {
   transform: translateY(7px);
 }
 
+.hamburger--active {
+  transform: scale(1);
+}
+
+.hamburger--active::before {
+  content: '';
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-primary-light);
+  opacity: 0;
+  animation: hamburger-bg-in 0.3s ease forwards;
+}
+
+@keyframes hamburger-bg-in {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .hamburger--active span:nth-child(1) {
   transform: translateY(0) rotate(45deg);
+  background-color: var(--color-primary);
 }
 .hamburger--active span:nth-child(2) {
   opacity: 0;
 }
 .hamburger--active span:nth-child(3) {
   transform: translateY(0) rotate(-45deg);
+  background-color: var(--color-primary);
 }
 
 /* ============================================================
@@ -971,6 +999,8 @@ table {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: var(--z-overlay);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 
 .mobile-overlay--active {
@@ -985,7 +1015,7 @@ table {
   height: 100%;
   background-color: var(--color-bg-white);
   z-index: calc(var(--z-overlay) + 1);
-  transition: right var(--transition-base);
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
 }
@@ -1273,13 +1303,23 @@ table {
   width: 100%;
   height: 100%;
   opacity: 0;
+  transform: scale(0.97);
   transition: opacity 0.6s ease, transform 0.6s ease;
   pointer-events: none;
 }
 
 .carousel-slide.active {
   opacity: 1;
+  transform: scale(1);
   pointer-events: auto;
+}
+
+.carousel-slide--from-left {
+  transform: translateX(-30px) scale(0.97);
+}
+
+.carousel-slide--from-right {
+  transform: translateX(30px) scale(0.97);
 }
 
 .carousel-slide img {
@@ -1457,6 +1497,7 @@ table {
 .carousel-prev:hover,
 .carousel-next:hover {
   background-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
 }
 
 .carousel-prev:active,
@@ -1500,10 +1541,10 @@ table {
 }
 
 .carousel-progress-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   background-color: rgba(255, 255, 255, 0.35);
-  border-radius: 2px;
+  border-radius: 0;
   transition: background-color var(--transition-base), transform var(--transition-base);
   cursor: pointer;
 }
@@ -1515,7 +1556,13 @@ table {
 
 .carousel-progress-dot--active {
   background-color: var(--color-primary);
-  width: 20px;
+  width: 24px;
+  animation: dot-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 18, 48, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(196, 18, 48, 0); }
 }
 
 .carousel-progress-fill {
@@ -1585,12 +1632,14 @@ table {
   padding: var(--spacing-xl);
   background-color: var(--color-bg-white);
   opacity: 0;
+  transform: scale(0.96);
   pointer-events: none;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .footer-carousel__slide--active {
   opacity: 1;
+  transform: scale(1);
   pointer-events: auto;
 }
 
@@ -1705,7 +1754,8 @@ table {
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-base) var(--spacing-xl);
-  border-bottom: 1px solid var(--color-border-light);
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(to right, var(--color-primary), transparent 80%) 1;
   animation: fadeInDown 0.5s ease forwards;
 }
 
@@ -1923,6 +1973,7 @@ table {
 .news-item:hover {
   background-color: var(--color-bg-gray);
   padding-left: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 .news-item__dot {
@@ -2075,9 +2126,10 @@ table {
   padding: var(--spacing-md) var(--spacing-sm);
   background-color: var(--color-bg-gray);
   border-radius: var(--border-radius-sm);
+  border: 1px solid transparent;
   text-align: center;
   transition: background-color var(--transition-fast), transform var(--transition-fast),
-    box-shadow var(--transition-fast);
+    box-shadow var(--transition-fast), border-color var(--transition-fast);
   cursor: pointer;
 }
 
@@ -2085,6 +2137,7 @@ table {
   background-color: var(--color-primary-light);
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
+  border-color: var(--color-primary);
 }
 
 .quick-link-grid__icon {
@@ -2420,7 +2473,7 @@ table {
   height: 72px;
   margin: 0 auto var(--spacing-lg);
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  border-radius: 50%;
+  border-radius: 4px;
   font-size: 30px;
   color: #fff;
   box-shadow: 0 4px 15px rgba(196, 18, 48, 0.3);
@@ -2554,6 +2607,19 @@ table {
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.home-stats::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(255,255,255,0.03) 50px, rgba(255,255,255,0.03) 51px),
+    repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(255,255,255,0.03) 50px, rgba(255,255,255,0.03) 51px);
   pointer-events: none;
 }
 
@@ -3267,6 +3333,7 @@ table {
 .auth-card {
   background-color: var(--color-bg-white);
   border-radius: var(--border-radius-xl);
+  border-top: 3px solid var(--color-primary);
   box-shadow: var(--shadow-md);
   width: 100%;
   max-width: 420px;
@@ -4258,6 +4325,7 @@ select.form-input {
   color: var(--color-primary);
   background-color: var(--color-primary-light);
   padding-left: calc(var(--spacing-lg) + 4px);
+  box-shadow: var(--shadow-sm);
 }
 
 .category-nav__count {
@@ -4742,7 +4810,7 @@ select.form-input {
     gap: var(--spacing-lg);
   }
 
-  .footer-carousel__container {
+  .footer-carousel {
     height: 140px;
   }
 
@@ -4750,7 +4818,7 @@ select.form-input {
     padding: var(--spacing-lg);
   }
 
-  .footer-carousel__slide-img {
+  .footer-carousel__slide img {
     width: 100px;
     height: 70px;
   }
@@ -4909,7 +4977,7 @@ select.form-input {
     max-height: 36px;
   }
 
-  .footer-carousel__container {
+  .footer-carousel {
     height: 120px;
   }
 
@@ -4919,7 +4987,7 @@ select.form-input {
     padding: var(--spacing-md);
   }
 
-  .footer-carousel__slide-img {
+  .footer-carousel__slide img {
     width: 100%;
     height: 60px;
   }

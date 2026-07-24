@@ -1,6 +1,6 @@
 <?php
 /**
- * 分类列表页 v9.0.0
+ * 分类列表页 v10.0.0
  */
 define('SYSTEM_INIT', true);
 require_once __DIR__ . '/includes/init.php';

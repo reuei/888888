@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { Role } from '../types';
 import PageHeader from '../components/PageHeader';
 import EmptyState from '../components/EmptyState';
 import { notifications as initialNotifications } from '../data/mock';
 import { Check, Trash2, Bell } from 'lucide-react';
 
 interface NotificationsProps {
-  role: 's' | 'b';
+  role: Role;
 }
 
 const typeColor: Record<string, string> = {

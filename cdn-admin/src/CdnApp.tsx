@@ -53,6 +53,20 @@ const SApiDocs = lazy(() => import('./pages/s/ApiDocs'));
 const SRoles = lazy(() => import('./pages/s/Roles'));
 const SBackup = lazy(() => import('./pages/s/Backup'));
 const SSystem = lazy(() => import('./pages/s/System'));
+const SStations = lazy(() => import('./pages/s/Stations'));
+const SStationCreate = lazy(() => import('./pages/s/StationCreate'));
+const SStationMonitor = lazy(() => import('./pages/s/StationMonitor'));
+const SMerchantMode = lazy(() => import('./pages/s/MerchantMode'));
+const SMerchantBan = lazy(() => import('./pages/s/MerchantBan'));
+const SMerchantRealname = lazy(() => import('./pages/s/MerchantRealname'));
+const SCardSecrets = lazy(() => import('./pages/s/CardSecrets'));
+const SBannedProducts = lazy(() => import('./pages/s/BannedProducts'));
+const SStockAlerts = lazy(() => import('./pages/s/StockAlerts'));
+const SBatchPayment = lazy(() => import('./pages/s/BatchPayment'));
+const SFeeGroups = lazy(() => import('./pages/s/FeeGroups'));
+const SMerchantFee = lazy(() => import('./pages/s/MerchantFee'));
+const SSettlementCycle = lazy(() => import('./pages/s/SettlementCycle'));
+const SRiskMonitor = lazy(() => import('./pages/s/RiskMonitor'));
 
 // B-side pages
 const BDashboard = lazy(() => import('./pages/b/Dashboard'));
@@ -66,12 +80,31 @@ const BFinance = lazy(() => import('./pages/b/Finance'));
 const BSettings = lazy(() => import('./pages/b/Settings'));
 const BOrders = lazy(() => import('./pages/b/MyOrders'));
 const BInvoice = lazy(() => import('./pages/b/Invoice'));
+const BProducts = lazy(() => import('./pages/b/Products'));
+const BCardImport = lazy(() => import('./pages/b/CardImport'));
+const BSourcePickup = lazy(() => import('./pages/b/SourcePickup'));
+const BAgentDock = lazy(() => import('./pages/b/AgentDock'));
+const BOrderSearch = lazy(() => import('./pages/b/OrderSearch'));
+const BComplaints = lazy(() => import('./pages/b/Complaints'));
+const BCustomerService = lazy(() => import('./pages/b/CustomerService'));
+const BSettlementPending = lazy(() => import('./pages/b/SettlementPending'));
+const BFlowRank = lazy(() => import('./pages/b/FlowRank'));
+const BRealnameApply = lazy(() => import('./pages/b/RealnameApply'));
+const BCustomPayment = lazy(() => import('./pages/b/CustomPayment'));
+const BSubdomain = lazy(() => import('./pages/b/Subdomain'));
+
+// C-side pages
+const CHome = lazy(() => import('./pages/c/Home'));
+const CBuy = lazy(() => import('./pages/c/Buy'));
+const CPayResult = lazy(() => import('./pages/c/PayResult'));
+const COrderQuery = lazy(() => import('./pages/c/OrderQuery'));
+const CUserCenter = lazy(() => import('./pages/c/UserCenter'));
 
 function CdnApp() {
   const [role, setRole] = useState<Role | null>(() => {
     if (typeof window === 'undefined') return null;
     const saved = localStorage.getItem('cdn-role') as Role | null;
-    return saved === 's' || saved === 'b' ? saved : null;
+    return saved === 's' || saved === 'b' || saved === 'c' ? saved : null;
   });
 
   const handleLogin = (r: Role, remember = true) => {
@@ -87,7 +120,9 @@ function CdnApp() {
     setRole(null);
   };
   const handleSwitchRole = () => {
-    const next = role === 's' ? 'b' : 's';
+    const order: Role[] = ['s', 'b', 'c'];
+    const idx = order.indexOf(role as Role);
+    const next = order[(idx + 1) % order.length];
     localStorage.setItem('cdn-role', next);
     setRole(next);
   };
@@ -156,12 +191,26 @@ function CdnApp() {
                   <Route path="/s/roles" element={<SRoles />} />
                   <Route path="/s/backup" element={<SBackup />} />
                   <Route path="/s/system" element={<SSystem />} />
+                  <Route path="/s/stations" element={<SStations />} />
+                  <Route path="/s/station-create" element={<SStationCreate />} />
+                  <Route path="/s/station-monitor" element={<SStationMonitor />} />
+                  <Route path="/s/merchant-mode" element={<SMerchantMode />} />
+                  <Route path="/s/merchant-ban" element={<SMerchantBan />} />
+                  <Route path="/s/merchant-realname" element={<SMerchantRealname />} />
+                  <Route path="/s/card-secrets" element={<SCardSecrets />} />
+                  <Route path="/s/banned-products" element={<SBannedProducts />} />
+                  <Route path="/s/stock-alert" element={<SStockAlerts />} />
+                  <Route path="/s/batch-payment" element={<SBatchPayment />} />
+                  <Route path="/s/fee-groups" element={<SFeeGroups />} />
+                  <Route path="/s/merchant-fee" element={<SMerchantFee />} />
+                  <Route path="/s/settlement-cycle" element={<SSettlementCycle />} />
+                  <Route path="/s/risk-monitor" element={<SRiskMonitor />} />
                   <Route path="/s/notifications" element={<Notifications role="s" />} />
                   <Route path="/s/profile" element={<Profile role="s" />} />
                   <Route path="/" element={<Navigate to="/s/dashboard" replace />} />
                   <Route path="*" element={<NotFound />} />
                 </>
-              ) : (
+              ) : role === 'b' ? (
                 <>
                   <Route path="/b/dashboard" element={<BDashboard />} />
                   <Route path="/b/sites" element={<BSites />} />
@@ -174,9 +223,33 @@ function CdnApp() {
                   <Route path="/b/whitelist" element={<BWhitelist />} />
                   <Route path="/b/finance" element={<BFinance />} />
                   <Route path="/b/settings" element={<BSettings />} />
+                  <Route path="/b/products" element={<BProducts />} />
+                  <Route path="/b/card-import" element={<BCardImport />} />
+                  <Route path="/b/source-pickup" element={<BSourcePickup />} />
+                  <Route path="/b/agent-dock" element={<BAgentDock />} />
+                  <Route path="/b/order-search" element={<BOrderSearch />} />
+                  <Route path="/b/complaints" element={<BComplaints />} />
+                  <Route path="/b/customer-service" element={<BCustomerService />} />
+                  <Route path="/b/settlement-pending" element={<BSettlementPending />} />
+                  <Route path="/b/flow-rank" element={<BFlowRank />} />
+                  <Route path="/b/realname-apply" element={<BRealnameApply />} />
+                  <Route path="/b/custom-payment" element={<BCustomPayment />} />
+                  <Route path="/b/subdomain" element={<BSubdomain />} />
                   <Route path="/b/notifications" element={<Notifications role="b" />} />
                   <Route path="/b/profile" element={<Profile role="b" />} />
                   <Route path="/" element={<Navigate to="/b/dashboard" replace />} />
+                  <Route path="*" element={<NotFound />} />
+                </>
+              ) : (
+                <>
+                  <Route path="/c/home" element={<CHome />} />
+                  <Route path="/c/buy/:productId" element={<CBuy />} />
+                  <Route path="/c/pay-result" element={<CPayResult />} />
+                  <Route path="/c/order-query" element={<COrderQuery />} />
+                  <Route path="/c/user-center" element={<CUserCenter />} />
+                  <Route path="/c/notifications" element={<Notifications role="c" />} />
+                  <Route path="/c/profile" element={<Profile role="c" />} />
+                  <Route path="/" element={<Navigate to="/c/home" replace />} />
                   <Route path="*" element={<NotFound />} />
                 </>
               )}

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Role } from '../types';
 import { login } from '../services/api';
-import { Shield, Store, AlertCircle, CheckCircle, Zap, Globe } from 'lucide-react';
+import { Shield, Store, AlertCircle, CheckCircle, Zap, Globe, UserCircle } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (role: Role, remember?: boolean) => void;
@@ -24,7 +24,7 @@ export default function Login({ onLogin }: LoginProps) {
 
   const handleRoleChange = (r: Role) => {
     setRole(r);
-    setAccount(r === 's' ? 'admin' : 'merchant');
+    setAccount(r === 's' ? 'admin' : r === 'b' ? 'merchant' : 'user');
     setPassword('123456');
     setError('');
   };
@@ -121,6 +121,14 @@ export default function Login({ onLogin }: LoginProps) {
               }`}
             >
               <Store size={16} /> B端 商户
+            </button>
+            <button
+              onClick={() => handleRoleChange('c')}
+              className={`flex-1 py-2 rounded-md text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                role === 'c' ? 'bg-white text-primary border border-border' : 'text-text-secondary hover:text-text'
+              }`}
+            >
+              <UserCircle size={16} /> C端 购买用户
             </button>
           </div>
 

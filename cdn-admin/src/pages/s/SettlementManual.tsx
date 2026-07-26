@@ -88,6 +88,7 @@ export default function SettlementManual() {
       cycle,
       amount: value,
       fee,
+      netAmount: Math.round((value - fee) * 100) / 100,
       status: 'pending',
       time,
     });

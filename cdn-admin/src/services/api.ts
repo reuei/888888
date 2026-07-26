@@ -36,6 +36,7 @@ import type {
   AgentProduct,
   TemplateItem,
   LuckyNumber,
+  Role,
 } from '../types';
 import * as mock from '../data/mock';
 
@@ -665,14 +666,14 @@ export async function fetchUserGrowthStats(): Promise<UserGrowthStat[]> {
   return [...store.userGrowthStats];
 }
 
-export async function login(payload: { account: string; password: string; role: 's' | 'b' }): Promise<{ success: boolean; role?: 's' | 'b'; error?: string }> {
+export async function login(payload: { account: string; password: string; role: Role }): Promise<{ success: boolean; role?: Role; error?: string }> {
   if (await detectPhpApi()) {
     const res = await fetch(`${API_BASE}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    const data = (await res.json()) as { success?: boolean; role?: 's' | 'b'; error?: string };
+    const data = (await res.json()) as { success?: boolean; role?: Role; error?: string };
     if (!res.ok) {
       return { success: false, error: data.error || '登录失败' };
     }

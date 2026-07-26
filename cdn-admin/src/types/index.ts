@@ -225,12 +225,11 @@ export interface Agent {
 // Agent product (代理对接商品)
 export interface AgentProduct {
   id: string;
-  sourceProductId: string;
-  agentMerchantId: string;
+  name: string;
+  source: string;
   costPrice: number;
-  salePrice: number;
-  auditStatus: 'pending' | 'approved' | 'rejected';
-  status: 'on' | 'off';
+  retailPrice: number;
+  status: 'on' | 'off' | 'pending';
 }
 
 export interface CommissionRecord {

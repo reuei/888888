@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { Role } from '../types';
 import PageHeader from '../components/PageHeader';
 import Modal from '../components/Modal';
 import { useToast } from '../hooks/useToast';
@@ -7,7 +8,7 @@ import { sProfile, bProfile } from '../data/mock';
 import { User, Mail, Phone, Building2, Save, Camera, Lock, Shield, Smartphone } from 'lucide-react';
 
 interface ProfileProps {
-  role: 's' | 'b';
+  role: Role;
 }
 
 export default function Profile({ role }: ProfileProps) {

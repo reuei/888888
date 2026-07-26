@@ -1,4 +1,4 @@
-import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, CouponRecord, TemplateItem, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, BOrder, Invoice, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord, DailyStat, MerchantStat, UserGrowthStat, SettlementRecord } from '../types';
+import type { Site, Merchant, Product, Order, Package, WhitelistRecord, FinanceRecord, UserProfile, Category, Node, Sku, Complaint, InviteCode, Article, AdSlot, Coupon, CouponRecord, TemplateItem, User, UserGroup, UserLevel, LuckyNumber, RealnameRecord, Agent, AgentProduct, CommissionRecord, Gateway, MyPackage, BOrder, Invoice, Notification, OperationLog, RolePermission, ApiDoc, BackupRecord, DailyStat, MerchantStat, UserGrowthStat, SettlementRecord, Station, CardSecret, ImportBatch, FeeGroup, BannedProduct, StockAlert, Announcement } from '../types';
 
 export const sProfile: UserProfile = {
   name: '总站长',
@@ -10,7 +10,7 @@ export const bProfile: UserProfile = {
   name: '商户_阿明',
   avatar: 'B',
   balance: 12850.65,
-  shopName: '阿明网络',
+  shopName: '极速发卡',
 };
 
 export const sStats = [
@@ -22,29 +22,29 @@ export const sStats = [
 ];
 
 export const bStats = [
-  { title: '访问量', value: '12,847', sub: '今日 / 7天 89K / 30天 410K', color: 'primary' as const },
-  { title: 'QFS 量', value: '3,291,044', sub: '今日 82K / 累计 3.2M', color: 'success' as const },
-  { title: '流量消耗', value: '1,204.5', unit: 'GB', sub: '今日 45GB / 累计 1.2TB', color: 'warning' as const },
-  { title: '运行站点 / 证书', value: '8 / 8', sub: '全部正常运行', color: 'danger' as const },
+  { title: '今日订单', value: '284', unit: '笔', sub: '昨日 256 / 7天 1,842', color: 'primary' as const },
+  { title: '今日交易额', value: '12,847.50', unit: '元', sub: '昨日 10,234 / 7天 89K', color: 'success' as const },
+  { title: '待结算', value: '8,450.00', unit: '元', sub: 'T+1 结算周期', color: 'warning' as const },
+  { title: '库存预警', value: '3', unit: '个商品', sub: '需补充卡密', color: 'danger' as const },
 ];
 
 export const trendLabels = ['06-22', '06-23', '06-24', '06-25', '06-26', '06-27', '06-28'];
 export const trendValues = [120, 132, 101, 134, 90, 230, 210];
-export const bTrendValues1 = [820, 932, 901, 934, 1290, 1330, 1320];
-export const bTrendValues2 = [220, 282, 201, 234, 290, 330, 310];
-export const bTrendValues3 = [120, 132, 101, 134, 90, 230, 210];
+export const bTrendValues1 = [120, 132, 101, 134, 230, 210, 284];
+export const bTrendValues2 = [320, 432, 401, 434, 590, 630, 620];
+export const bTrendValues3 = [82, 92, 71, 84, 130, 110, 142];
 
 export const merchantRank = [
-  { name: '极速云', amount: 482900 },
-  { name: '蓝海防护', amount: 391200 },
-  { name: '站点卫士', amount: 284500 },
-  { name: '云盾科技', amount: 198300 },
-  { name: '安全链', amount: 165000 },
-  { name: '快网互联', amount: 142800 },
-  { name: '防御大师', amount: 128000 },
-  { name: '烽火CDN', amount: 105600 },
-  { name: '蜂巢加速', amount: 93200 },
-  { name: '北极星', amount: 78000 },
+  { name: '极速发卡', amount: 482900 },
+  { name: '蓝海数码', amount: 391200 },
+  { name: '优惠券之家', amount: 284500 },
+  { name: '云卡商城', amount: 198300 },
+  { name: '卡密工坊', amount: 165000 },
+  { name: '快发网络', amount: 142800 },
+  { name: '便民发卡', amount: 128000 },
+  { name: '数码驿站', amount: 105600 },
+  { name: '充值中心', amount: 93200 },
+  { name: '优选卡店', amount: 78000 },
 ];
 
 export const sites: Site[] = [
@@ -63,17 +63,17 @@ export const merchants: Merchant[] = [
 ];
 
 export const products: Product[] = [
-  { id: 'P001', name: '基础CDN加速', type: 'CDN', nodePool: '公开节点池A', priceRange: '¥9.90 - ¥99.00', status: 'on' },
-  { id: 'P002', name: '企业高防CDN', type: '高防CDN', nodePool: '高防节点池B', priceRange: '¥299.00 - ¥2999.00', status: 'on' },
-  { id: 'P003', name: '游戏盾专业版', type: '游戏盾', nodePool: '游戏专用池C', priceRange: '¥599.00 - ¥5999.00', status: 'off' },
-  { id: 'P004', name: '全球加速Pro', type: '全球加速', nodePool: 'Cloudflare池', priceRange: '¥199.00 - ¥1999.00', status: 'on' },
+  { id: 'P001', name: 'VPN月卡', type: '虚拟商品', nodePool: '自动发卡', priceRange: '¥9.90 - ¥99.00', status: 'on' },
+  { id: 'P002', name: '游戏点券100元', type: '充值卡', nodePool: '自动发卡', priceRange: '¥95.00 - ¥100.00', status: 'on' },
+  { id: 'P003', name: 'Steam充值卡', type: '礼品卡', nodePool: '自动发卡', priceRange: '¥299.00 - ¥2999.00', status: 'off' },
+  { id: 'P004', name: '话费充值50元', type: '充值卡', nodePool: '自动发卡', priceRange: '¥49.00 - ¥50.00', status: 'on' },
 ];
 
 export const orders: Order[] = [
-  { id: 'O202606280001', buyer: 'user_9527', merchant: '极速云', product: '企业高防CDN', amount: 299.00, status: 'paid', createdAt: '2026-06-28 10:23' },
-  { id: 'O202606280002', buyer: 'user_3344', merchant: '蓝海防护', product: '基础CDN加速', amount: 59.00, status: 'pending', createdAt: '2026-06-28 09:45' },
-  { id: 'O202606280003', buyer: 'user_7788', merchant: '站点卫士', product: '全球加速Pro', amount: 199.00, status: 'refunded', createdAt: '2026-06-27 22:10' },
-  { id: 'O202606280004', buyer: 'user_1122', merchant: '云盾科技', product: '游戏盾专业版', amount: 599.00, status: 'closed', createdAt: '2026-06-27 18:33' },
+  { id: 'O202607100001', buyer: 'user_9527', merchant: '极速发卡', product: 'VPN月卡', amount: 29.00, status: 'paid', createdAt: '2026-07-10 10:23' },
+  { id: 'O202607100002', buyer: 'user_3344', merchant: '蓝海数码', product: '游戏点券100元', amount: 95.00, status: 'pending', createdAt: '2026-07-10 09:45' },
+  { id: 'O202607100003', buyer: 'user_7788', merchant: '优惠券之家', product: 'Steam充值卡', amount: 299.00, status: 'refunded', createdAt: '2026-07-09 22:10' },
+  { id: 'O202607100004', buyer: 'user_1122', merchant: '云卡商城', product: '话费充值50元', amount: 49.00, status: 'closed', createdAt: '2026-07-09 18:33' },
 ];
 
 export const packages: Package[] = [
@@ -181,9 +181,9 @@ export const cardTemplates: TemplateItem[] = [
 ];
 
 export const settlementRecords: SettlementRecord[] = [
-  { id: 'SET001', merchant: '极速云', cycle: 'T+1', amount: 4820.00, fee: 48.20, status: 'settled', time: '2026-06-28 10:00' },
-  { id: 'SET002', merchant: '蓝海防护', cycle: 'T+1', amount: 3150.50, fee: 31.51, status: 'settled', time: '2026-06-27 10:00' },
-  { id: 'SET003', merchant: '站点卫士', cycle: 'T+7', amount: 1200.00, fee: 12.00, status: 'pending', time: '2026-06-28 09:00' },
+  { id: 'SET001', merchant: '极速云', cycle: 'T+1', amount: 4820.00, fee: 48.20, netAmount: 4771.80, status: 'settled', time: '2026-06-28 10:00' },
+  { id: 'SET002', merchant: '蓝海防护', cycle: 'T+1', amount: 3150.50, fee: 31.51, netAmount: 3118.99, status: 'settled', time: '2026-06-27 10:00' },
+  { id: 'SET003', merchant: '站点卫士', cycle: 'T+7', amount: 1200.00, fee: 12.00, netAmount: 1188.00, status: 'pending', time: '2026-06-28 09:00' },
 ];
 
 export const users: User[] = [
@@ -371,5 +371,43 @@ export const userGrowthStats: UserGrowthStat[] = [
   { date: '06-26', newUsers: 90, activeUsers: 4690, paidUsers: 410 },
   { date: '06-27', newUsers: 230, activeUsers: 4920, paidUsers: 450 },
   { date: '06-28', newUsers: 210, activeUsers: 5100, paidUsers: 465 },
+];
+
+export const stations: Station[] = [
+  { id: 'ST01', name: '华东分站', domain: 'east.card.com', themeColor: '#2F6BFF', superAdmin: '张三', settleMode: 't1', merchantCount: 156, orderCount: 8542, revenue: 482900, status: 'active', createdAt: '2026-01-15' },
+  { id: 'ST02', name: '华南分站', domain: 'south.card.com', themeColor: '#06B6D4', superAdmin: '李四', settleMode: 't0', merchantCount: 89, orderCount: 4231, revenue: 284500, status: 'active', createdAt: '2026-02-20' },
+  { id: 'ST03', name: '华北分站', domain: 'north.card.com', themeColor: '#F97316', superAdmin: '王五', settleMode: 't7', merchantCount: 42, orderCount: 1856, revenue: 98300, status: 'suspended', createdAt: '2026-03-10' },
+];
+
+export const cardSecrets: CardSecret[] = [
+  { id: 'CS001', productId: 'P001', merchantId: 'M001', content: 'XXXX-XXXX-XXXX-001', status: 'unsold', importBatchId: 'B001', createdAt: '2026-07-01' },
+  { id: 'CS002', productId: 'P001', merchantId: 'M001', content: 'XXXX-XXXX-XXXX-002', status: 'sold', orderId: 'O202607100001', importBatchId: 'B001', createdAt: '2026-07-01' },
+  { id: 'CS003', productId: 'P002', merchantId: 'M002', content: 'YYYY-YYYY-YYYY-001', status: 'locked', importBatchId: 'B002', createdAt: '2026-07-02' },
+];
+
+export const importBatches: ImportBatch[] = [
+  { id: 'B001', operatorId: 'M001', operatorRole: 'b', total: 500, success: 498, fail: 2, deliverMode: 'sequential', createdAt: '2026-07-01' },
+  { id: 'B002', operatorId: 'M002', operatorRole: 'b', total: 200, success: 200, fail: 0, deliverMode: 'random', createdAt: '2026-07-02' },
+];
+
+export const feeGroups: FeeGroup[] = [
+  { id: 'FG01', name: '标准费率', rate: 0.02, merchantCount: 856, description: '默认2%费率' },
+  { id: 'FG02', name: 'VIP费率', rate: 0.01, merchantCount: 234, description: 'VIP商户1%费率' },
+  { id: 'FG03', name: '大客户费率', rate: 0.005, merchantCount: 56, description: '大客户0.5%费率' },
+];
+
+export const bannedProducts: BannedProduct[] = [
+  { id: 'BP01', keyword: '违禁品A', category: '虚拟商品', matchType: 'keyword', createdAt: '2026-06-01' },
+  { id: 'BP02', keyword: '违法服务', category: '服务类', matchType: 'keyword', createdAt: '2026-06-02' },
+];
+
+export const stockAlerts: StockAlert[] = [
+  { id: 'SA01', productId: 'P001', productName: 'VPN月卡', threshold: 10, currentStock: 3, merchantName: '极速发卡', status: 'alerting' },
+  { id: 'SA02', productId: 'P003', productName: 'Steam充值卡', threshold: 20, currentStock: 5, merchantName: '蓝海数码', status: 'alerting' },
+];
+
+export const announcements: Announcement[] = [
+  { id: 'A01', title: '系统升级公告', content: '系统将于今晚22:00-23:00进行升级维护，届时无法下单。', type: 'popup', isPopup: true, countdown: 5, publishAt: '2026-07-09', status: 'published' },
+  { id: 'A02', title: '费率调整通知', content: '即日起标准费率调整为2%，VIP费率1%。', type: 'notice', isPopup: false, countdown: 0, publishAt: '2026-07-08', status: 'published' },
 ];
 

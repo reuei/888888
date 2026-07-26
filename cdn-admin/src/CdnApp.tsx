@@ -22,8 +22,6 @@ const SMerchantAudit = lazy(() => import('./pages/s/MerchantAudit'));
 const SInvites = lazy(() => import('./pages/s/Invites'));
 const SProducts = lazy(() => import('./pages/s/Products'));
 const SCategories = lazy(() => import('./pages/s/Categories'));
-const SNodes = lazy(() => import('./pages/s/Nodes'));
-const SSkus = lazy(() => import('./pages/s/Skus'));
 const SOrders = lazy(() => import('./pages/s/Orders'));
 const SComplaints = lazy(() => import('./pages/s/Complaints'));
 const SAbnormalOrders = lazy(() => import('./pages/s/AbnormalOrders'));
@@ -47,11 +45,8 @@ const SAgentAudit = lazy(() => import('./pages/s/AgentAudit'));
 const SSettlementManual = lazy(() => import('./pages/s/SettlementManual'));
 const SSettlementAuto = lazy(() => import('./pages/s/SettlementAuto'));
 const SAlipayExport = lazy(() => import('./pages/s/AlipayExport'));
-const SGatewayConfig = lazy(() => import('./pages/s/GatewayConfig'));
 const SOperationLogs = lazy(() => import('./pages/s/OperationLogs'));
-const SApiDocs = lazy(() => import('./pages/s/ApiDocs'));
 const SRoles = lazy(() => import('./pages/s/Roles'));
-const SBackup = lazy(() => import('./pages/s/Backup'));
 const SSystem = lazy(() => import('./pages/s/System'));
 const SStations = lazy(() => import('./pages/s/Stations'));
 const SStationCreate = lazy(() => import('./pages/s/StationCreate'));
@@ -70,16 +65,9 @@ const SRiskMonitor = lazy(() => import('./pages/s/RiskMonitor'));
 
 // B-side pages
 const BDashboard = lazy(() => import('./pages/b/Dashboard'));
-const BSites = lazy(() => import('./pages/b/Sites'));
-const AddSite = lazy(() => import('./pages/b/AddSite'));
-const BPackages = lazy(() => import('./pages/b/Packages'));
-const MyPackages = lazy(() => import('./pages/b/MyPackages'));
-const Renew = lazy(() => import('./pages/b/Renew'));
-const BWhitelist = lazy(() => import('./pages/b/Whitelist'));
 const BFinance = lazy(() => import('./pages/b/Finance'));
 const BSettings = lazy(() => import('./pages/b/Settings'));
 const BOrders = lazy(() => import('./pages/b/MyOrders'));
-const BInvoice = lazy(() => import('./pages/b/Invoice'));
 const BProducts = lazy(() => import('./pages/b/Products'));
 const BCardImport = lazy(() => import('./pages/b/CardImport'));
 const BSourcePickup = lazy(() => import('./pages/b/SourcePickup'));
@@ -160,8 +148,6 @@ function CdnApp() {
                   <Route path="/s/invites" element={<SInvites />} />
                   <Route path="/s/products" element={<SProducts />} />
                   <Route path="/s/categories" element={<SCategories />} />
-                  <Route path="/s/nodes" element={<SNodes />} />
-                  <Route path="/s/skus" element={<SSkus />} />
                   <Route path="/s/orders" element={<SOrders />} />
                   <Route path="/s/complaints" element={<SComplaints />} />
                   <Route path="/s/abnormal-orders" element={<SAbnormalOrders />} />
@@ -185,11 +171,8 @@ function CdnApp() {
                   <Route path="/s/settlement-manual" element={<SSettlementManual />} />
                   <Route path="/s/settlement-auto" element={<SSettlementAuto />} />
                   <Route path="/s/alipay-export" element={<SAlipayExport />} />
-                  <Route path="/s/gateway-config" element={<SGatewayConfig />} />
                   <Route path="/s/operation-logs" element={<SOperationLogs />} />
-                  <Route path="/s/api-docs" element={<SApiDocs />} />
                   <Route path="/s/roles" element={<SRoles />} />
-                  <Route path="/s/backup" element={<SBackup />} />
                   <Route path="/s/system" element={<SSystem />} />
                   <Route path="/s/stations" element={<SStations />} />
                   <Route path="/s/station-create" element={<SStationCreate />} />
@@ -213,14 +196,7 @@ function CdnApp() {
               ) : role === 'b' ? (
                 <>
                   <Route path="/b/dashboard" element={<BDashboard />} />
-                  <Route path="/b/sites" element={<BSites />} />
-                  <Route path="/b/add-site" element={<AddSite />} />
-                  <Route path="/b/packages" element={<BPackages />} />
-                  <Route path="/b/my-packages" element={<MyPackages />} />
-                  <Route path="/b/renew" element={<Renew />} />
                   <Route path="/b/orders" element={<BOrders />} />
-                  <Route path="/b/invoice" element={<BInvoice />} />
-                  <Route path="/b/whitelist" element={<BWhitelist />} />
                   <Route path="/b/finance" element={<BFinance />} />
                   <Route path="/b/settings" element={<BSettings />} />
                   <Route path="/b/products" element={<BProducts />} />

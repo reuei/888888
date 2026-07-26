@@ -5,35 +5,31 @@ export interface MenuItem {
   children?: MenuItem[];
 }
 
+// S端 (super admin) primary color: #2F6BFF (blue)
+export const sPrimaryColor = '#2F6BFF';
+
 export const sMenu: MenuItem[] = [
   { key: '/s/dashboard', label: '仪表盘', icon: 'LayoutDashboard' },
   {
-    key: '/s/transaction-stats',
-    label: '数据报表',
-    icon: 'BarChart3',
+    key: '/s/stations',
+    label: '分站管理',
+    icon: 'Network',
     children: [
-      { key: '/s/transaction-stats', label: '交易统计' },
-      { key: '/s/user-growth', label: '用户增长' },
-      { key: '/s/merchant-analysis', label: '商户分析' },
-    ],
-  },
-  {
-    key: '/s/sites',
-    label: '站点管理',
-    icon: 'Globe',
-    children: [
-      { key: '/s/sites', label: '站点列表' },
-      { key: '/s/site-config', label: '站点配置' },
+      { key: '/s/stations', label: '分站列表' },
+      { key: '/s/station-create', label: '新建分站' },
+      { key: '/s/station-monitor', label: '分站运营监控' },
     ],
   },
   {
     key: '/s/merchants',
     label: '商户管理',
-    icon: 'Users',
+    icon: 'Store',
     children: [
-      { key: '/s/merchants', label: '商户列表' },
+      { key: '/s/merchants', label: '入驻店铺列表' },
       { key: '/s/merchant-audit', label: '商户审核' },
-      { key: '/s/invites', label: '邀请码管理' },
+      { key: '/s/merchant-mode', label: '入驻模式设置' },
+      { key: '/s/merchant-ban', label: '封禁/解禁管理' },
+      { key: '/s/merchant-realname', label: '实名认证管理' },
     ],
   },
   {
@@ -41,10 +37,11 @@ export const sMenu: MenuItem[] = [
     label: '商品管理',
     icon: 'Package',
     children: [
-      { key: '/s/products', label: 'CDN产品列表' },
-      { key: '/s/categories', label: '产品分类' },
-      { key: '/s/nodes', label: 'CDN节点管理' },
-      { key: '/s/skus', label: '套餐规格管理' },
+      { key: '/s/products', label: '全平台商品列表' },
+      { key: '/s/categories', label: '商品分类管理' },
+      { key: '/s/banned-products', label: '禁售目录设置' },
+      { key: '/s/card-secrets', label: '卡密管理' },
+      { key: '/s/stock-alert', label: '库存预警设置' },
     ],
   },
   {
@@ -52,26 +49,26 @@ export const sMenu: MenuItem[] = [
     label: '订单管理',
     icon: 'ShoppingCart',
     children: [
-      { key: '/s/orders', label: '全部订单' },
+      { key: '/s/orders', label: '全平台订单列表' },
       { key: '/s/complaints', label: '投诉管理' },
-      { key: '/s/abnormal-orders', label: '异常订单处理' },
+      { key: '/s/batch-payment', label: '批量付款通知' },
+      { key: '/s/abnormal-orders', label: '异常订单标记' },
     ],
   },
   {
     key: '/s/users',
     label: '会员/用户管理',
-    icon: 'UserCircle',
+    icon: 'UsersRound',
     children: [
-      { key: '/s/users', label: '用户列表' },
-      { key: '/s/user-groups', label: '用户分组' },
-      { key: '/s/user-levels', label: '用户等级' },
+      { key: '/s/users', label: '全平台用户列表' },
+      { key: '/s/user-groups', label: '用户分组与等级' },
       { key: '/s/lucky-numbers', label: '自助选号' },
-      { key: '/s/user-realname', label: '用户实名审核' },
+      { key: '/s/user-realname', label: '实名认证审核' },
       { key: '/s/user-rank', label: '用户流水排行' },
     ],
   },
   {
-    key: '/s/agents',
+    key: '/s/agent-dock',
     label: '代理/分销管理',
     icon: 'GitBranch',
     children: [
@@ -88,50 +85,46 @@ export const sMenu: MenuItem[] = [
     icon: 'Wallet',
     children: [
       { key: '/s/finance', label: '资金流水总览' },
-      { key: '/s/settlement-manual', label: '手动结算' },
-      { key: '/s/settlement-auto', label: '自动结算' },
+      { key: '/s/fee-groups', label: '费率分组管理' },
+      { key: '/s/merchant-fee', label: '单商户费率' },
+      { key: '/s/settlement-cycle', label: '结算周期设置' },
+      { key: '/s/settlement-manual', label: '结算打款' },
       { key: '/s/alipay-export', label: '支付宝打款导出' },
-      { key: '/s/gateway-config', label: '网关配置' },
     ],
   },
   { key: '/s/payments', label: '支付网关管理', icon: 'CreditCard' },
-  { key: '/s/templates', label: '模板与前端管理', icon: 'Monitor' },
+  { key: '/s/templates', label: '模板与前端管理', icon: 'LayoutTemplate' },
   { key: '/s/articles', label: '文章/公告管理', icon: 'FileText' },
   { key: '/s/ads', label: '广告位管理', icon: 'Image' },
   { key: '/s/coupons', label: '优惠券/营销管理', icon: 'Ticket' },
   {
-    key: '/s/operation-logs',
-    label: '系统运维',
-    icon: 'ClipboardList',
+    key: '/s/transaction-stats',
+    label: '数据统计与日志',
+    icon: 'BarChart3',
     children: [
+      { key: '/s/transaction-stats', label: '经营报表' },
+      { key: '/s/merchant-analysis', label: '商户流水排行' },
+      { key: '/s/risk-monitor', label: '风控大屏' },
       { key: '/s/operation-logs', label: '操作日志' },
-      { key: '/s/api-docs', label: 'API 文档' },
-      { key: '/s/roles', label: '权限角色管理' },
-      { key: '/s/backup', label: '数据备份' },
     ],
   },
   { key: '/s/system', label: '系统设置', icon: 'Settings' },
 ];
 
+// B端 (merchant) primary color: #06B6D4 (cyan)
+export const bPrimaryColor = '#06B6D4';
+
 export const bMenu: MenuItem[] = [
   { key: '/b/dashboard', label: '仪表盘', icon: 'LayoutDashboard' },
   {
-    key: '/b/sites',
-    label: '站点管理',
-    icon: 'Globe',
-    children: [
-      { key: '/b/sites', label: '我的站点' },
-      { key: '/b/add-site', label: '添加站点' },
-    ],
-  },
-  {
-    key: '/b/packages',
-    label: '套餐管理',
+    key: '/b/products',
+    label: '商品管理',
     icon: 'Package',
     children: [
-      { key: '/b/packages', label: '在线订购套餐' },
-      { key: '/b/my-packages', label: '我的套餐' },
-      { key: '/b/renew', label: '套餐续费' },
+      { key: '/b/products', label: '商品列表' },
+      { key: '/b/card-import', label: '卡密导入' },
+      { key: '/b/source-pickup', label: '货源采集' },
+      { key: '/b/agent-dock', label: '代理对接' },
     ],
   },
   {
@@ -139,11 +132,31 @@ export const bMenu: MenuItem[] = [
     label: '订单管理',
     icon: 'ShoppingCart',
     children: [
-      { key: '/b/orders', label: '我的订单' },
-      { key: '/b/invoice', label: '发票申请' },
+      { key: '/b/orders', label: '发货/退款' },
+      { key: '/b/order-search', label: '查单' },
+      { key: '/b/complaints', label: '投诉处理' },
     ],
   },
-  { key: '/b/whitelist', label: '域名过白管理', icon: 'Shield' },
-  { key: '/b/finance', label: '财务管理', icon: 'Wallet' },
-  { key: '/b/settings', label: '个人设置', icon: 'UserCog' },
+  { key: '/b/customer-service', label: '客服管理', icon: 'Headset' },
+  {
+    key: '/b/finance',
+    label: '资金管理',
+    icon: 'Wallet',
+    children: [
+      { key: '/b/finance', label: '结算记录' },
+      { key: '/b/settlement-pending', label: '待结算' },
+      { key: '/b/flow-rank', label: '流水排行' },
+    ],
+  },
+  {
+    key: '/b/settings',
+    label: '店铺设置',
+    icon: 'Store',
+    children: [
+      { key: '/b/settings', label: '店铺信息' },
+      { key: '/b/realname-apply', label: '实名申请' },
+      { key: '/b/custom-payment', label: '自定义支付' },
+      { key: '/b/subdomain', label: '引导页子域名' },
+    ],
+  },
 ];

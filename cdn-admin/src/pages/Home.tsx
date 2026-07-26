@@ -100,7 +100,7 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
               <Globe size={18} />
             </div>
-            <span className="text-lg font-bold">CloudShield CDN</span>
+            <span className="text-lg font-bold">玄武发卡</span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm text-text-secondary">
             <a href="#features" className="hover:text-primary transition-colors">产品功能</a>
@@ -120,7 +120,7 @@ export default function Home() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+        <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 relative">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6">
@@ -128,14 +128,14 @@ export default function Home() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
               </span>
-              企业级 CDN 防护加速平台
+              企业级发卡平台
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
               比鹿云盾更开放
               <span className="text-primary block mt-2">比 SCDN 更经济</span>
             </h1>
             <p className="text-lg text-text-secondary mb-8 max-w-2xl mx-auto leading-relaxed">
-              自主可控的企业级 CDN 防护加速后台，源码交付、数据私有、按需部署。告别平台绑架与高额流量税，为电商、金融、游戏、政企提供一站式加速与 WAF 解决方案。
+              自主可控的企业级发卡平台后台，源码交付、数据私有、按需部署。告别平台绑架与高额流量税，为电商、金融、游戏、政企提供一站式发卡与 WAF 解决方案。
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
@@ -188,7 +188,7 @@ export default function Home() {
             {features.map((f, i) => (
               <div
                 key={i}
-                className="card p-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                className="card p-6 transition-all duration-200"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4">
                   {f.icon}
@@ -205,7 +205,7 @@ export default function Home() {
       <section className="py-20 bg-black/[0.02] dark:bg-white/[0.02]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">为什么选择 CloudShield CDN？</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">为什么选择 玄武发卡？</h2>
             <p className="text-text-secondary">源码级交付，数据与部署完全自主，不再被第三方平台绑定。</p>
           </div>
           <div className="overflow-x-auto">
@@ -213,7 +213,7 @@ export default function Home() {
               <thead>
                 <tr className="border-b border-border">
                   <th className="py-4 px-4 text-left font-semibold">能力</th>
-                  <th className="py-4 px-4 text-center font-semibold text-primary">CloudShield CDN</th>
+                  <th className="py-4 px-4 text-center font-semibold text-primary">玄武发卡</th>
                   <th className="py-4 px-4 text-center font-semibold text-text-secondary">鹿云盾</th>
                   <th className="py-4 px-4 text-center font-semibold text-text-secondary">SCDN</th>
                 </tr>
@@ -287,7 +287,7 @@ export default function Home() {
       {/* CTA */}
       <section className="py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="card p-8 md:p-12 text-center bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+          <div className="card p-8 md:p-12 text-center bg-primary/5 border-primary/20">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">准备好加速您的业务了吗？</h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
               立即注册，享受 7 天免费试用。专业技术团队协助您完成接入与配置。
@@ -318,10 +318,10 @@ export default function Home() {
               <div className="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center">
                 <Globe size={16} />
               </div>
-              <span className="font-semibold">CloudShield CDN</span>
+              <span className="font-semibold">玄武发卡</span>
             </div>
             <div className="text-sm text-text-secondary">
-              © 2026 CloudShield CDN. 企业级 CDN 防护加速平台.
+              © 2026 玄武发卡. 企业级发卡平台.
             </div>
             <div className="flex items-center gap-4 text-sm text-text-secondary">
               <button onClick={() => navigate('/login')} className="hover:text-primary">登录</button>

@@ -105,10 +105,10 @@ export default function Header({
             <Menu size={18} />
           </button>
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center">
               <Shield size={16} />
             </div>
-            <span className="font-semibold text-text">EdgeOne 控制台</span>
+            <span className="font-semibold text-text">玄武发卡</span>
           </div>
           {role === 'b' && profile.shopName && (
             <span className="text-sm text-text-secondary ml-2 hidden sm:inline">| {profile.shopName}</span>
@@ -140,7 +140,7 @@ export default function Header({
               )}
             </button>
             {notifyOpen && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-lg z-40 overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl z-40 overflow-hidden">
                 <div className="flex items-center justify-between px-4 h-11 border-b border-border">
                   <span className="text-sm font-medium">消息通知</span>
                   <button onClick={markAllRead} className="text-xs text-primary hover:underline">
@@ -215,7 +215,7 @@ export default function Header({
               onClick={() => setUserOpen((v) => !v)}
               className="flex items-center gap-2 pl-2 md:pl-3 ml-1 border-l border-border hover:opacity-90 transition-opacity"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center text-xs font-medium">
+              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-medium">
                 {profile.avatar}
               </div>
               <span className="text-sm hidden lg:inline text-text">{profile.name}</span>
@@ -223,10 +223,10 @@ export default function Header({
             </button>
 
             {userOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-xl shadow-lg z-40 overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-xl z-40 overflow-hidden">
                 <div className="px-4 py-3 border-b border-border">
                   <div className="text-sm font-medium text-text">{profile.name}</div>
-                  <div className="text-xs text-text-secondary">{role === 's' ? 'S 端总站长' : 'B 端商户'}</div>
+                  <div className="text-xs text-text-secondary">{role === 's' ? 'S端(站长)' : 'B端(商户)'}</div>
                 </div>
                 <Link
                   to={`/${role}/profile`}

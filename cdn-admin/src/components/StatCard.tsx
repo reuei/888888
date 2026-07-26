@@ -1,10 +1,10 @@
 import type { StatCardData } from '../types';
 
 const colorMap: Record<string, string> = {
-  primary: 'bg-blue-50 text-primary border-primary/20',
-  success: 'bg-green-50 text-success border-success/20',
-  warning: 'bg-orange-50 text-warning border-warning/20',
-  danger: 'bg-red-50 text-danger border-danger/20',
+  primary: 'bg-blue-50 text-primary border-l-4 border-l-primary',
+  success: 'bg-green-50 text-success border-l-4 border-l-success',
+  warning: 'bg-orange-50 text-warning border-l-4 border-l-warning',
+  danger: 'bg-red-50 text-danger border-l-4 border-l-danger',
 };
 
 interface StatCardProps {
@@ -13,7 +13,7 @@ interface StatCardProps {
 
 export default function StatCard({ data }: StatCardProps) {
   return (
-    <div className={`card p-5 border ${colorMap[data.color || 'primary']}`}>
+    <div className={`card p-5 border border-border ${colorMap[data.color || 'primary']}`}>
       <div className="text-sm text-text-secondary mb-2">{data.title}</div>
       <div className="text-2xl font-bold tracking-tight">
         {data.value}

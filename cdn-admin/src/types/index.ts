@@ -1,4 +1,4 @@
-export type Role = 's' | 'b';
+export type Role = 's' | 'b' | 'c';
 export type SalesRole = 'user';
 
 export interface MenuItem {
@@ -222,13 +222,15 @@ export interface Agent {
   commission: number;
 }
 
+// Agent product (代理对接商品)
 export interface AgentProduct {
   id: string;
-  name: string;
-  source: string;
+  sourceProductId: string;
+  agentMerchantId: string;
   costPrice: number;
-  retailPrice: number;
-  status: 'on' | 'off' | 'pending';
+  salePrice: number;
+  auditStatus: 'pending' | 'approved' | 'rejected';
+  status: 'on' | 'off';
 }
 
 export interface CommissionRecord {
@@ -337,12 +339,14 @@ export interface ApiDoc {
   group: string;
 }
 
+// Settlement record
 export interface SettlementRecord {
   id: string;
   merchant: string;
   cycle: string;
   amount: number;
   fee: number;
+  netAmount: number;
   status: 'settled' | 'pending';
   time: string;
 }
@@ -377,4 +381,169 @@ export interface UserGrowthStat {
   newUsers: number;
   activeUsers: number;
   paidUsers: number;
+}
+
+// ============ Card platform domain (发卡平台) ============
+
+// Multi-tenant station (分站)
+export interface Station {
+  id: string;
+  name: string;
+  domain: string;
+  themeColor: string;
+  superAdmin: string;
+  settleMode: 't0' | 't1' | 't7';
+  merchantCount: number;
+  orderCount: number;
+  revenue: number;
+  status: 'active' | 'suspended';
+  createdAt: string;
+}
+
+// Card secret (卡密)
+export interface CardSecret {
+  id: string;
+  productId: string;
+  merchantId: string;
+  content: string;
+  status: 'unsold' | 'sold' | 'locked' | 'voided';
+  orderId?: string;
+  importBatchId: string;
+  createdAt: string;
+}
+
+// Import batch (导入批次)
+export interface ImportBatch {
+  id: string;
+  operatorId: string;
+  operatorRole: 's' | 'b';
+  total: number;
+  success: number;
+  fail: number;
+  deliverMode: 'sequential' | 'random';
+  errorFileUrl?: string;
+  createdAt: string;
+}
+
+// Agent relation (代理关系树)
+export interface AgentRelation {
+  id: string;
+  parentMerchantId: string;
+  childMerchantId: string;
+  level: number;
+  path: string;
+  commissionRate: number;
+}
+
+// Profit share (分润明细)
+export interface ProfitShare {
+  id: string;
+  orderId: string;
+  merchantId: string;
+  role: 'platform' | 'parent' | 'agent';
+  amount: number;
+  rate: number;
+  settleStatus: 'settled' | 'pending';
+}
+
+// Payment risk rule (风控策略)
+export interface PayRiskRule {
+  id: string;
+  scopeType: 'group' | 'merchant';
+  scopeId: string;
+  gatewayCode: string;
+  minAmount: number;
+  maxAmount: number;
+  randomEnabled: boolean;
+  randomRange: string;
+}
+
+// Payment channel (支付通道)
+export interface PayChannel {
+  id: string;
+  gatewayCode: string;
+  gatewayName: string;
+  scopeType: 'group' | 'merchant' | 'global';
+  scopeId: string;
+  enabled: boolean;
+  rate: number;
+  capFee: number;
+  costFee: number;
+  sort: number;
+}
+
+// Payment lock (随机金额占用)
+export interface PaymentLock {
+  id: string;
+  realAmount: number;
+  orderId: string;
+  gatewayCode: string;
+  expireAt: string;
+}
+
+// Fee group (费率分组)
+export interface FeeGroup {
+  id: string;
+  name: string;
+  rate: number;
+  merchantCount: number;
+  description: string;
+}
+
+// Banned product (禁售目录)
+export interface BannedProduct {
+  id: string;
+  keyword: string;
+  category: string;
+  matchType: 'keyword' | 'category';
+  createdAt: string;
+}
+
+// Stock alert (库存预警)
+export interface StockAlert {
+  id: string;
+  productId: string;
+  productName: string;
+  threshold: number;
+  currentStock: number;
+  merchantName: string;
+  status: 'alerting' | 'resolved';
+}
+
+// Announcement with popup
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  type: 'popup' | 'notice' | 'article';
+  isPopup: boolean;
+  countdown: number;
+  publishAt: string;
+  status: 'published' | 'draft';
+}
+
+// Customer service message
+export interface CSMessage {
+  id: string;
+  userId: string;
+  merchantId: string;
+  content: string;
+  direction: 'in' | 'out';
+  status: 'read' | 'unread';
+  createdAt: string;
+}
+
+// Card product (发卡商品)
+export interface CardProduct {
+  id: string;
+  name: string;
+  categoryId: string;
+  merchantId: string;
+  merchantName: string;
+  price: number;
+  stock: number;
+  soldCount: number;
+  deliveryMode: 'auto' | 'manual';
+  status: 'on' | 'off';
+  template: string;
 }

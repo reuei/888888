@@ -56,16 +56,13 @@ export default function Login({ onLogin }: LoginProps) {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Left brand area */}
-      <div className="relative hidden md:flex md:w-1/2 lg:w-[45%] flex-col justify-between p-10 lg:p-14 text-white overflow-hidden bg-gradient-to-br from-[#0052d9] via-[#3d52e8] to-[#9275ff]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_40%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(0,0,0,0.1),transparent_40%)]" />
-
+      <div className="relative hidden md:flex md:w-1/2 lg:w-[45%] flex-col justify-between p-10 lg:p-14 text-white overflow-hidden bg-primary">
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
               <Shield size={22} />
             </div>
-            <span className="text-xl font-bold">EdgeOne 控制台</span>
+            <span className="text-xl font-bold">玄武发卡</span>
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold leading-tight mb-4">
             统一控制台 · 规则编排 · 异步任务同步
@@ -91,15 +88,15 @@ export default function Login({ onLogin }: LoginProps) {
 
       {/* Right login form */}
       <div className="flex-1 flex items-center justify-center p-4 md:p-8 lg:p-12 bg-bg relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+        <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
 
-        <div className="relative w-full max-w-md bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl ring-1 ring-slate-200 p-8 md:p-10">
+        <div className="relative w-full max-w-md bg-white/90 backdrop-blur-xl rounded-2xl border border-border p-8 md:p-10">
           {/* Mobile logo */}
           <div className="md:hidden flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center">
               <Shield size={22} />
             </div>
-            <span className="text-xl font-bold text-text">EdgeOne 控制台</span>
+            <span className="text-xl font-bold text-text">玄武发卡</span>
           </div>
 
           <div className="mb-6">
@@ -112,18 +109,18 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               onClick={() => handleRoleChange('s')}
               className={`flex-1 py-2 rounded-md text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                role === 's' ? 'bg-white text-primary shadow-sm' : 'text-text-secondary hover:text-text'
+                role === 's' ? 'bg-white text-primary border border-border' : 'text-text-secondary hover:text-text'
               }`}
             >
-              <Shield size={16} /> S 端总站长
+              <Shield size={16} /> S端 总站长
             </button>
             <button
               onClick={() => handleRoleChange('b')}
               className={`flex-1 py-2 rounded-md text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                role === 'b' ? 'bg-white text-primary shadow-sm' : 'text-text-secondary hover:text-text'
+                role === 'b' ? 'bg-white text-primary border border-border' : 'text-text-secondary hover:text-text'
               }`}
             >
-              <Store size={16} /> B 端商户
+              <Store size={16} /> B端 商户
             </button>
           </div>
 
@@ -173,7 +170,7 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full py-2.5 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-primary to-primary-dark shadow-lg shadow-primary/25 hover:shadow-primary/40 disabled:opacity-70 transition-all"
+              className="w-full py-2.5 rounded-lg text-sm font-medium text-white bg-primary disabled:opacity-70 transition-all"
             >
               {loading ? '登录中...' : '登录'}
             </button>

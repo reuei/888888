@@ -125,10 +125,11 @@
     align-items: center;
     gap: 8px;
     text-decoration: none;
-    transition: box-shadow 0.3s;
+    border: 1px solid var(--border);
+    transition: border-color 0.3s, background-color 0.3s;
 
     &:hover {
-      box-shadow: var(--shadow);
+      border-color: var(--accent);
     }
     .button-icon {
       height: 18px;

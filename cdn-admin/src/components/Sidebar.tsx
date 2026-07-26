@@ -78,15 +78,15 @@ export default function Sidebar({ role, collapsed, onNavigate }: SidebarProps) {
     >
       <div className="h-14 flex items-center justify-center border-b border-border">
         {collapsed ? (
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
             <Shield size={16} />
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center">
               <Shield size={15} />
             </div>
-            <span className="font-bold text-text">EdgeOne</span>
+            <span className="font-bold text-text">玄武发卡</span>
           </div>
         )}
       </div>
@@ -105,7 +105,7 @@ export default function Sidebar({ role, collapsed, onNavigate }: SidebarProps) {
                 className={({ isActive }) =>
                   `flex items-center justify-center h-10 mx-1 rounded-lg mb-1 transition-all ${
                     isActive
-                      ? 'bg-primary text-white shadow-md shadow-primary/25'
+                      ? 'bg-primary text-white'
                       : 'text-text-secondary hover:bg-hover-bg hover:text-text'
                   }`
                 }
@@ -162,7 +162,7 @@ export default function Sidebar({ role, collapsed, onNavigate }: SidebarProps) {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 h-10 text-sm rounded-lg transition-all ${
                       isActive
-                        ? 'bg-primary text-white shadow-md shadow-primary/25 font-medium'
+                        ? 'bg-primary text-white font-medium'
                         : 'text-text-secondary hover:bg-hover-bg hover:text-text'
                     }`
                   }

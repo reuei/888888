@@ -1,0 +1,462 @@
+{extend name="layout" /}
+
+{block name="title"}余额管理 - QEEFG授权站{/block}
+
+{block name="style"}
+<style>
+    .user-header {
+        background-color: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1rem 0;
+    }
+    
+    .user-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .icon-btn {
+        width: 40px;
+        height: 40px;
+        background: none;
+        border: 2px solid #000000;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .icon-btn:hover {
+        background-color: #000000;
+        color: #ffffff;
+    }
+    
+    .lang-btn, .theme-btn {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        background: #ffffff;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .lang-btn:hover, .theme-btn:hover {
+        border-color: #000000;
+    }
+    
+    .avatar {
+        width: 40px;
+        height: 40px;
+        background-color: #000000;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .balance-container {
+        padding: 2rem 0;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 2rem;
+    }
+    
+    .balance-card {
+        background: #000000;
+        color: #ffffff;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .balance-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-bottom: 0.5rem;
+    }
+    
+    .balance-amount {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .balance-actions {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .recharge-btn {
+        padding: 0.75rem 2rem;
+        border: 2px solid #ffffff;
+        background-color: #ffffff;
+        color: #000000;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .recharge-btn:hover {
+        background-color: #000000;
+        color: #ffffff;
+    }
+    
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+    
+    .card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .recharge-options {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .recharge-option {
+        padding: 1.5rem;
+        border: 2px solid #e2e8f0;
+        background: #ffffff;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .recharge-option:hover, .recharge-option.active {
+        border-color: #000000;
+        background-color: #f7fafc;
+    }
+    
+    .recharge-option.active {
+        border-color: #000000;
+        background-color: #000000;
+        color: #ffffff;
+    }
+    
+    .recharge-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    
+    .recharge-gift {
+        font-size: 0.85rem;
+        color: #718096;
+    }
+    
+    .recharge-option.active .recharge-gift {
+        color: #e2e8f0;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background-color: #ffffff;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #000000;
+    }
+    
+    .submit-btn {
+        display: block;
+        width: 100%;
+        padding: 0.875rem;
+        border: 2px solid #000000;
+        background-color: #000000;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .submit-btn:hover {
+        background-color: #ffffff;
+        color: #000000;
+    }
+    
+    .log-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #f7fafc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .log-item:last-child {
+        border-bottom: none;
+    }
+    
+    .log-info {
+        flex: 1;
+    }
+    
+    .log-type {
+        font-weight: 600;
+        color: #000000;
+        margin-bottom: 0.25rem;
+    }
+    
+    .log-time {
+        color: #a0aec0;
+        font-size: 0.85rem;
+    }
+    
+    .log-amount {
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+    
+    .log-amount.income {
+        color: #38a169;
+    }
+    
+    .log-amount.expense {
+        color: #e53e3e;
+    }
+    
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        border-color: #000000;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #000000;
+    }
+    
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .recharge-options {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .recharge-options {
+            grid-template-columns: 1fr;
+        }
+        
+        .balance-amount {
+            font-size: 2.5rem;
+        }
+        
+        .header-right {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{/block}
+
+{block name="content"}
+<!-- 用户中心头部 -->
+<div class="user-header">
+    <div class="container">
+        <div class="user-header-content">
+            <div class="header-left">
+                <button id="menuToggle" class="icon-btn">
+                    <span style="width: 18px; height: 2px; background-color: #000000; display: block;"></span>
+                    <span style="width: 18px; height: 2px; background-color: #000000; display: block;"></span>
+                    <span style="width: 18px; height: 2px; background-color: #000000; display: block;"></span>
+                </button>
+            </div>
+            
+            <div class="header-right">
+                <button class="lang-btn" id="langToggle">中文</button>
+                <button class="theme-btn" id="themeToggle">☀️</button>
+                <div class="avatar" title="{$user.email}">{$user.username|substr=0,1}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file="menu" /}
+
+<div class="balance-container">
+    <div class="container">
+        <h1 class="page-title">余额管理</h1>
+        
+        <!-- 余额卡片 -->
+        <div class="balance-card">
+            <div class="balance-label">当前余额（元）</div>
+            <div class="balance-amount">¥{$user.balance|default="0.00"}</div>
+            <div class="balance-actions">
+                <button class="recharge-btn" onclick="document.getElementById('rechargeSection').scrollIntoView({behavior: 'smooth'})">充值</button>
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <div>
+                <!-- 充值 -->
+                <div class="card" id="rechargeSection">
+                    <h3 class="card-title">充值余额</h3>
+                    <p style="color: #718096; margin-bottom: 1rem;">选择充值金额或自定义金额</p>
+                    
+                    <div class="recharge-options">
+                        <div class="recharge-option" onclick="selectAmount(10)">
+                            <div class="recharge-amount">¥10</div>
+                        </div>
+                        <div class="recharge-option" onclick="selectAmount(50)">
+                            <div class="recharge-amount">¥50</div>
+                        </div>
+                        <div class="recharge-option" onclick="selectAmount(100)">
+                            <div class="recharge-amount">¥100</div>
+                        </div>
+                        <div class="recharge-option" onclick="selectAmount(500)">
+                            <div class="recharge-amount">¥500</div>
+                        </div>
+                    </div>
+                    
+                    <form action="/user/recharge" method="post">
+                        <div class="form-group">
+                            <label class="form-label">自定义金额</label>
+                            <input type="number" name="amount" id="rechargeAmount" class="form-input" placeholder="请输入充值金额" min="1" step="0.01">
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">立即充值</button>
+                    </form>
+                </div>
+                
+                <!-- 余额记录 -->
+                <div class="card">
+                    <h3 class="card-title">余额记录</h3>
+                    
+                    {if condition="!empty($balance_logs)"}
+                    {volist name="balance_logs" id="log"}
+                    <div class="log-item">
+                        <div class="log-info">
+                            <div class="log-type">{$log.type_text}</div>
+                            <div class="log-time">{$log.create_time|date="Y-m-d H:i"}</div>
+                        </div>
+                        <div class="log-amount {if condition='$log.amount > 0'}income{else /}expense{/if}">
+                            {if condition='$log.amount > 0'}+{/if}{$log.amount}
+                        </div>
+                    </div>
+                    {/volist}
+                    {else /}
+                    <div style="color: #a0aec0; text-align: center; padding: 2rem 0;">暂无记录</div>
+                    {/if}
+                </div>
+            </div>
+            
+            <div>
+                <!-- 统计 -->
+                <div class="stat-card">
+                    <div class="stat-label">累计充值</div>
+                    <div class="stat-value">¥{$stats.total_recharge|default="0.00"}</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">累计消费</div>
+                    <div class="stat-value">¥{$stats.total_spent|default="0.00"}</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">订单数量</div>
+                    <div class="stat-value">{$stats.order_count|default="0"}</div>
+                </div>
+                
+                <!-- 充值说明 -->
+                <div class="card">
+                    <h3 class="card-title">充值说明</h3>
+                    <div style="color: #718096; font-size: 0.9rem; line-height: 1.8;">
+                        <p>• 充值金额将实时到账</p>
+                        <p>• 充值后可用于购买产品授权</p>
+                        <p>• 余额不支持提现</p>
+                        <p>• 如有疑问请联系客服</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+function selectAmount(amount) {
+    document.getElementById('rechargeAmount').value = amount;
+    
+    // 移除所有active类
+    document.querySelectorAll('.recharge-option').forEach(function(el) {
+        el.classList.remove('active');
+    });
+    
+    // 添加active类
+    event.currentTarget.classList.add('active');
+}
+</script>
+{/block}

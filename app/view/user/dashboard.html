@@ -1,0 +1,402 @@
+{extend name="layout" /}
+
+{block name="title"}用户中心 - QEEFG授权站{/block}
+
+{block name="style"}
+<style>
+    .user-header {
+        background-color: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1rem 0;
+    }
+    
+    .user-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .icon-btn {
+        width: 40px;
+        height: 40px;
+        background: none;
+        border: 2px solid #000000;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .icon-btn:hover {
+        background-color: #000000;
+        color: #ffffff;
+    }
+    
+    .lang-btn, .theme-btn {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        background: #ffffff;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .lang-btn:hover, .theme-btn:hover {
+        border-color: #000000;
+    }
+    
+    .avatar {
+        width: 40px;
+        height: 40px;
+        background-color: #000000;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .dashboard-container {
+        padding: 2rem 0;
+    }
+    
+    .welcome-section {
+        margin-bottom: 2rem;
+    }
+    
+    .welcome-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 0.5rem;
+    }
+    
+    .welcome-subtitle {
+        color: #718096;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        border-color: #000000;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #000000;
+    }
+    
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+    
+    .card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .card-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #000000;
+    }
+    
+    .card-link {
+        color: #4a5568;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s;
+    }
+    
+    .card-link:hover {
+        color: #000000;
+    }
+    
+    .license-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #f7fafc;
+    }
+    
+    .license-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    
+    .license-name {
+        font-weight: 600;
+        color: #000000;
+        margin-bottom: 0.25rem;
+    }
+    
+    .license-info {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+    
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .action-btn {
+        display: block;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #000000;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .action-btn:hover {
+        background-color: #000000;
+        color: #ffffff;
+        border-color: #000000;
+    }
+    
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .header-right {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .lang-btn, .theme-btn {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{/block}
+
+{block name="content"}
+<!-- 用户中心头部 -->
+<div class="user-header">
+    <div class="container">
+        <div class="user-header-content">
+            <div class="header-left">
+                <!-- 汉堡菜单按钮 -->
+                <button id="menuToggle" class="icon-btn" style="width: 40px; height: 40px; background: none; border: 2px solid #000000; cursor: pointer; display: flex; flex-direction: column; justify-content: space-around; align-items: center; padding: 8px;">
+                    <span style="width: 18px; height: 2px; background-color: #000000; display: block;"></span>
+                    <span style="width: 18px; height: 2px; background-color: #000000; display: block;"></span>
+                    <span style="width: 18px; height: 2px; background-color: #000000; display: block;"></span>
+                </button>
+            </div>
+            
+            <div class="header-right">
+                <!-- 中英文切换 -->
+                <button class="lang-btn" id="langToggle">中文</button>
+                
+                <!-- 昼夜切换 -->
+                <button class="theme-btn" id="themeToggle">☀️</button>
+                
+                <!-- 用户头像（QQ邮箱） -->
+                <div class="avatar" title="{$user.email}">
+                    {$user.username|substr=0,1}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 汉堡菜单 -->
+{include file="menu" /}
+
+<div class="dashboard-container">
+    <div class="container">
+        <!-- 欢迎区域 -->
+        <div class="welcome-section">
+            <h1 class="welcome-title">欢迎回来，{$user.username}</h1>
+            <p class="welcome-subtitle">这是您的用户中心，可以管理您的授权和账户信息</p>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">我的产品</div>
+                <div class="stat-value">{$stats.products|default="0"}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">授权数量</div>
+                <div class="stat-value">{$stats.licenses|default="0"}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">账户余额</div>
+                <div class="stat-value">¥{$user.balance|default="0.00"}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">消费总额</div>
+                <div class="stat-value">¥{$stats.spent|default="0.00"}</div>
+            </div>
+        </div>
+        
+        <!-- 内容区域 -->
+        <div class="content-grid">
+            <div>
+                <!-- 最近授权 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">最近授权</h3>
+                        <a href="/user/my_products" class="card-link">查看全部 →</a>
+                    </div>
+                    <div>
+                        {if condition="!empty($recent_licenses)"}
+                        {volist name="recent_licenses" id="license"}
+                        <div class="license-item">
+                            <div class="license-name">{$license.product_name}</div>
+                            <div class="license-info">到期时间：{$license.expire_time|date="Y-m-d H:i"} | 状态：{$license.status_text}</div>
+                        </div>
+                        {/volist}
+                        {else /}
+                        <div style="color: #a0aec0; text-align: center; padding: 2rem 0;">暂无授权记录</div>
+                        {/if}
+                    </div>
+                </div>
+                
+                <!-- 最近订单 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">最近订单</h3>
+                        <a href="/user/orders" class="card-link">查看全部 →</a>
+                    </div>
+                    <div>
+                        {if condition="!empty($recent_orders)"}
+                        {volist name="recent_orders" id="order"}
+                        <div class="license-item">
+                            <div class="license-name">{$order.product_name} - {$order.order_no}</div>
+                            <div class="license-info">金额：¥{$order.amount} | 状态：{$order.status_text} | {$order.create_time|date="Y-m-d H:i"}</div>
+                        </div>
+                        {/volist}
+                        {else /}
+                        <div style="color: #a0aec0; text-align: center; padding: 2rem 0;">暂无订单记录</div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <!-- 快捷操作 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">快捷操作</h3>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="/user/products" class="action-btn">浏览产品</a>
+                        <a href="/user/balance" class="action-btn">充值余额</a>
+                        <a href="/user/my_products" class="action-btn">我的授权</a>
+                        <a href="/user/settings" class="action-btn">账户设置</a>
+                    </div>
+                </div>
+                
+                <!-- 系统公告 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">系统公告</h3>
+                    </div>
+                    <div>
+                        {if condition="!empty($notices)"}
+                        {volist name="notices" id="notice"}
+                        <div style="padding: 0.75rem 0; border-bottom: 1px solid #f7fafc;">
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">{$notice.title}</div>
+                            <div style="font-size: 0.85rem; color: #718096;">{$notice.content}</div>
+                        </div>
+                        {/volist}
+                        {else /}
+                        <div style="color: #a0aec0; text-align: center; padding: 1rem 0;">暂无公告</div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+// 语言切换
+document.getElementById('langToggle').addEventListener('click', function() {
+    if (this.textContent === '中文') {
+        this.textContent = 'EN';
+    } else {
+        this.textContent = '中文';
+    }
+});
+
+// 主题切换
+document.getElementById('themeToggle').addEventListener('click', function() {
+    if (this.textContent === '☀️') {
+        this.textContent = '🌙';
+        document.body.style.backgroundColor = '#1a202c';
+        document.body.style.color = '#e2e8f0';
+    } else {
+        this.textContent = '☀️';
+        document.body.style.backgroundColor = '#ffffff';
+        document.body.style.color = '#333333';
+    }
+});
+</script>
+{/block}

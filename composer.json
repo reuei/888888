@@ -1,0 +1,28 @@
+{
+    "name": "qeefg/auth-system",
+    "description": "QEEFG授权站系统",
+    "type": "project",
+    "keywords": [
+        "auth",
+        "license",
+        "thinkphp"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1",
+        "topthink/framework": "^8.0",
+        "topthink/think-orm": "^2.0",
+        "topthink/think-view": "^1.0",
+        "topthink/think-captcha": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "app/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
+    }
+}

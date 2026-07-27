@@ -1,0 +1,259 @@
+{extend name="layout" /}
+
+{block name="title"}QEEFG授权站 - 便捷快速的授权管理系统{/block}
+
+{block name="style"}
+<style>
+    .hero {
+        min-height: calc(100vh - 120px);
+        display: flex;
+        align-items: center;
+        padding: 2rem 0;
+    }
+    
+    .hero-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+    
+    .hero-text h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+    
+    .hero-text h2 {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #4a5568;
+        margin-bottom: 2rem;
+        line-height: 1.4;
+    }
+    
+    .hero-text p {
+        font-size: 1.1rem;
+        color: #718096;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+    }
+    
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .hero-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .image-placeholder {
+        width: 100%;
+        height: 400px;
+        background: linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%);
+        border: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a0aec0;
+        font-size: 1rem;
+    }
+    
+    .features {
+        padding: 4rem 0;
+        background-color: #f7fafc;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+    
+    .feature-card {
+        background: #ffffff;
+        padding: 2rem;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        border-color: #000000;
+    }
+    
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        background-color: #000000;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 0.75rem;
+    }
+    
+    .feature-card p {
+        color: #718096;
+        line-height: 1.6;
+    }
+    
+    @media (max-width: 1024px) {
+        .hero-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+        
+        .hero-image {
+            order: -1;
+        }
+        
+        .hero-buttons {
+            justify-content: center;
+        }
+        
+        .hero-text h1 {
+            font-size: 2.5rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .hero-text h1 {
+            font-size: 2rem;
+        }
+        
+        .image-placeholder {
+            height: 300px;
+        }
+    }
+</style>
+{/block}
+
+{block name="content"}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>QEEFG授权站</h1>
+                <h2>便捷快速的授权管理系统</h2>
+                <p>
+                    专业的软件授权解决方案，为开发者和企业提供安全、高效、易用的授权管理服务。
+                    一键授权，轻松管理，让软件保护变得简单。
+                </p>
+                <div class="hero-buttons">
+                    <a href="/user/register" class="btn">立即开始</a>
+                    <a href="/user/login" class="btn btn-outline">登录账户</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="image-placeholder">
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🚀</div>
+                        <div>授权管理插画占位符</div>
+                        <div style="font-size: 0.85rem; color: #cbd5e0;">建议尺寸: 600x400</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2 style="font-size: 2rem; font-weight: 700; color: #000000; margin-bottom: 1rem;">为什么选择QEEFG？</h2>
+            <p style="color: #718096; max-width: 600px; margin: 0 auto;">我们提供全面的授权管理功能，帮助您轻松保护软件产品</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>快速部署</h3>
+                <p>几分钟内完成授权系统集成，无需复杂的配置和开发工作，即可为您的软件添加授权保护。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>安全可靠</h3>
+                <p>采用先进的加密技术和安全协议，确保授权信息和用户数据的安全性，防止破解和篡改。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>便捷管理</h3>
+                <p>直观的后台管理界面，轻松管理产品、授权、订单和用户，实时查看统计数据和运营状况。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>灵活计费</h3>
+                <p>支持多种授权周期和定价策略，满足不同业务需求。余额充值系统让支付更加便捷。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>精准控制</h3>
+                <p>完善的授权控制机制，支持设备绑定、授权验证、到期提醒等功能，全面掌控软件使用权限。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🛠️</div>
+                <h3>API集成</h3>
+                <p>提供丰富的API接口和SDK，轻松集成到您的软件产品中，实现自动化的授权验证和管理。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section style="padding: 4rem 0; background-color: #000000; color: #ffffff;">
+    <div class="container">
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align: center;">
+            <div>
+                <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">{$stats.users|default="1000"}+</div>
+                <div style="color: #a0aec0; font-size: 0.9rem;">注册用户</div>
+            </div>
+            <div>
+                <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">{$stats.products|default="50"}+</div>
+                <div style="color: #a0aec0; font-size: 0.9rem;">授权产品</div>
+            </div>
+            <div>
+                <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">{$stats.licenses|default="10000"}+</div>
+                <div style="color: #a0aec0; font-size: 0.9rem;">授权次数</div>
+            </div>
+            <div>
+                <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">99.9%</div>
+                <div style="color: #a0aec0; font-size: 0.9rem;">服务可用性</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section style="padding: 4rem 0; text-align: center;">
+    <div class="container">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #000000; margin-bottom: 1rem;">准备好开始了吗？</h2>
+        <p style="color: #718096; max-width: 600px; margin: 0 auto 2rem;">立即注册，享受专业的软件授权管理服务，让您的产品获得全面保护</p>
+        <a href="/user/register" class="btn" style="font-size: 1.1rem; padding: 1rem 2.5rem;">免费注册</a>
+    </div>
+</section>
+{/block}

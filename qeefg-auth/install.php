@@ -181,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="container">
         <div class="logo">
-            <h1>QEEFG授权站 v3.0</h1>
+            <h1>QEEFG授权站 v4.0</h1>
             <p>专业软件授权管理平台</p>
         </div>
         

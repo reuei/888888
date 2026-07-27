@@ -1,22 +1,31 @@
 <?php
 /**
- * 数据库配置
+ * 数据库配置文件
  */
 return [
     'default' => 'mysql',
     'connections' => [
         'mysql' => [
             'type'            => 'mysql',
-            'hostname'        => env('database.hostname', '127.0.0.1'),
-            'database'        => env('database.database', 'qeefg_auth'),
-            'username'        => env('database.username', 'root'),
-            'password'        => env('database.password', ''),
-            'hostport'        => env('database.hostport', '3306'),
-            'charset'         => env('database.charset', 'utf8mb4'),
-            'prefix'          => env('database.prefix', 'qf_'),
-            'debug'           => env('app.debug', true),
-            'fields_cache'    => false,
-            'schema_cache'    => false,
+            'hostname'        => env('DB_HOST', '127.0.0.1'),
+            'database'        => env('DB_NAME', 'qeefg_auth'),
+            'username'        => env('DB_USER', 'root'),
+            'password'        => env('DB_PASS', ''),
+            'hostport'        => env('DB_PORT', '3306'),
+            'charset'         => 'utf8mb4',
+            'prefix'          => 'qf_',
         ],
     ],
 ];
+
+/**
+ * 环境变量辅助函数
+ */
+function env($key, $default = null)
+{
+    $value = getenv($key);
+    if ($value === false) {
+        return $default;
+    }
+    return $value;
+}

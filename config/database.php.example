@@ -1,0 +1,20 @@
+<?php
+/**
+ * 数据库配置示例文件
+ * 请复制为 database.php 并修改配置
+ */
+return [
+    'default' => 'mysql',
+    'connections' => [
+        'mysql' => [
+            'type'            => 'mysql',
+            'hostname'        => '127.0.0.1',      // 数据库地址
+            'database'        => 'qeefg_auth',     // 数据库名
+            'username'        => 'root',           // 用户名
+            'password'        => '',               // 密码
+            'hostport'        => '3306',           // 端口
+            'charset'         => 'utf8mb4',        // 字符集
+            'prefix'          => 'qf_',            // 表前缀
+        ],
+    ],
+];

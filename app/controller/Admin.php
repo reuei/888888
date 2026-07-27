@@ -1,16 +1,8 @@
 <?php
 namespace app\controller;
 
-use app\model\Admins;
-use app\model\Users;
-use app\model\Products;
-use app\model\Licenses;
-use app\model\Orders;
-use app\model\Settings;
-use think\facade\Session;
-
 /**
- * 后台管理控制器
+ * 后台管理控制器 - 简化版
  */
 class Admin extends BaseController
 {
@@ -19,52 +11,49 @@ class Admin extends BaseController
      */
     public function login()
     {
-        if (Session::get('admin_id')) {
-            return redirect('/admin/dashboard');
+        if (isset($_SESSION['admin_id'])) {
+            header('Location: /admin/dashboard');
+            exit;
         }
-        return $this->fetch();
+        return $this->render('admin/login');
     }
 
     /**
-     * 执行后台登录
+     * 处理后台登录
      */
     public function dologin()
     {
-        $username = $this->request->post('username', '');
-        $password = $this->request->post('password', '');
-        
+        $username = $this->post('username', '');
+        $password = $this->post('password', '');
+
         if (empty($username) || empty($password)) {
             return $this->error('请填写完整信息');
         }
-        
-        $admin = Admins::where('username', $username)->find();
-        
-        if (!$admin) {
-            return $this->error('管理员不存在');
-        }
-        
-        if ($admin->status != 1) {
-            return $this->error('账户已被禁用');
-        }
-        
-        if (!password_verify($password, $admin->password)) {
-            return $this->error('密码错误');
-        }
-        
-        Session::set('admin_id', $admin->id);
-        Session::set('admin_username', $admin->username);
-        
-        return $this->success(['redirect' => '/admin/dashboard'], '登录成功');
-    }
 
-    /**
-     * 后台退出
-     */
-    public function logout()
-    {
-        Session::delete('admin_id');
-        Session::delete('admin_username');
-        return redirect('/admin/login');
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM qf_admins WHERE username = ?");
+            $stmt->execute([$username]);
+            $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$admin) {
+                return $this->error('管理员不存在');
+            }
+
+            if ($admin['status'] != 1) {
+                return $this->error('账户已被禁用');
+            }
+
+            if (!password_verify($password, $admin['password'])) {
+                return $this->error('密码错误');
+            }
+
+            $_SESSION['admin_id'] = $admin['id'];
+            $_SESSION['admin_username'] = $admin['username'];
+
+            return $this->success(['redirect' => '/admin/dashboard'], '登录成功');
+        } catch (\PDOException $e) {
+            return $this->error('系统错误: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -73,16 +62,29 @@ class Admin extends BaseController
     public function dashboard()
     {
         $this->checkAdminLogin();
-        
+
         $stats = [
-            'users'    => Users::count(),
-            'products' => Products::count(),
-            'licenses' => Licenses::count(),
-            'orders'   => Orders::count(),
-            'revenue'  => Orders::where('payment_status', 1)->sum('amount'),
+            'users' => 0,
+            'products' => 0,
+            'licenses' => 0,
+            'orders' => 0,
+            'revenue' => 0
         ];
-        
-        return $this->fetch('', ['stats' => $stats]);
+
+        try {
+            $stats['users'] = $this->db->query("SELECT COUNT(*) FROM qf_users")->fetchColumn();
+            $stats['products'] = $this->db->query("SELECT COUNT(*) FROM qf_products")->fetchColumn();
+            $stats['licenses'] = $this->db->query("SELECT COUNT(*) FROM qf_licenses")->fetchColumn();
+            $stats['orders'] = $this->db->query("SELECT COUNT(*) FROM qf_orders")->fetchColumn();
+
+            $stmt = $this->db->query("SELECT SUM(amount) FROM qf_orders WHERE payment_status = 1");
+            $revenue = $stmt->fetchColumn();
+            $stats['revenue'] = $revenue ?: 0;
+        } catch (\PDOException $e) {
+            // 表可能不存在
+        }
+
+        return $this->render('admin/dashboard', ['stats' => $stats]);
     }
 
     /**
@@ -91,11 +93,27 @@ class Admin extends BaseController
     public function users()
     {
         $this->checkAdminLogin();
-        
-        $users = Users::order('created_at', 'desc')
-            ->paginate(15);
-        
-        return $this->fetch('', ['users' => $users]);
+
+        $page = intval($this->get('page', 1));
+        $pageSize = 15;
+        $offset = ($page - 1) * $pageSize;
+
+        $users = [];
+        $total = 0;
+
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM qf_users ORDER BY created_at DESC LIMIT ?, ?");
+            $stmt->execute([$offset, $pageSize]);
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $total = $this->db->query("SELECT COUNT(*) FROM qf_users")->fetchColumn();
+        } catch (\PDOException $e) {
+            // 表可能不存在
+        }
+
+        $totalPages = ceil($total / $pageSize);
+
+        return $this->render('admin/users', ['users' => $users, 'page' => $page, 'totalPages' => $totalPages]);
     }
 
     /**
@@ -104,39 +122,27 @@ class Admin extends BaseController
     public function products()
     {
         $this->checkAdminLogin();
-        
-        $products = Products::order('sort', 'desc')
-            ->paginate(15);
-        
-        return $this->fetch('', ['products' => $products]);
-    }
 
-    /**
-     * 授权管理
-     */
-    public function licenses()
-    {
-        $this->checkAdminLogin();
-        
-        $licenses = Licenses::with(['user', 'product'])
-            ->order('created_at', 'desc')
-            ->paginate(15);
-        
-        return $this->fetch('', ['licenses' => $licenses]);
-    }
+        $page = intval($this->get('page', 1));
+        $pageSize = 15;
+        $offset = ($page - 1) * $pageSize;
 
-    /**
-     * 订单管理
-     */
-    public function orders()
-    {
-        $this->checkAdminLogin();
-        
-        $orders = Orders::with(['user', 'product'])
-            ->order('created_at', 'desc')
-            ->paginate(15);
-        
-        return $this->fetch('', ['orders' => $orders]);
+        $products = [];
+        $total = 0;
+
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM qf_products ORDER BY sort DESC LIMIT ?, ?");
+            $stmt->execute([$offset, $pageSize]);
+            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $total = $this->db->query("SELECT COUNT(*) FROM qf_products")->fetchColumn();
+        } catch (\PDOException $e) {
+            // 表可能不存在
+        }
+
+        $totalPages = ceil($total / $pageSize);
+
+        return $this->render('admin/products', ['products' => $products, 'page' => $page, 'totalPages' => $totalPages]);
     }
 
     /**
@@ -145,41 +151,28 @@ class Admin extends BaseController
     public function settings()
     {
         $this->checkAdminLogin();
-        
-        $settings = Settings::all();
-        $config = [];
-        
-        foreach ($settings as $item) {
-            $config[$item->key] = $item->value;
+
+        $settings = [];
+        try {
+            $stmt = $this->db->query("SELECT * FROM qf_settings");
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($results as $item) {
+                $settings[$item['key']] = $item['value'];
+            }
+        } catch (\PDOException $e) {
+            // 表可能不存在
         }
-        
-        return $this->fetch('', ['config' => $config]);
+
+        return $this->render('admin/settings', ['settings' => $settings]);
     }
 
     /**
-     * 保存系统设置
+     * 后台退出
      */
-    public function saveSettings()
+    public function logout()
     {
-        $this->checkAdminLogin();
-        
-        $data = $this->request->post();
-        
-        foreach ($data as $key => $value) {
-            Settings::where('key', $key)->update(['value' => $value]);
-        }
-        
-        return $this->success([], '保存成功');
-    }
-
-    /**
-     * 检查管理员登录状态
-     */
-    private function checkAdminLogin()
-    {
-        if (!Session::get('admin_id')) {
-            redirect('/admin/login')->send();
-            exit;
-        }
+        session_destroy();
+        header('Location: /admin/login');
+        exit;
     }
 }

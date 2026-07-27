@@ -1,128 +1,141 @@
 <?php
 namespace app\controller;
 
-use think\App;
-use think\exception\ValidateException;
-use think\Validate;
-
 /**
- * 控制器基类
+ * 控制器基类 - 简化版
  */
-abstract class BaseController
+class BaseController
 {
-    /**
-     * 应用实例
-     * @var App
-     */
-    protected $app;
-
-    /**
-     * 请求实例
-     */
-    protected $request;
-
-    /**
-     * 是否批量验证
-     * @var bool
-     */
-    protected $batchValidate = false;
-
-    /**
-     * 控制器中间件
-     * @var array
-     */
-    protected $middleware = [];
-
-    /**
-     * 构造方法
-     * @access public
-     * @param  App  $app  应用实例
-     */
-    public function __construct(App $app)
+    protected $db;
+    
+    public function __construct()
     {
-        $this->app     = $app;
-        $this->request = $this->app->request;
-
-        // 控制器初始化
-        $this->initialize();
+        $this->initDatabase();
+        $this->startSession();
     }
-
+    
     /**
-     * 初始化
+     * 初始化数据库连接
      */
-    protected function initialize()
-    {}
-
-    /**
-     * 验证数据
-     * @access protected
-     * @param  array        $data     数据
-     * @param  string|array $validate 验证器名或者验证规则数组
-     * @param  array        $message  提示信息
-     * @param  bool         $batch    是否批量验证
-     * @return array|string|true
-     * @throws ValidateException
-     */
-    protected function validate(array $data, $validate, array $message = [], bool $batch = false)
+    protected function initDatabase()
     {
-        if (is_array($validate)) {
-            $v = new Validate();
-            $v->rule($validate);
-        } else {
-            if (strpos($validate, '.')) {
-                // 支持场景
-                [$validate, $scene] = explode('.', $validate);
-            }
-            $class = false !== strpos($validate, '\\') ? $validate : $this->app->parseClass('validate', $validate);
-            $v     = new $class();
-            if (!empty($scene)) {
-                $v->scene($scene);
-            }
+        try {
+            $config = include ROOT_PATH . 'config/database.php';
+            $dsn = "mysql:host={$config['connections']['mysql']['hostname']};";
+            $dsn .= "dbname={$config['connections']['mysql']['database']};";
+            $dsn .= "charset={$config['connections']['mysql']['charset']}";
+            
+            $this->db = new PDO($dsn, 
+                $config['connections']['mysql']['username'],
+                $config['connections']['mysql']['password']
+            );
+            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die('数据库连接失败: ' . $e->getMessage());
         }
-
-        $v->message($message);
-
-        // 是否批量验证
-        if ($batch || $this->batchValidate) {
-            $v->batch(true);
+    }
+    
+    /**
+     * 启动Session
+     */
+    protected function startSession()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
-
-        return $v->failException(true)->check($data);
     }
-
-    /**
-     * 返回成功响应
-     */
-    protected function success($data = [], $msg = '操作成功', $code = 200)
-    {
-        return json([
-            'code' => $code,
-            'msg'  => $msg,
-            'data' => $data
-        ]);
-    }
-
-    /**
-     * 返回失败响应
-     */
-    protected function error($msg = '操作失败', $code = 400)
-    {
-        return json([
-            'code' => $code,
-            'msg'  => $msg,
-            'data' => []
-        ]);
-    }
-
+    
     /**
      * 渲染模板
      */
-    protected function fetch(string $template = '', array $vars = [])
+    protected function render($template, $data = [])
     {
-        if (!$template) {
-            $template = $this->request->controller() . '/' . $this->request->action();
+        extract($data);
+        $templateFile = APP_PATH . 'view/' . $template . '.php';
+        
+        if (!file_exists($templateFile)) {
+            return "模板文件不存在: {$template}";
         }
-
-        return view($template, $vars);
+        
+        ob_start();
+        include $templateFile;
+        return ob_get_clean();
+    }
+    
+    /**
+     * 返回JSON响应
+     */
+    protected function json($data)
+    {
+        header('Content-Type: application/json');
+        return json_encode($data);
+    }
+    
+    /**
+     * 成功响应
+     */
+    protected function success($data = [], $msg = '操作成功')
+    {
+        return $this->json([
+            'code' => 200,
+            'msg' => $msg,
+            'data' => $data
+        ]);
+    }
+    
+    /**
+     * 失败响应
+     */
+    protected function error($msg = '操作失败')
+    {
+        return $this->json([
+            'code' => 400,
+            'msg' => $msg,
+            'data' => []
+        ]);
+    }
+    
+    /**
+     * 检查登录
+     */
+    protected function checkLogin()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+    }
+    
+    /**
+     * 检查管理员登录
+     */
+    protected function checkAdminLogin()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /admin/login');
+            exit;
+        }
+    }
+    
+    /**
+     * 获取POST数据
+     */
+    protected function post($key = null, $default = null)
+    {
+        if ($key === null) {
+            return $_POST;
+        }
+        return $_POST[$key] ?? $default;
+    }
+    
+    /**
+     * 获取GET数据
+     */
+    protected function get($key = null, $default = null)
+    {
+        if ($key === null) {
+            return $_GET;
+        }
+        return $_GET[$key] ?? $default;
     }
 }

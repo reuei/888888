@@ -1,7 +1,4 @@
-<div class="user-breadcrumb">
-    <span>用户中心</span> / <span>我的产品</span>
-</div>
-<h1 class="page-title" style="font-size: 24px; color: #1a1a2e; margin-bottom: 20px;">我的产品</h1>
+<h1 class="page-title" style="font-size: 24px; color: #1a1a2e; margin-bottom: 24px;">订单管理</h1>
 
 <div class="card">
     <?php if (!empty($orders)): ?>
@@ -9,28 +6,29 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>订单号</th>
                     <th>产品名称</th>
+                    <th>用户</th>
                     <th>金额</th>
                     <th>状态</th>
-                    <th>下载</th>
-                    <th>购买时间</th>
+                    <th>创建时间</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($orders as $order): ?>
                 <tr>
+                    <td><?= $order['id'] ?? '' ?></td>
                     <td style="font-family: monospace; font-size: 13px;"><?= htmlspecialchars($order['order_no'] ?? '') ?></td>
                     <td><?= htmlspecialchars($order['product_name'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($order['username'] ?? '') ?></td>
                     <td>¥<?= number_format($order['amount'] ?? 0, 2) ?></td>
-                    <td><span class="badge <?= ($order['status'] ?? 0) == 1 ? 'badge-success' : 'badge-warning' ?>"><?= ($order['status'] ?? 0) == 1 ? '已完成' : '待处理' ?></span></td>
                     <td>
-                        <?php if (!empty($order['download_file'])): ?>
-                        <a href="/download?order_id=<?= $order['id'] ?? 0 ?>" class="btn btn-primary btn-sm">
-                            <svg width="14" height="14" style="vertical-align: middle; margin-right: 4px;"><use href="#i-download"/></svg>下载
-                        </a>
+                        <?php $status = $order['status'] ?? 0; ?>
+                        <?php if ($status == 1): ?>
+                        <span class="badge badge-success">已完成</span>
                         <?php else: ?>
-                        <span class="badge badge-info">暂无文件</span>
+                        <span class="badge badge-warning">待处理</span>
                         <?php endif; ?>
                     </td>
                     <td><?= htmlspecialchars($order['created_at'] ?? '') ?></td>
@@ -40,10 +38,7 @@
         </table>
     </div>
     <?php else: ?>
-    <div class="empty-state" style="text-align: center; padding: 60px; color: #687690;">
-        <svg width="48" height="48" style="color: #c0c8d8; margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto;"><use href="#i-box"/></svg>
-        暂无已购买的产品，<a href="/user/products" style="color: #4f8cff;">立即选购</a>
-    </div>
+    <div class="empty-state" style="text-align: center; padding: 60px; color: #687690;">暂无订单数据</div>
     <?php endif; ?>
 </div>
 

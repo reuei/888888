@@ -1,409 +1,876 @@
-/**
- * QEEFG授权站 JavaScript
- */
+/* ==========================================================================
+   QEEFG Auth Station - 熵云 Software License Management Platform
+   Main JavaScript
+   ========================================================================== */
 
-// 汉堡菜单切换
-function toggleMenu() {
-    const menu = document.getElementById('fullscreen-menu');
-    const toggle = document.querySelector('.menu-toggle');
-    
-    if (menu.classList.contains('active')) {
-        closeMenu();
-    } else {
-        openMenu();
+(function () {
+  'use strict';
+
+  /* ========================================================================
+     1. HELPER FUNCTIONS
+     ======================================================================== */
+
+  var $ = function (selector, context) {
+    return (context || document).querySelector(selector);
+  };
+
+  var $$ = function (selector, context) {
+    return Array.prototype.slice.call((context || document).querySelectorAll(selector));
+  };
+
+  /* ========================================================================
+     2. TOAST SYSTEM
+     ======================================================================== */
+
+  function getToastContainer() {
+    var container = $('.toast-center');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'toast-center';
+      document.body.appendChild(container);
     }
-}
+    return container;
+  }
 
-function openMenu() {
-    const menu = document.getElementById('fullscreen-menu');
-    const toggle = document.querySelector('.menu-toggle');
-    menu.classList.add('active');
-    toggle.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
+  var TOAST_ICONS = {
+    success: '&#10003;',
+    error: '&#10007;',
+    warning: '&#9888;',
+    info: '&#8505;'
+  };
 
-function closeMenu() {
-    const menu = document.getElementById('fullscreen-menu');
-    const toggle = document.querySelector('.menu-toggle');
-    menu.classList.remove('active');
-    toggle.classList.remove('active');
-    document.body.style.overflow = '';
-}
+  function showToast(msg, type) {
+    type = type || 'info';
+    var container = getToastContainer();
 
-// 二级菜单展开/收起
-function toggleSubmenu(element) {
-    const menuItem = element.closest('.menu-item');
-    if (menuItem) {
-        menuItem.classList.toggle('expanded');
-        const icon = element.querySelector('.menu-arrow');
-        if (icon) {
-            icon.textContent = menuItem.classList.contains('expanded') ? '▼' : '▶';
-        }
-    }
-}
+    var item = document.createElement('div');
+    item.className = 'toast-center-item';
 
-// 语言切换
-function switchLang(lang) {
-    // 更新按钮状态
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.querySelector(`.lang-btn[data-lang="${lang}"]`).classList.add('active');
-    
-    // 存储语言设置
-    localStorage.setItem('language', lang);
-    
-    // 这里可以添加实际的语言切换逻辑
-    console.log('切换语言:', lang);
-}
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
 
-// 昼夜模式切换
-function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    
-    // 更新按钮图标
-    const themeBtn = document.querySelector('.theme-toggle');
-    if (themeBtn) {
-        themeBtn.innerHTML = isDark ? '☀️' : '🌙';
-    }
-}
+    var icon = document.createElement('span');
+    icon.className = 'toast-icon';
+    icon.innerHTML = TOAST_ICONS[type] || TOAST_ICONS.info;
 
-// 初始化主题
-function initTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        const themeBtn = document.querySelector('.theme-toggle');
-        if (themeBtn) {
-            themeBtn.innerHTML = '☀️';
-        }
-    }
-}
+    var body = document.createElement('span');
+    body.className = 'toast-body';
+    body.textContent = msg;
 
-// 初始化语言
-function initLanguage() {
-    const savedLang = localStorage.getItem('language') || 'zh';
-    const langBtn = document.querySelector(`.lang-btn[data-lang="${savedLang}"]`);
-    if (langBtn) {
-        langBtn.classList.add('active');
-    }
-}
+    toast.appendChild(icon);
+    toast.appendChild(body);
+    item.appendChild(toast);
+    container.appendChild(item);
 
-// 表单验证
-function validateForm(formId) {
-    const form = document.getElementById(formId);
-    if (!form) return false;
-    
-    let isValid = true;
-    const inputs = form.querySelectorAll('input[required], textarea[required]');
-    
-    inputs.forEach(input => {
-        if (!input.value.trim()) {
-            isValid = false;
-            showError(input, '此项为必填项');
-        } else {
-            clearError(input);
-        }
-    });
-    
-    return isValid;
-}
+    // Force reflow then show
+    void toast.offsetWidth;
+    toast.classList.add('show');
 
-// 显示错误信息
-function showError(input, message) {
-    clearError(input);
-    
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.style.color = '#f5222d';
-    errorDiv.style.fontSize = '14px';
-    errorDiv.style.marginTop = '5px';
-    errorDiv.textContent = message;
-    
-    input.parentNode.appendChild(errorDiv);
-    input.style.borderColor = '#f5222d';
-}
-
-// 清除错误信息
-function clearError(input) {
-    const error = input.parentNode.querySelector('.error-message');
-    if (error) {
-        error.remove();
-    }
-    input.style.borderColor = '#e0e0e0';
-}
-
-// 显示消息提示
-function showMessage(message, type = 'success') {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type}`;
-    alertDiv.textContent = message;
-    alertDiv.style.position = 'fixed';
-    alertDiv.style.top = '20px';
-    alertDiv.style.right = '20px';
-    alertDiv.style.zIndex = '9999';
-    alertDiv.style.minWidth = '300px';
-    
-    document.body.appendChild(alertDiv);
-    
-    setTimeout(() => {
-        alertDiv.remove();
+    // Auto-remove after 3s
+    var timer = setTimeout(function () {
+      removeToast(toast, item);
     }, 3000);
-}
 
-// AJAX请求封装
-function ajax(url, method = 'GET', data = null) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(method, url, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    resolve(response);
-                } catch (e) {
-                    reject(e);
-                }
-            } else {
-                reject(new Error('请求失败'));
-            }
-        };
-        
-        xhr.onerror = function() {
-            reject(new Error('网络错误'));
-        };
-        
-        xhr.send(data ? JSON.stringify(data) : null);
+    // Store timer for potential early removal
+    toast._timer = timer;
+    toast._item = item;
+
+    // Click to dismiss early
+    toast.addEventListener('click', function () {
+      clearTimeout(timer);
+      removeToast(toast, item);
     });
-}
+  }
 
-// 用户登录
-async function userLogin(event) {
-    event.preventDefault();
-    
-    const form = event.target;
-    const formData = new FormData(form);
-    
-    try {
-        const response = await ajax('/user/dologin', 'POST', {
-            username: formData.get('username'),
-            password: formData.get('password')
-        });
-        
-        if (response.code === 200) {
-            showMessage('登录成功', 'success');
-            setTimeout(() => {
-                window.location.href = response.data.redirect || '/user/dashboard';
-            }, 1000);
-        } else {
-            showMessage(response.msg || '登录失败', 'error');
-        }
-    } catch (error) {
-        showMessage('登录失败，请稍后重试', 'error');
+  function removeToast(toast, item) {
+    if (toast._removed) return;
+    toast._removed = true;
+    clearTimeout(toast._timer);
+    toast.classList.remove('show');
+    toast.classList.add('hide');
+    setTimeout(function () {
+      if (item.parentNode) {
+        item.parentNode.removeChild(item);
+      }
+    }, 300);
+  }
+
+  function showError(msg) {
+    showToast(msg, 'error');
+  }
+
+  function showSuccess(msg) {
+    showToast(msg, 'success');
+  }
+
+  function showWarning(msg) {
+    showToast(msg, 'warning');
+  }
+
+  /* ========================================================================
+     3. THEME TOGGLE
+     ======================================================================== */
+
+  var THEME_KEY = 'qeefg_theme';
+
+  function initTheme() {
+    var savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (savedTheme === 'light') {
+      document.documentElement.removeAttribute('data-theme');
     }
-}
-
-// 用户注册
-async function userRegister(event) {
-    event.preventDefault();
-    
-    const form = event.target;
-    const formData = new FormData(form);
-    
-    try {
-        const response = await ajax('/user/doregister', 'POST', {
-            username: formData.get('username'),
-            email: formData.get('email'),
-            password: formData.get('password'),
-            qq: formData.get('qq'),
-            phone: formData.get('phone')
-        });
-        
-        if (response.code === 200) {
-            showMessage('注册成功', 'success');
-            setTimeout(() => {
-                window.location.href = response.data.redirect || '/user/login';
-            }, 1000);
-        } else {
-            showMessage(response.msg || '注册失败', 'error');
-        }
-    } catch (error) {
-        showMessage('注册失败，请稍后重试', 'error');
+    // If no saved theme, respect system preference
+    if (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
     }
-}
+  }
 
-// 授权查询
-async function queryLicense(event) {
-    event.preventDefault();
-    
-    const form = event.target;
-    const licenseKey = form.querySelector('input[name="license_key"]').value;
-    
-    if (!licenseKey) {
-        showMessage('请输入授权密钥', 'error');
-        return;
-    }
-    
-    try {
-        const response = await ajax('/license-query', 'POST', {
-            license_key: licenseKey
-        });
-        
-        if (response.code === 200) {
-            displayLicenseInfo(response.data);
-        } else {
-            showMessage(response.msg || '查询失败', 'error');
-        }
-    } catch (error) {
-        showMessage('查询失败，请稍后重试', 'error');
-    }
-}
-
-// 显示授权信息
-function displayLicenseInfo(data) {
-    const resultDiv = document.getElementById('license-result');
-    if (!resultDiv) return;
-    
-    const statusClass = data.license.status ? 'status-success' : 'status-error';
-    const statusText = data.license.status ? '正常' : '禁用';
-    const expireText = data.license.expires_at || '永久有效';
-    
-    resultDiv.innerHTML = `
-        <div class="card">
-            <h3 class="card-title">授权信息</h3>
-            <div class="license-info">
-                <p><strong>授权密钥:</strong> ${data.license.license_key}</p>
-                <p><strong>产品名称:</strong> ${data.product.name}</p>
-                <p><strong>用户名:</strong> ${data.user.username}</p>
-                <p><strong>状态:</strong> <span class="status ${statusClass}">${statusText}</span></p>
-                <p><strong>到期时间:</strong> ${expireText}</p>
-                <p><strong>激活时间:</strong> ${data.license.activated_at || '未激活'}</p>
-            </div>
-        </div>
-    `;
-    
-    resultDiv.style.display = 'block';
-}
-
-// 复制到剪贴板
-function copyToClipboard(text) {
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-            showMessage('已复制到剪贴板', 'success');
-        }).catch(() => {
-            showMessage('复制失败', 'error');
-        });
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    if (current === 'dark') {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem(THEME_KEY, 'light');
     } else {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        showMessage('已复制到剪贴板', 'success');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem(THEME_KEY, 'dark');
     }
-}
+  }
 
-// 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', function() {
-    // 初始化主题和语言
-    initTheme();
-    initLanguage();
-    
-    // 绑定汉堡菜单事件
-    const menuToggle = document.querySelector('.menu-toggle');
-    if (menuToggle) {
-        menuToggle.addEventListener('click', toggleMenu);
+  function bindThemeToggle() {
+    var btn = $('.theme-toggle');
+    if (btn) {
+      btn.addEventListener('click', toggleTheme);
     }
-    
-    // 绑定关闭菜单按钮
-    const menuClose = document.querySelector('.menu-close');
-    if (menuClose) {
-        menuClose.addEventListener('click', closeMenu);
-    }
-    
-    // 绑定二级菜单事件
-    document.querySelectorAll('.menu-link.has-submenu').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            toggleSubmenu(this);
-        });
-    });
-    
-    // 绑定主题切换
-    const themeToggle = document.querySelector('.theme-toggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
-    
-    // 绑定语言切换
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            switchLang(this.dataset.lang);
-        });
-    });
-    
-    // 绑定登录表单
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', userLogin);
-    }
-    
-    // 绑定注册表单
-    const registerForm = document.getElementById('register-form');
-    if (registerForm) {
-        registerForm.addEventListener('submit', userRegister);
-    }
-    
-    // 绑定授权查询表单
-    const licenseQueryForm = document.getElementById('license-query-form');
-    if (licenseQueryForm) {
-        licenseQueryForm.addEventListener('submit', queryLicense);
-    }
-    
-    // 添加平滑滚动
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-});
 
-// 防抖函数
-function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-}
+    // Ctrl+T shortcut
+    document.addEventListener('keydown', function (e) {
+      if (e.ctrlKey && e.key === 't') {
+        e.preventDefault();
+        toggleTheme();
+      }
+    });
+  }
 
-// 节流函数
-function throttle(func, limit) {
-    let inThrottle;
-    return function(...args) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
+  /* ========================================================================
+     4. MOBILE NAV (Public pages)
+     ======================================================================== */
+
+  function initMobileNav() {
+    var hamburger = $('.hamburger-btn');
+    var mobileNav = $('.mobile-nav');
+
+    if (!hamburger || !mobileNav) return;
+
+    hamburger.addEventListener('click', function () {
+      var isOpen = mobileNav.classList.contains('show');
+      if (isOpen) {
+        mobileNav.classList.remove('show');
+        hamburger.innerHTML = '&#9776;';
+      } else {
+        mobileNav.classList.add('show');
+        hamburger.innerHTML = '&#10005;';
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && mobileNav.classList.contains('show')) {
+        mobileNav.classList.remove('show');
+        if (hamburger) hamburger.innerHTML = '&#9776;';
+      }
+    });
+  }
+
+  /* ========================================================================
+     5. HAMBURGER SIDEBAR (User/Admin pages)
+     ======================================================================== */
+
+  function initHamburger() {
+    var hamburgerBtn = $('.hamburger-btn');
+    var sidebar = $('.user-sidebar') || $('.admin-sidebar');
+    var overlay = $('.sidebar-overlay');
+
+    if (!hamburgerBtn) return;
+
+    hamburgerBtn.addEventListener('click', function () {
+      // Re-query sidebar in case layout changed
+      var sb = $('.user-sidebar') || $('.admin-sidebar');
+      var ov = $('.sidebar-overlay');
+
+      if (sb) {
+        var isOpen = sb.classList.contains('show');
+        if (isOpen) {
+          closeSidebar(sb, ov, hamburgerBtn);
+        } else {
+          openSidebar(sb, ov, hamburgerBtn);
         }
-    };
-}
+      }
+    });
 
-// 导出函数供全局使用
-window.toggleMenu = toggleMenu;
-window.closeMenu = closeMenu;
-window.toggleSubmenu = toggleSubmenu;
-window.switchLang = switchLang;
-window.toggleTheme = toggleTheme;
-window.copyToClipboard = copyToClipboard;
+    // Close button inside sidebar
+    var closeBtn = $('.sidebar-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        var sb = $('.user-sidebar') || $('.admin-sidebar');
+        var ov = $('.sidebar-overlay');
+        closeSidebar(sb, ov, hamburgerBtn);
+      });
+    }
+
+    // Overlay click
+    if (overlay) {
+      overlay.addEventListener('click', function () {
+        var sb = $('.user-sidebar') || $('.admin-sidebar');
+        closeSidebar(sb, overlay, hamburgerBtn);
+      });
+    }
+
+    // Escape key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        var sb = $('.user-sidebar.show') || $('.admin-sidebar.show');
+        if (sb) {
+          var ov = $('.sidebar-overlay');
+          closeSidebar(sb, ov, hamburgerBtn);
+        }
+      }
+    });
+
+    // Resize handler: close sidebar on large screens
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 1024) {
+        var sb = $('.user-sidebar.show') || $('.admin-sidebar.show');
+        if (sb) {
+          var ov = $('.sidebar-overlay');
+          closeSidebar(sb, ov, hamburgerBtn);
+        }
+      }
+    });
+
+    // Submenu toggle
+    $$('.has-submenu .menu-link').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        var parent = link.closest('.has-submenu');
+        if (parent) {
+          e.preventDefault();
+          parent.classList.toggle('open');
+        }
+      });
+    });
+  }
+
+  function openSidebar(sidebar, overlay, btn) {
+    if (sidebar) sidebar.classList.add('show');
+    if (overlay) overlay.classList.add('show');
+    if (btn) btn.innerHTML = '&#10005;';
+  }
+
+  function closeSidebar(sidebar, overlay, btn) {
+    if (sidebar) sidebar.classList.remove('show');
+    if (overlay) overlay.classList.remove('show');
+    if (btn) btn.innerHTML = '&#9776;';
+  }
+
+  /* ========================================================================
+     6. SIDEBAR ACTIVE STATE
+     ======================================================================== */
+
+  function initSidebarActive() {
+    var currentPath = window.location.pathname;
+
+    // Highlight active menu link
+    $$('.menu-link').forEach(function (link) {
+      var href = link.getAttribute('href');
+      if (href && currentPath === href) {
+        link.classList.add('active');
+
+        // Auto-open parent submenu
+        var parentSubmenu = link.closest('.submenu');
+        if (parentSubmenu) {
+          var parentHasSubmenu = parentSubmenu.closest('.has-submenu');
+          if (parentHasSubmenu) {
+            parentHasSubmenu.classList.add('open');
+          }
+
+          // Also mark the submenu item as active
+          var submenuItem = link.closest('.submenu-item');
+          if (submenuItem) {
+            submenuItem.classList.add('active');
+          }
+        }
+      }
+    });
+
+    // Also check for submenu items active
+    $$('.submenu-item .menu-link').forEach(function (link) {
+      var href = link.getAttribute('href');
+      if (href && currentPath === href) {
+        link.classList.add('active');
+        var item = link.closest('.submenu-item');
+        if (item) item.classList.add('active');
+        var parent = link.closest('.has-submenu');
+        if (parent) parent.classList.add('open');
+      }
+    });
+
+    // Hamburger sidebar items
+    $$('.hs-item').forEach(function (item) {
+      var href = item.getAttribute('href');
+      if (href && currentPath === href) {
+        item.classList.add('active');
+      }
+    });
+
+    // Docs sidebar links
+    $$('.docs-link').forEach(function (link) {
+      var href = link.getAttribute('href');
+      if (href && currentPath === href) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  /* ========================================================================
+     7. CAPTCHA REFRESH
+     ======================================================================== */
+
+  function refreshCaptcha() {
+    var captchaImg = $('.captcha-img');
+    if (!captchaImg) return;
+    var src = captchaImg.getAttribute('src') || captchaImg.getAttribute('data-src') || '';
+    // Remove existing timestamp param
+    src = src.replace(/[?&]_t=\d+/, '');
+    var separator = src.indexOf('?') > -1 ? '&' : '?';
+    captchaImg.setAttribute('src', src + separator + '_t=' + Date.now());
+  }
+
+  function initCaptcha() {
+    var captchaImg = $('.captcha-img');
+    if (captchaImg) {
+      captchaImg.addEventListener('click', refreshCaptcha);
+    }
+  }
+
+  /* ========================================================================
+     8. AJAX FORMS
+     ======================================================================== */
+
+  function initAjaxForms() {
+    document.addEventListener('submit', function (e) {
+      var form = e.target.closest('form[data-ajax]');
+      if (!form) return;
+
+      e.preventDefault();
+
+      var submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+      var originalText = submitBtn ? submitBtn.textContent || submitBtn.value : '';
+
+      // Show loading state
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = submitBtn.getAttribute('data-loading') || (originalText + '...');
+        submitBtn.value = submitBtn.getAttribute('data-loading') || (originalText + '...');
+      }
+
+      showPageTransition();
+
+      var formData = new FormData(form);
+      var method = (form.getAttribute('method') || 'POST').toUpperCase();
+      var action = form.getAttribute('action') || window.location.href;
+
+      // Convert FormData to URLSearchParams for POST
+      var body;
+      var headers = {};
+
+      if (method === 'GET') {
+        var params = new URLSearchParams(formData);
+        action = action + (action.indexOf('?') > -1 ? '&' : '?') + params.toString();
+        body = null;
+      } else {
+        body = new URLSearchParams(formData);
+        headers['Content-Type'] = 'application/x-www-form-urlencoded';
+      }
+
+      fetch(action, {
+        method: method,
+        headers: headers,
+        body: body
+      })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            return { status: response.status, ok: response.ok, data: data };
+          }).catch(function () {
+            return { status: response.status, ok: response.ok, data: null };
+          });
+        })
+        .then(function (result) {
+          hidePageTransition();
+
+          if (result.ok && result.data) {
+            if (result.data.code === 200) {
+              var msg = result.data.msg || '操作成功';
+              showSuccess(msg);
+
+              if (result.data.data && result.data.data.redirect) {
+                setTimeout(function () {
+                  window.location.href = result.data.data.redirect;
+                }, 1000);
+              } else if (result.data.data && result.data.data.reload) {
+                setTimeout(function () {
+                  window.location.reload();
+                }, 1000);
+              }
+            } else {
+              showError(result.data.msg || '操作失败');
+            }
+          } else {
+            showError('请求失败 (' + result.status + ')');
+          }
+        })
+        .catch(function (err) {
+          hidePageTransition();
+          showError('网络错误，请稍后重试');
+          console.error('AJAX form error:', err);
+        })
+        .finally(function () {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            submitBtn.value = originalText;
+          }
+        });
+    });
+  }
+
+  /* ========================================================================
+     9. CONFIRM LINKS
+     ======================================================================== */
+
+  function initConfirmLinks() {
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a[data-confirm]');
+      if (!link) return;
+
+      var message = link.getAttribute('data-confirm') || '确定要执行此操作吗？';
+      if (!confirm(message)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+  }
+
+  /* ========================================================================
+     10. ANNOUNCEMENT MODAL
+     ======================================================================== */
+
+  var ANNOUNCEMENT_KEY = 'qeefg_announcement_hidden';
+
+  function initAnnouncement() {
+    var modal = $('.announcement-modal');
+    if (!modal) return;
+
+    var hiddenData = localStorage.getItem(ANNOUNCEMENT_KEY);
+    if (hiddenData) {
+      try {
+        var parsed = JSON.parse(hiddenData);
+        var now = Date.now();
+        // 1 hour expiry
+        if (now - parsed.timestamp < 3600000) {
+          return; // Still suppressed
+        }
+      } catch (e) {
+        // Invalid data, show modal
+      }
+    }
+
+    // Show modal
+    modal.classList.add('show');
+
+    // Close button
+    var closeBtn = $('.am-close', modal);
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        hideAnnouncementModal(modal);
+      });
+    }
+
+    // Suppress button
+    var suppressBtn = $('.am-suppress, [data-suppress]', modal);
+    if (suppressBtn) {
+      suppressBtn.addEventListener('click', function () {
+        localStorage.setItem(ANNOUNCEMENT_KEY, JSON.stringify({
+          timestamp: Date.now()
+        }));
+        hideAnnouncementModal(modal);
+      });
+    }
+
+    // Overlay click
+    var overlay = $('.am-overlay', modal);
+    if (overlay) {
+      overlay.addEventListener('click', function () {
+        hideAnnouncementModal(modal);
+      });
+    }
+
+    // Escape key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('show')) {
+        hideAnnouncementModal(modal);
+      }
+    });
+  }
+
+  function hideAnnouncementModal(modal) {
+    modal.classList.remove('show');
+  }
+
+  /* ========================================================================
+     11. SEARCH
+     ======================================================================== */
+
+  function initSearch() {
+    // Create search overlay if not exists
+    var overlay = $('.search-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'search-overlay';
+      overlay.innerHTML =
+        '<div class="search-box">' +
+        '<input type="text" class="search-box-input" placeholder="搜索..." autocomplete="off">' +
+        '<div class="search-box-results"></div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+
+      // Click overlay background to close
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) {
+          closeSearch(overlay);
+        }
+      });
+
+      // Input handler
+      var input = $('.search-box-input', overlay);
+      if (input) {
+        input.addEventListener('input', function () {
+          performSearch(input.value, $('.search-box-results', overlay));
+        });
+      }
+    }
+
+    // Keyboard shortcut: Ctrl+K or /
+    document.addEventListener('keydown', function (e) {
+      // Don't trigger when typing in inputs
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        return;
+      }
+
+      if ((e.ctrlKey && e.key === 'k') || e.key === '/') {
+        e.preventDefault();
+        openSearch(overlay);
+      }
+
+      if (e.key === 'Escape' && overlay.classList.contains('show')) {
+        closeSearch(overlay);
+      }
+    });
+
+    // Search trigger button
+    var searchTrigger = $('[data-search-trigger]');
+    if (searchTrigger) {
+      searchTrigger.addEventListener('click', function () {
+        openSearch(overlay);
+      });
+    }
+  }
+
+  function openSearch(overlay) {
+    overlay.classList.add('show');
+    var input = $('.search-box-input', overlay);
+    if (input) {
+      setTimeout(function () {
+        input.focus();
+        input.value = '';
+        var results = $('.search-box-results', overlay);
+        if (results) results.innerHTML = '';
+      }, 100);
+    }
+  }
+
+  function closeSearch(overlay) {
+    overlay.classList.remove('show');
+  }
+
+  function performSearch(query, resultsContainer) {
+    if (!resultsContainer) return;
+    resultsContainer.innerHTML = '';
+
+    if (!query || query.trim().length === 0) {
+      return;
+    }
+
+    var q = query.toLowerCase().trim();
+    var items = $$('[data-search-item]');
+    var found = [];
+
+    items.forEach(function (item) {
+      var title = (item.getAttribute('data-search-title') || item.textContent || '').toLowerCase();
+      var href = item.getAttribute('data-search-href') || item.getAttribute('href') || '#';
+      var desc = (item.getAttribute('data-search-desc') || '').toLowerCase();
+
+      if (title.indexOf(q) > -1 || desc.indexOf(q) > -1) {
+        found.push({
+          title: item.getAttribute('data-search-title') || item.textContent || '',
+          href: href,
+          desc: item.getAttribute('data-search-desc') || ''
+        });
+      }
+    });
+
+    if (found.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'search-result-item';
+      empty.textContent = '未找到相关结果';
+      empty.style.color = 'var(--text-muted)';
+      resultsContainer.appendChild(empty);
+      return;
+    }
+
+    found.forEach(function (item) {
+      var el = document.createElement('a');
+      el.className = 'search-result-item';
+      el.href = item.href;
+
+      var text = document.createElement('span');
+      text.textContent = item.title;
+      el.appendChild(text);
+
+      if (item.desc) {
+        var descEl = document.createElement('span');
+        descEl.textContent = item.desc;
+        descEl.style.fontSize = '12px';
+        descEl.style.color = 'var(--text-muted)';
+        el.appendChild(descEl);
+      }
+
+      el.addEventListener('click', function () {
+        closeSearch($('.search-overlay'));
+      });
+
+      resultsContainer.appendChild(el);
+    });
+  }
+
+  /* ========================================================================
+     12. PAGE TRANSITION
+     ======================================================================== */
+
+  function showPageTransition() {
+    var bar = $('.page-loading');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'page-loading';
+      bar.innerHTML = '<div class="page-loading-bar"></div>';
+      document.body.appendChild(bar);
+    }
+    bar.style.display = 'block';
+  }
+
+  function hidePageTransition() {
+    var bar = $('.page-loading');
+    if (bar) {
+      bar.style.display = 'none';
+    }
+  }
+
+  /* ========================================================================
+     13. ICON RAIL
+     ======================================================================== */
+
+  function initIconRail() {
+    var currentPath = window.location.pathname;
+    $$('.icon-rail-item').forEach(function (item) {
+      var href = item.getAttribute('href');
+      if (href && currentPath === href) {
+        item.classList.add('active');
+      }
+    });
+  }
+
+  /* ========================================================================
+     14. DOCUMENTS SIDEBAR
+     ======================================================================== */
+
+  function initDocsSidebar() {
+    $$('.docs-cat-title').forEach(function (title) {
+      title.addEventListener('click', function () {
+        var body = title.nextElementSibling;
+        if (body && body.classList.contains('docs-cat-body')) {
+          var isHidden = body.style.display === 'none';
+          body.style.display = isHidden ? '' : 'none';
+          // Toggle arrow indicator
+          var arrow = title.querySelector('.docs-cat-arrow');
+          if (arrow) {
+            arrow.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+          }
+        }
+      });
+    });
+  }
+
+  /* ========================================================================
+     15. CLICK OUTSIDE
+     ======================================================================== */
+
+  function initClickOutside() {
+    document.addEventListener('click', function (e) {
+      // Close hamburger sidebar when clicking outside
+      if (window.innerWidth <= 1024) {
+        var sidebar = $('.user-sidebar.show') || $('.admin-sidebar.show');
+        var hamburger = $('.hamburger-btn');
+
+        if (sidebar && hamburger) {
+          var clickedInsideSidebar = sidebar.contains(e.target);
+          var clickedHamburger = hamburger.contains(e.target);
+
+          if (!clickedInsideSidebar && !clickedHamburger) {
+            var overlay = $('.sidebar-overlay');
+            closeSidebar(sidebar, overlay, hamburger);
+          }
+        }
+      }
+    });
+  }
+
+  /* ========================================================================
+     16. LANGUAGE SWITCH
+     ======================================================================== */
+
+  function initLangSwitch() {
+    $$('.lang-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var lang = btn.getAttribute('data-lang');
+        if (!lang) return;
+
+        // Update active state
+        $$('.lang-btn').forEach(function (b) {
+          b.classList.remove('active');
+        });
+        btn.classList.add('active');
+
+        // Store preference
+        localStorage.setItem('qeefg_lang', lang);
+
+        // If there's a form, submit it
+        var form = btn.closest('form');
+        if (form) {
+          form.submit();
+        } else {
+          // Otherwise reload with lang param
+          var url = new URL(window.location.href);
+          url.searchParams.set('lang', lang);
+          window.location.href = url.toString();
+        }
+      });
+    });
+
+    // Set initial active state from localStorage
+    var savedLang = localStorage.getItem('qeefg_lang');
+    if (savedLang) {
+      $$('.lang-btn').forEach(function (btn) {
+        if (btn.getAttribute('data-lang') === savedLang) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+  }
+
+  /* ========================================================================
+     17. SCROLL ANIMATIONS
+     ======================================================================== */
+
+  function initScrollAnimations() {
+    var animatedElements = $$('[data-animate]');
+    if (animatedElements.length === 0) return;
+
+    function checkVisibility() {
+      var windowHeight = window.innerHeight;
+
+      animatedElements.forEach(function (el) {
+        if (el.classList.contains('animated')) return;
+
+        var rect = el.getBoundingClientRect();
+        var threshold = el.getAttribute('data-animate-threshold');
+        var offset = threshold ? parseInt(threshold, 10) : 100;
+
+        if (rect.top < windowHeight - offset && rect.bottom > 0) {
+          el.classList.add('animated');
+          var animation = el.getAttribute('data-animate') || 'fadeIn';
+          el.style.animation = animation + ' 0.6s ease forwards';
+        }
+      });
+    }
+
+    // Check on load
+    checkVisibility();
+
+    // Check on scroll (throttled)
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        window.requestAnimationFrame(function () {
+          checkVisibility();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  }
+
+  /* ========================================================================
+     18. INITIALIZATION
+     ======================================================================== */
+
+  function init() {
+    initTheme();
+    bindThemeToggle();
+    initMobileNav();
+    initHamburger();
+    initSidebarActive();
+    initCaptcha();
+    initAjaxForms();
+    initConfirmLinks();
+    initAnnouncement();
+    initSearch();
+    initIconRail();
+    initDocsSidebar();
+    initClickOutside();
+    initLangSwitch();
+    initScrollAnimations();
+  }
+
+  // Run on DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  /* ========================================================================
+     19. PUBLIC API
+     ======================================================================== */
+
+  window.QEEFG = {
+    showToast: showToast,
+    showError: showError,
+    showSuccess: showSuccess,
+    showWarning: showWarning,
+    showPageTransition: showPageTransition,
+    hidePageTransition: hidePageTransition,
+    refreshCaptcha: refreshCaptcha
+  };
+
+})();

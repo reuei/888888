@@ -1,111 +1,42 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用户管理 - QEEFG授权站</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
-        a { text-decoration: none; color: inherit; }
-        .header { background: #1a1a1a; padding: 0 20px; }
-        .header-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 60px; }
-        .logo { font-size: 18px; font-weight: 600; color: #fff; }
-        .admin-info { display: flex; align-items: center; gap: 20px; }
-        .admin-info span { color: #fff; font-size: 14px; }
-        .logout-btn { background: #ff4d4f; color: #fff; padding: 6px 16px; border: none; cursor: pointer; font-size: 14px; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; display: flex; gap: 20px; }
-        .sidebar { width: 200px; background: #fff; border: 1px solid #e5e5e5; padding: 20px 0; height: calc(100vh - 100px); }
-        .sidebar a { display: block; padding: 12px 20px; color: #333; font-size: 14px; }
-        .sidebar a:hover { background: #f5f7fa; }
-        .sidebar a.active { background: #e6f7ff; color: #1890ff; border-left: 3px solid #1890ff; }
-        .content { flex: 1; }
-        .page-title { font-size: 24px; margin-bottom: 20px; color: #1a1a1a; }
-        .table-box { background: #fff; border: 1px solid #e5e5e5; }
-        .table { width: 100%; border-collapse: collapse; }
-        .table th, .table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-        .table th { background: #fafafa; font-weight: 500; color: #666; }
-        .table tr:hover { background: #f5f7fa; }
-        .status-active { color: #52c41a; }
-        .status-inactive { color: #ff4d4f; }
-        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-        .pagination a { padding: 8px 16px; background: #fff; border: 1px solid #e5e5e5; color: #333; }
-        .pagination a:hover { border-color: #1890ff; color: #1890ff; }
-        .pagination a.active { background: #1890ff; color: #fff; border-color: #1890ff; }
-        .empty-msg { text-align: center; color: #999; padding: 60px; }
-        .footer { padding: 20px; background: #1a1a1a; color: #fff; text-align: center; position: fixed; bottom: 0; left: 0; right: 0; }
-        @media (max-width: 768px) {
-            .container { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; }
-            .table-box { overflow-x: auto; }
-        }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <div class="header-inner">
-            <span class="logo">QEEFG授权站 - 管理后台</span>
-            <div class="admin-info">
-                <span>管理员：<?php echo htmlspecialchars($_SESSION['admin_username'] ?? ''); ?></span>
-                <a href="/admin/login?logout=1" class="logout-btn" onclick="return confirm('确定要退出吗？')">退出</a>
-            </div>
-        </div>
-    </header>
+<h1 class="page-title" style="font-size: 24px; color: #1a1a2e; margin-bottom: 24px;">用户管理</h1>
 
-    <div class="container">
-        <aside class="sidebar">
-            <a href="/admin/dashboard">后台首页</a>
-            <a href="/admin/users" class="active">用户管理</a>
-            <a href="/admin/products">产品管理</a>
-            <a href="/admin/settings">系统设置</a>
-        </aside>
-
-        <main class="content">
-            <h1 class="page-title">用户管理</h1>
-
-            <div class="table-box">
-                <?php if (!empty($users)): ?>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>用户名</th>
-                            <th>邮箱</th>
-                            <th>余额</th>
-                            <th>状态</th>
-                            <th>注册时间</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($users as $user): ?>
-                        <tr>
-                            <td><?php echo $user['id'] ?? ''; ?></td>
-                            <td><?php echo htmlspecialchars($user['username'] ?? ''); ?></td>
-                            <td><?php echo htmlspecialchars($user['email'] ?? ''); ?></td>
-                            <td>¥<?php echo number_format($user['balance'] ?? 0, 2); ?></td>
-                            <td><span class="<?php echo ($user['status'] ?? 0) == 1 ? 'status-active' : 'status-inactive'; ?>"><?php echo ($user['status'] ?? 0) == 1 ? '正常' : '禁用'; ?></span></td>
-                            <td><?php echo $user['created_at'] ?? ''; ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <?php else: ?>
-                <div class="empty-msg">暂无用户数据</div>
-                <?php endif; ?>
-            </div>
-
-            <?php if ($totalPages > 1): ?>
-            <div class="pagination">
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <a href="?page=<?php echo $i; ?>" class="<?php echo $page == $i ? 'active' : ''; ?>"><?php echo $i; ?></a>
-                <?php endfor; ?>
-            </div>
-            <?php endif; ?>
-        </main>
+<div class="card">
+    <?php if (!empty($users)): ?>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用户名</th>
+                    <th>邮箱</th>
+                    <th>余额</th>
+                    <th>状态</th>
+                    <th>注册时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($users as $u): ?>
+                <tr>
+                    <td><?= $u['id'] ?? '' ?></td>
+                    <td><?= htmlspecialchars($u['username'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($u['email'] ?? '') ?></td>
+                    <td>¥<?= number_format($u['balance'] ?? 0, 2) ?></td>
+                    <td><span class="badge <?= ($u['status'] ?? 0) == 1 ? 'badge-success' : 'badge-danger' ?>"><?= ($u['status'] ?? 0) == 1 ? '正常' : '禁用' ?></span></td>
+                    <td><?= htmlspecialchars($u['created_at'] ?? '') ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
+    <?php else: ?>
+    <div class="empty-state" style="text-align: center; padding: 60px; color: #687690;">暂无用户数据</div>
+    <?php endif; ?>
+</div>
 
-    <footer class="footer">
-        <p>© <?php echo date('Y'); ?> QEEFG授权站 All Rights Reserved.</p>
-    </footer>
-</body>
-</html>
+<?php if (($totalPages ?? 1) > 1): ?>
+<div class="pagination">
+    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+    <a href="?page=<?= $i ?>" class="<?= ($page ?? 1) == $i ? 'active' : '' ?>"><?= $i ?></a>
+    <?php endfor; ?>
+</div>
+<?php endif; ?>

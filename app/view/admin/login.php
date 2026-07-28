@@ -3,74 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理后台 - QEEFG授权站</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #1a1a1a; color: #333; line-height: 1.6; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: #fff; padding: 50px; width: 100%; max-width: 400px; }
-        .login-title { font-size: 24px; text-align: center; margin-bottom: 30px; color: #1a1a1a; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 14px; color: #333; margin-bottom: 8px; }
-        .form-control { width: 100%; padding: 12px 16px; font-size: 14px; border: 1px solid #d9d9d9; background: #fff; }
-        .form-control:focus { outline: none; border-color: #1890ff; }
-        .btn { display: block; width: 100%; padding: 12px; font-size: 16px; border: none; cursor: pointer; background: #1890ff; color: #fff; }
-        .btn:hover { background: #40a9ff; }
-        .back-link { text-align: center; margin-top: 20px; }
-        .back-link a { color: #666; font-size: 14px; }
-        .back-link a:hover { color: #1890ff; }
-        .error-msg { background: #fff2f0; border: 1px solid #ffccc7; color: #ff4d4f; padding: 10px; margin-bottom: 20px; display: none; }
-    </style>
+    <title>管理后台 - <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="login-box">
-        <h1 class="login-title">管理后台</h1>
-        <div class="error-msg" id="error-msg"></div>
-        <form id="loginForm" onsubmit="return handleSubmit(event)">
-            <div class="form-group">
-                <label>管理员账号</label>
-                <input type="text" class="form-control" name="username" placeholder="请输入管理员账号" required>
+    <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+            <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></symbol>
+        </defs>
+    </svg>
+
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f0f2f5;">
+        <div class="card" style="max-width: 400px; width: 100%;">
+            <h1 style="font-size: 22px; color: #1a1a2e; margin-bottom: 8px; text-align: center;">管理后台</h1>
+            <p style="color: #687690; font-size: 14px; text-align: center; margin-bottom: 24px;"><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></p>
+            <?php if (!empty($error)): ?>
+            <div style="background: #fff2f0; border: 1px solid #ffccc7; color: #ff4d4f; padding: 10px 14px; margin-bottom: 16px; font-size: 14px;">
+                <?= htmlspecialchars($error) ?>
             </div>
-            <div class="form-group">
-                <label>密码</label>
-                <input type="password" class="form-control" name="password" placeholder="请输入密码" required>
+            <?php endif; ?>
+            <form method="POST" action="/admin/dologin" data-ajax="true">
+                <div class="form-group">
+                    <label class="form-label" for="username">管理员账号</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="请输入管理员账号" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">登录</button>
+            </form>
+            <div style="text-align: center; margin-top: 16px; font-size: 14px;">
+                <a href="/" style="color: #687690;">返回首页</a>
             </div>
-            <button type="submit" class="btn">登录</button>
-        </form>
-        <div class="back-link">
-            <a href="/">返回首页</a>
         </div>
     </div>
 
-    <script>
-        function handleSubmit(e) {
-            e.preventDefault();
-            const form = document.getElementById('loginForm');
-            const formData = new FormData(form);
+    <div class="toast-center" id="toastContainer"></div>
 
-            fetch('/admin/dologin', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.code === 200) {
-                    window.location.href = data.data.redirect || '/admin/dashboard';
-                } else {
-                    showError(data.msg);
-                }
-            })
-            .catch(error => {
-                showError('网络错误，请稍后重试');
-            });
-
-            return false;
-        }
-
-        function showError(msg) {
-            const errorDiv = document.getElementById('error-msg');
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
-        }
-    </script>
+    <script src="/static/js/main.js"></script>
 </body>
 </html>

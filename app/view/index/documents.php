@@ -3,131 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文档中心 - QEEFG授权站</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #fff; color: #333; line-height: 1.6; }
-        a { text-decoration: none; color: inherit; }
-        .header { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 0 20px; }
-        .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 60px; }
-        .logo { font-size: 20px; font-weight: 600; color: #1a1a1a; }
-        .nav { display: flex; gap: 30px; }
-        .nav a { color: #666; font-size: 14px; padding: 8px 0; }
-        .nav a:hover { color: #1890ff; }
-        .nav-btn { background: #1890ff; color: #fff; padding: 8px 20px; border: none; cursor: pointer; }
-        .nav-btn:hover { background: #40a9ff; }
-        .container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
-        .page-title { font-size: 28px; text-align: center; margin-bottom: 40px; color: #1a1a1a; }
-        .doc-section { margin-bottom: 40px; }
-        .doc-section h2 { font-size: 20px; color: #1a1a1a; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #e5e5e5; }
-        .doc-item { background: #fafafa; padding: 20px; margin-bottom: 16px; border: 1px solid #e5e5e5; }
-        .doc-item h3 { font-size: 16px; color: #1890ff; margin-bottom: 10px; }
-        .doc-item p { font-size: 14px; color: #666; }
-        .doc-item pre { background: #f5f5f5; padding: 15px; margin-top: 10px; overflow-x: auto; font-size: 13px; border: 1px solid #e5e5e5; }
-        .doc-item code { background: #f5f5f5; padding: 2px 6px; font-size: 13px; }
-        .footer { padding: 40px 20px; background: #1a1a1a; color: #fff; text-align: center; margin-top: 60px; }
-        .footer a { color: #1890ff; }
-        @media (max-width: 768px) {
-            .header-inner { flex-direction: column; height: auto; padding: 15px 0; }
-            .nav { margin-top: 15px; flex-wrap: wrap; justify-content: center; gap: 15px; }
-            .container { margin: 30px auto; }
-        }
-    </style>
+    <title>文档中心 - <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <header class="header">
-        <div class="header-inner">
-            <a href="/" class="logo">QEEFG授权站</a>
-            <nav class="nav">
-                <a href="/">首页</a>
-                <a href="/license-query">授权查询</a>
-                <a href="/documents">文档中心</a>
-                <a href="/login" class="nav-btn">登录</a>
-                <a href="/register" class="nav-btn" style="background: #fff; color: #1890ff; border: 1px solid #1890ff;">注册</a>
+    <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+            <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+            <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+            <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+            <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+        </defs>
+    </svg>
+
+    <header class="site-header">
+        <div class="header-inner container">
+            <a href="/" class="logo"><span class="logo-mark">&#9729;</span><span>熵云</span></a>
+            <nav class="main-nav">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/platform" class="nav-link">平台能力</a>
+                <a href="/license-query" class="nav-link">授权查询</a>
+                <a href="/documents" class="nav-link active">文档中心</a>
+                <a href="/announcement" class="nav-link">网站公告</a>
             </nav>
+            <div class="auth-links">
+                <a href="/login" class="btn btn-ghost btn-sm">登录</a>
+                <a href="/register" class="btn btn-primary btn-sm">注册</a>
+            </div>
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单"><span></span><span></span><span></span></button>
         </div>
     </header>
 
-    <div class="container">
-        <h1 class="page-title">文档中心</h1>
+    <div class="mobile-nav" id="mobileNav">
+        <a href="/" class="nav-link">首页</a>
+        <a href="/platform" class="nav-link">平台能力</a>
+        <a href="/license-query" class="nav-link">授权查询</a>
+        <a href="/documents" class="nav-link">文档中心</a>
+        <a href="/announcement" class="nav-link">网站公告</a>
+    </div>
 
-        <div class="doc-section">
-            <h2>快速开始</h2>
-            <div class="doc-item">
-                <h3>1. 注册账号</h3>
-                <p>点击右上角"注册"按钮，填写用户名、邮箱和密码完成注册。</p>
-            </div>
-            <div class="doc-item">
-                <h3>2. 购买授权</h3>
-                <p>登录后进入产品中心，选择需要购买的产品，完成支付即可获得授权。</p>
-            </div>
-            <div class="doc-item">
-                <h3>3. 绑定域名</h3>
-                <p>在"我的产品"中绑定您的域名，即可开始使用授权服务。</p>
-            </div>
-        </div>
-
-        <div class="doc-section">
-            <h2>API接口</h2>
-            <div class="doc-item">
-                <h3>授权验证接口</h3>
-                <p>用于验证用户授权是否有效。</p>
-                <pre>POST /api/license/verify
-参数:
-- license_key: 授权码
-- domain: 域名
-
-返回:
-{
-    "code": 200,
-    "msg": "授权有效",
-    "data": {
-        "product_id": 1,
-        "expire_time": "2099-12-31",
-        "status": 1
-    }
-}</pre>
-            </div>
-            <div class="doc-item">
-                <h3>授权信息查询</h3>
-                <p>查询授权的详细信息。</p>
-                <pre>GET /api/license/info
-参数:
-- license_key: 授权码
-
-返回:
-{
-    "code": 200,
-    "data": {
-        "license_key": "XXXXX-XXXXX-XXXXX",
-        "product_name": "产品名称",
-        "domain": "example.com",
-        "expire_time": "2099-12-31",
-        "status": 1
-    }
-}</pre>
-            </div>
-        </div>
-
-        <div class="doc-section">
-            <h2>常见问题</h2>
-            <div class="doc-item">
-                <h3>授权码忘记了怎么办？</h3>
-                <p>登录后在"我的产品"页面可以查看所有授权码。</p>
-            </div>
-            <div class="doc-item">
-                <h3>如何更换绑定的域名？</h3>
-                <p>在"我的产品"中点击"解绑"按钮，然后重新绑定新域名即可。</p>
-            </div>
-            <div class="doc-item">
-                <h3>授权到期后怎么办？</h3>
-                <p>授权到期后需要重新购买，或联系客服续费。</p>
-            </div>
+    <div style="padding-top: 80px;">
+        <div class="container">
+            <h1 style="font-size: 28px; color: #1a1a2e; margin-bottom: 8px;">文档中心</h1>
+            <p style="color: #687690; font-size: 14px; margin-bottom: 32px;">查阅产品文档与使用指南</p>
         </div>
     </div>
 
-    <footer class="footer">
-        <p>© <?php echo date('Y'); ?> QEEFG授权站 All Rights Reserved. <a href="/admin/login">管理后台</a></p>
+    <div class="docs-layout">
+        <aside class="docs-sidebar">
+            <div class="docs-sidebar-inner">
+                <?php if (!empty($categories)): ?>
+                    <?php foreach ($categories as $cat => $catDocs): ?>
+                    <div class="docs-cat-section">
+                        <div class="docs-cat-title"><?= htmlspecialchars($cat) ?></div>
+                        <div class="docs-cat-body">
+                            <?php foreach ($catDocs as $doc): ?>
+                            <a href="/documents?doc=<?= $doc['id'] ?? 0 ?>" class="docs-link<?= ($currentDoc['id'] ?? 0) == ($doc['id'] ?? 0) ? ' active' : '' ?>"><?= htmlspecialchars($doc['title'] ?? '') ?></a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div style="padding: 20px; color: #687690; text-align: center;">暂无文档</div>
+                <?php endif; ?>
+            </div>
+        </aside>
+        <main class="docs-content">
+            <?php if (!empty($currentDoc)): ?>
+            <div class="docs-article">
+                <div class="markdown-body">
+                    <h1><?= htmlspecialchars($currentDoc['title'] ?? '') ?></h1>
+                    <?= nl2br(htmlspecialchars($currentDoc['content'] ?? '')) ?>
+                </div>
+            </div>
+            <?php else: ?>
+            <div class="empty-state" style="text-align: center; padding: 80px 20px;">
+                <svg width="64" height="64" style="color: #c0c8d8; margin-bottom: 16px;"><use href="#i-doc"/></svg>
+                <h3 style="font-size: 18px; color: #1a1a2e; margin-bottom: 8px;">选择文档</h3>
+                <p style="color: #687690; font-size: 14px;">请从左侧目录选择一篇文档查看</p>
+            </div>
+            <?php endif; ?>
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container" style="text-align: center;">
+            <p style="margin-bottom: 8px;">&copy; <?= date('Y') ?> <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> All Rights Reserved.</p>
+            <?php if (!empty($siteSettings['icp'])): ?>
+            <p style="color: #687690; font-size: 12px;"><?= htmlspecialchars($siteSettings['icp']) ?></p>
+            <?php endif; ?>
+        </div>
     </footer>
+
+    <script>
+        document.getElementById('hamburgerBtn').addEventListener('click', function() {
+            document.getElementById('mobileNav').classList.toggle('show');
+        });
+    </script>
 </body>
 </html>

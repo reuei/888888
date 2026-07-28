@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> - 授权服务平台</title>
+    <title><?= htmlspecialchars($pageTitle ?? '用户中心') ?> - <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -58,160 +58,121 @@
     <!-- Header -->
     <header class="site-header">
         <div class="header-inner container">
-            <a href="/" class="logo">
-                <span class="logo-mark">☁</span>
-                <span>熵云</span>
-            </a>
+            <a href="/" class="logo"><span class="logo-mark">☁</span><span>熵云</span></a>
             <nav class="main-nav">
-                <a href="/" class="nav-link active">首页</a>
+                <a href="/" class="nav-link">首页</a>
                 <a href="/platform" class="nav-link">平台能力</a>
                 <a href="/license-query" class="nav-link">授权查询</a>
                 <a href="/documents" class="nav-link">文档中心</a>
-                <a href="/announcement" class="nav-link">网站公告</a>
             </nav>
-            <div class="auth-links">
-                <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
-                <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
+            <div class="auth-links" style="display: flex; align-items: center; gap: 12px;">
+                <button class="theme-toggle" id="themeToggle" title="切换主题" style="background: none; border: none; cursor: pointer; padding: 4px;">
+                    <svg width="18" height="18" id="themeIcon"><use href="#i-moon"/></svg>
+                </button>
+                <div class="lang-switch" style="display: flex; border: 1px solid #e0e0e0; overflow: hidden;">
+                    <a href="?lang=zh" class="lang-btn<?= ($lang ?? 'zh') === 'zh' ? ' active' : '' ?>" style="padding: 4px 10px; font-size: 12px; background: <?= ($lang ?? 'zh') === 'zh' ? '#4f8cff' : '#fff' ?>; color: <?= ($lang ?? 'zh') === 'zh' ? '#fff' : '#666' ?>;">中</a>
+                    <a href="?lang=en" class="lang-btn<?= ($lang ?? 'zh') === 'en' ? ' active' : '' ?>" style="padding: 4px 10px; font-size: 12px; background: <?= ($lang ?? 'zh') === 'en' ? '#4f8cff' : '#fff' ?>; color: <?= ($lang ?? 'zh') === 'en' ? '#fff' : '#666' ?>;">EN</a>
+                </div>
+                <div class="user-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4f8cff, #3868ff); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
+                    <?= mb_substr($user['username'] ?? 'U', 0, 1) ?>
+                </div>
+                <a href="/user/logout" class="btn btn-ghost btn-sm" style="color: #666;">退出</a>
             </div>
-            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单">
-                <span></span><span></span><span></span>
-            </button>
         </div>
     </header>
 
-    <!-- Mobile Nav -->
-    <div class="mobile-nav" id="mobileNav">
-        <a href="/" class="nav-link">首页</a>
-        <a href="/platform" class="nav-link">平台能力</a>
-        <a href="/license-query" class="nav-link">授权查询</a>
-        <a href="/documents" class="nav-link">文档中心</a>
-        <a href="/announcement" class="nav-link">网站公告</a>
-        <div class="auth-links" style="margin-top: 16px; display: flex; gap: 10px; justify-content: center;">
-            <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
-            <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
-        </div>
+    <!-- User Layout -->
+    <div class="user-layout" style="padding-top: 80px; display: flex; min-height: calc(100vh - 80px);">
+        <aside class="user-sidebar">
+            <div class="icon-rail">
+                <div class="menu-item">
+                    <a href="/user/dashboard" class="menu-link<?= ($activeMenu ?? '') === 'dashboard' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-home"/></svg>
+                        <span>用户中心</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="/user/workplace" class="menu-link<?= ($activeMenu ?? '') === 'workplace' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-platform"/></svg>
+                        <span>工作台</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="/user/products" class="menu-link<?= ($activeMenu ?? '') === 'products' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-box"/></svg>
+                        <span>产品中心</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="/user/my-products" class="menu-link<?= ($activeMenu ?? '') === 'myProducts' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-key"/></svg>
+                        <span>我的产品</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="/user/orders" class="menu-link<?= ($activeMenu ?? '') === 'orders' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-orders"/></svg>
+                        <span>我的订单</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="/user/balance" class="menu-link<?= ($activeMenu ?? '') === 'balance' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-wallet"/></svg>
+                        <span>余额管理</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="/user/logs" class="menu-link<?= ($activeMenu ?? '') === 'logs' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-log"/></svg>
+                        <span>站点日志</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="/user/settings" class="menu-link<?= ($activeMenu ?? '') === 'settings' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-settings"/></svg>
+                        <span>账户设置</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="/user/feedback" class="menu-link<?= ($activeMenu ?? '') === 'feedback' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-feedback"/></svg>
+                        <span>意见反馈</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="user-content">
+            <?php if (isset($toast)): ?>
+            <div class="toast toast-<?= $toast['type'] ?? 'success' ?>">
+                <?= htmlspecialchars($toast['message'] ?? '') ?>
+            </div>
+            <?php endif; ?>
+            <?= $content ?>
+        </main>
     </div>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="container hero-content">
-            <h1 class="hero-title">熵云<span class="gradient-text">授权服务平台</span></h1>
-            <p class="hero-subtitle">专业的软件授权与许可证服务平台</p>
-            <p class="hero-subtitle" style="font-size: 15px; color: #687690; max-width: 560px; margin: 0 auto 32px; line-height: 1.8;">
-                安全授权 · 稳定验证 · 高效管理
-            </p>
-            <p style="max-width: 600px; margin: 0 auto 40px; color: #687690; font-size: 14px; line-height: 1.8;">
-                熵云为软件开发者与企业提供一站式授权管理解决方案，涵盖授权发放、在线验证、设备绑定与数据分析等核心能力，助力您的产品安全高效运营。
-            </p>
-            <div class="hero-buttons">
-                <a href="/user/register" class="btn btn-primary btn-lg">立即注册</a>
-                <a href="/platform" class="btn btn-outline btn-lg">了解更多</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Core Capabilities -->
-    <section style="padding: 80px 0; background: #f8f9fb;">
-        <div class="container">
-            <h2 class="section-title" style="text-align:center; margin-bottom: 48px; font-size: 28px; color: #1a1a2e;">核心能力</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
-                <div class="card">
-                    <div class="card-header">
-                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #4f8cff, #3868ff); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                            <svg width="24" height="24" style="color:#fff;"><use href="#i-key"/></svg>
-                        </div>
-                        <h3 class="card-title">授权发放与管理</h3>
-                        <p style="color: #687690; font-size: 14px; line-height: 1.7;">集中管理授权信息、有效期与使用状态，支持批量发放与实时查询，让授权管理变得简单高效。</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #4f8cff, #3868ff); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                            <svg width="24" height="24" style="color:#fff;"><use href="#i-shield"/></svg>
-                        </div>
-                        <h3 class="card-title">在线验证与设备绑定</h3>
-                        <p style="color: #687690; font-size: 14px; line-height: 1.7;">支持授权查询、在线激活与设备特征管理，基于设备指纹绑定确保授权安全可控。</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #4f8cff, #3868ff); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                            <svg width="24" height="24" style="color:#fff;"><use href="#i-doc"/></svg>
-                        </div>
-                        <h3 class="card-title">授权服务支持</h3>
-                        <p style="color: #687690; font-size: 14px; line-height: 1.7;">通过文档中心、公告与服务入口帮助用户快速接入和使用，降低学习与运维成本。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Products -->
-    <?php if (!empty($products)): ?>
-    <section style="padding: 80px 0;">
-        <div class="container">
-            <h2 class="section-title" style="text-align:center; margin-bottom: 48px; font-size: 28px; color: #1a1a2e;">热门产品</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
-                <?php foreach ($products as $product): ?>
-                <div class="card">
-                    <h3 class="card-title" style="font-size: 18px;"><?= htmlspecialchars($product['name'] ?? '') ?></h3>
-                    <p style="color: #687690; font-size: 14px; margin-bottom: 16px; min-height: 44px;"><?= htmlspecialchars($product['description'] ?? '') ?></p>
-                    <div style="font-size: 24px; font-weight: 700; color: #e74c3c; margin-bottom: 16px;">
-                        ¥<?= number_format($product['price'] ?? 0, 2) ?><span style="font-size: 12px; color: #999; font-weight: 400;"> / 永久</span>
-                    </div>
-                    <a href="/user/register" class="btn btn-primary btn-block">立即购买</a>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
-    <?php endif; ?>
-
-    <!-- Stats -->
-    <section style="padding: 60px 0; background: linear-gradient(135deg, #4f8cff, #3868ff);">
-        <div class="container">
-            <div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                <div class="stat-card" style="background: transparent; border: none; text-align: center; padding: 24px;">
-                    <div class="stat-value" style="color: #fff; font-size: 36px;"><?= $stats['products'] ?? 0 ?></div>
-                    <div class="stat-label" style="color: rgba(255,255,255,0.8);">产品数量</div>
-                </div>
-                <div class="stat-card" style="background: transparent; border: none; text-align: center; padding: 24px;">
-                    <div class="stat-value" style="color: #fff; font-size: 36px;"><?= $stats['users'] ?? 0 ?></div>
-                    <div class="stat-label" style="color: rgba(255,255,255,0.8);">注册用户</div>
-                </div>
-                <div class="stat-card" style="background: transparent; border: none; text-align: center; padding: 24px;">
-                    <div class="stat-value" style="color: #fff; font-size: 36px;"><?= $stats['licenses'] ?? 0 ?></div>
-                    <div class="stat-label" style="color: rgba(255,255,255,0.8);">授权总数</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Announcement -->
+    <!-- Announcement Modal -->
     <?php if (!empty($siteSettings['announcement'])): ?>
-    <section style="padding: 60px 0; background: #f8f9fb;">
-        <div class="container" style="text-align: center;">
-            <h2 style="font-size: 28px; color: #1a1a2e; margin-bottom: 24px;">
-                <svg width="24" height="24" style="vertical-align: middle; margin-right: 8px;"><use href="#i-bell"/></svg>网站公告
-            </h2>
-            <div class="card" style="max-width: 700px; margin: 0 auto; text-align: left;">
-                <p style="color: #687690; font-size: 14px; line-height: 1.8;"><?= htmlspecialchars(mb_substr($siteSettings['announcement'], 0, 200)) ?><?= mb_strlen($siteSettings['announcement']) > 200 ? '...' : '' ?></p>
-                <?php if (mb_strlen($siteSettings['announcement']) > 200): ?>
-                <a href="/announcement" style="color: #4f8cff; font-size: 14px; margin-top: 8px; display: inline-block;">查看详情 <svg width="14" height="14" style="vertical-align: middle;"><use href="#i-arrow-right"/></svg></a>
-                <?php endif; ?>
+    <div class="announcement-modal" id="announcementModal">
+        <div class="am-overlay"></div>
+        <div class="am-dialog">
+            <div class="am-header">
+                <h3><svg width="18" height="18" style="vertical-align: middle; margin-right: 6px;"><use href="#i-bell"/></svg>网站公告</h3>
+                <button class="am-close" id="amCloseBtn"><svg width="18" height="18"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="am-body">
+                <p style="color: #444; line-height: 1.8; white-space: pre-wrap;"><?= htmlspecialchars($siteSettings['announcement']) ?></p>
+            </div>
+            <div class="am-footer">
+                <button class="btn btn-primary btn-sm" id="amConfirmBtn">我知道了</button>
             </div>
         </div>
-    </section>
+    </div>
     <?php endif; ?>
 
-    <!-- CTA -->
-    <section style="padding: 80px 0; text-align: center;">
-        <div class="container">
-            <h2 style="font-size: 28px; color: #1a1a2e; margin-bottom: 16px;">准备好开始了吗？</h2>
-            <p style="color: #687690; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto;">立即注册熵云，体验专业的软件授权管理服务</p>
-            <a href="/user/register" class="btn btn-primary btn-lg">免费注册</a>
-        </div>
-    </section>
+    <!-- Toast Container -->
+    <div class="toast-center" id="toastContainer"></div>
 
     <!-- Footer -->
     <footer class="site-footer">
@@ -223,10 +184,51 @@
         </div>
     </footer>
 
+    <script src="/static/js/main.js"></script>
     <script>
-        document.getElementById('hamburgerBtn').addEventListener('click', function() {
-            document.getElementById('mobileNav').classList.toggle('show');
-        });
+        // Theme toggle
+        (function() {
+            var btn = document.getElementById('themeToggle');
+            var icon = document.getElementById('themeIcon');
+            if (btn && icon) {
+                btn.addEventListener('click', function() {
+                    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    if (isDark) {
+                        document.documentElement.removeAttribute('data-theme');
+                        icon.innerHTML = '<use href="#i-moon"/>';
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        icon.innerHTML = '<use href="#i-sun"/>';
+                        localStorage.setItem('theme', 'dark');
+                    }
+                });
+                var saved = localStorage.getItem('theme');
+                if (saved === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    icon.innerHTML = '<use href="#i-sun"/>';
+                }
+            }
+        })();
+
+        // Announcement modal
+        (function() {
+            var modal = document.getElementById('announcementModal');
+            if (modal) {
+                var closeBtn = document.getElementById('amCloseBtn');
+                var confirmBtn = document.getElementById('amConfirmBtn');
+                var dismissed = localStorage.getItem('announcementDismissed');
+                if (!dismissed) {
+                    modal.classList.add('show');
+                }
+                function dismiss() {
+                    modal.classList.remove('show');
+                    localStorage.setItem('announcementDismissed', '1');
+                }
+                if (closeBtn) closeBtn.addEventListener('click', dismiss);
+                if (confirmBtn) confirmBtn.addEventListener('click', dismiss);
+            }
+        })();
     </script>
 </body>
 </html>

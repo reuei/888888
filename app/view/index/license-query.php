@@ -3,111 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>授权查询 - QEEFG授权站</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #fff; color: #333; line-height: 1.6; }
-        a { text-decoration: none; color: inherit; }
-        .header { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 0 20px; }
-        .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 60px; }
-        .logo { font-size: 20px; font-weight: 600; color: #1a1a1a; }
-        .nav { display: flex; gap: 30px; }
-        .nav a { color: #666; font-size: 14px; padding: 8px 0; }
-        .nav a:hover { color: #1890ff; }
-        .nav-btn { background: #1890ff; color: #fff; padding: 8px 20px; border: none; cursor: pointer; }
-        .nav-btn:hover { background: #40a9ff; }
-        .container { max-width: 800px; margin: 60px auto; padding: 0 20px; }
-        .page-title { font-size: 28px; text-align: center; margin-bottom: 40px; color: #1a1a1a; }
-        .query-box { background: #fafafa; padding: 40px; border: 1px solid #e5e5e5; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 14px; color: #333; margin-bottom: 8px; }
-        .form-control { width: 100%; padding: 12px 16px; font-size: 14px; border: 1px solid #d9d9d9; background: #fff; }
-        .form-control:focus { outline: none; border-color: #1890ff; }
-        .btn { display: inline-block; padding: 12px 32px; font-size: 16px; border: none; cursor: pointer; background: #1890ff; color: #fff; width: 100%; }
-        .btn:hover { background: #40a9ff; }
-        .result-box { margin-top: 30px; padding: 20px; border: 1px solid #e5e5e5; background: #fff; display: none; }
-        .result-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-        .result-item:last-child { border-bottom: none; }
-        .result-label { color: #666; }
-        .result-value { color: #1a1a1a; font-weight: 500; }
-        .status-active { color: #52c41a; }
-        .status-inactive { color: #ff4d4f; }
-        .footer { padding: 40px 20px; background: #1a1a1a; color: #fff; text-align: center; margin-top: 60px; }
-        .footer a { color: #1890ff; }
-        @media (max-width: 768px) {
-            .header-inner { flex-direction: column; height: auto; padding: 15px 0; }
-            .nav { margin-top: 15px; flex-wrap: wrap; justify-content: center; gap: 15px; }
-            .container { margin: 30px auto; }
-            .query-box { padding: 20px; }
-        }
-    </style>
+    <title>授权查询 - <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <header class="header">
-        <div class="header-inner">
-            <a href="/" class="logo">QEEFG授权站</a>
-            <nav class="nav">
-                <a href="/">首页</a>
-                <a href="/license-query">授权查询</a>
-                <a href="/documents">文档中心</a>
-                <a href="/login" class="nav-btn">登录</a>
-                <a href="/register" class="nav-btn" style="background: #fff; color: #1890ff; border: 1px solid #1890ff;">注册</a>
+    <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+            <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+            <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+            <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+            <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></symbol>
+        </defs>
+    </svg>
+
+    <header class="site-header">
+        <div class="header-inner container">
+            <a href="/" class="logo"><span class="logo-mark">☁</span><span>熵云</span></a>
+            <nav class="main-nav">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/platform" class="nav-link">平台能力</a>
+                <a href="/license-query" class="nav-link active">授权查询</a>
+                <a href="/documents" class="nav-link">文档中心</a>
+                <a href="/announcement" class="nav-link">网站公告</a>
             </nav>
+            <div class="auth-links">
+                <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
+                <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
+            </div>
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单"><span></span><span></span><span></span></button>
         </div>
     </header>
 
-    <div class="container">
-        <h1 class="page-title">授权查询</h1>
-        <div class="query-box">
-            <div class="form-group">
-                <label>请输入授权码</label>
-                <input type="text" class="form-control" id="license_key" placeholder="请输入您的授权码">
-            </div>
-            <button class="btn" onclick="queryLicense()">查询授权</button>
-            <div class="result-box" id="result">
-                <div class="result-item">
-                    <span class="result-label">授权码</span>
-                    <span class="result-value" id="r-key">-</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">产品名称</span>
-                    <span class="result-value" id="r-product">-</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">授权状态</span>
-                    <span class="result-value" id="r-status">-</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">到期时间</span>
-                    <span class="result-value" id="r-expire">-</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">绑定域名</span>
-                    <span class="result-value" id="r-domain">-</span>
-                </div>
-            </div>
+    <div class="mobile-nav" id="mobileNav">
+        <a href="/" class="nav-link">首页</a>
+        <a href="/platform" class="nav-link">平台能力</a>
+        <a href="/license-query" class="nav-link">授权查询</a>
+        <a href="/documents" class="nav-link">文档中心</a>
+        <a href="/announcement" class="nav-link">网站公告</a>
+    </div>
+
+    <div style="padding-top: 80px;">
+        <div class="container">
+            <h1 style="font-size: 28px; color: #1a1a2e; margin-bottom: 8px;">授权查询</h1>
+            <p style="color: #687690; font-size: 14px; margin-bottom: 32px;">输入授权码查询授权信息</p>
         </div>
     </div>
 
-    <footer class="footer">
-        <p>© <?php echo date('Y'); ?> QEEFG授权站 All Rights Reserved. <a href="/admin/login">管理后台</a></p>
+    <div class="container" style="padding-bottom: 60px;">
+        <div class="card" style="max-width: 640px; margin: 0 auto;">
+            <form method="GET" action="/license-query">
+                <div class="form-group">
+                    <label class="form-label" for="license_key">授权码</label>
+                    <input type="text" class="form-control" id="license_key" name="key" placeholder="请输入您的授权码" value="<?= htmlspecialchars($key ?? '') ?>" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <svg width="16" height="16" style="vertical-align: middle; margin-right: 6px;"><use href="#i-search"/></svg>查询授权
+                </button>
+            </form>
+        </div>
+
+        <?php if (isset($result)): ?>
+        <div class="card" style="max-width: 640px; margin: 24px auto 0;">
+            <h3 style="font-size: 18px; color: #1a1a2e; margin-bottom: 16px;">查询结果</h3>
+            <?php if ($result): ?>
+            <div style="display: grid; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                    <span style="color: #687690;">授权码</span>
+                    <span style="font-weight: 500; font-family: monospace; font-size: 13px;"><?= htmlspecialchars($result['license_key'] ?? '-') ?></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                    <span style="color: #687690;">产品名称</span>
+                    <span style="font-weight: 500;"><?= htmlspecialchars($result['product_name'] ?? '-') ?></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                    <span style="color: #687690;">授权状态</span>
+                    <?php $status = $result['status'] ?? 0; ?>
+                    <span class="badge <?= $status == 1 ? 'badge-success' : 'badge-danger' ?>"><?= $status == 1 ? '有效' : '已失效' ?></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                    <span style="color: #687690;">到期时间</span>
+                    <span style="font-weight: 500;"><?= htmlspecialchars($result['expires_at'] ?? '永久') ?></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                    <span style="color: #687690;">绑定用户</span>
+                    <span style="font-weight: 500;"><?= htmlspecialchars($result['username'] ?? '未知') ?></span>
+                </div>
+            </div>
+            <?php else: ?>
+            <div class="empty-state" style="text-align: center; padding: 40px 20px;">
+                <svg width="48" height="48" style="color: #c0c8d8; margin-bottom: 12px;"><use href="#i-x"/></svg>
+                <p style="color: #687690; font-size: 14px;"><?= htmlspecialchars($error ?? '未找到该授权码对应的信息') ?></p>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p style="margin-bottom: 8px;">© <?= date('Y') ?> <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> All Rights Reserved.</p>
+            <?php if (!empty($siteSettings['icp'])): ?>
+            <p style="color: #687690; font-size: 12px;"><?= htmlspecialchars($siteSettings['icp']) ?></p>
+            <?php endif; ?>
+        </div>
     </footer>
 
     <script>
-        function queryLicense() {
-            const key = document.getElementById('license_key').value.trim();
-            if (!key) {
-                alert('请输入授权码');
-                return;
-            }
-            // 模拟查询结果
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('r-key').textContent = key;
-            document.getElementById('r-product').textContent = '示例产品';
-            document.getElementById('r-status').innerHTML = '<span class="status-active">有效</span>';
-            document.getElementById('r-expire').textContent = '永久';
-            document.getElementById('r-domain').textContent = '未绑定';
-        }
+        document.getElementById('hamburgerBtn').addEventListener('click', function() {
+            document.getElementById('mobileNav').classList.toggle('show');
+        });
     </script>
 </body>
 </html>

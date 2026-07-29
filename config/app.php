@@ -4,8 +4,8 @@
  */
 return [
     'app_name'        => 'QEEFG授权站',
-    'app_debug'       => env('app.debug', true),
-    'app_trace'       => env('app.trace', false),
+    'app_debug'       => env('APP_DEBUG', true),
+    'app_trace'       => env('APP_TRACE', false),
     'default_timezone' => 'Asia/Shanghai',
     'default_lang'    => 'zh-cn',
     'default_module'  => 'index',

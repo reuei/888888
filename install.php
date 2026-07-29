@@ -62,19 +62,19 @@ echo "[5] 读取数据库配置...\n";
 $envContent = file_get_contents(__DIR__ . '/.env');
 $config = [];
 
-preg_match('/HOSTNAME\s*=\s*(.+)/', $envContent, $matches);
+preg_match('/DB_HOST\s*=\s*(.+)/', $envContent, $matches);
 $config['hostname'] = trim($matches[1] ?? '127.0.0.1');
 
-preg_match('/DATABASE\s*=\s*(.+)/', $envContent, $matches);
+preg_match('/DB_NAME\s*=\s*(.+)/', $envContent, $matches);
 $config['database'] = trim($matches[1] ?? 'qeefg_auth');
 
-preg_match('/USERNAME\s*=\s*(.+)/', $envContent, $matches);
+preg_match('/DB_USER\s*=\s*(.+)/', $envContent, $matches);
 $config['username'] = trim($matches[1] ?? 'root');
 
-preg_match('/PASSWORD\s*=\s*(.+)/', $envContent, $matches);
+preg_match('/DB_PASS\s*=\s*(.+)/', $envContent, $matches);
 $config['password'] = trim($matches[1] ?? '');
 
-preg_match('/HOSTPORT\s*=\s*(.+)/', $envContent, $matches);
+preg_match('/DB_PORT\s*=\s*(.+)/', $envContent, $matches);
 $config['hostport'] = trim($matches[1] ?? '3306');
 
 echo "数据库名: {$config['database']}\n";

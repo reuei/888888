@@ -24,8 +24,23 @@ define('CONFIG_PATH', ROOT_PATH . 'config/');
 define('PUBLIC_PATH', __DIR__ . '/');
 define('STORAGE_PATH', ROOT_PATH . 'storage/');
 
+// 环境变量辅助函数
+function env($key, $default = null)
+{
+    $value = getenv($key);
+    if ($value === false) {
+        return $default;
+    }
+    return $value;
+}
+
 // 自动加载
 spl_autoload_register(function ($class) {
+    // 去掉 app\ 前缀，映射到 APP_PATH
+    $prefix = 'app\\';
+    if (strncmp($class, $prefix, strlen($prefix)) === 0) {
+        $class = substr($class, strlen($prefix));
+    }
     $file = APP_PATH . str_replace('\\', '/', $class) . '.php';
     if (file_exists($file)) {
         require $file;

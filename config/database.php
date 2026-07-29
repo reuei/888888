@@ -18,14 +18,3 @@ return [
     ],
 ];
 
-/**
- * 环境变量辅助函数
- */
-function env($key, $default = null)
-{
-    $value = getenv($key);
-    if ($value === false) {
-        return $default;
-    }
-    return $value;
-}

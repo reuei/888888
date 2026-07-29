@@ -7,7 +7,9 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <!-- SVG Icon Definitions -->
+    <!-- ==========================================================================
+         SVG ICON DEFINITIONS
+         ========================================================================== -->
     <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
@@ -55,47 +57,57 @@
             <symbol id="i-plugin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></symbol>
             <symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
             <symbol id="i-dev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+            <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+            <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
         </defs>
     </svg>
 
-    <!-- Header -->
+    <!-- ==========================================================================
+         HEADER
+         ========================================================================== -->
     <header class="site-header">
         <div class="header-inner container">
-            <a href="/" class="logo"><span class="logo-mark">☁</span><span>熵云</span></a>
+            <a href="/" class="logo">
+                <span class="logo-mark">☁</span>
+                <span><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
+            </a>
+
             <nav class="main-nav">
                 <a href="/" class="nav-link">首页</a>
                 <a href="/platform" class="nav-link">平台能力</a>
                 <a href="/license-query" class="nav-link">授权查询</a>
                 <a href="/documents" class="nav-link">文档中心</a>
             </nav>
-            <div class="auth-links" style="display: flex; align-items: center; gap: 12px;">
-                <button class="theme-toggle" id="themeToggle" title="切换主题" style="background: none; border: none; cursor: pointer; padding: 4px;">
+
+            <div class="auth-links">
+                <button class="theme-toggle" id="themeToggle" title="切换主题">
                     <svg width="18" height="18" id="themeIcon"><use href="#i-moon"/></svg>
                 </button>
-                <div class="lang-switch" style="display: flex; border: 1px solid #e0e0e0; overflow: hidden;">
-                    <a href="?lang=zh" class="lang-btn<?= ($lang ?? 'zh') === 'zh' ? ' active' : '' ?>" style="padding: 4px 10px; font-size: 12px; background: <?= ($lang ?? 'zh') === 'zh' ? '#4f8cff' : '#fff' ?>; color: <?= ($lang ?? 'zh') === 'zh' ? '#fff' : '#666' ?>;">中</a>
-                    <a href="?lang=en" class="lang-btn<?= ($lang ?? 'zh') === 'en' ? ' active' : '' ?>" style="padding: 4px 10px; font-size: 12px; background: <?= ($lang ?? 'zh') === 'en' ? '#4f8cff' : '#fff' ?>; color: <?= ($lang ?? 'zh') === 'en' ? '#fff' : '#666' ?>;">EN</a>
+
+                <div class="lang-switch">
+                    <a href="?lang=zh" class="lang-btn<?= ($lang ?? 'zh') === 'zh' ? ' active' : '' ?>">中</a>
+                    <a href="?lang=en" class="lang-btn<?= ($lang ?? 'zh') === 'en' ? ' active' : '' ?>">EN</a>
                 </div>
-                <!-- Message Bell -->
-                <div class="bell-wrapper" style="position: relative;">
-                    <button class="bell-btn" id="bellBtn" title="消息通知" style="background: none; border: none; cursor: pointer; padding: 4px; position: relative;">
+
+                <div class="bell-wrapper">
+                    <button class="bell-btn" id="bellBtn" title="消息通知">
                         <svg width="20" height="20" style="color: var(--text-secondary);"><use href="#i-bell"/></svg>
                         <?php if (($unreadCount ?? 0) > 0): ?>
-                        <span class="bell-badge" id="bellBadge" style="position: absolute; top: -2px; right: -2px; background: #ef4444; color: #fff; font-size: 10px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 4px; font-weight: 600;"><?= ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) ?></span>
+                        <span class="bell-badge" id="bellBadge"><?= ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) ?></span>
                         <?php endif; ?>
                     </button>
-                    <!-- Message Dropdown -->
-                    <div class="message-dropdown" id="messageDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; width: 340px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg); z-index: 200;">
-                        <div class="md-header" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border);">
-                            <span style="font-weight: 600; font-size: 14px; color: var(--text);">消息通知</span>
+
+                    <div class="message-dropdown" id="messageDropdown">
+                        <div class="md-header">
+                            <span>消息通知</span>
                             <?php if (($unreadCount ?? 0) > 0): ?>
                             <a href="/user/messages?action=read-all" style="font-size: 12px; color: var(--primary);">全部已读</a>
                             <?php endif; ?>
                         </div>
-                        <div class="md-body" style="max-height: 320px; overflow-y: auto;">
+                        <div class="md-body">
                             <?php if (!empty($latestMessages)): ?>
                                 <?php foreach ($latestMessages as $msg): ?>
-                                <a href="/user/messages?id=<?= $msg['id'] ?? 0 ?>" class="md-item" style="display: block; padding: 12px 16px; border-bottom: 1px solid var(--border-light); transition: background var(--transition-fast); text-decoration: none; <?= ($msg['is_read'] ?? 0) == 0 ? 'background: var(--primary-light);' : '' ?>">
+                                <a href="/user/messages?id=<?= $msg['id'] ?? 0 ?>" class="md-item" style="<?= ($msg['is_read'] ?? 0) == 0 ? 'background: var(--primary-light);' : '' ?>">
                                     <div style="font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; <?= ($msg['is_read'] ?? 0) == 0 ? '' : 'color: var(--text-secondary);' ?>"><?= htmlspecialchars($msg['title'] ?? '') ?></div>
                                     <div style="font-size: 12px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($msg['content'] ?? '') ?></div>
                                     <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"><?= htmlspecialchars($msg['created_at'] ?? '') ?></div>
@@ -105,29 +117,36 @@
                                 <div style="text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px;">暂无消息</div>
                             <?php endif; ?>
                         </div>
-                        <div class="md-footer" style="padding: 10px 16px; border-top: 1px solid var(--border); text-align: center;">
-                            <a href="/user/messages" style="font-size: 13px; color: var(--primary);">查看全部消息</a>
+                        <div class="md-footer">
+                            <a href="/user/messages">查看全部消息</a>
                         </div>
                     </div>
                 </div>
-                <!-- User Avatar (email-based) -->
-                <div class="user-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4f8cff, #3868ff); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; text-transform: uppercase;">
+
+                <div class="user-avatar" title="<?= htmlspecialchars($user['email'] ?? '') ?>">
                     <?= mb_strtoupper(mb_substr($user['email'] ?? 'U', 0, 1)) ?>
                 </div>
-                <a href="/user/logout" class="btn btn-ghost btn-sm" style="color: #666;">退出</a>
-                <!-- Hamburger Button -->
-                <button class="hamburger-btn" id="hamburgerBtn" title="菜单" style="background: none; border: none; cursor: pointer; padding: 4px;">
-                    <svg width="24" height="24" style="color: var(--text);"><use href="#i-platform"/></svg>
+
+                <a href="/user/logout" class="btn btn-ghost btn-sm">退出</a>
+
+                <button class="hamburger-btn" id="hamburgerBtn" title="菜单">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Hamburger Overlay -->
+    <!-- ==========================================================================
+         HAMBURGER OVERLAY
+         ========================================================================== -->
     <div class="hamburger-overlay" id="hamburgerOverlay"></div>
 
-    <!-- Hamburger Sidebar -->
-    <div class="hamburger-sidebar" id="hamburgerSidebar">
+    <!-- ==========================================================================
+         HAMBURGER SIDEBAR (Mobile)
+         ========================================================================== -->
+    <aside class="hamburger-sidebar" id="hamburgerSidebar">
         <div class="icon-rail">
             <div class="menu-item">
                 <a href="/user/dashboard" class="menu-link<?= ($activeMenu ?? '') === 'dashboard' ? ' active' : '' ?>">
@@ -165,12 +184,11 @@
                     <span>余额管理</span>
                 </a>
             </div>
-            <!-- 站点日志 with submenu -->
             <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['balance-logs', 'login-logs', 'operation-logs']) ? ' open' : '' ?>">
                 <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
                     <svg width="18" height="18"><use href="#i-log"/></svg>
                     <span>站点日志</span>
-                    <span class="submenu-toggle" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-muted); transition: transform 0.2s ease;">
+                    <span class="submenu-toggle">
                         <svg width="12" height="12"><use href="#i-chevron"/></svg>
                     </span>
                 </a>
@@ -192,12 +210,11 @@
                     </li>
                 </ul>
             </div>
-            <!-- 账户设置 with submenu -->
             <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['settings', 'rebind']) ? ' open' : '' ?>">
                 <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
                     <svg width="18" height="18"><use href="#i-settings"/></svg>
                     <span>账户设置</span>
-                    <span class="submenu-toggle" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-muted); transition: transform 0.2s ease;">
+                    <span class="submenu-toggle">
                         <svg width="12" height="12"><use href="#i-chevron"/></svg>
                     </span>
                 </a>
@@ -244,10 +261,12 @@
                 </a>
             </div>
         </div>
-    </div>
+    </aside>
 
-    <!-- User Layout -->
-    <div class="user-layout" style="display: flex; min-height: calc(100vh - 80px);">
+    <!-- ==========================================================================
+         USER LAYOUT (Desktop Sidebar + Content)
+         ========================================================================== -->
+    <div class="user-layout">
         <aside class="user-sidebar" id="userSidebar">
             <div class="icon-rail">
                 <div class="menu-item">
@@ -286,7 +305,6 @@
                         <span>余额管理</span>
                     </a>
                 </div>
-                <!-- 站点日志 with submenu -->
                 <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['balance-logs', 'login-logs', 'operation-logs']) ? ' open' : '' ?>">
                     <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
                         <svg width="18" height="18"><use href="#i-log"/></svg>
@@ -313,7 +331,6 @@
                         </li>
                     </ul>
                 </div>
-                <!-- 账户设置 with submenu -->
                 <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['settings', 'rebind']) ? ' open' : '' ?>">
                     <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
                         <svg width="18" height="18"><use href="#i-settings"/></svg>
@@ -367,9 +384,12 @@
             </div>
         </aside>
 
+        <!-- ==================================================================
+             MAIN CONTENT
+             ================================================================== -->
         <main class="user-content">
             <?php if (isset($toast)): ?>
-            <div class="toast toast-<?= $toast['type'] ?? 'success' ?>">
+            <div class="toast toast-<?= $toast['type'] ?? 'success' ?> show">
                 <?= htmlspecialchars($toast['message'] ?? '') ?>
             </div>
             <?php endif; ?>
@@ -377,7 +397,9 @@
         </main>
     </div>
 
-    <!-- Announcement Modal -->
+    <!-- ==========================================================================
+         ANNOUNCEMENT MODAL
+         ========================================================================== -->
     <?php if (!empty($siteSettings['announcement'])): ?>
     <div class="announcement-modal" id="announcementModal">
         <div class="am-overlay"></div>
@@ -387,7 +409,7 @@
                 <button class="am-close" id="amCloseBtn"><svg width="18" height="18"><use href="#i-close"/></svg></button>
             </div>
             <div class="am-body">
-                <p style="color: #444; line-height: 1.8; white-space: pre-wrap;"><?= htmlspecialchars($siteSettings['announcement']) ?></p>
+                <p style="color: var(--text-secondary); line-height: 1.8; white-space: pre-wrap;"><?= htmlspecialchars($siteSettings['announcement']) ?></p>
             </div>
             <div class="am-footer">
                 <button class="btn btn-primary btn-sm" id="amConfirmBtn">我知道了</button>
@@ -396,109 +418,130 @@
     </div>
     <?php endif; ?>
 
-    <!-- Toast Container -->
+    <!-- ==========================================================================
+         TOAST CONTAINER
+         ========================================================================== -->
     <div class="toast-center" id="toastContainer"></div>
 
-    <!-- Footer -->
+    <!-- ==========================================================================
+         FOOTER
+         ========================================================================== -->
     <footer class="site-footer">
         <div class="container">
             <p style="margin-bottom: 8px;">© <?= date('Y') ?> <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> All Rights Reserved.</p>
             <?php if (!empty($siteSettings['icp'])): ?>
-            <p style="color: #687690; font-size: 12px;"><?= htmlspecialchars($siteSettings['icp']) ?></p>
+            <p style="color: var(--text-muted); font-size: 12px;"><?= htmlspecialchars($siteSettings['icp']) ?></p>
             <?php endif; ?>
         </div>
     </footer>
 
+    <!-- ==========================================================================
+         SCRIPTS
+         ========================================================================== -->
     <script src="/static/js/main.js"></script>
     <script>
-        // Theme toggle
-        (function() {
-            var btn = document.getElementById('themeToggle');
-            var icon = document.getElementById('themeIcon');
-            if (btn && icon) {
-                btn.addEventListener('click', function() {
-                    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                    if (isDark) {
-                        document.documentElement.removeAttribute('data-theme');
-                        icon.innerHTML = '<use href="#i-moon"/>';
-                        localStorage.setItem('theme', 'light');
-                    } else {
-                        document.documentElement.setAttribute('data-theme', 'dark');
-                        icon.innerHTML = '<use href="#i-sun"/>';
-                        localStorage.setItem('theme', 'dark');
-                    }
-                });
-                var saved = localStorage.getItem('theme');
-                if (saved === 'dark') {
+    (function() {
+        'use strict';
+
+        // ======================================================================
+        // Theme Toggle
+        // ======================================================================
+        var themeBtn = document.getElementById('themeToggle');
+        var themeIcon = document.getElementById('themeIcon');
+        if (themeBtn && themeIcon) {
+            themeBtn.addEventListener('click', function() {
+                var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (isDark) {
+                    document.documentElement.removeAttribute('data-theme');
+                    themeIcon.innerHTML = '<use href="#i-moon"/>';
+                    localStorage.setItem('theme', 'light');
+                } else {
                     document.documentElement.setAttribute('data-theme', 'dark');
-                    icon.innerHTML = '<use href="#i-sun"/>';
+                    themeIcon.innerHTML = '<use href="#i-sun"/>';
+                    localStorage.setItem('theme', 'dark');
                 }
+            });
+            var savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.innerHTML = '<use href="#i-sun"/>';
             }
-        })();
+        }
 
-        // Announcement modal
-        (function() {
-            var modal = document.getElementById('announcementModal');
-            if (modal) {
-                var closeBtn = document.getElementById('amCloseBtn');
-                var confirmBtn = document.getElementById('amConfirmBtn');
-                var dismissed = localStorage.getItem('announcementDismissed');
-                if (!dismissed) {
-                    modal.classList.add('show');
+        // ======================================================================
+        // Announcement Modal
+        // ======================================================================
+        var annModal = document.getElementById('announcementModal');
+        if (annModal) {
+            var annClose = document.getElementById('amCloseBtn');
+            var annConfirm = document.getElementById('amConfirmBtn');
+            var annDismissed = localStorage.getItem('announcementDismissed');
+            if (!annDismissed) {
+                annModal.classList.add('show');
+            }
+            function dismissAnnouncement() {
+                annModal.classList.remove('show');
+                localStorage.setItem('announcementDismissed', '1');
+            }
+            if (annClose) annClose.addEventListener('click', dismissAnnouncement);
+            if (annConfirm) annConfirm.addEventListener('click', dismissAnnouncement);
+        }
+
+        // ======================================================================
+        // Message Bell Dropdown
+        // ======================================================================
+        var bellBtn = document.getElementById('bellBtn');
+        var msgDropdown = document.getElementById('messageDropdown');
+        if (bellBtn && msgDropdown) {
+            bellBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var isVisible = msgDropdown.style.display === 'block';
+                msgDropdown.style.display = isVisible ? 'none' : 'block';
+            });
+            document.addEventListener('click', function(e) {
+                if (!msgDropdown.contains(e.target) && e.target !== bellBtn && !bellBtn.contains(e.target)) {
+                    msgDropdown.style.display = 'none';
                 }
-                function dismiss() {
-                    modal.classList.remove('show');
-                    localStorage.setItem('announcementDismissed', '1');
+            });
+        }
+
+        // ======================================================================
+        // Hamburger Menu Toggle
+        // ======================================================================
+        var hamburgerBtn = document.getElementById('hamburgerBtn');
+        var hamburgerSidebar = document.getElementById('hamburgerSidebar');
+        var hamburgerOverlay = document.getElementById('hamburgerOverlay');
+        if (hamburgerBtn && hamburgerSidebar && hamburgerOverlay) {
+            function openHamburger() {
+                hamburgerSidebar.classList.add('show');
+                hamburgerOverlay.classList.add('show');
+                hamburgerBtn.classList.add('open');
+            }
+            function closeHamburger() {
+                hamburgerSidebar.classList.remove('show');
+                hamburgerOverlay.classList.remove('show');
+                hamburgerBtn.classList.remove('open');
+            }
+            hamburgerBtn.addEventListener('click', function() {
+                if (hamburgerSidebar.classList.contains('show')) {
+                    closeHamburger();
+                } else {
+                    openHamburger();
                 }
-                if (closeBtn) closeBtn.addEventListener('click', dismiss);
-                if (confirmBtn) confirmBtn.addEventListener('click', dismiss);
-            }
-        })();
+            });
+            hamburgerOverlay.addEventListener('click', closeHamburger);
+        }
 
-        // Message bell dropdown toggle
-        (function() {
-            var bellBtn = document.getElementById('bellBtn');
-            var dropdown = document.getElementById('messageDropdown');
-            if (bellBtn && dropdown) {
-                bellBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    var isVisible = dropdown.style.display === 'block';
-                    dropdown.style.display = isVisible ? 'none' : 'block';
-                });
-                document.addEventListener('click', function(e) {
-                    if (!dropdown.contains(e.target) && e.target !== bellBtn && !bellBtn.contains(e.target)) {
-                        dropdown.style.display = 'none';
-                    }
-                });
-            }
-        })();
-
-        // Submenu toggle
-        function toggleSubmenu(el) {
+        // ======================================================================
+        // Submenu Toggle
+        // ======================================================================
+        window.toggleSubmenu = function(el) {
             var parent = el.closest('.has-submenu');
             if (parent) {
                 parent.classList.toggle('open');
             }
-        }
-
-        // Hamburger menu toggle
-        (function() {
-            var hamburgerBtn = document.getElementById('hamburgerBtn');
-            var sidebar = document.getElementById('hamburgerSidebar');
-            var overlay = document.getElementById('hamburgerOverlay');
-            if (hamburgerBtn && sidebar && overlay) {
-                function openMenu() {
-                    sidebar.classList.add('show');
-                    overlay.classList.add('show');
-                }
-                function closeMenu() {
-                    sidebar.classList.remove('show');
-                    overlay.classList.remove('show');
-                }
-                hamburgerBtn.addEventListener('click', openMenu);
-                overlay.addEventListener('click', closeMenu);
-            }
-        })();
+        };
+    })();
     </script>
 </body>
 </html>

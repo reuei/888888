@@ -19,8 +19,15 @@
   };
 
   /* ========================================================================
-     2. TOAST SYSTEM
+     2. TOAST / NOTIFICATION SYSTEM (clean, minimal, SVG icons)
      ======================================================================== */
+
+  var TOAST_ICONS = {
+    success: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    error: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    info: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+  };
 
   function getToastContainer() {
     var container = $('.toast-center');
@@ -31,13 +38,6 @@
     }
     return container;
   }
-
-  var TOAST_ICONS = {
-    success: '&#10003;',
-    error: '&#10007;',
-    warning: '&#9888;',
-    info: '&#8505;'
-  };
 
   function showToast(msg, type) {
     type = type || 'info';
@@ -71,7 +71,6 @@
       removeToast(toast, item);
     }, 3000);
 
-    // Store timer for potential early removal
     toast._timer = timer;
     toast._item = item;
 
@@ -153,7 +152,30 @@
   }
 
   /* ========================================================================
-     4. MOBILE NAV (Public pages)
+     4. SMOOTH SCROLL
+     ======================================================================== */
+
+  function initSmoothScroll() {
+    document.documentElement.style.scrollBehavior = 'smooth';
+
+    // Handle anchor links with smooth scroll
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a[href^="#"]');
+      if (!link) return;
+
+      var targetId = link.getAttribute('href');
+      if (targetId === '#' || targetId === '') return;
+
+      var target = document.querySelector(targetId);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
+
+  /* ========================================================================
+     5. MOBILE NAV (Public pages)
      ======================================================================== */
 
   function initMobileNav() {
@@ -183,18 +205,16 @@
   }
 
   /* ========================================================================
-     5. HAMBURGER SIDEBAR (User/Admin pages)
+     6. HAMBURGER SIDEBAR (User/Admin pages)
      ======================================================================== */
 
   function initHamburger() {
     var hamburgerBtn = $('.hamburger-btn');
-    var sidebar = $('.user-sidebar') || $('.admin-sidebar');
     var overlay = $('.sidebar-overlay');
 
     if (!hamburgerBtn) return;
 
     hamburgerBtn.addEventListener('click', function () {
-      // Re-query sidebar in case layout changed
       var sb = $('.user-sidebar') || $('.admin-sidebar');
       var ov = $('.sidebar-overlay');
 
@@ -248,12 +268,21 @@
       }
     });
 
-    // Submenu toggle
+    // Submenu toggle: toggle submenu, but allow navigation if href is a real URL
     $$('.has-submenu .menu-link').forEach(function (link) {
       link.addEventListener('click', function (e) {
         var parent = link.closest('.has-submenu');
-        if (parent) {
+        if (!parent) return;
+
+        var href = link.getAttribute('href') || '';
+        var isPlaceholder = !href || href === '#' || href === 'javascript:void(0)' || href === 'javascript:;';
+
+        if (isPlaceholder) {
+          // No real navigation target — just toggle the submenu
           e.preventDefault();
+          parent.classList.toggle('open');
+        } else {
+          // Has a real href — toggle submenu, then navigate
           parent.classList.toggle('open');
         }
       });
@@ -273,16 +302,40 @@
   }
 
   /* ========================================================================
-     6. SIDEBAR ACTIVE STATE
+     7. SIDEBAR ACTIVE STATE
      ======================================================================== */
 
   function initSidebarActive() {
     var currentPath = window.location.pathname;
 
-    // Highlight active menu link
+    // Normalize path: remove trailing slash (except root)
+    var normalizedPath = currentPath;
+    if (normalizedPath !== '/' && normalizedPath.slice(-1) === '/') {
+      normalizedPath = normalizedPath.slice(0, -1);
+    }
+
+    function normalizeHref(href) {
+      if (!href) return '';
+      if (href !== '/' && href.slice(-1) === '/') {
+        href = href.slice(0, -1);
+      }
+      return href;
+    }
+
+    function isActive(href) {
+      var nhref = normalizeHref(href);
+      if (!nhref || nhref === '#') return false;
+      // Exact match
+      if (normalizedPath === nhref) return true;
+      // Sub-path match (e.g., /user/licenses matches /user)
+      if (nhref !== '/' && normalizedPath.indexOf(nhref + '/') === 0) return true;
+      return false;
+    }
+
+    // Highlight top-level menu links
     $$('.menu-link').forEach(function (link) {
       var href = link.getAttribute('href');
-      if (href && currentPath === href) {
+      if (isActive(href)) {
         link.classList.add('active');
 
         // Auto-open parent submenu
@@ -292,8 +345,6 @@
           if (parentHasSubmenu) {
             parentHasSubmenu.classList.add('open');
           }
-
-          // Also mark the submenu item as active
           var submenuItem = link.closest('.submenu-item');
           if (submenuItem) {
             submenuItem.classList.add('active');
@@ -302,10 +353,10 @@
       }
     });
 
-    // Also check for submenu items active
+    // Highlight submenu items
     $$('.submenu-item .menu-link').forEach(function (link) {
       var href = link.getAttribute('href');
-      if (href && currentPath === href) {
+      if (isActive(href)) {
         link.classList.add('active');
         var item = link.closest('.submenu-item');
         if (item) item.classList.add('active');
@@ -317,7 +368,7 @@
     // Hamburger sidebar items
     $$('.hs-item').forEach(function (item) {
       var href = item.getAttribute('href');
-      if (href && currentPath === href) {
+      if (isActive(href)) {
         item.classList.add('active');
       }
     });
@@ -325,21 +376,20 @@
     // Docs sidebar links
     $$('.docs-link').forEach(function (link) {
       var href = link.getAttribute('href');
-      if (href && currentPath === href) {
+      if (isActive(href)) {
         link.classList.add('active');
       }
     });
   }
 
   /* ========================================================================
-     7. CAPTCHA REFRESH
+     8. CAPTCHA REFRESH
      ======================================================================== */
 
   function refreshCaptcha() {
     var captchaImg = $('.captcha-img');
     if (!captchaImg) return;
     var src = captchaImg.getAttribute('src') || captchaImg.getAttribute('data-src') || '';
-    // Remove existing timestamp param
     src = src.replace(/[?&]_t=\d+/, '');
     var separator = src.indexOf('?') > -1 ? '&' : '?';
     captchaImg.setAttribute('src', src + separator + '_t=' + Date.now());
@@ -353,7 +403,7 @@
   }
 
   /* ========================================================================
-     8. AJAX FORMS
+     9. AJAX FORMS (with page transition loading bar)
      ======================================================================== */
 
   function initAjaxForms() {
@@ -364,13 +414,17 @@
       e.preventDefault();
 
       var submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
-      var originalText = submitBtn ? submitBtn.textContent || submitBtn.value : '';
+      var originalText = submitBtn ? (submitBtn.textContent || submitBtn.value) : '';
 
       // Show loading state
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = submitBtn.getAttribute('data-loading') || (originalText + '...');
-        submitBtn.value = submitBtn.getAttribute('data-loading') || (originalText + '...');
+        var loadingText = submitBtn.getAttribute('data-loading') || (originalText + '...');
+        if (submitBtn.tagName === 'INPUT') {
+          submitBtn.value = loadingText;
+        } else {
+          submitBtn.textContent = loadingText;
+        }
       }
 
       showPageTransition();
@@ -379,7 +433,6 @@
       var method = (form.getAttribute('method') || 'POST').toUpperCase();
       var action = form.getAttribute('action') || window.location.href;
 
-      // Convert FormData to URLSearchParams for POST
       var body;
       var headers = {};
 
@@ -436,15 +489,18 @@
         .finally(function () {
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-            submitBtn.value = originalText;
+            if (submitBtn.tagName === 'INPUT') {
+              submitBtn.value = originalText;
+            } else {
+              submitBtn.textContent = originalText;
+            }
           }
         });
     });
   }
 
   /* ========================================================================
-     9. CONFIRM LINKS
+     10. CONFIRM LINKS
      ======================================================================== */
 
   function initConfirmLinks() {
@@ -461,7 +517,7 @@
   }
 
   /* ========================================================================
-     10. ANNOUNCEMENT MODAL
+     11. ANNOUNCEMENT MODAL (auto-show on homepage, works on all pages)
      ======================================================================== */
 
   var ANNOUNCEMENT_KEY = 'qeefg_announcement_hidden';
@@ -490,15 +546,17 @@
     // Close button
     var closeBtn = $('.am-close', modal);
     if (closeBtn) {
-      closeBtn.addEventListener('click', function () {
+      closeBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
         hideAnnouncementModal(modal);
       });
     }
 
-    // Suppress button
+    // Suppress button (don't show again for 1 hour)
     var suppressBtn = $('.am-suppress, [data-suppress]', modal);
     if (suppressBtn) {
-      suppressBtn.addEventListener('click', function () {
+      suppressBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
         localStorage.setItem(ANNOUNCEMENT_KEY, JSON.stringify({
           timestamp: Date.now()
         }));
@@ -511,6 +569,13 @@
     if (overlay) {
       overlay.addEventListener('click', function () {
         hideAnnouncementModal(modal);
+      });
+    } else {
+      // If no overlay element, click on modal background closes it
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          hideAnnouncementModal(modal);
+        }
       });
     }
 
@@ -527,11 +592,10 @@
   }
 
   /* ========================================================================
-     11. SEARCH
+     12. SEARCH
      ======================================================================== */
 
   function initSearch() {
-    // Create search overlay if not exists
     var overlay = $('.search-overlay');
     if (!overlay) {
       overlay = document.createElement('div');
@@ -543,14 +607,12 @@
         '</div>';
       document.body.appendChild(overlay);
 
-      // Click overlay background to close
       overlay.addEventListener('click', function (e) {
         if (e.target === overlay) {
           closeSearch(overlay);
         }
       });
 
-      // Input handler
       var input = $('.search-box-input', overlay);
       if (input) {
         input.addEventListener('input', function () {
@@ -561,7 +623,6 @@
 
     // Keyboard shortcut: Ctrl+K or /
     document.addEventListener('keydown', function (e) {
-      // Don't trigger when typing in inputs
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
         return;
       }
@@ -663,7 +724,7 @@
   }
 
   /* ========================================================================
-     12. PAGE TRANSITION
+     13. PAGE TRANSITION LOADING BAR
      ======================================================================== */
 
   function showPageTransition() {
@@ -675,31 +736,102 @@
       document.body.appendChild(bar);
     }
     bar.style.display = 'block';
+    // Reset and trigger animation
+    var inner = $('.page-loading-bar', bar);
+    if (inner) {
+      inner.style.width = '0%';
+      inner.classList.remove('page-loading-bar--done');
+      // Force reflow
+      void inner.offsetWidth;
+      inner.style.width = '90%';
+    }
   }
 
   function hidePageTransition() {
     var bar = $('.page-loading');
-    if (bar) {
-      bar.style.display = 'none';
+    if (!bar) return;
+    var inner = $('.page-loading-bar', bar);
+    if (inner) {
+      inner.style.width = '100%';
+      inner.classList.add('page-loading-bar--done');
     }
+    // Hide after transition completes
+    setTimeout(function () {
+      bar.style.display = 'none';
+      if (inner) {
+        inner.style.width = '0%';
+        inner.classList.remove('page-loading-bar--done');
+      }
+    }, 400);
   }
 
   /* ========================================================================
-     13. ICON RAIL
+     14. PAGE LOADING SPINNER (on navigation)
      ======================================================================== */
 
-  function initIconRail() {
-    var currentPath = window.location.pathname;
-    $$('.icon-rail-item').forEach(function (item) {
-      var href = item.getAttribute('href');
-      if (href && currentPath === href) {
-        item.classList.add('active');
+  function initPageLoadingSpinner() {
+    // Show spinner on link clicks that navigate away
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a');
+      if (!link) return;
+
+      var href = link.getAttribute('href');
+      if (!href) return;
+
+      // Skip: javascript:, #, anchor-only, download, new-tab, mailto, tel
+      if (href === '#' || href === '') return;
+      if (href.indexOf('javascript:') === 0) return;
+      if (link.getAttribute('target') === '_blank') return;
+      if (link.getAttribute('download') !== null) return;
+      if (href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) return;
+      if (link.getAttribute('data-confirm') !== null) return;
+      if (link.getAttribute('data-no-spinner') !== null) return;
+
+      // Only show spinner for internal navigation
+      if (href.indexOf('://') > -1 && href.indexOf(window.location.origin) !== 0) return;
+
+      showPageTransition();
+    });
+
+    // Hide spinner when page finishes loading
+    window.addEventListener('pageshow', function () {
+      hidePageTransition();
+    });
+
+    // Hide spinner on beforeunload (in case of errors)
+    window.addEventListener('beforeunload', function () {
+      // Reset spinner to prepare for next page
+      var bar = $('.page-loading');
+      if (bar) {
+        bar.style.display = 'block';
       }
     });
   }
 
   /* ========================================================================
-     14. DOCUMENTS SIDEBAR
+     15. ICON RAIL
+     ======================================================================== */
+
+  function initIconRail() {
+    var currentPath = window.location.pathname;
+    if (currentPath !== '/' && currentPath.slice(-1) === '/') {
+      currentPath = currentPath.slice(0, -1);
+    }
+    $$('.icon-rail-item').forEach(function (item) {
+      var href = item.getAttribute('href');
+      if (href) {
+        if (href !== '/' && href.slice(-1) === '/') {
+          href = href.slice(0, -1);
+        }
+        if (currentPath === href || (href !== '/' && currentPath.indexOf(href + '/') === 0)) {
+          item.classList.add('active');
+        }
+      }
+    });
+  }
+
+  /* ========================================================================
+     16. DOCUMENTS SIDEBAR
      ======================================================================== */
 
   function initDocsSidebar() {
@@ -709,7 +841,6 @@
         if (body && body.classList.contains('docs-cat-body')) {
           var isHidden = body.style.display === 'none';
           body.style.display = isHidden ? '' : 'none';
-          // Toggle arrow indicator
           var arrow = title.querySelector('.docs-cat-arrow');
           if (arrow) {
             arrow.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(-90deg)';
@@ -720,7 +851,7 @@
   }
 
   /* ========================================================================
-     15. CLICK OUTSIDE
+     17. CLICK OUTSIDE
      ======================================================================== */
 
   function initClickOutside() {
@@ -744,7 +875,7 @@
   }
 
   /* ========================================================================
-     16. LANGUAGE SWITCH
+     18. LANGUAGE SWITCH
      ======================================================================== */
 
   function initLangSwitch() {
@@ -753,21 +884,17 @@
         var lang = btn.getAttribute('data-lang');
         if (!lang) return;
 
-        // Update active state
         $$('.lang-btn').forEach(function (b) {
           b.classList.remove('active');
         });
         btn.classList.add('active');
 
-        // Store preference
         localStorage.setItem('qeefg_lang', lang);
 
-        // If there's a form, submit it
         var form = btn.closest('form');
         if (form) {
           form.submit();
         } else {
-          // Otherwise reload with lang param
           var url = new URL(window.location.href);
           url.searchParams.set('lang', lang);
           window.location.href = url.toString();
@@ -775,7 +902,6 @@
       });
     });
 
-    // Set initial active state from localStorage
     var savedLang = localStorage.getItem('qeefg_lang');
     if (savedLang) {
       $$('.lang-btn').forEach(function (btn) {
@@ -789,7 +915,7 @@
   }
 
   /* ========================================================================
-     17. SCROLL ANIMATIONS
+     19. SCROLL ANIMATIONS
      ======================================================================== */
 
   function initScrollAnimations() {
@@ -814,10 +940,8 @@
       });
     }
 
-    // Check on load
     checkVisibility();
 
-    // Check on scroll (throttled)
     var ticking = false;
     window.addEventListener('scroll', function () {
       if (!ticking) {
@@ -831,7 +955,7 @@
   }
 
   /* ========================================================================
-     18. MESSAGE NOTIFICATION BELL
+     20. MESSAGE NOTIFICATION BELL
      ======================================================================== */
 
   function initMessageBell() {
@@ -841,12 +965,18 @@
     var dropdown = $('.msg-dropdown', bell);
     if (!dropdown) return;
 
+    // Toggle dropdown on bell click
     bell.addEventListener('click', function (e) {
+      e.preventDefault();
       e.stopPropagation();
       var isOpen = dropdown.classList.contains('show');
       if (isOpen) {
         dropdown.classList.remove('show');
       } else {
+        // Close all other open dropdowns first
+        $$('.msg-dropdown.show').forEach(function (d) {
+          d.classList.remove('show');
+        });
         dropdown.classList.add('show');
         fetchUnreadCount(bell);
       }
@@ -866,7 +996,6 @@
       }
     });
 
-    // Fetch unread count on init
     fetchUnreadCount(bell);
   }
 
@@ -900,14 +1029,13 @@
   }
 
   /* ========================================================================
-     19. MODAL SYSTEM
+     21. MODAL SYSTEM
      ======================================================================== */
 
   function openModal(modalId) {
     var modal = document.getElementById(modalId);
     if (!modal) return;
     modal.classList.add('show');
-    // Focus trap: focus the first focusable element
     var focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
     if (focusable) {
       setTimeout(function () { focusable.focus(); }, 100);
@@ -968,36 +1096,49 @@
   }
 
   /* ========================================================================
-     20. FORM REAL-TIME VALIDATION
+     22. FORM REAL-TIME VALIDATION
      ======================================================================== */
 
   function initFormValidation() {
+    // Validate inputs inside forms with data-validate
     $$('form[data-validate]').forEach(function (form) {
       var inputs = $$('input[data-validate]', form);
       inputs.forEach(function (input) {
-        input.addEventListener('blur', function () {
-          validateInput(input);
-        });
-        input.addEventListener('input', function () {
-          // Only validate if already touched (has feedback)
-          if (input.classList.contains('is-invalid') || input.classList.contains('is-valid')) {
-            validateInput(input);
+        bindValidationEvents(input);
+      });
+
+      // Prevent form submission if there are invalid inputs
+      form.addEventListener('submit', function (e) {
+        var allInputs = $$('input[data-validate]', form);
+        var hasError = false;
+        allInputs.forEach(function (inp) {
+          var result = validateInput(inp);
+          if (result && !result.valid) {
+            hasError = true;
           }
         });
+        if (hasError) {
+          e.preventDefault();
+          showWarning('请修正表单中的错误');
+        }
       });
     });
 
     // Also validate standalone inputs with data-validate outside forms
     $$('input[data-validate]').forEach(function (input) {
       if (!input.closest('form[data-validate]')) {
-        input.addEventListener('blur', function () {
-          validateInput(input);
-        });
-        input.addEventListener('input', function () {
-          if (input.classList.contains('is-invalid') || input.classList.contains('is-valid')) {
-            validateInput(input);
-          }
-        });
+        bindValidationEvents(input);
+      }
+    });
+  }
+
+  function bindValidationEvents(input) {
+    input.addEventListener('blur', function () {
+      validateInput(input);
+    });
+    input.addEventListener('input', function () {
+      if (input.classList.contains('is-invalid') || input.classList.contains('is-valid')) {
+        validateInput(input);
       }
     });
   }
@@ -1015,7 +1156,7 @@
         result = validateEmail(value);
         break;
       case 'password':
-        result = validatePassword(value);
+        result = validatePassword(value, input);
         break;
       case 'phone':
         result = validatePhone(value);
@@ -1024,7 +1165,7 @@
         result = validateUsername(value);
         break;
       default:
-        return;
+        return null;
     }
 
     // Remove existing feedback
@@ -1036,8 +1177,7 @@
     input.classList.remove('is-invalid', 'is-valid');
 
     if (value.length === 0) {
-      // Don't show validation for empty fields on blur
-      return;
+      return result;
     }
 
     if (result.valid) {
@@ -1049,6 +1189,8 @@
       feedback.textContent = result.message;
       input.parentNode.appendChild(feedback);
     }
+
+    return result;
   }
 
   function validateEmail(value) {
@@ -1059,8 +1201,14 @@
     return { valid: true };
   }
 
-  function validatePassword(value) {
-    var minLength = parseInt($('input[data-validate="password"]') ? $('input[data-validate="password"]').getAttribute('data-min-length') : null, 10) || 6;
+  function validatePassword(value, input) {
+    var minLength = 6;
+    if (input) {
+      var attrMin = input.getAttribute('data-min-length');
+      if (attrMin) {
+        minLength = parseInt(attrMin, 10) || 6;
+      }
+    }
     if (value.length < minLength) {
       return { valid: false, message: '密码长度至少 ' + minLength + ' 位' };
     }
@@ -1093,7 +1241,7 @@
   }
 
   /* ========================================================================
-     21. PAYMENT CHANNEL SELECTION
+     23. PAYMENT CHANNEL SELECTION
      ======================================================================== */
 
   function initPaymentChannel() {
@@ -1104,9 +1252,7 @@
 
     items.forEach(function (item) {
       item.addEventListener('click', function () {
-        // Remove selected from all
         items.forEach(function (i) { i.classList.remove('selected'); });
-        // Add selected to clicked
         item.classList.add('selected');
 
         var channelValue = item.getAttribute('data-channel');
@@ -1116,7 +1262,6 @@
       });
     });
 
-    // Select first item by default if none selected
     var hasSelected = $$('.payment-channel-item.selected').length > 0;
     if (!hasSelected && items.length > 0) {
       items[0].click();
@@ -1124,7 +1269,7 @@
   }
 
   /* ========================================================================
-     22. TAB SWITCHING
+     24. TAB SWITCHING
      ======================================================================== */
 
   function initTabs() {
@@ -1135,11 +1280,9 @@
 
       tabItems.forEach(function (tab) {
         tab.addEventListener('click', function () {
-          // Update active tab
           tabItems.forEach(function (t) { t.classList.remove('active'); });
           tab.classList.add('active');
 
-          // Show matching pane
           var targetId = tab.getAttribute('data-tab');
           if (targetId && tabPanes.length > 0) {
             tabPanes.forEach(function (pane) {
@@ -1153,7 +1296,6 @@
         });
       });
 
-      // Activate first tab if none active
       var hasActive = $$('.tab-item.active', tabNav).length > 0;
       if (!hasActive && tabItems.length > 0) {
         tabItems[0].click();
@@ -1162,7 +1304,7 @@
   }
 
   /* ========================================================================
-     23. DEVELOPER APPLICATION
+     25. DEVELOPER APPLICATION
      ======================================================================== */
 
   function initDeveloperApply() {
@@ -1182,6 +1324,8 @@
       var originalText = applyBtn.textContent;
       applyBtn.textContent = '提交中...';
 
+      showPageTransition();
+
       fetch(url, {
         method: 'POST',
         headers: {
@@ -1195,6 +1339,7 @@
           });
         })
         .then(function (result) {
+          hidePageTransition();
           if (result.ok && result.data && result.data.code === 200) {
             showSuccess(result.data.msg || '申请已提交');
             if (result.data.data && result.data.data.redirect) {
@@ -1211,6 +1356,7 @@
           }
         })
         .catch(function () {
+          hidePageTransition();
           showError('网络错误，请稍后重试');
         })
         .finally(function () {
@@ -1221,7 +1367,7 @@
   }
 
   /* ========================================================================
-     24. PLUGIN SUBMISSION
+     26. PLUGIN SUBMISSION
      ======================================================================== */
 
   function initPluginSubmit() {
@@ -1236,15 +1382,20 @@
       e.preventDefault();
 
       var submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
-      var originalText = submitBtn ? submitBtn.textContent || submitBtn.value : '';
+      var originalText = submitBtn ? (submitBtn.textContent || submitBtn.value) : '';
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = '上传中...';
-        submitBtn.value = '上传中...';
+        if (submitBtn.tagName === 'INPUT') {
+          submitBtn.value = '上传中...';
+        } else {
+          submitBtn.textContent = '上传中...';
+        }
       }
 
       if (progressBar) progressBar.style.display = '';
+
+      showPageTransition();
 
       var formData = new FormData(form);
       var action = form.getAttribute('action') || window.location.href;
@@ -1260,6 +1411,7 @@
       });
 
       xhr.addEventListener('load', function () {
+        hidePageTransition();
         if (progressBar) progressBar.style.display = 'none';
 
         try {
@@ -1284,18 +1436,25 @@
 
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-          submitBtn.value = originalText;
+          if (submitBtn.tagName === 'INPUT') {
+            submitBtn.value = originalText;
+          } else {
+            submitBtn.textContent = originalText;
+          }
         }
       });
 
       xhr.addEventListener('error', function () {
+        hidePageTransition();
         if (progressBar) progressBar.style.display = 'none';
         showError('网络错误，请稍后重试');
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-          submitBtn.value = originalText;
+          if (submitBtn.tagName === 'INPUT') {
+            submitBtn.value = originalText;
+          } else {
+            submitBtn.textContent = originalText;
+          }
         }
       });
 
@@ -1305,12 +1464,13 @@
   }
 
   /* ========================================================================
-     25. INITIALIZATION
+     27. INITIALIZATION
      ======================================================================== */
 
   function init() {
     initTheme();
     bindThemeToggle();
+    initSmoothScroll();
     initMobileNav();
     initHamburger();
     initSidebarActive();
@@ -1331,6 +1491,7 @@
     initTabs();
     initDeveloperApply();
     initPluginSubmit();
+    initPageLoadingSpinner();
   }
 
   // Run on DOMContentLoaded
@@ -1341,7 +1502,7 @@
   }
 
   /* ========================================================================
-     26. PUBLIC API
+     28. PUBLIC API
      ======================================================================== */
 
   window.QEEFG = {

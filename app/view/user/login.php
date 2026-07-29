@@ -11,7 +11,7 @@
         <defs>
             <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
             <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></symbol>
-            <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+            <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
         </defs>
     </svg>
 
@@ -23,7 +23,7 @@
                 <a href="/platform" class="nav-link">平台能力</a>
                 <a href="/license-query" class="nav-link">授权查询</a>
                 <a href="/documents" class="nav-link">文档中心</a>
-                <a href="/announcement" class="nav-link">网站公告</a>
+                <a href="#" class="nav-link" id="announcementLink">网站公告</a>
             </nav>
             <div class="auth-links">
                 <a href="/user/login" class="btn btn-primary btn-sm">登录</a>
@@ -38,7 +38,7 @@
         <a href="/platform" class="nav-link">平台能力</a>
         <a href="/license-query" class="nav-link">授权查询</a>
         <a href="/documents" class="nav-link">文档中心</a>
-        <a href="/announcement" class="nav-link">网站公告</a>
+        <a href="#" class="nav-link" id="announcementLinkMobile">网站公告</a>
     </div>
 
     <div style="padding-top: 100px; padding-bottom: 60px;">
@@ -52,14 +52,16 @@
                     <?= htmlspecialchars($error) ?>
                 </div>
                 <?php endif; ?>
-                <form method="POST" action="/user/dologin" data-ajax="true">
+                <form method="POST" action="/user/dologin" data-ajax="true" id="loginForm">
                     <div class="form-group">
-                        <label class="form-label" for="username">用户名 / 邮箱</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名或邮箱" required>
+                        <label class="form-label" for="username">用户名 / 邮箱 / 手机号</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名、邮箱或手机号" required data-validate="login">
+                        <div class="form-feedback" id="usernameFeedback"></div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="password">密码</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" required>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" required data-validate="password">
+                        <div class="form-feedback" id="passwordFeedback"></div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">登录</button>
                 </form>
@@ -87,6 +89,19 @@
         document.getElementById('hamburgerBtn').addEventListener('click', function() {
             document.getElementById('mobileNav').classList.toggle('show');
         });
+        document.getElementById('announcementLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            var modal = document.getElementById('announcementModal');
+            if (modal) modal.classList.add('show');
+        });
+        var amLinkMobile = document.getElementById('announcementLinkMobile');
+        if (amLinkMobile) {
+            amLinkMobile.addEventListener('click', function(e) {
+                e.preventDefault();
+                var modal = document.getElementById('announcementModal');
+                if (modal) modal.classList.add('show');
+            });
+        }
     </script>
 </body>
 </html>

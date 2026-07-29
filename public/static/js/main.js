@@ -166,10 +166,10 @@
       var isOpen = mobileNav.classList.contains('show');
       if (isOpen) {
         mobileNav.classList.remove('show');
-        hamburger.innerHTML = '&#9776;';
+        hamburger.classList.remove('open');
       } else {
         mobileNav.classList.add('show');
-        hamburger.innerHTML = '&#10005;';
+        hamburger.classList.add('open');
       }
     });
 
@@ -177,7 +177,7 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && mobileNav.classList.contains('show')) {
         mobileNav.classList.remove('show');
-        if (hamburger) hamburger.innerHTML = '&#9776;';
+        if (hamburger) hamburger.classList.remove('open');
       }
     });
   }
@@ -263,13 +263,13 @@
   function openSidebar(sidebar, overlay, btn) {
     if (sidebar) sidebar.classList.add('show');
     if (overlay) overlay.classList.add('show');
-    if (btn) btn.innerHTML = '&#10005;';
+    if (btn) btn.classList.add('open');
   }
 
   function closeSidebar(sidebar, overlay, btn) {
     if (sidebar) sidebar.classList.remove('show');
     if (overlay) overlay.classList.remove('show');
-    if (btn) btn.innerHTML = '&#9776;';
+    if (btn) btn.classList.remove('open');
   }
 
   /* ========================================================================
@@ -408,7 +408,7 @@
           hidePageTransition();
 
           if (result.ok && result.data) {
-            if (result.data.code === 200) {
+            if (result.data.code === 200 || result.data.code == 200) {
               var msg = result.data.msg || '操作成功';
               showSuccess(msg);
 
@@ -831,7 +831,481 @@
   }
 
   /* ========================================================================
-     18. INITIALIZATION
+     18. MESSAGE NOTIFICATION BELL
+     ======================================================================== */
+
+  function initMessageBell() {
+    var bell = $('.msg-bell');
+    if (!bell) return;
+
+    var dropdown = $('.msg-dropdown', bell);
+    if (!dropdown) return;
+
+    bell.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = dropdown.classList.contains('show');
+      if (isOpen) {
+        dropdown.classList.remove('show');
+      } else {
+        dropdown.classList.add('show');
+        fetchUnreadCount(bell);
+      }
+    });
+
+    // Click outside to close
+    document.addEventListener('click', function (e) {
+      if (!bell.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Escape key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Fetch unread count on init
+    fetchUnreadCount(bell);
+  }
+
+  function fetchUnreadCount(bell) {
+    var badge = $('.badge-dot', bell);
+    if (!badge) return;
+
+    var unreadUrl = bell.getAttribute('data-unread-url');
+    if (!unreadUrl) return;
+
+    fetch(unreadUrl, { method: 'GET', headers: { 'Accept': 'application/json' } })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          return { status: response.status, ok: response.ok, data: data };
+        });
+      })
+      .then(function (result) {
+        if (result.ok && result.data && result.data.code === 200) {
+          var count = result.data.data && result.data.data.count;
+          if (count && count > 0) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.style.display = '';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      })
+      .catch(function () {
+        badge.style.display = 'none';
+      });
+  }
+
+  /* ========================================================================
+     19. MODAL SYSTEM
+     ======================================================================== */
+
+  function openModal(modalId) {
+    var modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.add('show');
+    // Focus trap: focus the first focusable element
+    var focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusable) {
+      setTimeout(function () { focusable.focus(); }, 100);
+    }
+  }
+
+  function closeModal(modalId) {
+    var modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.remove('show');
+  }
+
+  function initModals() {
+    // Bind close buttons
+    $$('.modal-close').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var modal = btn.closest('.modal-overlay');
+        if (modal) {
+          closeModal(modal.id);
+        }
+      });
+    });
+
+    // Close on overlay click
+    $$('.modal-overlay').forEach(function (overlay) {
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) {
+          closeModal(overlay.id);
+        }
+      });
+    });
+
+    // Escape key closes all open modals
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        var openModals = $$('.modal-overlay.show');
+        openModals.forEach(function (modal) {
+          closeModal(modal.id);
+        });
+      }
+    });
+
+    // Bind data-modal-trigger buttons
+    $$('[data-modal-trigger]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var modalId = btn.getAttribute('data-modal-trigger');
+        if (modalId) openModal(modalId);
+      });
+    });
+
+    // Bind data-modal-close buttons
+    $$('[data-modal-close]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var modalId = btn.getAttribute('data-modal-close');
+        if (modalId) closeModal(modalId);
+      });
+    });
+  }
+
+  /* ========================================================================
+     20. FORM REAL-TIME VALIDATION
+     ======================================================================== */
+
+  function initFormValidation() {
+    $$('form[data-validate]').forEach(function (form) {
+      var inputs = $$('input[data-validate]', form);
+      inputs.forEach(function (input) {
+        input.addEventListener('blur', function () {
+          validateInput(input);
+        });
+        input.addEventListener('input', function () {
+          // Only validate if already touched (has feedback)
+          if (input.classList.contains('is-invalid') || input.classList.contains('is-valid')) {
+            validateInput(input);
+          }
+        });
+      });
+    });
+
+    // Also validate standalone inputs with data-validate outside forms
+    $$('input[data-validate]').forEach(function (input) {
+      if (!input.closest('form[data-validate]')) {
+        input.addEventListener('blur', function () {
+          validateInput(input);
+        });
+        input.addEventListener('input', function () {
+          if (input.classList.contains('is-invalid') || input.classList.contains('is-valid')) {
+            validateInput(input);
+          }
+        });
+      }
+    });
+  }
+
+  function validateInput(input) {
+    var type = input.getAttribute('data-validate');
+    var value = input.value;
+    var result;
+
+    switch (type) {
+      case 'login':
+        result = validateLogin(value);
+        break;
+      case 'email':
+        result = validateEmail(value);
+        break;
+      case 'password':
+        result = validatePassword(value);
+        break;
+      case 'phone':
+        result = validatePhone(value);
+        break;
+      case 'username':
+        result = validateUsername(value);
+        break;
+      default:
+        return;
+    }
+
+    // Remove existing feedback
+    var existingFeedback = input.parentNode.querySelector('.form-feedback');
+    if (existingFeedback) {
+      existingFeedback.parentNode.removeChild(existingFeedback);
+    }
+
+    input.classList.remove('is-invalid', 'is-valid');
+
+    if (value.length === 0) {
+      // Don't show validation for empty fields on blur
+      return;
+    }
+
+    if (result.valid) {
+      input.classList.add('is-valid');
+    } else {
+      input.classList.add('is-invalid');
+      var feedback = document.createElement('div');
+      feedback.className = 'form-feedback error';
+      feedback.textContent = result.message;
+      input.parentNode.appendChild(feedback);
+    }
+  }
+
+  function validateEmail(value) {
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+      return { valid: false, message: '请输入有效的邮箱地址' };
+    }
+    return { valid: true };
+  }
+
+  function validatePassword(value) {
+    var minLength = parseInt($('input[data-validate="password"]') ? $('input[data-validate="password"]').getAttribute('data-min-length') : null, 10) || 6;
+    if (value.length < minLength) {
+      return { valid: false, message: '密码长度至少 ' + minLength + ' 位' };
+    }
+    return { valid: true };
+  }
+
+  function validatePhone(value) {
+    var phoneRegex = /^1[3-9]\d{9}$/;
+    if (!phoneRegex.test(value)) {
+      return { valid: false, message: '请输入有效的手机号码' };
+    }
+    return { valid: true };
+  }
+
+  function validateUsername(value) {
+    if (value.length < 3) {
+      return { valid: false, message: '用户名长度至少 3 个字符' };
+    }
+    if (value.length > 20) {
+      return { valid: false, message: '用户名长度不能超过 20 个字符' };
+    }
+    return { valid: true };
+  }
+
+  function validateLogin(value) {
+    if (value.length < 1) {
+      return { valid: false, message: '请输入用户名、邮箱或手机号' };
+    }
+    return { valid: true };
+  }
+
+  /* ========================================================================
+     21. PAYMENT CHANNEL SELECTION
+     ======================================================================== */
+
+  function initPaymentChannel() {
+    var items = $$('.payment-channel-item');
+    if (items.length === 0) return;
+
+    var hiddenInput = $('input[name="payment_channel"]');
+
+    items.forEach(function (item) {
+      item.addEventListener('click', function () {
+        // Remove selected from all
+        items.forEach(function (i) { i.classList.remove('selected'); });
+        // Add selected to clicked
+        item.classList.add('selected');
+
+        var channelValue = item.getAttribute('data-channel');
+        if (hiddenInput && channelValue) {
+          hiddenInput.value = channelValue;
+        }
+      });
+    });
+
+    // Select first item by default if none selected
+    var hasSelected = $$('.payment-channel-item.selected').length > 0;
+    if (!hasSelected && items.length > 0) {
+      items[0].click();
+    }
+  }
+
+  /* ========================================================================
+     22. TAB SWITCHING
+     ======================================================================== */
+
+  function initTabs() {
+    $$('.tab-nav').forEach(function (tabNav) {
+      var tabItems = $$('.tab-item', tabNav);
+      var container = tabNav.parentNode;
+      var tabPanes = $$('.tab-pane', container);
+
+      tabItems.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          // Update active tab
+          tabItems.forEach(function (t) { t.classList.remove('active'); });
+          tab.classList.add('active');
+
+          // Show matching pane
+          var targetId = tab.getAttribute('data-tab');
+          if (targetId && tabPanes.length > 0) {
+            tabPanes.forEach(function (pane) {
+              if (pane.getAttribute('data-tab') === targetId) {
+                pane.style.display = '';
+              } else {
+                pane.style.display = 'none';
+              }
+            });
+          }
+        });
+      });
+
+      // Activate first tab if none active
+      var hasActive = $$('.tab-item.active', tabNav).length > 0;
+      if (!hasActive && tabItems.length > 0) {
+        tabItems[0].click();
+      }
+    });
+  }
+
+  /* ========================================================================
+     23. DEVELOPER APPLICATION
+     ======================================================================== */
+
+  function initDeveloperApply() {
+    var applyBtn = $('[data-developer-apply]');
+    if (!applyBtn) return;
+
+    applyBtn.addEventListener('click', function () {
+      if (!confirm('确定要提交开发者申请吗？')) return;
+
+      var url = applyBtn.getAttribute('data-developer-apply') || applyBtn.getAttribute('data-url');
+      if (!url) {
+        showError('缺少提交地址');
+        return;
+      }
+
+      applyBtn.disabled = true;
+      var originalText = applyBtn.textContent;
+      applyBtn.textContent = '提交中...';
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        }
+      })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            return { status: response.status, ok: response.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          if (result.ok && result.data && result.data.code === 200) {
+            showSuccess(result.data.msg || '申请已提交');
+            if (result.data.data && result.data.data.redirect) {
+              setTimeout(function () {
+                window.location.href = result.data.data.redirect;
+              }, 1000);
+            } else {
+              setTimeout(function () {
+                window.location.reload();
+              }, 1000);
+            }
+          } else {
+            showError((result.data && result.data.msg) || '申请提交失败');
+          }
+        })
+        .catch(function () {
+          showError('网络错误，请稍后重试');
+        })
+        .finally(function () {
+          applyBtn.disabled = false;
+          applyBtn.textContent = originalText;
+        });
+    });
+  }
+
+  /* ========================================================================
+     24. PLUGIN SUBMISSION
+     ======================================================================== */
+
+  function initPluginSubmit() {
+    var form = $('form[data-plugin-submit]');
+    if (!form) return;
+
+    var progressBar = $('.upload-progress', form);
+    var progressFill = $('.upload-progress-fill', form);
+    var progressText = $('.upload-progress-text', form);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+      var originalText = submitBtn ? submitBtn.textContent || submitBtn.value : '';
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '上传中...';
+        submitBtn.value = '上传中...';
+      }
+
+      if (progressBar) progressBar.style.display = '';
+
+      var formData = new FormData(form);
+      var action = form.getAttribute('action') || window.location.href;
+
+      var xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener('progress', function (e) {
+        if (e.lengthComputable) {
+          var percent = Math.round((e.loaded / e.total) * 100);
+          if (progressFill) progressFill.style.width = percent + '%';
+          if (progressText) progressText.textContent = percent + '%';
+        }
+      });
+
+      xhr.addEventListener('load', function () {
+        if (progressBar) progressBar.style.display = 'none';
+
+        try {
+          var data = JSON.parse(xhr.responseText);
+          if (xhr.status >= 200 && xhr.status < 300 && data.code === 200) {
+            showSuccess(data.msg || '提交成功');
+            if (data.data && data.data.redirect) {
+              setTimeout(function () {
+                window.location.href = data.data.redirect;
+              }, 1000);
+            } else {
+              setTimeout(function () {
+                window.location.reload();
+              }, 1000);
+            }
+          } else {
+            showError(data.msg || '提交失败');
+          }
+        } catch (err) {
+          showError('服务器响应异常');
+        }
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          submitBtn.value = originalText;
+        }
+      });
+
+      xhr.addEventListener('error', function () {
+        if (progressBar) progressBar.style.display = 'none';
+        showError('网络错误，请稍后重试');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          submitBtn.value = originalText;
+        }
+      });
+
+      xhr.open('POST', action);
+      xhr.send(formData);
+    });
+  }
+
+  /* ========================================================================
+     25. INITIALIZATION
      ======================================================================== */
 
   function init() {
@@ -850,6 +1324,13 @@
     initClickOutside();
     initLangSwitch();
     initScrollAnimations();
+    initMessageBell();
+    initModals();
+    initFormValidation();
+    initPaymentChannel();
+    initTabs();
+    initDeveloperApply();
+    initPluginSubmit();
   }
 
   // Run on DOMContentLoaded
@@ -860,7 +1341,7 @@
   }
 
   /* ========================================================================
-     19. PUBLIC API
+     26. PUBLIC API
      ======================================================================== */
 
   window.QEEFG = {
@@ -870,7 +1351,9 @@
     showWarning: showWarning,
     showPageTransition: showPageTransition,
     hidePageTransition: hidePageTransition,
-    refreshCaptcha: refreshCaptcha
+    refreshCaptcha: refreshCaptcha,
+    openModal: openModal,
+    closeModal: closeModal
   };
 
 })();

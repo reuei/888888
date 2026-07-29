@@ -74,6 +74,22 @@ class BaseController
         $data['user'] = $user;
         $data['siteSettings'] = $siteSettings;
 
+        // 获取未读消息数和最新消息
+        $unreadCount = 0;
+        $latestMessages = [];
+        if ($user) {
+            try {
+                $stmt = $this->db->prepare("SELECT COUNT(*) FROM qf_messages WHERE user_id = ? AND is_read = 0");
+                $stmt->execute([$user['id']]);
+                $unreadCount = $stmt->fetchColumn();
+
+                $stmt = $this->db->prepare("SELECT * FROM qf_messages WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
+                $stmt->execute([$user['id']]);
+                $latestMessages = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            } catch (\PDOException $e) {
+            }
+        }
+
         $content = $this->render($template, $data);
 
         $templateFile = APP_PATH . 'view/user/layout.php';
@@ -81,6 +97,7 @@ class BaseController
             return $content;
         }
 
+        $pageTitle = $title;
         ob_start();
         include $templateFile;
         return ob_get_clean();
@@ -105,6 +122,7 @@ class BaseController
             return $content;
         }
 
+        $pageTitle = $title;
         ob_start();
         include $templateFile;
         return ob_get_clean();
@@ -244,7 +262,7 @@ class BaseController
         }
 
         try {
-            $stmt = $this->db->prepare("SELECT id, username, email, balance, qq, phone, avatar, status, created_at FROM qf_users WHERE id = ?");
+            $stmt = $this->db->prepare("SELECT id, username, email, balance, qq, phone, avatar, status, is_developer, developer_status, created_at FROM qf_users WHERE id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             return $stmt->fetch();
         } catch (\PDOException $e) {

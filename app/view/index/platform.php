@@ -17,6 +17,8 @@
             <symbol id="i-tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
             <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
             <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+            <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+            <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
         </defs>
     </svg>
 
@@ -28,7 +30,7 @@
                 <a href="/platform" class="nav-link active">平台能力</a>
                 <a href="/license-query" class="nav-link">授权查询</a>
                 <a href="/documents" class="nav-link">文档中心</a>
-                <a href="/announcement" class="nav-link">网站公告</a>
+                <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncementPopup()">网站公告</a>
             </nav>
             <div class="auth-links">
                 <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
@@ -43,7 +45,7 @@
         <a href="/platform" class="nav-link">平台能力</a>
         <a href="/license-query" class="nav-link">授权查询</a>
         <a href="/documents" class="nav-link">文档中心</a>
-        <a href="/announcement" class="nav-link">网站公告</a>
+        <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncementPopup()">网站公告</a>
     </div>
 
     <section class="hero" style="padding: 100px 0 60px;">
@@ -122,9 +124,56 @@
         </div>
     </footer>
 
+    <!-- Announcement Popup Modal -->
+    <?php if (!empty($siteSettings['announcement'])): ?>
+    <div class="announcement-modal" id="announcementModal">
+        <div class="am-overlay"></div>
+        <div class="am-dialog">
+            <div class="am-header">
+                <h3><svg width="18" height="18" style="vertical-align: middle; margin-right: 6px;"><use href="#i-bell"/></svg>网站公告</h3>
+                <button class="am-close" onclick="hideAnnouncement()"><svg width="18" height="18"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="am-body">
+                <p style="color: #444; line-height: 1.8; white-space: pre-wrap;"><?= htmlspecialchars($siteSettings['announcement']) ?></p>
+            </div>
+            <div class="am-footer">
+                <button class="btn btn-primary btn-sm" onclick="hideAnnouncement()">我知道了</button>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <script>
+        // Hamburger menu
         document.getElementById('hamburgerBtn').addEventListener('click', function() {
             document.getElementById('mobileNav').classList.toggle('show');
+        });
+
+        // Announcement popup
+        function showAnnouncementPopup() {
+            var modal = document.getElementById('announcementModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+        function hideAnnouncement() {
+            var modal = document.getElementById('announcementModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+        // Close modal on overlay click
+        document.addEventListener('click', function(e) {
+            var modal = document.getElementById('announcementModal');
+            if (modal && e.target.classList.contains('am-overlay')) {
+                hideAnnouncement();
+            }
+        });
+        // Close modal on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideAnnouncement();
+            }
         });
     </script>
 </body>

@@ -12,6 +12,7 @@
                     <th>订单号</th>
                     <th>产品名称</th>
                     <th>金额</th>
+                    <th>支付方式</th>
                     <th>状态</th>
                     <th>下载</th>
                     <th>购买时间</th>
@@ -23,14 +24,17 @@
                     <td style="font-family: monospace; font-size: 13px;"><?= htmlspecialchars($order['order_no'] ?? '') ?></td>
                     <td><?= htmlspecialchars($order['product_name'] ?? '') ?></td>
                     <td>¥<?= number_format($order['amount'] ?? 0, 2) ?></td>
+                    <td><span class="badge badge-info"><?= htmlspecialchars($order['payment_method'] ?? '余额') ?></span></td>
                     <td><span class="badge <?= ($order['status'] ?? 0) == 1 ? 'badge-success' : 'badge-warning' ?>"><?= ($order['status'] ?? 0) == 1 ? '已完成' : '待处理' ?></span></td>
                     <td>
-                        <?php if (!empty($order['download_file'])): ?>
+                        <?php if ($order['status'] == 1 && !empty($order['download_file'])): ?>
                         <a href="/download?order_id=<?= $order['id'] ?? 0 ?>" class="btn btn-primary btn-sm">
                             <svg width="14" height="14" style="vertical-align: middle; margin-right: 4px;"><use href="#i-download"/></svg>下载
                         </a>
-                        <?php else: ?>
+                        <?php elseif ($order['status'] == 1 && empty($order['download_file'])): ?>
                         <span class="badge badge-info">暂无文件</span>
+                        <?php else: ?>
+                        <span class="badge badge-warning">待支付</span>
                         <?php endif; ?>
                     </td>
                     <td><?= htmlspecialchars($order['created_at'] ?? '') ?></td>

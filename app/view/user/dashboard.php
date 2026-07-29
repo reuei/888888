@@ -32,7 +32,7 @@
         <div class="card-header">
             <h3 class="card-title">快捷操作</h3>
         </div>
-        <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
             <a href="/user/products" class="btn btn-primary">
                 <svg width="16" height="16" style="vertical-align: middle; margin-right: 4px;"><use href="#i-box"/></svg>购买产品
             </a>
@@ -41,6 +41,12 @@
             </a>
             <a href="/user/balance" class="btn btn-outline">
                 <svg width="16" height="16" style="vertical-align: middle; margin-right: 4px;"><use href="#i-wallet"/></svg>余额管理
+            </a>
+            <a href="/user/messages" class="btn btn-outline">
+                <svg width="16" height="16" style="vertical-align: middle; margin-right: 4px;"><use href="#i-bell"/></svg>消息中心
+                <?php if (($unreadCount ?? 0) > 0): ?>
+                <span style="background:#ff4d4f;color:#fff;border-radius:10px;padding:0 6px;font-size:11px;margin-left:4px;"><?= $unreadCount ?></span>
+                <?php endif; ?>
             </a>
         </div>
     </div>

@@ -52,6 +52,9 @@
             <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
             <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
             <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+            <symbol id="i-plugin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></symbol>
+            <symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+            <symbol id="i-dev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
         </defs>
     </svg>
 
@@ -73,17 +76,179 @@
                     <a href="?lang=zh" class="lang-btn<?= ($lang ?? 'zh') === 'zh' ? ' active' : '' ?>" style="padding: 4px 10px; font-size: 12px; background: <?= ($lang ?? 'zh') === 'zh' ? '#4f8cff' : '#fff' ?>; color: <?= ($lang ?? 'zh') === 'zh' ? '#fff' : '#666' ?>;">中</a>
                     <a href="?lang=en" class="lang-btn<?= ($lang ?? 'zh') === 'en' ? ' active' : '' ?>" style="padding: 4px 10px; font-size: 12px; background: <?= ($lang ?? 'zh') === 'en' ? '#4f8cff' : '#fff' ?>; color: <?= ($lang ?? 'zh') === 'en' ? '#fff' : '#666' ?>;">EN</a>
                 </div>
-                <div class="user-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4f8cff, #3868ff); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
-                    <?= mb_substr($user['username'] ?? 'U', 0, 1) ?>
+                <!-- Message Bell -->
+                <div class="bell-wrapper" style="position: relative;">
+                    <button class="bell-btn" id="bellBtn" title="消息通知" style="background: none; border: none; cursor: pointer; padding: 4px; position: relative;">
+                        <svg width="20" height="20" style="color: var(--text-secondary);"><use href="#i-bell"/></svg>
+                        <?php if (($unreadCount ?? 0) > 0): ?>
+                        <span class="bell-badge" id="bellBadge" style="position: absolute; top: -2px; right: -2px; background: #ef4444; color: #fff; font-size: 10px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 4px; font-weight: 600;"><?= ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) ?></span>
+                        <?php endif; ?>
+                    </button>
+                    <!-- Message Dropdown -->
+                    <div class="message-dropdown" id="messageDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; width: 340px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg); z-index: 200;">
+                        <div class="md-header" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border);">
+                            <span style="font-weight: 600; font-size: 14px; color: var(--text);">消息通知</span>
+                            <?php if (($unreadCount ?? 0) > 0): ?>
+                            <a href="/user/messages?action=read-all" style="font-size: 12px; color: var(--primary);">全部已读</a>
+                            <?php endif; ?>
+                        </div>
+                        <div class="md-body" style="max-height: 320px; overflow-y: auto;">
+                            <?php if (!empty($latestMessages)): ?>
+                                <?php foreach ($latestMessages as $msg): ?>
+                                <a href="/user/messages?id=<?= $msg['id'] ?? 0 ?>" class="md-item" style="display: block; padding: 12px 16px; border-bottom: 1px solid var(--border-light); transition: background var(--transition-fast); text-decoration: none; <?= ($msg['is_read'] ?? 0) == 0 ? 'background: var(--primary-light);' : '' ?>">
+                                    <div style="font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; <?= ($msg['is_read'] ?? 0) == 0 ? '' : 'color: var(--text-secondary);' ?>"><?= htmlspecialchars($msg['title'] ?? '') ?></div>
+                                    <div style="font-size: 12px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($msg['content'] ?? '') ?></div>
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"><?= htmlspecialchars($msg['created_at'] ?? '') ?></div>
+                                </a>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div style="text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px;">暂无消息</div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="md-footer" style="padding: 10px 16px; border-top: 1px solid var(--border); text-align: center;">
+                            <a href="/user/messages" style="font-size: 13px; color: var(--primary);">查看全部消息</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- User Avatar (email-based) -->
+                <div class="user-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4f8cff, #3868ff); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; text-transform: uppercase;">
+                    <?= mb_strtoupper(mb_substr($user['email'] ?? 'U', 0, 1)) ?>
                 </div>
                 <a href="/user/logout" class="btn btn-ghost btn-sm" style="color: #666;">退出</a>
+                <!-- Hamburger Button -->
+                <button class="hamburger-btn" id="hamburgerBtn" title="菜单" style="background: none; border: none; cursor: pointer; padding: 4px;">
+                    <svg width="24" height="24" style="color: var(--text);"><use href="#i-platform"/></svg>
+                </button>
             </div>
         </div>
     </header>
 
+    <!-- Hamburger Overlay -->
+    <div class="hamburger-overlay" id="hamburgerOverlay"></div>
+
+    <!-- Hamburger Sidebar -->
+    <div class="hamburger-sidebar" id="hamburgerSidebar">
+        <div class="icon-rail">
+            <div class="menu-item">
+                <a href="/user/dashboard" class="menu-link<?= ($activeMenu ?? '') === 'dashboard' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-home"/></svg>
+                    <span>用户中心</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="/user/workplace" class="menu-link<?= ($activeMenu ?? '') === 'workplace' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-platform"/></svg>
+                    <span>工作台</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="/user/products" class="menu-link<?= ($activeMenu ?? '') === 'products' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-box"/></svg>
+                    <span>产品中心</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="/user/my-products" class="menu-link<?= ($activeMenu ?? '') === 'myProducts' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-key"/></svg>
+                    <span>我的产品</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="/user/orders" class="menu-link<?= ($activeMenu ?? '') === 'orders' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-orders"/></svg>
+                    <span>我的订单</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="/user/balance" class="menu-link<?= ($activeMenu ?? '') === 'balance' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-wallet"/></svg>
+                    <span>余额管理</span>
+                </a>
+            </div>
+            <!-- 站点日志 with submenu -->
+            <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['balance-logs', 'login-logs', 'operation-logs']) ? ' open' : '' ?>">
+                <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
+                    <svg width="18" height="18"><use href="#i-log"/></svg>
+                    <span>站点日志</span>
+                    <span class="submenu-toggle" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-muted); transition: transform 0.2s ease;">
+                        <svg width="12" height="12"><use href="#i-chevron"/></svg>
+                    </span>
+                </a>
+                <ul class="submenu">
+                    <li class="submenu-item">
+                        <a href="/user/balance-logs" class="menu-link<?= ($activeMenu ?? '') === 'balance-logs' ? ' active' : '' ?>">
+                            <span>余额明细</span>
+                        </a>
+                    </li>
+                    <li class="submenu-item">
+                        <a href="/user/login-logs" class="menu-link<?= ($activeMenu ?? '') === 'login-logs' ? ' active' : '' ?>">
+                            <span>登录日志</span>
+                        </a>
+                    </li>
+                    <li class="submenu-item">
+                        <a href="/user/operation-logs" class="menu-link<?= ($activeMenu ?? '') === 'operation-logs' ? ' active' : '' ?>">
+                            <span>操作日志</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- 账户设置 with submenu -->
+            <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['settings', 'rebind']) ? ' open' : '' ?>">
+                <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
+                    <svg width="18" height="18"><use href="#i-settings"/></svg>
+                    <span>账户设置</span>
+                    <span class="submenu-toggle" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-muted); transition: transform 0.2s ease;">
+                        <svg width="12" height="12"><use href="#i-chevron"/></svg>
+                    </span>
+                </a>
+                <ul class="submenu">
+                    <li class="submenu-item">
+                        <a href="/user/settings" class="menu-link<?= ($activeMenu ?? '') === 'settings' ? ' active' : '' ?>">
+                            <span>基本设置</span>
+                        </a>
+                    </li>
+                    <li class="submenu-item">
+                        <a href="/user/rebind" class="menu-link<?= ($activeMenu ?? '') === 'rebind' ? ' active' : '' ?>">
+                            <span>换绑信息</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="menu-item">
+                <a href="/user/messages" class="menu-link<?= ($activeMenu ?? '') === 'messages' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-message"/></svg>
+                    <span>消息中心</span>
+                    <?php if (($unreadCount ?? 0) > 0): ?>
+                    <span class="badge badge-danger" style="margin-left: auto; font-size: 10px; min-width: 18px; height: 18px; padding: 0 5px;"><?= ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) ?></span>
+                    <?php endif; ?>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="/user/plugin-market" class="menu-link<?= ($activeMenu ?? '') === 'plugin-market' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-plugin"/></svg>
+                    <span>插件市场</span>
+                </a>
+            </div>
+            <?php if (($user['is_developer'] ?? 0) == 1): ?>
+            <div class="menu-item">
+                <a href="/user/developer" class="menu-link<?= ($activeMenu ?? '') === 'developer' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-dev"/></svg>
+                    <span>开发者选项</span>
+                </a>
+            </div>
+            <?php endif; ?>
+            <div class="menu-item">
+                <a href="/user/feedback" class="menu-link<?= ($activeMenu ?? '') === 'feedback' ? ' active' : '' ?>">
+                    <svg width="18" height="18"><use href="#i-feedback"/></svg>
+                    <span>意见反馈</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- User Layout -->
-    <div class="user-layout" style="padding-top: 80px; display: flex; min-height: calc(100vh - 80px);">
-        <aside class="user-sidebar">
+    <div class="user-layout" style="display: flex; min-height: calc(100vh - 80px);">
+        <aside class="user-sidebar" id="userSidebar">
             <div class="icon-rail">
                 <div class="menu-item">
                     <a href="/user/dashboard" class="menu-link<?= ($activeMenu ?? '') === 'dashboard' ? ' active' : '' ?>">
@@ -121,18 +286,78 @@
                         <span>余额管理</span>
                     </a>
                 </div>
-                <div class="menu-item">
-                    <a href="/user/logs" class="menu-link<?= ($activeMenu ?? '') === 'logs' ? ' active' : '' ?>">
+                <!-- 站点日志 with submenu -->
+                <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['balance-logs', 'login-logs', 'operation-logs']) ? ' open' : '' ?>">
+                    <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
                         <svg width="18" height="18"><use href="#i-log"/></svg>
                         <span>站点日志</span>
+                        <span class="submenu-toggle">
+                            <svg width="12" height="12"><use href="#i-chevron"/></svg>
+                        </span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a href="/user/balance-logs" class="menu-link<?= ($activeMenu ?? '') === 'balance-logs' ? ' active' : '' ?>">
+                                <span>余额明细</span>
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/user/login-logs" class="menu-link<?= ($activeMenu ?? '') === 'login-logs' ? ' active' : '' ?>">
+                                <span>登录日志</span>
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/user/operation-logs" class="menu-link<?= ($activeMenu ?? '') === 'operation-logs' ? ' active' : '' ?>">
+                                <span>操作日志</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- 账户设置 with submenu -->
+                <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['settings', 'rebind']) ? ' open' : '' ?>">
+                    <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
+                        <svg width="18" height="18"><use href="#i-settings"/></svg>
+                        <span>账户设置</span>
+                        <span class="submenu-toggle">
+                            <svg width="12" height="12"><use href="#i-chevron"/></svg>
+                        </span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a href="/user/settings" class="menu-link<?= ($activeMenu ?? '') === 'settings' ? ' active' : '' ?>">
+                                <span>基本设置</span>
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/user/rebind" class="menu-link<?= ($activeMenu ?? '') === 'rebind' ? ' active' : '' ?>">
+                                <span>换绑信息</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="menu-item">
+                    <a href="/user/messages" class="menu-link<?= ($activeMenu ?? '') === 'messages' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-message"/></svg>
+                        <span>消息中心</span>
+                        <?php if (($unreadCount ?? 0) > 0): ?>
+                        <span class="badge badge-danger" style="margin-left: auto; font-size: 10px; min-width: 18px; height: 18px; padding: 0 5px;"><?= ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) ?></span>
+                        <?php endif; ?>
                     </a>
                 </div>
                 <div class="menu-item">
-                    <a href="/user/settings" class="menu-link<?= ($activeMenu ?? '') === 'settings' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-settings"/></svg>
-                        <span>账户设置</span>
+                    <a href="/user/plugin-market" class="menu-link<?= ($activeMenu ?? '') === 'plugin-market' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-plugin"/></svg>
+                        <span>插件市场</span>
                     </a>
                 </div>
+                <?php if (($user['is_developer'] ?? 0) == 1): ?>
+                <div class="menu-item">
+                    <a href="/user/developer" class="menu-link<?= ($activeMenu ?? '') === 'developer' ? ' active' : '' ?>">
+                        <svg width="18" height="18"><use href="#i-dev"/></svg>
+                        <span>开发者选项</span>
+                    </a>
+                </div>
+                <?php endif; ?>
                 <div class="menu-item">
                     <a href="/user/feedback" class="menu-link<?= ($activeMenu ?? '') === 'feedback' ? ' active' : '' ?>">
                         <svg width="18" height="18"><use href="#i-feedback"/></svg>
@@ -227,6 +452,51 @@
                 }
                 if (closeBtn) closeBtn.addEventListener('click', dismiss);
                 if (confirmBtn) confirmBtn.addEventListener('click', dismiss);
+            }
+        })();
+
+        // Message bell dropdown toggle
+        (function() {
+            var bellBtn = document.getElementById('bellBtn');
+            var dropdown = document.getElementById('messageDropdown');
+            if (bellBtn && dropdown) {
+                bellBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var isVisible = dropdown.style.display === 'block';
+                    dropdown.style.display = isVisible ? 'none' : 'block';
+                });
+                document.addEventListener('click', function(e) {
+                    if (!dropdown.contains(e.target) && e.target !== bellBtn && !bellBtn.contains(e.target)) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            }
+        })();
+
+        // Submenu toggle
+        function toggleSubmenu(el) {
+            var parent = el.closest('.has-submenu');
+            if (parent) {
+                parent.classList.toggle('open');
+            }
+        }
+
+        // Hamburger menu toggle
+        (function() {
+            var hamburgerBtn = document.getElementById('hamburgerBtn');
+            var sidebar = document.getElementById('hamburgerSidebar');
+            var overlay = document.getElementById('hamburgerOverlay');
+            if (hamburgerBtn && sidebar && overlay) {
+                function openMenu() {
+                    sidebar.classList.add('show');
+                    overlay.classList.add('show');
+                }
+                function closeMenu() {
+                    sidebar.classList.remove('show');
+                    overlay.classList.remove('show');
+                }
+                hamburgerBtn.addEventListener('click', openMenu);
+                overlay.addEventListener('click', closeMenu);
             }
         })();
     </script>

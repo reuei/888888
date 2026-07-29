@@ -67,7 +67,7 @@
                 <a href="/platform" class="nav-link">平台能力</a>
                 <a href="/license-query" class="nav-link">授权查询</a>
                 <a href="/documents" class="nav-link">文档中心</a>
-                <a href="/announcement" class="nav-link">网站公告</a>
+                <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncementPopup()">网站公告</a>
             </nav>
             <div class="auth-links">
                 <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
@@ -85,7 +85,7 @@
         <a href="/platform" class="nav-link">平台能力</a>
         <a href="/license-query" class="nav-link">授权查询</a>
         <a href="/documents" class="nav-link">文档中心</a>
-        <a href="/announcement" class="nav-link">网站公告</a>
+        <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncementPopup()">网站公告</a>
         <div class="auth-links" style="margin-top: 16px; display: flex; gap: 10px; justify-content: center;">
             <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
             <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
@@ -197,7 +197,7 @@
             <div class="card" style="max-width: 700px; margin: 0 auto; text-align: left;">
                 <p style="color: #687690; font-size: 14px; line-height: 1.8;"><?= htmlspecialchars(mb_substr($siteSettings['announcement'], 0, 200)) ?><?= mb_strlen($siteSettings['announcement']) > 200 ? '...' : '' ?></p>
                 <?php if (mb_strlen($siteSettings['announcement']) > 200): ?>
-                <a href="/announcement" style="color: #4f8cff; font-size: 14px; margin-top: 8px; display: inline-block;">查看详情 <svg width="14" height="14" style="vertical-align: middle;"><use href="#i-arrow-right"/></svg></a>
+                <a href="javascript:void(0)" onclick="showAnnouncementPopup()" style="color: #4f8cff; font-size: 14px; margin-top: 8px; display: inline-block;">查看详情 <svg width="14" height="14" style="vertical-align: middle;"><use href="#i-arrow-right"/></svg></a>
                 <?php endif; ?>
             </div>
         </div>
@@ -213,6 +213,25 @@
         </div>
     </section>
 
+    <!-- Announcement Popup Modal -->
+    <?php if (!empty($siteSettings['announcement'])): ?>
+    <div class="announcement-modal" id="announcementModal">
+        <div class="am-overlay"></div>
+        <div class="am-dialog">
+            <div class="am-header">
+                <h3><svg width="18" height="18" style="vertical-align: middle; margin-right: 6px;"><use href="#i-bell"/></svg>网站公告</h3>
+                <button class="am-close" onclick="hideAnnouncement()"><svg width="18" height="18"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="am-body">
+                <p style="color: #444; line-height: 1.8; white-space: pre-wrap;"><?= htmlspecialchars($siteSettings['announcement']) ?></p>
+            </div>
+            <div class="am-footer">
+                <button class="btn btn-primary btn-sm" onclick="hideAnnouncement()">我知道了</button>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Footer -->
     <footer class="site-footer">
         <div class="container">
@@ -224,8 +243,36 @@
     </footer>
 
     <script>
+        // Hamburger menu
         document.getElementById('hamburgerBtn').addEventListener('click', function() {
             document.getElementById('mobileNav').classList.toggle('show');
+        });
+
+        // Announcement popup
+        function showAnnouncementPopup() {
+            var modal = document.getElementById('announcementModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+        function hideAnnouncement() {
+            var modal = document.getElementById('announcementModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+        // Close modal on overlay click
+        document.addEventListener('click', function(e) {
+            var modal = document.getElementById('announcementModal');
+            if (modal && e.target.classList.contains('am-overlay')) {
+                hideAnnouncement();
+            }
+        });
+        // Close modal on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideAnnouncement();
+            }
         });
     </script>
 </body>

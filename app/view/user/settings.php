@@ -26,7 +26,10 @@
                 <label class="form-label" for="phone">手机号</label>
                 <input type="text" class="form-control" id="phone" name="phone" value="<?= htmlspecialchars($user['phone'] ?? '') ?>" placeholder="选填">
             </div>
-            <button type="submit" class="btn btn-primary">保存资料</button>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button type="submit" class="btn btn-primary">保存资料</button>
+                <a href="/user/rebind" class="btn btn-outline btn-sm" style="font-size:12px;">换绑邮箱/手机号</a>
+            </div>
         </form>
     </div>
 
@@ -49,4 +52,3 @@
         </form>
     </div>
 </div>
-

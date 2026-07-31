@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
         .uc-layout { display: flex; min-height: calc(100vh - 64px); }
-        .uc-sidebar { width: 248px; background: var(--bg-elevated); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; }
+        .uc-sidebar { width: 248px; background: #ffffff; border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; }
         .uc-sidebar-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border-light); }
         .uc-user-card { display: flex; align-items: center; gap: 12px; }
         .uc-avatar { width: 44px; height: 44px; border-radius: 12px; background: var(--primary-gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; flex-shrink: 0; }
@@ -195,73 +195,66 @@
 
     <header class="site-header">
         <div class="header-inner container">
+            <button class="hamburger-btn" id="hamburgerBtn" title="菜单" aria-label="菜单">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
             <a href="/" class="logo">
-                <span class="logo-mark">☁</span>
-                <span><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
+                <span class="logo-mark"><?= htmlspecialchars(mb_substr($siteSettings['site_name'] ?? '熵云', 0, 1)) ?></span>
+                <div class="logo-text">
+                    <span class="logo-name"><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
+                    <span class="logo-sub"><?= htmlspecialchars($pageTitle ?? '用户中心') ?></span>
+                </div>
             </a>
 
-            <nav class="main-nav">
-                <a href="/" class="nav-link">首页</a>
-                <a href="/platform" class="nav-link">平台能力</a>
-                <a href="/license-query" class="nav-link">授权查询</a>
-                <a href="/documents" class="nav-link">文档中心</a>
-            </nav>
-
-            <div class="auth-links">
-                <button class="theme-toggle" id="themeToggle" title="切换主题">
-                    <svg width="18" height="18" id="themeIcon"><use href="#i-moon"/></svg>
-                </button>
-
-                <div class="lang-switch">
-                    <a href="?lang=zh" class="lang-btn<?= ($lang ?? 'zh') === 'zh' ? ' active' : '' ?>">中</a>
-                    <a href="?lang=en" class="lang-btn<?= ($lang ?? 'zh') === 'en' ? ' active' : '' ?>">EN</a>
-                </div>
-
-                <div class="bell-wrapper">
-                    <button class="bell-btn" id="bellBtn" title="消息通知">
-                        <svg width="20" height="20" style="color: var(--text-secondary);"><use href="#i-bell"/></svg>
-                        <?php if (($unreadCount ?? 0) > 0): ?>
-                        <span class="bell-badge" id="bellBadge"><?= ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) ?></span>
-                        <?php endif; ?>
+            <div class="header-right">
+                <div class="lang-dropdown">
+                    <button class="icon-btn" id="langBtn" title="语言">
+                        <svg width="20" height="20"><use href="#i-globe"/></svg>
                     </button>
-
-                    <div class="message-dropdown" id="messageDropdown">
-                        <div class="md-header">
-                            <span>消息通知</span>
-                            <?php if (($unreadCount ?? 0) > 0): ?>
-                            <a href="/user/messages?action=read-all" style="font-size: 12px; color: var(--primary);">全部已读</a>
-                            <?php endif; ?>
-                        </div>
-                        <div class="md-body">
-                            <?php if (!empty($latestMessages)): ?>
-                                <?php foreach ($latestMessages as $msg): ?>
-                                <a href="/user/messages?id=<?= $msg['id'] ?? 0 ?>" class="md-item" style="<?= ($msg['is_read'] ?? 0) == 0 ? 'background: var(--primary-light);' : '' ?>">
-                                    <div style="font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; <?= ($msg['is_read'] ?? 0) == 0 ? '' : 'color: var(--text-secondary);' ?>"><?= htmlspecialchars($msg['title'] ?? '') ?></div>
-                                    <div style="font-size: 12px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($msg['content'] ?? '') ?></div>
-                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"><?= htmlspecialchars($msg['created_at'] ?? '') ?></div>
-                                </a>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <div style="text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px;">暂无消息</div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="md-footer">
-                            <a href="/user/messages">查看全部消息</a>
-                        </div>
+                    <div class="lang-menu" id="langMenu">
+                        <a href="?lang=zh" class="lang-option<?= ($lang ?? 'zh') === 'zh' ? ' active' : '' ?>" data-lang="zh">中文</a>
+                        <a href="?lang=en" class="lang-option<?= ($lang ?? 'zh') === 'en' ? ' active' : '' ?>" data-lang="en">English</a>
                     </div>
                 </div>
 
-                <div class="user-avatar" title="<?= htmlspecialchars($user['email'] ?? '') ?>">
-                    <?= mb_strtoupper(mb_substr($user['email'] ?? 'U', 0, 1)) ?>
+                <div class="theme-dropdown">
+                    <button class="icon-btn" id="themeBtn" title="切换主题">
+                        <svg width="20" height="20" id="themeIcon"><use href="#i-moon"/></svg>
+                    </button>
+                    <div class="theme-menu" id="themeMenu">
+                        <button class="theme-option" data-theme="light">
+                            <svg width="16" height="16"><use href="#i-sun"/></svg>
+                            浅色模式
+                        </button>
+                        <button class="theme-option" data-theme="dark">
+                            <svg width="16" height="16"><use href="#i-moon"/></svg>
+                            深色模式
+                        </button>
+                    </div>
                 </div>
 
-                <a href="/user/logout" class="btn btn-ghost btn-sm">退出</a>
-
-                <button class="hamburger-btn" id="hamburgerBtn" title="菜单">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                <div class="avatar-dropdown">
+                    <button class="user-avatar-btn" id="avatarBtn" title="<?= htmlspecialchars($user['email'] ?? '') ?>">
+                        <?php if (!empty($user['avatar'])): ?>
+                        <img src="<?= htmlspecialchars($user['avatar']) ?>" alt="avatar" class="avatar-img">
+                        <?php else: ?>
+                        <div class="avatar-text"><?= mb_strtoupper(mb_substr($user['email'] ?? 'U', 0, 1)) ?></div>
+                        <?php endif; ?>
+                    </button>
+                    <div class="avatar-menu" id="avatarMenu">
+                        <a href="/user/settings" class="avatar-menu-item">
+                            <svg width="16" height="16"><use href="#i-settings"/></svg>
+                            <span>用户设置</span>
+                        </a>
+                        <a href="/user/logout" class="avatar-menu-item">
+                            <svg width="16" height="16"><use href="#i-logout"/></svg>
+                            <span>退出登录</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </header>

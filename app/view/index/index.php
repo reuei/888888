@@ -18,6 +18,7 @@
             <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
             <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
             <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+            <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></symbol>
             <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
             <symbol id="i-bar-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></symbol>
             <symbol id="i-tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
@@ -41,9 +42,15 @@
 
     <header class="site-header">
         <div class="header-inner">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单">
+                <span></span><span></span><span></span>
+            </button>
             <a href="/" class="logo">
                 <span class="logo-mark"><?= htmlspecialchars(mb_substr($siteSettings['site_name'] ?? '熵云', 0, 1)) ?></span>
-                <span><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
+                <div class="logo-text">
+                    <span class="logo-name"><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
+                    <span class="logo-sub">授权服务平台</span>
+                </div>
             </a>
             <nav class="main-nav">
                 <a href="/" class="nav-link active">首页</a>
@@ -52,13 +59,11 @@
                 <a href="/documents" class="nav-link">文档中心</a>
                 <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncement()">网站公告</a>
             </nav>
-            <div class="auth-links">
-                <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
-                <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
+            <div class="header-right">
+                <a href="/user/login" class="icon-btn" title="登录">
+                    <svg width="20" height="20"><use href="#i-user"/></svg>
+                </a>
             </div>
-            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单">
-                <span></span><span></span><span></span>
-            </button>
         </div>
     </header>
 
@@ -68,10 +73,6 @@
         <a href="/license-query" class="nav-link">授权查询</a>
         <a href="/documents" class="nav-link">文档中心</a>
         <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncement()">网站公告</a>
-        <div class="auth-links" style="margin-top: 16px; display: flex; gap: 10px; justify-content: center;">
-            <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
-            <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
-        </div>
     </nav>
 
     <section class="hero">

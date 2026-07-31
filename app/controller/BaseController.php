@@ -26,12 +26,53 @@ class BaseController
 
     /**
      * 初始化数据库连接
+     * 优先读取 config/database.php，否则从 .env 解析
      */
     protected function initDatabase()
     {
+        $dbConfig = null;
+        $configFile = CONFIG_PATH . 'database.php';
+        if (file_exists($configFile)) {
+            try {
+                $config = include $configFile;
+                if (is_array($config) && isset($config['connections']['mysql'])) {
+                    $dbConfig = $config['connections']['mysql'];
+                }
+            } catch (\Throwable $e) {
+                $dbConfig = null;
+            }
+        }
+
+        if (!$dbConfig) {
+            $envFile = ROOT_PATH . '.env';
+            if (file_exists($envFile)) {
+                $envContent = file_get_contents($envFile);
+                $dbConfig = [
+                    'hostname' => $this->envValue($envContent, 'DB_HOST', '127.0.0.1'),
+                    'database' => $this->envValue($envContent, 'DB_NAME', 'qeefg_auth'),
+                    'username' => $this->envValue($envContent, 'DB_USER', 'root'),
+                    'password' => $this->envValue($envContent, 'DB_PASS', ''),
+                    'hostport' => $this->envValue($envContent, 'DB_PORT', '3306'),
+                    'charset'  => $this->envValue($envContent, 'DB_CHARSET', 'utf8mb4'),
+                ];
+            }
+        }
+
+        if (!$dbConfig) {
+            $exampleFile = CONFIG_PATH . 'database.php.example';
+            if (file_exists($exampleFile)) {
+                $config = include $exampleFile;
+                if (is_array($config) && isset($config['connections']['mysql'])) {
+                    $dbConfig = $config['connections']['mysql'];
+                }
+            }
+        }
+
+        if (!$dbConfig) {
+            die('数据库配置不存在，请创建 config/database.php 或配置 .env 文件');
+        }
+
         try {
-            $config = include CONFIG_PATH . 'database.php';
-            $dbConfig = $config['connections']['mysql'];
             $dsn = "mysql:host={$dbConfig['hostname']};port={$dbConfig['hostport']};dbname={$dbConfig['database']};charset={$dbConfig['charset']}";
 
             $this->db = new \PDO($dsn, $dbConfig['username'], $dbConfig['password'], [
@@ -42,6 +83,14 @@ class BaseController
         } catch (\PDOException $e) {
             die('数据库连接失败: ' . $e->getMessage());
         }
+    }
+
+    private function envValue($content, $key, $default = '')
+    {
+        if (preg_match('/' . preg_quote($key, '/') . '\s*=\s*(.+)/', $content, $m)) {
+            return trim($m[1]);
+        }
+        return $default;
     }
 
     /**

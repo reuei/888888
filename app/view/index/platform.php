@@ -25,9 +25,15 @@
 
     <header class="site-header">
         <div class="header-inner">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单">
+                <span></span><span></span><span></span>
+            </button>
             <a href="/" class="logo">
                 <span class="logo-mark"><?= htmlspecialchars(mb_substr($siteSettings['site_name'] ?? '熵云', 0, 1)) ?></span>
-                <span><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
+                <div class="logo-text">
+                    <span class="logo-name"><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
+                    <span class="logo-sub">平台能力</span>
+                </div>
             </a>
             <nav class="main-nav">
                 <a href="/" class="nav-link">首页</a>
@@ -36,13 +42,11 @@
                 <a href="/documents" class="nav-link">文档中心</a>
                 <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncement()">网站公告</a>
             </nav>
-            <div class="auth-links">
-                <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
-                <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
+            <div class="header-right">
+                <a href="/user/login" class="icon-btn" title="登录">
+                    <svg width="20" height="20"><use href="#i-user"/></svg>
+                </a>
             </div>
-            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单">
-                <span></span><span></span><span></span>
-            </button>
         </div>
     </header>
 
@@ -52,10 +56,6 @@
         <a href="/license-query" class="nav-link">授权查询</a>
         <a href="/documents" class="nav-link">文档中心</a>
         <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncement()">网站公告</a>
-        <div class="auth-links" style="margin-top: 16px; display: flex; gap: 10px; justify-content: center;">
-            <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
-            <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
-        </div>
     </nav>
 
     <section class="platform-hero">

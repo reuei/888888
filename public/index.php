@@ -70,11 +70,14 @@ $method = $_SERVER['REQUEST_METHOD'];
 $routes = [
     'GET' => [
         '/' => 'Index@index',
+        '/welcome' => 'Index@welcome',
         '/platform' => 'Index@platform',
         '/license-query' => 'Index@licenseQuery',
         '/documents' => 'Index@documents',
         '/announcement' => 'Index@announcement',
         '/switch-lang' => 'Index@switchLang',
+        '/app-download' => 'Index@appDownload',
+        '/appDownload' => 'Index@appDownload',
         '/login' => 'User@login',
         '/register' => 'User@register',
         '/logout' => 'User@logout',
@@ -109,6 +112,7 @@ $routes = [
         '/admin/licenses' => 'Admin@licenses',
         '/admin/orders' => 'Admin@orders',
         '/admin/settings' => 'Admin@settings',
+        '/admin/apps' => 'Admin@appManagement',
         '/admin/documents' => 'Admin@documents',
         '/admin/messages' => 'Admin@messages',
         '/admin/developers' => 'Admin@developers',
@@ -165,6 +169,8 @@ $routes = [
         '/admin/uploadSiteLogo' => 'Admin@uploadSiteLogo',
         '/admin/uploadSiteFavicon' => 'Admin@uploadSiteFavicon',
         '/admin/saveEmailConfig' => 'Admin@saveEmailConfig',
+        '/admin/saveApp' => 'Admin@saveApp',
+        '/admin/deleteApp' => 'Admin@deleteApp',
     ],
 ];
 

@@ -141,8 +141,8 @@
 
             <div class="sidebar-section">
                 <div class="sidebar-section-title">系统</div>
-                <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['settings', 'emailPool', 'emailTemplates', 'paymentChannels', 'uploadFiles']) ? ' open' : '' ?>">
-                    <a href="javascript:void(0)" class="menu-link <?= in_array($activeMenu ?? '', ['settings', 'emailPool', 'emailTemplates', 'paymentChannels', 'uploadFiles']) ? 'active' : '' ?>" onclick="toggleAdminSubmenu(this)">
+                <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['settings', 'apps', 'emailPool', 'emailTemplates', 'paymentChannels', 'uploadFiles']) ? ' open' : '' ?>">
+                    <a href="javascript:void(0)" class="menu-link <?= in_array($activeMenu ?? '', ['settings', 'apps', 'emailPool', 'emailTemplates', 'paymentChannels', 'uploadFiles']) ? 'active' : '' ?>" onclick="toggleAdminSubmenu(this)">
                         <svg><use href="#i-settings"/></svg>
                         <span class="menu-label">系统设置</span>
                         <span class="submenu-arrow"><svg width="10" height="10"><use href="#i-chevron-right"/></svg></span>
@@ -150,6 +150,9 @@
                     <ul class="submenu">
                         <li class="submenu-item">
                             <a href="/admin/settings" class="menu-link<?= ($activeMenu ?? '') === 'settings' ? ' active' : '' ?>">基本设置</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="/admin/apps" class="menu-link<?= ($activeMenu ?? '') === 'apps' ? ' active' : '' ?>">APP管理</a>
                         </li>
                         <li class="submenu-item">
                             <a href="/admin/emailPool" class="menu-link<?= ($activeMenu ?? '') === 'emailPool' ? ' active' : '' ?>">邮箱池配置</a>

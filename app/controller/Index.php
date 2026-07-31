@@ -41,14 +41,11 @@ class Index extends BaseController
     }
 
     /**
-     * 平台介绍
+     * 平台介绍 - 锚点跳转到首页核心能力
      */
     public function platform()
     {
-        $siteSettings = $this->getSiteSettings();
-        return $this->render('index/platform', [
-            'siteSettings' => $siteSettings,
-        ]);
+        $this->redirect('/#features');
     }
 
     /**
@@ -80,6 +77,11 @@ class Index extends BaseController
                 $error = '查询失败，请稍后重试';
             }
         }
+
+        // 记录授权查询操作日志（可选）
+        try {
+            $this->db->query("UPDATE qf_analytics SET query_count = query_count + 1 WHERE id = 1");
+        } catch (\PDOException $e) {}
 
         return $this->render('index/license-query', [
             'siteSettings' => $siteSettings,
@@ -140,6 +142,31 @@ class Index extends BaseController
         $siteSettings = $this->getSiteSettings();
         return $this->render('index/announcement', [
             'siteSettings' => $siteSettings,
+        ]);
+    }
+
+    /**
+     * Welcome 页面（与首页同构）
+     */
+    public function welcome()
+    {
+        return $this->index();
+    }
+
+    /**
+     * APP下载页面
+     */
+    public function appDownload()
+    {
+        $siteSettings = $this->getSiteSettings();
+        $apps = [];
+        try {
+            $stmt = $this->db->query("SELECT * FROM qf_apps WHERE status = 1 ORDER BY sort_order ASC, id ASC");
+            $apps = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {}
+        return $this->render('index/app-download', [
+            'siteSettings' => $siteSettings,
+            'apps' => $apps,
         ]);
     }
 

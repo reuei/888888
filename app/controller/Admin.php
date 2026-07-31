@@ -1776,4 +1776,81 @@ class Admin extends BaseController
             return $default;
         }
     }
+
+    /**
+     * APP下载管理
+     */
+    public function appManagement()
+    {
+        $this->requireAdminLogin();
+        $apps = [];
+        try {
+            $stmt = $this->db->query("SELECT * FROM qf_apps ORDER BY sort_order ASC, id ASC");
+            $apps = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+        }
+        return $this->renderAdmin('admin/apps', [
+            'apps' => $apps,
+        ], 'apps', 'APP下载管理');
+    }
+
+    /**
+     * 保存APP
+     */
+    public function saveApp()
+    {
+        $this->requireAdminLogin();
+        $id = intval($this->post('id', 0));
+        $appName = trim($this->post('app_name', ''));
+        $appVersion = trim($this->post('app_version', ''));
+        $appLogo = trim($this->post('app_logo', ''));
+        $appScreenshot = trim($this->post('app_screenshot', ''));
+        $appDescription = trim($this->post('app_description', ''));
+        $appSlogan = trim($this->post('app_slogan', ''));
+        $androidUrl = trim($this->post('android_url', ''));
+        $androidVersion = trim($this->post('android_version', ''));
+        $iosUrl = trim($this->post('ios_url', ''));
+        $iosVersion = trim($this->post('ios_version', ''));
+        $sortOrder = intval($this->post('sort_order', 0));
+        $status = intval($this->post('status', 1));
+        if (empty($appName)) {
+            echo $this->error('软件名称不能为空');
+            exit;
+        }
+        try {
+            if ($id > 0) {
+                $stmt = $this->db->prepare("UPDATE qf_apps SET app_name=?,app_version=?,app_logo=?,app_screenshot=?,app_description=?,app_slogan=?,android_url=?,android_version=?,ios_url=?,ios_version=?,sort_order=?,status=?,updated_at=NOW() WHERE id=?");
+                $stmt->execute([$appName, $appVersion, $appLogo, $appScreenshot, $appDescription, $appSlogan, $androidUrl, $androidVersion, $iosUrl, $iosVersion, $sortOrder, $status, $id]);
+                echo $this->success([], 'APP更新成功');
+            } else {
+                $stmt = $this->db->prepare("INSERT INTO qf_apps (app_name,app_version,app_logo,app_screenshot,app_description,app_slogan,android_url,android_version,ios_url,ios_version,sort_order,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())");
+                $stmt->execute([$appName, $appVersion, $appLogo, $appScreenshot, $appDescription, $appSlogan, $androidUrl, $androidVersion, $iosUrl, $iosVersion, $sortOrder, $status]);
+                echo $this->success(['id' => $this->db->lastInsertId()], 'APP添加成功');
+            }
+        } catch (\PDOException $e) {
+            echo $this->error('保存失败: ' . $e->getMessage());
+        }
+        exit;
+    }
+
+    /**
+     * 删除APP
+     */
+    public function deleteApp()
+    {
+        $this->requireAdminLogin();
+        $id = intval($this->post('id', 0));
+        if ($id <= 0) {
+            echo $this->error('APP ID无效');
+            exit;
+        }
+        try {
+            $stmt = $this->db->prepare("DELETE FROM qf_apps WHERE id = ?");
+            $stmt->execute([$id]);
+            echo $this->success([], 'APP删除成功');
+        } catch (\PDOException $e) {
+            echo $this->error('删除失败: ' . $e->getMessage());
+        }
+        exit;
+    }
 }

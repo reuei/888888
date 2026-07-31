@@ -3,21 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>授权查询 - <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></title>
+    <title>授权查询 - <?php echo htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
         <defs>
+            <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+            <symbol id="i-platform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></symbol>
             <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
-            <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></symbol>
-            <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
-            <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
-            <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
-            <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></symbol>
+            <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+            <symbol id="i-announcement" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
             <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
             <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
             <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+            <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+            <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+            <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+            <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+            <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
         </defs>
     </svg>
 
@@ -27,111 +32,150 @@
                 <span></span><span></span><span></span>
             </button>
             <a href="/" class="logo">
-                <span class="logo-mark"><?= htmlspecialchars(mb_substr($siteSettings['site_name'] ?? '熵云', 0, 1)) ?></span>
+                <span class="logo-mark"><?php echo htmlspecialchars(mb_substr($siteSettings['site_name'] ?? '熵云', 0, 1)) ?></span>
                 <div class="logo-text">
-                    <span class="logo-name"><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
+                    <span class="logo-name"><?php echo htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
                     <span class="logo-sub">授权查询</span>
                 </div>
             </a>
             <nav class="main-nav">
                 <a href="/" class="nav-link">首页</a>
-                <a href="/platform" class="nav-link">平台能力</a>
+                <a href="/#features" class="nav-link">平台能力</a>
                 <a href="/license-query" class="nav-link active">授权查询</a>
                 <a href="/documents" class="nav-link">文档中心</a>
                 <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncement()">网站公告</a>
+                <a href="/app-download" class="nav-link">APP下载</a>
             </nav>
             <div class="header-right">
-                <a href="/user/login" class="icon-btn" title="登录">
-                    <svg width="20" height="20"><use href="#i-user"/></svg>
+                <a href="/user/login" class="btn btn-outline">登录</a>
+                <a href="/user/register" class="btn btn-primary">
+                    <svg width="16" height="16"><use href="#i-user"/></svg>
+                    注册
                 </a>
             </div>
         </div>
     </header>
 
     <nav class="mobile-nav" id="mobileNav">
-        <a href="/" class="nav-link">首页</a>
-        <a href="/platform" class="nav-link">平台能力</a>
-        <a href="/license-query" class="nav-link active">授权查询</a>
-        <a href="/documents" class="nav-link">文档中心</a>
-        <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncement()">网站公告</a>
+        <a href="/" class="nav-link" onclick="document.getElementById('mobileNav').classList.remove('open')">首页</a>
+        <a href="/#features" class="nav-link" onclick="document.getElementById('mobileNav').classList.remove('open')">平台能力</a>
+        <a href="/license-query" class="nav-link active" onclick="document.getElementById('mobileNav').classList.remove('open')">授权查询</a>
+        <a href="/documents" class="nav-link" onclick="document.getElementById('mobileNav').classList.remove('open')">文档中心</a>
+        <a href="javascript:void(0)" class="nav-link" onclick="document.getElementById('mobileNav').classList.remove('open');showAnnouncement();">网站公告</a>
+        <a href="/app-download" class="nav-link" onclick="document.getElementById('mobileNav').classList.remove('open')">APP下载</a>
+        <a href="/user/login" class="nav-link" onclick="document.getElementById('mobileNav').classList.remove('open')">用户登录</a>
     </nav>
 
     <section class="page-banner">
         <div class="container">
             <h1>授权<span class="gradient-text">查询</span></h1>
-            <p>输入授权码查询授权信息</p>
+            <p>输入授权码查询授权详情</p>
         </div>
     </section>
 
-    <section class="license-query-section">
-        <div class="container">
-            <div class="query-input-wrap">
-                <div class="card">
-                    <form method="GET" action="/license-query">
-                        <div class="form-group">
-                            <label class="form-label" for="license_key">授权码</label>
-                            <input type="text" class="form-control" id="license_key" name="key" placeholder="请输入您的授权码" value="<?= htmlspecialchars($key ?? '') ?>" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <svg width="16" height="16" style="vertical-align: middle; margin-right: 6px;"><use href="#i-search"/></svg>查询授权
-                        </button>
-                    </form>
+    <div class="container content-section" style="max-width: 800px; margin: 0 auto;">
+        <div class="card query-card">
+            <h2 class="card-title" style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">授权查询</h2>
+            <p class="card-desc">通过授权码可查询授权状态、有效期、绑定产品等信息</p>
+            <form class="query-form" method="GET" action="/license-query" autocomplete="off">
+                <div class="form-group">
+                    <label class="form-label" for="license_key">授权码</label>
+                    <div class="input-with-icon">
+                        <svg width="18" height="18" class="input-icon"><use href="#i-key"/></svg>
+                        <input type="text" class="form-control" id="license_key" name="key" placeholder="请输入您的授权码" required value="<?php echo htmlspecialchars($key ?? '') ?>">
+                    </div>
                 </div>
-            </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <svg width="16" height="16"><use href="#i-search"/></svg>
+                    查询授权
+                </button>
+            </form>
+        </div>
 
-            <?php if (isset($result)): ?>
-            <div class="query-result">
-                <div class="card">
-                    <h3 style="font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 16px;">查询结果</h3>
-                    <?php if ($result): ?>
-                    <div>
-                        <div class="query-result-row">
-                            <span class="label">授权码</span>
-                            <span class="value" style="font-family: monospace; font-size: 13px;"><?= htmlspecialchars($result['license_key'] ?? '-') ?></span>
+        <?php if (isset($result)): ?>
+        <div class="query-result-section mt-4">
+            <div class="card result-card">
+                <div class="result-header">
+                    <h3 style="margin: 0;">查询结果</h3>
+                    <span class="result-status-badge">
+                        <?php if ($result && ($result['status'] ?? 0) == 1): ?>
+                        <span class="badge badge-success">有效</span>
+                        <?php else: ?>
+                        <span class="badge badge-danger">已失效</span>
+                        <?php endif; ?>
+                    </span>
+                </div>
+                <?php if ($result): ?>
+                <div class="result-grid">
+                    <div class="result-row">
+                        <div class="result-label">授权码</div>
+                        <div class="result-value">
+                            <code style="font-family: monospace; font-size: 13px;"><?php echo htmlspecialchars($result['license_key'] ?? '-') ?></code>
                         </div>
-                        <div class="query-result-row">
-                            <span class="label">产品名称</span>
-                            <span class="value"><?= htmlspecialchars($result['product_name'] ?? '-') ?></span>
-                        </div>
-                        <div class="query-result-row">
-                            <span class="label">授权状态</span>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">产品名称</div>
+                        <div class="result-value"><?php echo htmlspecialchars($result['product_name'] ?? '-') ?></div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">授权状态</div>
+                        <div class="result-value">
                             <?php $status = $result['status'] ?? 0; ?>
-                            <span class="badge <?= $status == 1 ? 'badge-success' : 'badge-danger' ?>"><?= $status == 1 ? '有效' : '已失效' ?></span>
-                        </div>
-                        <div class="query-result-row">
-                            <span class="label">到期时间</span>
-                            <span class="value"><?= htmlspecialchars($result['expires_at'] ?? '永久') ?></span>
-                        </div>
-                        <div class="query-result-row">
-                            <span class="label">绑定用户</span>
-                            <span class="value"><?= htmlspecialchars($result['username'] ?? '未知') ?></span>
+                            <span class="badge <?php echo $status == 1 ? 'badge-success' : 'badge-danger' ?>"><?php echo $status == 1 ? '有效' : '已失效' ?></span>
                         </div>
                     </div>
-                    <?php else: ?>
-                    <div class="empty-state" style="padding: 40px 20px;">
-                        <svg width="48" height="48" style="color: var(--text-muted); margin-bottom: 12px;"><use href="#i-x"/></svg>
-                        <p style="color: var(--text-secondary); font-size: 14px;"><?= htmlspecialchars($error ?? '未找到该授权码对应的信息') ?></p>
+                    <div class="result-row">
+                        <div class="result-label">到期时间</div>
+                        <div class="result-value"><?php echo htmlspecialchars($result['expires_at'] ?? '永久有效') ?></div>
                     </div>
-                    <?php endif; ?>
+                    <div class="result-row">
+                        <div class="result-label">绑定用户</div>
+                        <div class="result-value"><?php echo htmlspecialchars($result['username'] ?? '未知用户') ?></div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">产品描述</div>
+                        <div class="result-value"><?php echo htmlspecialchars($result['product_description'] ?? '-') ?></div>
+                    </div>
                 </div>
+                <?php else: ?>
+                <div class="empty-state card">
+                    <svg width="48" height="48" style="color: var(--text-muted); margin-bottom: 12px;"><use href="#i-x"/></svg>
+                    <p class="muted" style="color: var(--text-secondary);">未找到该授权码对应的信息</p>
+                </div>
+                <?php endif; ?>
             </div>
-            <?php endif; ?>
         </div>
-    </section>
+        <?php elseif (isset($error)): ?>
+        <div class="empty-state card">
+            <svg width="48" height="48" style="color: var(--text-muted); margin-bottom: 12px;"><use href="#i-x"/></svg>
+            <p class="muted" style="color: var(--text-secondary);"><?php echo htmlspecialchars($error) ?></p>
+        </div>
+        <?php endif; ?>
+    </div>
 
     <?php if (!empty($siteSettings['announcement'])): ?>
     <div class="announcement-modal" id="announcementModal">
-        <div class="am-overlay"></div>
-        <div class="am-dialog">
-            <div class="am-header">
-                <h3><svg width="18" height="18" style="vertical-align: middle; margin-right: 6px;"><use href="#i-bell"/></svg>网站公告</h3>
-                <button class="am-close" id="amCloseBtn"><svg width="18" height="18"><use href="#i-close"/></svg></button>
-            </div>
-            <div class="am-body">
-                <p style="color: var(--text-secondary); line-height: 1.8; white-space: pre-wrap;"><?= htmlspecialchars($siteSettings['announcement']) ?></p>
-            </div>
-            <div class="am-footer">
-                <button class="btn btn-primary btn-sm" id="amConfirmBtn">我知道了</button>
+        <div class="arco-modal-mask am-overlay fade"></div>
+        <div class="arco-modal-wrapper">
+            <div class="arco-modal _announcementModal">
+                <div class="arco-modal-header">
+                    <span class="arco-modal-title">
+                        <svg width="18" height="18"><use href="#i-bell"/></svg>
+                        网站公告
+                    </span>
+                    <button class="arco-modal-close-icon" id="amCloseBtn" aria-label="关闭">
+                        <svg width="18" height="18"><use href="#i-x"/></svg>
+                    </button>
+                </div>
+                <div class="arco-modal-content">
+                    <div class="_announcementContent markdown-body">
+                        <?php echo nl2br(htmlspecialchars($siteSettings['announcement'])) ?>
+                    </div>
+                </div>
+                <div class="arco-modal-footer">
+                    <button class="btn btn-secondary" id="amHide1h">一小时内不再显示</button>
+                    <button class="btn btn-primary" id="amConfirmBtn">关闭</button>
+                </div>
             </div>
         </div>
     </div>
@@ -141,11 +185,12 @@
         <div class="footer-inner">
             <div class="footer-links">
                 <a href="/">首页</a>
-                <a href="/platform">平台能力</a>
+                <a href="/#features">平台能力</a>
                 <a href="/license-query">授权查询</a>
                 <a href="/documents">文档中心</a>
+                <a href="/app-download">APP下载</a>
             </div>
-            <p class="footer-copyright">© <?= date('Y') ?> <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> All Rights Reserved. <?= !empty($siteSettings['icp']) ? htmlspecialchars($siteSettings['icp']) : '' ?></p>
+            <p class="footer-copyright">© <?php echo date('Y') ?> <?php echo htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> All Rights Reserved. <?php echo !empty($siteSettings['icp']) ? htmlspecialchars($siteSettings['icp']) : '' ?></p>
         </div>
     </footer>
 

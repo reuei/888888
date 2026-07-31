@@ -373,8 +373,34 @@ CREATE TABLE `qf_verify_codes` (
   KEY `target` (`target`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='验证码表';
 
--- 插入默认管理员 (密码: admin123)
-INSERT INTO `qf_admins` VALUES (1, 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@qeefg.com', 1, NOW(), NOW());
+-- ----------------------------
+-- APP下载配置表
+-- ----------------------------
+DROP TABLE IF EXISTS `qf_apps`;
+CREATE TABLE `qf_apps` (
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `app_name` varchar(100) NOT NULL COMMENT '软件名称',
+  `app_version` varchar(30) DEFAULT '' COMMENT '版本号',
+  `app_logo` varchar(255) DEFAULT '' COMMENT '图标URL',
+  `app_screenshot` varchar(255) DEFAULT '' COMMENT '截图URL',
+  `app_description` text COMMENT '描述',
+  `app_slogan` varchar(255) DEFAULT '' COMMENT '宣传语',
+  `android_url` varchar(500) DEFAULT '' COMMENT '安卓下载地址',
+  `android_version` varchar(30) DEFAULT '' COMMENT '安卓版本号',
+  `ios_url` varchar(500) DEFAULT '' COMMENT 'iOS下载地址',
+  `ios_version` varchar(30) DEFAULT '' COMMENT 'iOS版本号',
+  `sort_order` int(11) DEFAULT 0,
+  `status` tinyint(1) DEFAULT 1 COMMENT '0下架1上架',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='APP下载配置表';
+
+-- 插入默认管理员 (密码: 201125.)
+INSERT INTO `qf_admins` VALUES (1,'admin','$2y$12$OtTwrVfm//bUsyfsNyo3eOyDmuVOKhZi6xBXbW4a6x3mu63.ykX/2','admin@qeefg.com',1,NOW(),NOW());
+
+-- 插入默认APP数据
+INSERT INTO `qf_apps` VALUES (1, '商家工作台', 'v1.0.2', '', '', '高效运营 · 安全管理 · 随时掌握', '', '', '', '', '', 0, 1, NOW(), NOW());
 
 -- 插入默认系统设置
 INSERT INTO `qf_settings` VALUES
@@ -390,7 +416,8 @@ INSERT INTO `qf_settings` VALUES
 (10, 'site_announcement', '欢迎使用熵云寄售系统！\n\n现处于测试阶段，产品免费下载，免费使用，如您通过付费等渠道知晓本系统，您可能正在遭遇源码转卖。\n\n官方测试交流群：441027731\n如遇到BUG请联系QQ 2264455923', '网站公告内容'),
 (11, 'site_logo', '', '网站LOGO路径'),
 (12, 'site_favicon', '', '网站Favicon路径'),
-(13, 'icp', '', 'ICP备案号');
+(13, 'icp', '', 'ICP备案号'),
+(14, 'app_download_enabled', '1', 'APP下载页面开关:0关闭1开启');
 
 -- 插入默认邮件模板
 INSERT INTO `qf_email_templates` VALUES

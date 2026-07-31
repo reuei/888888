@@ -56,7 +56,7 @@ class User extends BaseController
 
             $updateStmt = $this->db->prepare("UPDATE qf_users SET login_ip = ?, login_time = ? WHERE id = ?");
             $updateStmt->execute([
-                $_SERVER['REMOTE_ADDR'] ?? '',
+                $this->getRealIp(),
                 date('Y-m-d H:i:s'),
                 $user['id'],
             ]);
@@ -64,6 +64,8 @@ class User extends BaseController
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['email'] = $user['email'];
+
+            $this->recordOperationLog($user['id'], 'login', '用户登录成功，IP: ' . $this->getRealIp());
 
             $this->recordLoginLog($user['id'], $username, 1, '登录成功');
 
@@ -159,6 +161,9 @@ class User extends BaseController
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $this->db->prepare("INSERT INTO qf_users (username, email, phone, password, balance, created_at) VALUES (?, ?, ?, ?, 0.00, ?)");
             $stmt->execute([$username, $email, $phone, $hashedPassword, date('Y-m-d H:i:s')]);
+
+            $newId = $this->db->lastInsertId();
+            $this->recordOperationLog($newId, 'register', '用户注册成功，IP: ' . $this->getRealIp());
 
             echo $this->success(['redirect' => '/login'], '注册成功，请登录');
             exit;
@@ -503,6 +508,8 @@ class User extends BaseController
 
             $_SESSION['email'] = $email;
 
+            $this->recordOperationLog($userId, 'update_settings', '用户修改账户资料，邮箱: ' . $email . '，QQ: ' . $qq . '，手机号: ' . $phone . '，IP: ' . $this->getRealIp());
+
             echo $this->success([], '更新成功');
             exit;
         } catch (\PDOException $e) {
@@ -546,6 +553,8 @@ class User extends BaseController
             $stmt = $this->db->prepare("UPDATE qf_users SET password = ? WHERE id = ?");
             $stmt->execute([$hashedPassword, $userId]);
 
+            $this->recordOperationLog($userId, 'change_password', '用户修改密码成功，IP: ' . $this->getRealIp());
+
             echo $this->success([], '密码修改成功');
             exit;
         } catch (\PDOException $e) {
@@ -586,6 +595,8 @@ class User extends BaseController
         try {
             $stmt = $this->db->prepare("INSERT INTO qf_feedback (user_id, content, contact, created_at) VALUES (?, ?, ?, ?)");
             $stmt->execute([$userId, $content, $contact, date('Y-m-d H:i:s')]);
+
+            $this->recordOperationLog($userId, 'submit_feedback', '用户提交意见反馈，内容长度: ' . mb_strlen($content) . '，联系方式: ' . $contact . '，IP: ' . $this->getRealIp());
 
             echo $this->success([], '反馈提交成功，感谢您的意见');
             exit;
@@ -645,6 +656,8 @@ class User extends BaseController
                 ");
                 $stmt->execute([$licenseKey, $userId, $productId, $orderId, $expiresAt, date('Y-m-d H:i:s')]);
 
+                $this->recordOperationLog($userId, 'create_order', '用户领取免费产品：' . $product['name'] . '，订单号：' . $orderNo . '，IP: ' . $this->getRealIp());
+
                 $this->db->commit();
                 echo $this->success(['redirect' => '/user/my-products'], '领取成功');
                 exit;
@@ -698,6 +711,8 @@ class User extends BaseController
                     date('Y-m-d H:i:s'),
                 ]);
 
+                $this->recordOperationLog($userId, 'create_order', '用户余额购买产品：' . $product['name'] . '，金额：' . $product['price'] . '，订单号：' . $orderNo . '，IP: ' . $this->getRealIp());
+
                 $this->db->commit();
                 echo $this->success(['redirect' => '/user/my-products'], '购买成功');
                 exit;
@@ -723,6 +738,8 @@ class User extends BaseController
             $orderId = $this->db->lastInsertId();
 
             $this->db->commit();
+
+            $this->recordOperationLog($userId, 'create_order', '用户创建产品订单：' . $product['name'] . '，金额：' . $product['price'] . '，支付方式：' . $paymentMethod . '，订单号：' . $orderNo . '，IP: ' . $this->getRealIp());
 
             echo $this->success([
                 'order_no' => $orderNo,
@@ -781,6 +798,8 @@ class User extends BaseController
             $fileName = $order['product_name'] . '.zip';
             $fileSize = filesize($filePath);
 
+            $this->recordOperationLog($userId, 'download', '用户下载产品文件：' . $order['product_name'] . '，订单ID：' . $orderId . '，IP: ' . $this->getRealIp());
+
             header('Content-Type: application/octet-stream');
             header('Content-Disposition: attachment; filename="' . rawurlencode($fileName) . '"');
             header('Content-Length: ' . $fileSize);
@@ -798,6 +817,10 @@ class User extends BaseController
      */
     public function logout()
     {
+        if (isset($_SESSION['user_id'])) {
+            $userId = $_SESSION['user_id'];
+            $this->recordOperationLog($userId, 'logout', '用户退出登录，IP: ' . $this->getRealIp());
+        }
         session_destroy();
         $this->redirect('/login');
     }
@@ -1134,6 +1157,8 @@ class User extends BaseController
             // 更新用户开发者状态为pending
             $this->db->prepare("UPDATE qf_users SET developer_status = 'pending' WHERE id = ?")->execute([$userId]);
 
+            $this->recordOperationLog($userId, 'apply_developer', '用户提交开发者申请，真实姓名：' . $realName . '，申请说明长度：' . mb_strlen($description) . '，IP: ' . $this->getRealIp());
+
             echo $this->success([], '申请已提交，请等待审核');
             exit;
         } catch (\PDOException $e) {
@@ -1187,6 +1212,8 @@ class User extends BaseController
 
             $stmt = $this->db->prepare("INSERT INTO qf_plugins (user_id, name, description, version, file_path, price, status, created_at) VALUES (?, ?, ?, ?, ?, 0.00, 'pending', ?)");
             $stmt->execute([$userId, $name, $description, $version, $pluginFile, date('Y-m-d H:i:s')]);
+
+            $this->recordOperationLog($userId, 'submit_plugin', '用户提交插件：' . $name . '，版本：' . $version . '，描述长度：' . mb_strlen($description) . '，IP: ' . $this->getRealIp());
 
             echo $this->success([], '插件提交成功，请等待审核');
             exit;
@@ -1242,6 +1269,8 @@ class User extends BaseController
 
             $_SESSION['email'] = $email;
 
+            $this->recordOperationLog($userId, 'rebind_email', '用户换绑邮箱成功，新邮箱：' . $email . '，IP: ' . $this->getRealIp());
+
             echo $this->success([], '邮箱换绑成功');
             exit;
         } catch (\PDOException $e) {
@@ -1288,6 +1317,8 @@ class User extends BaseController
 
             $stmt = $this->db->prepare("UPDATE qf_verify_codes SET used = 1 WHERE id = ?");
             $stmt->execute([$verifyCode['id']]);
+
+            $this->recordOperationLog($userId, 'rebind_phone', '用户换绑手机号成功，新手机号：' . $phone . '，IP: ' . $this->getRealIp());
 
             echo $this->success([], '手机号换绑成功');
             exit;
@@ -1359,6 +1390,8 @@ class User extends BaseController
             $stmt = $this->db->prepare("UPDATE qf_messages SET is_read = 1 WHERE id = ? AND user_id = ?");
             $stmt->execute([$messageId, $userId]);
 
+            $this->recordOperationLog($userId, 'read_message', '用户标记单条消息为已读，消息ID：' . $messageId . '，IP: ' . $this->getRealIp());
+
             echo $this->success([], '已标记为已读');
             exit;
         } catch (\PDOException $e) {
@@ -1378,6 +1411,8 @@ class User extends BaseController
         try {
             $stmt = $this->db->prepare("UPDATE qf_messages SET is_read = 1 WHERE user_id = ? AND is_read = 0");
             $stmt->execute([$userId]);
+
+            $this->recordOperationLog($userId, 'read_all_messages', '用户标记全部消息为已读，IP: ' . $this->getRealIp());
 
             echo $this->success([], '全部消息已标记为已读');
             exit;
@@ -1407,21 +1442,20 @@ class User extends BaseController
     /**
      * 记录登录日志
      */
-    private function recordLoginLog($userId, $username, $status, $message)
+    protected function recordLoginLog($userId, $username, $status, $message)
     {
         try {
             $stmt = $this->db->prepare("
                 INSERT INTO qf_login_logs (user_id, username, ip, user_agent, status, message, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, NOW())
             ");
             $stmt->execute([
                 $userId,
                 $username,
-                $_SERVER['REMOTE_ADDR'] ?? '',
-                $_SERVER['HTTP_USER_AGENT'] ?? '',
+                $this->getRealIp(),
+                substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255),
                 $status,
                 $message,
-                date('Y-m-d H:i:s'),
             ]);
         } catch (\PDOException $e) {
         }

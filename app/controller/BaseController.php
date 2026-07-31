@@ -336,4 +336,32 @@ class BaseController
             return null;
         }
     }
+
+    public function getRealIp()
+    {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        $headers = ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED'];
+        foreach ($headers as $h) {
+            if (!empty($_SERVER[$h])) {
+                $arr = explode(',', $_SERVER[$h]);
+                $candidate = trim($arr[0]);
+                if (filter_var($candidate, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+                    $ip = $candidate;
+                    break;
+                }
+            }
+        }
+        return $ip ?: '0.0.0.0';
+    }
+
+    public function recordOperationLog($userId, $action, $description = '')
+    {
+        try {
+            $ip = $this->getRealIp();
+            $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+            if (strlen($ua) > 255) $ua = substr($ua, 0, 255);
+            $stmt = $this->db->prepare("INSERT INTO qf_operation_logs (user_id, action, description, ip, user_agent, created_at) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$userId, $action, $description, $ip, $ua, date('Y-m-d H:i:s')]);
+        } catch (\PDOException $e) {}
+    }
 }

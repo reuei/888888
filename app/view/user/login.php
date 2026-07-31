@@ -12,96 +12,80 @@
             <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
             <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></symbol>
             <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+            <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+            <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
         </defs>
     </svg>
 
-    <header class="site-header">
-        <div class="header-inner container">
-            <a href="/" class="logo"><span class="logo-mark">&#9729;</span><span>熵云</span></a>
-            <nav class="main-nav">
-                <a href="/" class="nav-link">首页</a>
-                <a href="/platform" class="nav-link">平台能力</a>
-                <a href="/license-query" class="nav-link">授权查询</a>
-                <a href="/documents" class="nav-link">文档中心</a>
-                <a href="#" class="nav-link" id="announcementLink">网站公告</a>
-            </nav>
-            <div class="auth-links">
-                <a href="/user/login" class="btn btn-primary btn-sm">登录</a>
-                <a href="/user/register" class="btn btn-outline btn-sm">注册</a>
+    <div class="auth-page">
+        <div class="auth-visual">
+            <div class="auth-visual-content">
+                <h2>欢迎回来</h2>
+                <p><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?>授权服务平台，为您的软件产品提供安全可靠的授权管理解决方案。</p>
+                <ul class="auth-features">
+                    <li>
+                        <svg width="18" height="18"><use href="#i-check"/></svg>
+                        安全的授权验证机制
+                    </li>
+                    <li>
+                        <svg width="18" height="18"><use href="#i-check"/></svg>
+                        实时查询与管理
+                    </li>
+                    <li>
+                        <svg width="18" height="18"><use href="#i-check"/></svg>
+                        7×24 小时技术支持
+                    </li>
+                </ul>
             </div>
-            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单"><span></span><span></span><span></span></button>
         </div>
-    </header>
+        <div class="auth-form-wrap">
+            <div class="auth-form">
+                <div class="auth-form-header">
+                    <div class="auth-form-logo"><?= htmlspecialchars(mb_substr($siteSettings['site_name'] ?? '熵云', 0, 1)) ?></div>
+                    <h1 class="auth-form-title">欢迎登录</h1>
+                    <p class="auth-form-subtitle">登录您的<?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?>账号</p>
+                </div>
 
-    <div class="mobile-nav" id="mobileNav">
-        <a href="/" class="nav-link">首页</a>
-        <a href="/platform" class="nav-link">平台能力</a>
-        <a href="/license-query" class="nav-link">授权查询</a>
-        <a href="/documents" class="nav-link">文档中心</a>
-        <a href="#" class="nav-link" id="announcementLinkMobile">网站公告</a>
-    </div>
-
-    <div style="padding-top: 100px; padding-bottom: 60px;">
-        <div class="container" style="max-width: 440px;">
-            <h1 style="font-size: 24px; color: #1a1a2e; margin-bottom: 8px; text-align: center;">用户登录</h1>
-            <p style="color: #687690; font-size: 14px; text-align: center; margin-bottom: 24px;">登录您的熵云账号</p>
-
-            <div class="card">
                 <?php if (!empty($error)): ?>
-                <div style="background: #fff2f0; border: 1px solid #ffccc7; color: #ff4d4f; padding: 10px 14px; margin-bottom: 16px; font-size: 14px;">
+                <div style="background: var(--danger-light); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--danger); padding: 10px 14px; margin-bottom: 16px; font-size: 14px; border-radius: var(--radius);">
                     <?= htmlspecialchars($error) ?>
                 </div>
                 <?php endif; ?>
+
                 <form method="POST" action="/user/dologin" data-ajax="true" id="loginForm">
                     <div class="form-group">
                         <label class="form-label" for="username">用户名 / 邮箱 / 手机号</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名、邮箱或手机号" required data-validate="login">
-                        <div class="form-feedback" id="usernameFeedback"></div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="password">密码</label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" required data-validate="password">
-                        <div class="form-feedback" id="passwordFeedback"></div>
                     </div>
+                    <?php if (!empty($captchaUrl)): ?>
+                    <div class="form-group">
+                        <label class="form-label" for="captcha">验证码</label>
+                        <div class="captcha-row">
+                            <input type="text" class="form-control" id="captcha" name="captcha" placeholder="请输入验证码" required style="flex: 1;">
+                            <img src="<?= htmlspecialchars($captchaUrl) ?>" class="captcha-img" alt="验证码" title="点击刷新">
+                        </div>
+                    </div>
+                    <?php endif; ?>
                     <button type="submit" class="btn btn-primary btn-block">登录</button>
                 </form>
-                <div style="display: flex; justify-content: space-between; margin-top: 16px; font-size: 14px;">
-                    <a href="/register" style="color: #4f8cff;">注册账号</a>
-                    <a href="/" style="color: #687690;">返回首页</a>
+
+                <div class="auth-form-actions">
+                    <a href="/user/register">注册账号</a>
+                    <a href="/">返回首页</a>
+                </div>
+
+                <div class="auth-footer">
+                    还没有账号？ <a href="/user/register" style="color: var(--primary);">立即注册</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="toast-center" id="toastContainer"></div>
-
-    <footer class="site-footer">
-        <div class="container" style="text-align: center;">
-            <p style="margin-bottom: 8px;">&copy; <?= date('Y') ?> <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> All Rights Reserved.</p>
-            <?php if (!empty($siteSettings['icp'])): ?>
-            <p style="color: #687690; font-size: 12px;"><?= htmlspecialchars($siteSettings['icp']) ?></p>
-            <?php endif; ?>
-        </div>
-    </footer>
-
     <script src="/static/js/main.js"></script>
-    <script>
-        document.getElementById('hamburgerBtn').addEventListener('click', function() {
-            document.getElementById('mobileNav').classList.toggle('show');
-        });
-        document.getElementById('announcementLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            var modal = document.getElementById('announcementModal');
-            if (modal) modal.classList.add('show');
-        });
-        var amLinkMobile = document.getElementById('announcementLinkMobile');
-        if (amLinkMobile) {
-            amLinkMobile.addEventListener('click', function(e) {
-                e.preventDefault();
-                var modal = document.getElementById('announcementModal');
-                if (modal) modal.classList.add('show');
-            });
-        }
-    </script>
 </body>
 </html>

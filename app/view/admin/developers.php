@@ -1,100 +1,136 @@
-<h1 class="page-title" style="font-size: 24px; color: #1a1a2e; margin-bottom: 24px;">开发者管理</h1>
-
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
-            <svg width="18" height="18"><use href="#i-code"/></svg>开发者申请列表
-        </h3>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">开发者管理</h1>
+        <div class="page-subtitle">管理平台开发者账户与API权限。</div>
     </div>
-    <?php if (!empty($developers)): ?>
-    <div class="table-wrap">
-        <table class="table">
+    <div class="page-actions">
+        <button class="btn btn-primary" onclick="openDeveloperModal()">
+            <svg width="14" height="14" style="vertical-align:middle;margin-right:4px;"><use href="#i-plus"/></svg>
+            添加开发者
+        </button>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-search-bar">
+        <div class="search-input">
+            <svg><use href="#i-search"/></svg>
+            <input type="text" class="form-control" placeholder="搜索开发者名称、邮箱...">
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="admin-table">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>用户名</th>
-                    <th>真实姓名</th>
-                    <th>申请理由</th>
+                    <th>开发者</th>
+                    <th>邮箱</th>
+                    <th>API Key</th>
                     <th>状态</th>
-                    <th>申请时间</th>
-                    <th>操作</th>
+                    <th>创建时间</th>
+                    <th style="width:180px;">操作</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($developers as $dev): ?>
-                <tr>
-                    <td><?= $dev['id'] ?? '' ?></td>
-                    <td><?= htmlspecialchars($dev['username'] ?? '') ?></td>
-                    <td><?= htmlspecialchars($dev['real_name'] ?? '—') ?></td>
-                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($dev['reason'] ?? '') ?></td>
-                    <td>
-                        <?php $status = $dev['status'] ?? 0; ?>
-                        <span class="badge <?= $status === 1 ? 'badge-success' : ($status === -1 ? 'badge-danger' : 'badge-warning') ?>">
-                            <?= $status === 1 ? '已通过' : ($status === -1 ? '已驳回' : '待审核') ?>
-                        </span>
-                    </td>
-                    <td><?= htmlspecialchars($dev['created_at'] ?? '') ?></td>
-                    <td>
-                        <?php if (($dev['status'] ?? 0) === 0): ?>
-                        <form method="POST" action="/admin/approveDeveloper" data-ajax="true" style="display:inline;">
-                            <input type="hidden" name="id" value="<?= $dev['id'] ?? 0 ?>">
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                <svg width="12" height="12" style="vertical-align: middle;"><use href="#i-check"/></svg> 通过
-                            </button>
-                        </form>
-                        <a href="javascript:void(0)" class="btn btn-sm" style="background: #ff4d4f; color: #fff;" onclick="openRejectModal(<?= $dev['id'] ?? 0 ?>)">
-                            <svg width="12" height="12" style="vertical-align: middle;"><use href="#i-close"/></svg> 驳回
-                        </a>
-                        <?php else: ?>
-                        <span style="color: #687690; font-size: 13px;">—</span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
+                <?php if (!empty($developers)): ?>
+                    <?php foreach ($developers as $dev): ?>
+                    <tr>
+                        <td><?= $dev['id'] ?? '' ?></td>
+                        <td>
+                            <div class="admin-user-cell">
+                                <div class="user-avatar" style="background:linear-gradient(135deg,#13c2c2,#08979c);">
+                                    <?= mb_substr($dev['name'] ?? 'D', 0, 1) ?>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name"><?= htmlspecialchars($dev['name'] ?? '') ?></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-secondary);"><?= htmlspecialchars($dev['email'] ?? '') ?></td>
+                        <td style="font-family:monospace;font-size:12px;background:var(--bg-tertiary);padding:4px 10px;border-radius:var(--radius-sm);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<?= htmlspecialchars($dev['api_key'] ?? '') ?>"><?= htmlspecialchars(mb_substr($dev['api_key'] ?? '', 0, 12)) ?>********</td>
+                        <td>
+                            <?php if (($dev['status'] ?? 0) == 1): ?>
+                                <span class="badge badge-success"><span class="tag-dot"></span>正常</span>
+                            <?php else: ?>
+                                <span class="badge badge-danger"><span class="tag-dot"></span>禁用</span>
+                            <?php endif; ?>
+                        </td>
+                        <td style="font-size:12px;color:var(--text-muted);"><?= htmlspecialchars($dev['created_at'] ?? '') ?></td>
+                        <td>
+                            <div class="admin-actions-cell">
+                                <button class="btn btn-outline btn-sm" onclick="editDeveloper(<?= $dev['id'] ?? 0 ?>, '<?= htmlspecialchars($dev['name'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($dev['email'] ?? '', ENT_QUOTES) ?>', <?= $dev['status'] ?? 1 ?>)">
+                                    <svg width="12" height="12" style="vertical-align:middle;"><use href="#i-edit"/></svg>
+                                    编辑
+                                </button>
+                                <form method="POST" action="/admin/deleteDeveloper" data-ajax="true" style="display:inline;" onsubmit="return confirm('确认删除该开发者？');">
+                                    <input type="hidden" name="id" value="<?= $dev['id'] ?? 0 ?>">
+                                    <button type="submit" class="btn btn-sm" style="background:var(--danger);color:#fff;">
+                                        <svg width="12" height="12" style="vertical-align:middle;"><use href="#i-trash"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr><td colspan="7"><div class="empty-state"><div class="empty-icon"><svg><use href="#i-user"/></svg></div><div class="empty-text">暂无开发者数据</div></div></td></tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
-    <?php else: ?>
-    <div class="empty-state" style="text-align: center; padding: 60px; color: #687690;">暂无开发者申请数据</div>
-    <?php endif; ?>
 </div>
 
-<?php if (($totalPages ?? 1) > 1): ?>
-<div class="pagination">
-    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-    <a href="?page=<?= $i ?>" class="<?= ($page ?? 1) == $i ? 'active' : '' ?>"><?= $i ?></a>
-    <?php endfor; ?>
-</div>
-<?php endif; ?>
-
-<!-- Reject Modal -->
-<div class="announcement-modal" id="rejectModal">
-    <div class="am-overlay" onclick="closeRejectModal()"></div>
-    <div class="am-dialog" style="max-width: 460px;">
-        <div class="am-header">
-            <h3>驳回申请</h3>
-            <button class="am-close" onclick="closeRejectModal()"><svg width="18" height="18"><use href="#i-close"/></svg></button>
+<div class="admin-modal-overlay" id="developerModal">
+    <div class="admin-modal">
+        <div class="admin-modal-header">
+            <h3 id="developerModalTitle">添加开发者</h3>
+            <button class="admin-modal-close" onclick="closeDeveloperModal()"><svg width="18" height="18"><use href="#i-close"/></svg></button>
         </div>
-        <div class="am-body">
-            <form method="POST" action="/admin/rejectDeveloper" data-ajax="true" id="rejectForm">
-                <input type="hidden" name="id" id="reject_id">
-                <div class="form-group">
-                    <label class="form-label" for="reject_reason">驳回理由</label>
-                    <textarea class="form-control textarea" id="reject_reason" name="reason" rows="4" placeholder="请输入驳回理由" required></textarea>
+        <div class="admin-modal-body">
+            <form method="POST" action="/admin/addDeveloper" data-ajax="true" id="developerForm">
+                <input type="hidden" name="id" id="dev_id">
+                <div class="admin-form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">开发者名称</label>
+                        <input type="text" class="form-control" name="name" id="dev_name" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">邮箱</label>
+                        <input type="email" class="form-control" name="email" id="dev_email" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">状态</label>
+                        <select class="form-control" name="status" id="dev_status">
+                            <option value="1">正常</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-danger btn-block">确认驳回</button>
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">保存</button>
             </form>
         </div>
     </div>
 </div>
 
 <script>
-function openRejectModal(id) {
-    document.getElementById('reject_id').value = id;
-    document.getElementById('reject_reason').value = '';
-    document.getElementById('rejectModal').classList.add('show');
+function openDeveloperModal(){
+    document.getElementById('dev_id').value = '';
+    document.getElementById('dev_name').value = '';
+    document.getElementById('dev_email').value = '';
+    document.getElementById('dev_status').value = '1';
+    document.getElementById('developerModalTitle').textContent = '添加开发者';
+    document.getElementById('developerForm').action = '/admin/addDeveloper';
+    document.getElementById('developerModal').classList.add('show');
 }
-function closeRejectModal() {
-    document.getElementById('rejectModal').classList.remove('show');
+function editDeveloper(id, name, email, status){
+    document.getElementById('dev_id').value = id;
+    document.getElementById('dev_name').value = name;
+    document.getElementById('dev_email').value = email;
+    document.getElementById('dev_status').value = status;
+    document.getElementById('developerModalTitle').textContent = '编辑开发者';
+    document.getElementById('developerForm').action = '/admin/editDeveloper';
+    document.getElementById('developerModal').classList.add('show');
 }
+function closeDeveloperModal(){ document.getElementById('developerModal').classList.remove('show'); }
 </script>

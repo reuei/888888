@@ -5,11 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? '用户中心') ?> - <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .uc-layout { display: flex; min-height: calc(100vh - 64px); }
+        .uc-sidebar { width: 248px; background: var(--bg-elevated); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; }
+        .uc-sidebar-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border-light); }
+        .uc-user-card { display: flex; align-items: center; gap: 12px; }
+        .uc-avatar { width: 44px; height: 44px; border-radius: 12px; background: var(--primary-gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; flex-shrink: 0; }
+        .uc-user-info { flex: 1; min-width: 0; }
+        .uc-user-name { font-size: 14px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .uc-user-email { font-size: 12px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .uc-sidebar-nav { flex: 1; padding: 12px; overflow-y: auto; }
+        .uc-nav-group { margin-bottom: 8px; }
+        .uc-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s ease; text-decoration: none; position: relative; }
+        .uc-nav-item:hover { background: var(--bg-hover); color: var(--text); }
+        .uc-nav-item.active { background: var(--primary-gradient); color: #fff; box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.3); }
+        .uc-nav-item.active svg { color: #fff; }
+        .uc-nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-muted); }
+        .uc-nav-item:hover .uc-nav-icon { color: var(--primary); }
+        .uc-nav-badge { margin-left: auto; background: var(--danger); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center; line-height: 1.2; }
+        .uc-nav-submenu { display: none; padding-left: 32px; margin-top: 4px; }
+        .uc-nav-submenu.open { display: block; }
+        .uc-nav-submenu .uc-nav-item { padding: 8px 12px; font-size: 13px; }
+        .uc-nav-submenu .uc-nav-item .uc-nav-icon { width: 16px; height: 16px; }
+        .uc-nav-toggle { margin-left: auto; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+        .uc-nav-parent.open .uc-nav-toggle { transform: rotate(90deg); }
+        .uc-nav-children { display: none; }
+        .uc-nav-parent.has-submenu.open ~ .uc-nav-children,
+        .uc-nav-parent.open + .uc-nav-children { display: block; }
+        .uc-sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); }
+        .uc-sidebar-footer-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px; border-radius: 8px; background: var(--danger-light); color: var(--danger); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; text-decoration: none; }
+        .uc-sidebar-footer-btn:hover { opacity: 0.9; }
+        .uc-content { flex: 1; padding: 24px; max-width: calc(100% - 248px); }
+        .uc-page-header { margin-bottom: 24px; }
+        .uc-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        .uc-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+        .uc-breadcrumb a:hover { color: var(--primary); }
+        .uc-breadcrumb .separator { color: var(--border-strong); }
+        .uc-breadcrumb .current { color: var(--text); }
+        .uc-page-title { font-size: 24px; font-weight: 700; color: var(--text); margin: 0; letter-spacing: -0.02em; }
+        .uc-page-subtitle { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+        .uc-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 10px; box-shadow: var(--shadow-lg); z-index: 1000; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; animation: ucToastIn 0.3s ease; }
+        .uc-toast-success { background: var(--success); color: #fff; }
+        .uc-toast-error { background: var(--danger); color: #fff; }
+        .uc-toast-warning { background: var(--warning); color: #fff; }
+        .uc-toast-info { background: var(--info); color: #fff; }
+        @keyframes ucToastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .uc-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; opacity: 0; transition: opacity 0.3s; }
+        .uc-sidebar-overlay.show { display: block; opacity: 1; }
+        @media (max-width: 768px) {
+            .uc-sidebar { position: fixed; left: -260px; top: 0; z-index: 300; transition: left 0.3s ease; height: 100vh; }
+            .uc-sidebar.show { left: 0; }
+            .uc-content { max-width: 100%; padding: 16px; }
+            .uc-mobile-menu-btn { display: flex; }
+            .uc-sidebar-header { padding-top: 60px; }
+        }
+        .uc-mobile-menu-btn { display: none; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: var(--bg-hover); color: var(--text); cursor: pointer; }
+        .uc-mobile-menu-btn:hover { background: var(--primary-50); color: var(--primary); }
+        .uc-mobile-header { display: none; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-elevated); border-bottom: 1px solid var(--border); }
+        .uc-mobile-header-title { font-size: 16px; font-weight: 600; color: var(--text); }
+        @media (max-width: 768px) {
+            .uc-mobile-header { display: flex; position: sticky; top: 0; z-index: 150; }
+            .uc-page-header { display: none; }
+            .uc-content { padding-top: 0; }
+        }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s; }
+        .stat-card:hover { box-shadow: var(--shadow-md); border-color: var(--primary); }
+        .stat-card .stat-icon-box { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .stat-card .stat-value { font-size: 28px; font-weight: 700; color: var(--text); }
+        .stat-card .stat-label { font-size: 13px; color: var(--text-secondary); }
+        .stat-card.accent-blue .stat-icon-box { background: var(--primary-50); color: var(--primary); }
+        .stat-card.accent-green .stat-icon-box { background: var(--success-light); color: var(--success); }
+        .stat-card.accent-orange .stat-icon-box { background: var(--warning-light); color: var(--warning); }
+        .stat-card.accent-purple .stat-icon-box { background: var(--accent); color: #fff; }
+        .quick-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .welcome-banner { background: var(--primary-gradient); border-radius: var(--radius-lg); padding: 28px; color: #fff; margin-bottom: 24px; position: relative; overflow: hidden; }
+        .welcome-banner::before { content: ''; position: absolute; top: -50%; right: -20%; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+        .welcome-banner h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; position: relative; z-index: 1; }
+        .welcome-banner p { opacity: 0.9; font-size: 14px; position: relative; z-index: 1; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .price-tag { font-size: 24px; font-weight: 700; }
+        .price-free { color: var(--success); }
+        .price-paid { color: var(--danger); }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-state-icon { width: 64px; height: 64px; margin: 0 auto 16px; background: var(--bg-tertiary); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+        .empty-state-text { font-size: 14px; margin-bottom: 16px; }
+        .filter-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .filter-search { flex: 1; min-width: 200px; position: relative; }
+        .filter-search input { width: 100%; padding: 10px 14px 10px 40px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-card); font-size: 14px; color: var(--text); outline: none; transition: border-color 0.15s; }
+        .filter-search input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-100); }
+        .filter-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .filter-tabs { display: flex; gap: 4px; background: var(--bg-tertiary); padding: 4px; border-radius: var(--radius); }
+        .filter-tab { padding: 6px 14px; font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: calc(var(--radius) - 2px); cursor: pointer; transition: all 0.15s; text-decoration: none; }
+        .filter-tab:hover { color: var(--text); }
+        .filter-tab.active { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-xs); }
+        .form-section { margin-bottom: 32px; }
+        .form-section-title { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+        .message-list .message-item { padding: 16px 0; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background 0.15s; }
+        .message-list .message-item:last-child { border-bottom: none; }
+        .message-list .message-item:hover { background: var(--bg-hover); margin: 0 -16px; padding: 16px; border-radius: var(--radius); }
+        .message-item-row { display: flex; align-items: flex-start; gap: 12px; }
+        .message-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); flex-shrink: 0; margin-top: 6px; }
+        .message-dot.read { background: var(--border-strong); }
+        .message-content { flex: 1; min-width: 0; }
+        .message-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+        .message-preview { font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .message-time { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+        .message-full-content { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light); font-size: 14px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
+        .feedback-item { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; }
+        .feedback-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .feedback-content { color: var(--text); font-size: 14px; line-height: 1.7; margin-bottom: 12px; white-space: pre-wrap; }
+        .feedback-reply { background: var(--primary-50); border-left: 3px solid var(--primary); padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; }
+        .feedback-reply-title { font-size: 12px; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+        .feedback-reply-content { font-size: 13px; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; }
+        .payment-option { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s; }
+        .payment-option:hover { border-color: var(--primary); background: var(--primary-50); }
+        .payment-option.selected { border-color: var(--primary); background: var(--primary-50); }
+        .payment-option input[type="radio"] { accent-color: var(--primary); }
+        .payment-option-info { flex: 1; }
+        .payment-option-name { font-size: 14px; font-weight: 500; color: var(--text); }
+        .payment-option-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .buy-summary-card { background: var(--primary-gradient); border-radius: var(--radius-lg); padding: 28px; color: #fff; text-align: center; }
+        .buy-summary-product { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .buy-summary-price { font-size: 32px; font-weight: 700; margin-bottom: 16px; }
+        .buy-summary-user { display: flex; justify-content: space-around; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2); }
+        .buy-summary-user-item .label { font-size: 12px; opacity: 0.8; }
+        .buy-summary-user-item .value { font-size: 14px; font-weight: 600; margin-top: 4px; }
+    </style>
 </head>
 <body>
-    <!-- ==========================================================================
-         SVG ICON DEFINITIONS
-         ========================================================================== -->
     <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
@@ -59,12 +185,14 @@
             <symbol id="i-dev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
             <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
             <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+            <symbol id="i-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></symbol>
+            <symbol id="i-credit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></symbol>
+            <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+            <symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+            <symbol id="i-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
         </defs>
     </svg>
 
-    <!-- ==========================================================================
-         HEADER
-         ========================================================================== -->
     <header class="site-header">
         <div class="header-inner container">
             <a href="/" class="logo">
@@ -138,268 +266,154 @@
         </div>
     </header>
 
-    <!-- ==========================================================================
-         HAMBURGER OVERLAY
-         ========================================================================== -->
-    <div class="hamburger-overlay" id="hamburgerOverlay"></div>
+    <div class="uc-mobile-header">
+        <button class="uc-mobile-menu-btn" id="mobileMenuBtn">
+            <svg width="20" height="20"><use href="#i-menu"/></svg>
+        </button>
+        <span class="uc-mobile-header-title"><?= htmlspecialchars($pageTitle ?? '用户中心') ?></span>
+    </div>
 
-    <!-- ==========================================================================
-         HAMBURGER SIDEBAR (Mobile)
-         ========================================================================== -->
-    <aside class="hamburger-sidebar" id="hamburgerSidebar">
-        <div class="icon-rail">
-            <div class="menu-item">
-                <a href="/user/dashboard" class="menu-link<?= ($activeMenu ?? '') === 'dashboard' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-home"/></svg>
-                    <span>用户中心</span>
-                </a>
+    <div class="uc-layout">
+        <div class="uc-sidebar-overlay" id="ucSidebarOverlay"></div>
+        <aside class="uc-sidebar" id="ucSidebar">
+            <div class="uc-sidebar-header">
+                <div class="uc-user-card">
+                    <div class="uc-avatar"><?= mb_strtoupper(mb_substr($user['email'] ?? 'U', 0, 1)) ?></div>
+                    <div class="uc-user-info">
+                        <div class="uc-user-name"><?= htmlspecialchars($user['username'] ?? '') ?></div>
+                        <div class="uc-user-email"><?= htmlspecialchars($user['email'] ?? '') ?></div>
+                    </div>
+                </div>
             </div>
-            <div class="menu-item">
-                <a href="/user/workplace" class="menu-link<?= ($activeMenu ?? '') === 'workplace' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-platform"/></svg>
-                    <span>工作台</span>
-                </a>
-            </div>
-            <div class="menu-item">
-                <a href="/user/products" class="menu-link<?= ($activeMenu ?? '') === 'products' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-box"/></svg>
-                    <span>产品中心</span>
-                </a>
-            </div>
-            <div class="menu-item">
-                <a href="/user/my-products" class="menu-link<?= ($activeMenu ?? '') === 'myProducts' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-key"/></svg>
-                    <span>我的产品</span>
-                </a>
-            </div>
-            <div class="menu-item">
-                <a href="/user/orders" class="menu-link<?= ($activeMenu ?? '') === 'orders' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-orders"/></svg>
-                    <span>我的订单</span>
-                </a>
-            </div>
-            <div class="menu-item">
-                <a href="/user/balance" class="menu-link<?= ($activeMenu ?? '') === 'balance' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-wallet"/></svg>
-                    <span>余额管理</span>
-                </a>
-            </div>
-            <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['balance-logs', 'login-logs', 'operation-logs']) ? ' open' : '' ?>">
-                <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
-                    <svg width="18" height="18"><use href="#i-log"/></svg>
-                    <span>站点日志</span>
-                    <span class="submenu-toggle">
-                        <svg width="12" height="12"><use href="#i-chevron"/></svg>
-                    </span>
-                </a>
-                <ul class="submenu">
-                    <li class="submenu-item">
-                        <a href="/user/balance-logs" class="menu-link<?= ($activeMenu ?? '') === 'balance-logs' ? ' active' : '' ?>">
-                            <span>余额明细</span>
-                        </a>
-                    </li>
-                    <li class="submenu-item">
-                        <a href="/user/login-logs" class="menu-link<?= ($activeMenu ?? '') === 'login-logs' ? ' active' : '' ?>">
-                            <span>登录日志</span>
-                        </a>
-                    </li>
-                    <li class="submenu-item">
-                        <a href="/user/operation-logs" class="menu-link<?= ($activeMenu ?? '') === 'operation-logs' ? ' active' : '' ?>">
-                            <span>操作日志</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['settings', 'rebind']) ? ' open' : '' ?>">
-                <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
-                    <svg width="18" height="18"><use href="#i-settings"/></svg>
-                    <span>账户设置</span>
-                    <span class="submenu-toggle">
-                        <svg width="12" height="12"><use href="#i-chevron"/></svg>
-                    </span>
-                </a>
-                <ul class="submenu">
-                    <li class="submenu-item">
-                        <a href="/user/settings" class="menu-link<?= ($activeMenu ?? '') === 'settings' ? ' active' : '' ?>">
-                            <span>基本设置</span>
-                        </a>
-                    </li>
-                    <li class="submenu-item">
-                        <a href="/user/rebind" class="menu-link<?= ($activeMenu ?? '') === 'rebind' ? ' active' : '' ?>">
-                            <span>换绑信息</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="menu-item">
-                <a href="/user/messages" class="menu-link<?= ($activeMenu ?? '') === 'messages' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-message"/></svg>
-                    <span>消息中心</span>
-                    <?php if (($unreadCount ?? 0) > 0): ?>
-                    <span class="badge badge-danger" style="margin-left: auto; font-size: 10px; min-width: 18px; height: 18px; padding: 0 5px;"><?= ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) ?></span>
-                    <?php endif; ?>
-                </a>
-            </div>
-            <div class="menu-item">
-                <a href="/user/plugin-market" class="menu-link<?= ($activeMenu ?? '') === 'plugin-market' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-plugin"/></svg>
-                    <span>插件市场</span>
-                </a>
-            </div>
-            <?php if (($user['is_developer'] ?? 0) == 1): ?>
-            <div class="menu-item">
-                <a href="/user/developer" class="menu-link<?= ($activeMenu ?? '') === 'developer' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-dev"/></svg>
-                    <span>开发者选项</span>
-                </a>
-            </div>
-            <?php endif; ?>
-            <div class="menu-item">
-                <a href="/user/feedback" class="menu-link<?= ($activeMenu ?? '') === 'feedback' ? ' active' : '' ?>">
-                    <svg width="18" height="18"><use href="#i-feedback"/></svg>
-                    <span>意见反馈</span>
-                </a>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ==========================================================================
-         USER LAYOUT (Desktop Sidebar + Content)
-         ========================================================================== -->
-    <div class="user-layout">
-        <aside class="user-sidebar" id="userSidebar">
-            <div class="icon-rail">
-                <div class="menu-item">
-                    <a href="/user/dashboard" class="menu-link<?= ($activeMenu ?? '') === 'dashboard' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-home"/></svg>
+            <nav class="uc-sidebar-nav">
+                <div class="uc-nav-group">
+                    <a href="/user/dashboard" class="uc-nav-item<?= ($activeMenu ?? '') === 'dashboard' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-home"/></svg></span>
                         <span>用户中心</span>
                     </a>
-                </div>
-                <div class="menu-item">
-                    <a href="/user/workplace" class="menu-link<?= ($activeMenu ?? '') === 'workplace' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-platform"/></svg>
+                    <a href="/user/workplace" class="uc-nav-item<?= ($activeMenu ?? '') === 'workplace' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-platform"/></svg></span>
                         <span>工作台</span>
                     </a>
-                </div>
-                <div class="menu-item">
-                    <a href="/user/products" class="menu-link<?= ($activeMenu ?? '') === 'products' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-box"/></svg>
+                    <a href="/user/products" class="uc-nav-item<?= ($activeMenu ?? '') === 'products' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-box"/></svg></span>
                         <span>产品中心</span>
                     </a>
-                </div>
-                <div class="menu-item">
-                    <a href="/user/my-products" class="menu-link<?= ($activeMenu ?? '') === 'myProducts' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-key"/></svg>
+                    <a href="/user/my-products" class="uc-nav-item<?= ($activeMenu ?? '') === 'myProducts' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-key"/></svg></span>
                         <span>我的产品</span>
                     </a>
-                </div>
-                <div class="menu-item">
-                    <a href="/user/orders" class="menu-link<?= ($activeMenu ?? '') === 'orders' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-orders"/></svg>
+                    <a href="/user/orders" class="uc-nav-item<?= ($activeMenu ?? '') === 'orders' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-orders"/></svg></span>
                         <span>我的订单</span>
                     </a>
-                </div>
-                <div class="menu-item">
-                    <a href="/user/balance" class="menu-link<?= ($activeMenu ?? '') === 'balance' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-wallet"/></svg>
+                    <a href="/user/balance" class="uc-nav-item<?= ($activeMenu ?? '') === 'balance' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-wallet"/></svg></span>
                         <span>余额管理</span>
                     </a>
                 </div>
-                <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['balance-logs', 'login-logs', 'operation-logs']) ? ' open' : '' ?>">
-                    <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
-                        <svg width="18" height="18"><use href="#i-log"/></svg>
+                <div class="uc-nav-group">
+                    <div class="uc-nav-item uc-nav-parent has-submenu<?= in_array($activeMenu ?? '', ['balance-logs', 'login-logs', 'operation-logs']) ? ' open' : '' ?>" onclick="toggleSubmenu(this)">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-log"/></svg></span>
                         <span>站点日志</span>
-                        <span class="submenu-toggle">
-                            <svg width="12" height="12"><use href="#i-chevron"/></svg>
-                        </span>
-                    </a>
-                    <ul class="submenu">
-                        <li class="submenu-item">
-                            <a href="/user/balance-logs" class="menu-link<?= ($activeMenu ?? '') === 'balance-logs' ? ' active' : '' ?>">
-                                <span>余额明细</span>
-                            </a>
-                        </li>
-                        <li class="submenu-item">
-                            <a href="/user/login-logs" class="menu-link<?= ($activeMenu ?? '') === 'login-logs' ? ' active' : '' ?>">
-                                <span>登录日志</span>
-                            </a>
-                        </li>
-                        <li class="submenu-item">
-                            <a href="/user/operation-logs" class="menu-link<?= ($activeMenu ?? '') === 'operation-logs' ? ' active' : '' ?>">
-                                <span>操作日志</span>
-                            </a>
-                        </li>
-                    </ul>
+                        <span class="uc-nav-toggle"><svg width="16" height="16"><use href="#i-chevron"/></svg></span>
+                    </div>
+                    <div class="uc-nav-children" style="<?= in_array($activeMenu ?? '', ['balance-logs', 'login-logs', 'operation-logs']) ? 'display: block;' : '' ?>">
+                        <a href="/user/balance-logs" class="uc-nav-item<?= ($activeMenu ?? '') === 'balance-logs' ? ' active' : '' ?>">
+                            <span class="uc-nav-icon"><svg width="16" height="16"><use href="#i-wallet"/></svg></span>
+                            <span>余额明细</span>
+                        </a>
+                        <a href="/user/login-logs" class="uc-nav-item<?= ($activeMenu ?? '') === 'login-logs' ? ' active' : '' ?>">
+                            <span class="uc-nav-icon"><svg width="16" height="16"><use href="#i-user"/></svg></span>
+                            <span>登录日志</span>
+                        </a>
+                        <a href="/user/operation-logs" class="uc-nav-item<?= ($activeMenu ?? '') === 'operation-logs' ? ' active' : '' ?>">
+                            <span class="uc-nav-icon"><svg width="16" height="16"><use href="#i-doc"/></svg></span>
+                            <span>操作日志</span>
+                        </a>
+                    </div>
                 </div>
-                <div class="menu-item has-submenu<?= in_array($activeMenu ?? '', ['settings', 'rebind']) ? ' open' : '' ?>">
-                    <a href="javascript:void(0)" class="menu-link submenu-parent" onclick="toggleSubmenu(this)">
-                        <svg width="18" height="18"><use href="#i-settings"/></svg>
+                <div class="uc-nav-group">
+                    <div class="uc-nav-item uc-nav-parent has-submenu<?= in_array($activeMenu ?? '', ['settings', 'rebind']) ? ' open' : '' ?>" onclick="toggleSubmenu(this)">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-settings"/></svg></span>
                         <span>账户设置</span>
-                        <span class="submenu-toggle">
-                            <svg width="12" height="12"><use href="#i-chevron"/></svg>
-                        </span>
-                    </a>
-                    <ul class="submenu">
-                        <li class="submenu-item">
-                            <a href="/user/settings" class="menu-link<?= ($activeMenu ?? '') === 'settings' ? ' active' : '' ?>">
-                                <span>基本设置</span>
-                            </a>
-                        </li>
-                        <li class="submenu-item">
-                            <a href="/user/rebind" class="menu-link<?= ($activeMenu ?? '') === 'rebind' ? ' active' : '' ?>">
-                                <span>换绑信息</span>
-                            </a>
-                        </li>
-                    </ul>
+                        <span class="uc-nav-toggle"><svg width="16" height="16"><use href="#i-chevron"/></svg></span>
+                    </div>
+                    <div class="uc-nav-children" style="<?= in_array($activeMenu ?? '', ['settings', 'rebind']) ? 'display: block;' : '' ?>">
+                        <a href="/user/settings" class="uc-nav-item<?= ($activeMenu ?? '') === 'settings' ? ' active' : '' ?>">
+                            <span class="uc-nav-icon"><svg width="16" height="16"><use href="#i-user"/></svg></span>
+                            <span>基本设置</span>
+                        </a>
+                        <a href="/user/rebind" class="uc-nav-item<?= ($activeMenu ?? '') === 'rebind' ? ' active' : '' ?>">
+                            <span class="uc-nav-icon"><svg width="16" height="16"><use href="#i-key"/></svg></span>
+                            <span>换绑信息</span>
+                        </a>
+                    </div>
                 </div>
-                <div class="menu-item">
-                    <a href="/user/messages" class="menu-link<?= ($activeMenu ?? '') === 'messages' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-message"/></svg>
+                <div class="uc-nav-group">
+                    <a href="/user/messages" class="uc-nav-item<?= ($activeMenu ?? '') === 'messages' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-message"/></svg></span>
                         <span>消息中心</span>
                         <?php if (($unreadCount ?? 0) > 0): ?>
-                        <span class="badge badge-danger" style="margin-left: auto; font-size: 10px; min-width: 18px; height: 18px; padding: 0 5px;"><?= ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) ?></span>
+                        <span class="uc-nav-badge"><?= ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) ?></span>
                         <?php endif; ?>
                     </a>
-                </div>
-                <div class="menu-item">
-                    <a href="/user/plugin-market" class="menu-link<?= ($activeMenu ?? '') === 'plugin-market' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-plugin"/></svg>
+                    <a href="/user/plugin-market" class="uc-nav-item<?= ($activeMenu ?? '') === 'plugin-market' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-plugin"/></svg></span>
                         <span>插件市场</span>
                     </a>
-                </div>
-                <?php if (($user['is_developer'] ?? 0) == 1): ?>
-                <div class="menu-item">
-                    <a href="/user/developer" class="menu-link<?= ($activeMenu ?? '') === 'developer' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-dev"/></svg>
+                    <?php if (($user['is_developer'] ?? 0) == 1): ?>
+                    <a href="/user/developer" class="uc-nav-item<?= ($activeMenu ?? '') === 'developer' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-dev"/></svg></span>
                         <span>开发者选项</span>
                     </a>
-                </div>
-                <?php endif; ?>
-                <div class="menu-item">
-                    <a href="/user/feedback" class="menu-link<?= ($activeMenu ?? '') === 'feedback' ? ' active' : '' ?>">
-                        <svg width="18" height="18"><use href="#i-feedback"/></svg>
+                    <?php endif; ?>
+                    <a href="/user/feedback" class="uc-nav-item<?= ($activeMenu ?? '') === 'feedback' ? ' active' : '' ?>">
+                        <span class="uc-nav-icon"><svg width="20" height="20"><use href="#i-feedback"/></svg></span>
                         <span>意见反馈</span>
                     </a>
                 </div>
+            </nav>
+            <div class="uc-sidebar-footer">
+                <a href="/user/logout" class="uc-sidebar-footer-btn">
+                    <svg width="16" height="16"><use href="#i-logout"/></svg>
+                    <span>退出登录</span>
+                </a>
             </div>
         </aside>
 
-        <!-- ==================================================================
-             MAIN CONTENT
-             ================================================================== -->
-        <main class="user-content">
+        <main class="uc-content">
+            <div class="uc-page-header">
+                <div class="uc-breadcrumb">
+                    <a href="/user/dashboard">用户中心</a>
+                    <?php if (!empty($breadcrumb)): ?>
+                        <?php foreach ($breadcrumb as $crumb): ?>
+                            <span class="separator">/</span>
+                            <?php if (isset($crumb['url'])): ?>
+                                <a href="<?= $crumb['url'] ?>"><?= htmlspecialchars($crumb['label']) ?></a>
+                            <?php else: ?>
+                                <span class="current"><?= htmlspecialchars($crumb['label']) ?></span>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <span class="separator">/</span>
+                        <span class="current"><?= htmlspecialchars($pageTitle ?? '首页') ?></span>
+                    <?php endif; ?>
+                </div>
+                <h1 class="uc-page-title"><?= htmlspecialchars($pageTitle ?? '用户中心') ?></h1>
+            </div>
+
             <?php if (isset($toast)): ?>
-            <div class="toast toast-<?= $toast['type'] ?? 'success' ?> show">
+            <div class="uc-toast uc-toast-<?= $toast['type'] ?? 'success' ?>">
+                <svg width="16" height="16"><use href="#i-<?= $toast['type'] ?? 'check' ?>"/></svg>
                 <?= htmlspecialchars($toast['message'] ?? '') ?>
             </div>
             <?php endif; ?>
+
             <?= $content ?>
         </main>
     </div>
 
-    <!-- ==========================================================================
-         ANNOUNCEMENT MODAL
-         ========================================================================== -->
     <?php if (!empty($siteSettings['announcement'])): ?>
     <div class="announcement-modal" id="announcementModal">
         <div class="am-overlay"></div>
@@ -418,14 +432,8 @@
     </div>
     <?php endif; ?>
 
-    <!-- ==========================================================================
-         TOAST CONTAINER
-         ========================================================================== -->
     <div class="toast-center" id="toastContainer"></div>
 
-    <!-- ==========================================================================
-         FOOTER
-         ========================================================================== -->
     <footer class="site-footer">
         <div class="container">
             <p style="margin-bottom: 8px;">© <?= date('Y') ?> <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> All Rights Reserved.</p>
@@ -435,113 +443,111 @@
         </div>
     </footer>
 
-    <!-- ==========================================================================
-         SCRIPTS
-         ========================================================================== -->
     <script src="/static/js/main.js"></script>
     <script>
-    (function() {
-        'use strict';
-
-        // ======================================================================
-        // Theme Toggle
-        // ======================================================================
-        var themeBtn = document.getElementById('themeToggle');
-        var themeIcon = document.getElementById('themeIcon');
-        if (themeBtn && themeIcon) {
-            themeBtn.addEventListener('click', function() {
-                var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                if (isDark) {
-                    document.documentElement.removeAttribute('data-theme');
-                    themeIcon.innerHTML = '<use href="#i-moon"/>';
-                    localStorage.setItem('theme', 'light');
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    themeIcon.innerHTML = '<use href="#i-sun"/>';
-                    localStorage.setItem('theme', 'dark');
-                }
-            });
-            var savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeIcon.innerHTML = '<use href="#i-sun"/>';
+        function toggleSubmenu(el) {
+            var parent = el;
+            parent.classList.toggle('open');
+            var children = parent.nextElementSibling;
+            if (children && children.classList.contains('uc-nav-children')) {
+                children.style.display = parent.classList.contains('open') ? 'block' : 'none';
             }
         }
 
-        // ======================================================================
-        // Announcement Modal
-        // ======================================================================
-        var annModal = document.getElementById('announcementModal');
-        if (annModal) {
-            var annClose = document.getElementById('amCloseBtn');
-            var annConfirm = document.getElementById('amConfirmBtn');
-            var annDismissed = localStorage.getItem('announcementDismissed');
-            if (!annDismissed) {
-                annModal.classList.add('show');
-            }
-            function dismissAnnouncement() {
-                annModal.classList.remove('show');
-                localStorage.setItem('announcementDismissed', '1');
-            }
-            if (annClose) annClose.addEventListener('click', dismissAnnouncement);
-            if (annConfirm) annConfirm.addEventListener('click', dismissAnnouncement);
-        }
+        (function() {
+            var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            var hamburgerBtn = document.getElementById('hamburgerBtn');
+            var sidebar = document.getElementById('ucSidebar');
+            var overlay = document.getElementById('ucSidebarOverlay');
 
-        // ======================================================================
-        // Message Bell Dropdown
-        // ======================================================================
-        var bellBtn = document.getElementById('bellBtn');
-        var msgDropdown = document.getElementById('messageDropdown');
-        if (bellBtn && msgDropdown) {
-            bellBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                var isVisible = msgDropdown.style.display === 'block';
-                msgDropdown.style.display = isVisible ? 'none' : 'block';
-            });
-            document.addEventListener('click', function(e) {
-                if (!msgDropdown.contains(e.target) && e.target !== bellBtn && !bellBtn.contains(e.target)) {
-                    msgDropdown.style.display = 'none';
-                }
-            });
-        }
+            function openSidebar() {
+                sidebar.classList.add('show');
+                overlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
 
-        // ======================================================================
-        // Hamburger Menu Toggle
-        // ======================================================================
-        var hamburgerBtn = document.getElementById('hamburgerBtn');
-        var hamburgerSidebar = document.getElementById('hamburgerSidebar');
-        var hamburgerOverlay = document.getElementById('hamburgerOverlay');
-        if (hamburgerBtn && hamburgerSidebar && hamburgerOverlay) {
-            function openHamburger() {
-                hamburgerSidebar.classList.add('show');
-                hamburgerOverlay.classList.add('show');
-                hamburgerBtn.classList.add('open');
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
             }
-            function closeHamburger() {
-                hamburgerSidebar.classList.remove('show');
-                hamburgerOverlay.classList.remove('show');
-                hamburgerBtn.classList.remove('open');
-            }
-            hamburgerBtn.addEventListener('click', function() {
-                if (hamburgerSidebar.classList.contains('show')) {
-                    closeHamburger();
-                } else {
-                    openHamburger();
-                }
-            });
-            hamburgerOverlay.addEventListener('click', closeHamburger);
-        }
 
-        // ======================================================================
-        // Submenu Toggle
-        // ======================================================================
-        window.toggleSubmenu = function(el) {
-            var parent = el.closest('.has-submenu');
-            if (parent) {
-                parent.classList.toggle('open');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    openSidebar();
+                });
             }
-        };
-    })();
+
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', function() {
+                    openSidebar();
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    closeSidebar();
+                });
+            }
+
+            var mdOverlay = document.querySelector('.hamburger-overlay');
+            var mdSidebar = document.getElementById('hamburgerSidebar');
+            var mdBtn = document.getElementById('bellBtn');
+            var mdDropdown = document.getElementById('messageDropdown');
+
+            if (mdBtn && mdDropdown) {
+                mdBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    mdDropdown.style.display = mdDropdown.style.display === 'block' ? 'none' : 'block';
+                });
+                document.addEventListener('click', function(e) {
+                    if (!mdDropdown.contains(e.target)) {
+                        mdDropdown.style.display = 'none';
+                    }
+                });
+            }
+
+            var themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    var currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                    var newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    var themeIcon = document.getElementById('themeIcon');
+                    if (themeIcon) {
+                        themeIcon.innerHTML = newTheme === 'dark'
+                            ? '<use href="#i-sun"/>'
+                            : '<use href="#i-moon"/>';
+                    }
+                    try {
+                        localStorage.setItem('theme', newTheme);
+                    } catch(e) {}
+                });
+                try {
+                    var savedTheme = localStorage.getItem('theme');
+                    if (savedTheme) {
+                        document.documentElement.setAttribute('data-theme', savedTheme);
+                        var themeIcon = document.getElementById('themeIcon');
+                        if (themeIcon) {
+                            themeIcon.innerHTML = savedTheme === 'dark'
+                                ? '<use href="#i-sun"/>'
+                                : '<use href="#i-moon"/>';
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            var amModal = document.getElementById('announcementModal');
+            if (amModal) {
+                var amCloseBtn = document.getElementById('amCloseBtn');
+                var amConfirmBtn = document.getElementById('amConfirmBtn');
+                var amOverlay = amModal.querySelector('.am-overlay');
+                amModal.classList.add('show');
+                if (amCloseBtn) amCloseBtn.addEventListener('click', function() { amModal.classList.remove('show'); });
+                if (amConfirmBtn) amConfirmBtn.addEventListener('click', function() { amModal.classList.remove('show'); });
+                if (amOverlay) amOverlay.addEventListener('click', function() { amModal.classList.remove('show'); });
+            }
+        })();
     </script>
 </body>
 </html>

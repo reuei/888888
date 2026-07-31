@@ -1,129 +1,113 @@
-<h1 class="page-title" style="font-size: 24px; color: #1a1a2e; margin-bottom: 24px;">插件管理</h1>
-
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
-            <svg width="18" height="18"><use href="#i-puzzle"/></svg>插件列表
-        </h3>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">插件管理</h1>
+        <div class="page-subtitle">管理系统中安装的插件与扩展模块。</div>
     </div>
-    <?php if (!empty($plugins)): ?>
-    <div class="table-wrap">
-        <table class="table">
+    <div class="page-actions">
+        <button class="btn btn-primary" onclick="openPluginModal()">
+            <svg width="14" height="14" style="vertical-align:middle;margin-right:4px;"><use href="#i-plus"/></svg>
+            安装插件
+        </button>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="table-responsive">
+        <table class="admin-table">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>名称</th>
-                    <th>提交者</th>
+                    <th>插件名称</th>
+                    <th>版本</th>
                     <th>描述</th>
-                    <th>价格</th>
                     <th>状态</th>
-                    <th>下载次数</th>
-                    <th>时间</th>
-                    <th>操作</th>
+                    <th>安装时间</th>
+                    <th style="width:180px;">操作</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($plugins as $plugin): ?>
-                <tr>
-                    <td><?= $plugin['id'] ?? '' ?></td>
-                    <td><?= htmlspecialchars($plugin['name'] ?? '') ?></td>
-                    <td><?= htmlspecialchars($plugin['submitter'] ?? '') ?></td>
-                    <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($plugin['description'] ?? '') ?></td>
-                    <td>¥<?= number_format($plugin['price'] ?? 0, 2) ?></td>
-                    <td>
-                        <?php $status = $plugin['status'] ?? 0; ?>
-                        <span class="badge <?= $status === 1 ? 'badge-success' : ($status === -1 ? 'badge-danger' : 'badge-warning') ?>">
-                            <?= $status === 1 ? '已通过' : ($status === -1 ? '已驳回' : '待审核') ?>
-                        </span>
-                    </td>
-                    <td><?= $plugin['downloads'] ?? 0 ?></td>
-                    <td><?= htmlspecialchars($plugin['created_at'] ?? '') ?></td>
-                    <td>
-                        <?php if (($plugin['status'] ?? 0) === 0): ?>
-                        <form method="POST" action="/admin/approvePlugin" data-ajax="true" style="display:inline;">
-                            <input type="hidden" name="id" value="<?= $plugin['id'] ?? 0 ?>">
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                <svg width="12" height="12" style="vertical-align: middle;"><use href="#i-check"/></svg> 通过
-                            </button>
-                        </form>
-                        <form method="POST" action="/admin/rejectPlugin" data-ajax="true" style="display:inline;">
-                            <input type="hidden" name="id" value="<?= $plugin['id'] ?? 0 ?>">
-                            <button type="submit" class="btn btn-sm" style="background: #ff4d4f; color: #fff;">
-                                <svg width="12" height="12" style="vertical-align: middle;"><use href="#i-close"/></svg> 驳回
-                            </button>
-                        </form>
-                        <?php endif; ?>
-                        <a href="javascript:void(0)" class="btn btn-outline btn-sm" onclick="openEditPluginModal(<?= $plugin['id'] ?? 0 ?>, '<?= htmlspecialchars($plugin['name'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($plugin['description'] ?? '', ENT_QUOTES) ?>', <?= $plugin['price'] ?? 0 ?>, '<?= htmlspecialchars($plugin['version'] ?? '', ENT_QUOTES) ?>')">
-                            <svg width="12" height="12" style="vertical-align: middle;"><use href="#i-edit"/></svg> 编辑
-                        </a>
-                        <form method="POST" action="/admin/deletePlugin" data-ajax="true" style="display:inline;">
-                            <input type="hidden" name="id" value="<?= $plugin['id'] ?? 0 ?>">
-                            <button type="submit" class="btn btn-sm" style="background: #ff4d4f; color: #fff;" onclick="return confirm('确认删除该插件?')">
-                                <svg width="12" height="12" style="vertical-align: middle;"><use href="#i-trash"/></svg> 删除
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
+                <?php if (!empty($plugins)): ?>
+                    <?php foreach ($plugins as $plugin): ?>
+                    <tr>
+                        <td><?= $plugin['id'] ?? '' ?></td>
+                        <td>
+                            <div class="admin-user-cell">
+                                <div class="user-avatar" style="background:linear-gradient(135deg,#722ed1,#531dab);">
+                                    <svg width="14" height="14" style="color:#fff;"><use href="#i-box"/></svg>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name"><?= htmlspecialchars($plugin['name'] ?? '') ?></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-info"><?= htmlspecialchars($plugin['version'] ?? '') ?></span></td>
+                        <td style="color:var(--text-secondary);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($plugin['description'] ?? '') ?></td>
+                        <td>
+                            <?php if (($plugin['status'] ?? 0) == 1): ?>
+                                <span class="badge badge-success"><span class="tag-dot"></span>已启用</span>
+                            <?php else: ?>
+                                <span class="badge badge-warning"><span class="tag-dot"></span>已禁用</span>
+                            <?php endif; ?>
+                        </td>
+                        <td style="font-size:12px;color:var(--text-muted);"><?= htmlspecialchars($plugin['created_at'] ?? '') ?></td>
+                        <td>
+                            <div class="admin-actions-cell">
+                                <form method="POST" action="/admin/togglePlugin" data-ajax="true" style="display:inline;">
+                                    <input type="hidden" name="id" value="<?= $plugin['id'] ?? 0 ?>">
+                                    <input type="hidden" name="status" value="<?= ($plugin['status'] ?? 0) == 1 ? 0 : 1 ?>">
+                                    <button type="submit" class="btn btn-outline btn-sm"><?= ($plugin['status'] ?? 0) == 1 ? '禁用' : '启用' ?></button>
+                                </form>
+                                <form method="POST" action="/admin/deletePlugin" data-ajax="true" style="display:inline;" onsubmit="return confirm('确认删除该插件？');">
+                                    <input type="hidden" name="id" value="<?= $plugin['id'] ?? 0 ?>">
+                                    <button type="submit" class="btn btn-sm" style="background:var(--danger);color:#fff;">
+                                        <svg width="12" height="12" style="vertical-align:middle;"><use href="#i-trash"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr><td colspan="7"><div class="empty-state"><div class="empty-icon"><svg><use href="#i-box"/></svg></div><div class="empty-text">暂无插件数据</div></div></td></tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
-    <?php else: ?>
-    <div class="empty-state" style="text-align: center; padding: 60px; color: #687690;">暂无插件数据</div>
-    <?php endif; ?>
 </div>
 
-<?php if (($totalPages ?? 1) > 1): ?>
-<div class="pagination">
-    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-    <a href="?page=<?= $i ?>" class="<?= ($page ?? 1) == $i ? 'active' : '' ?>"><?= $i ?></a>
-    <?php endfor; ?>
-</div>
-<?php endif; ?>
-
-<!-- Edit Plugin Modal -->
-<div class="announcement-modal" id="editPluginModal">
-    <div class="am-overlay" onclick="closeEditPluginModal()"></div>
-    <div class="am-dialog" style="max-width: 500px;">
-        <div class="am-header">
-            <h3>编辑插件</h3>
-            <button class="am-close" onclick="closeEditPluginModal()"><svg width="18" height="18"><use href="#i-close"/></svg></button>
+<div class="admin-modal-overlay" id="pluginModal">
+    <div class="admin-modal">
+        <div class="admin-modal-header">
+            <h3>安装插件</h3>
+            <button class="admin-modal-close" onclick="closePluginModal()"><svg width="18" height="18"><use href="#i-close"/></svg></button>
         </div>
-        <div class="am-body">
-            <form method="POST" action="/admin/editPlugin" data-ajax="true" id="editPluginForm">
-                <input type="hidden" name="id" id="plugin_id">
-                <div class="form-group">
-                    <label class="form-label" for="plugin_name">名称</label>
-                    <input type="text" class="form-control" id="plugin_name" name="name" required>
+        <div class="admin-modal-body">
+            <form method="POST" action="/admin/addPlugin" data-ajax="true">
+                <div class="admin-form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">插件名称</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">版本号</label>
+                        <input type="text" class="form-control" name="version" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">描述</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">插件目录</label>
+                        <input type="text" class="form-control" name="path" placeholder="如 plugins/my-plugin" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label" for="plugin_desc">描述</label>
-                    <textarea class="form-control textarea" id="plugin_desc" name="description" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="plugin_price">价格</label>
-                    <input type="number" class="form-control" id="plugin_price" name="price" step="0.01" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="plugin_version">版本</label>
-                    <input type="text" class="form-control" id="plugin_version" name="version" placeholder="1.0.0">
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">保存修改</button>
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">安装插件</button>
             </form>
         </div>
     </div>
 </div>
 
 <script>
-function openEditPluginModal(id, name, desc, price, version) {
-    document.getElementById('plugin_id').value = id;
-    document.getElementById('plugin_name').value = name;
-    document.getElementById('plugin_desc').value = desc;
-    document.getElementById('plugin_price').value = price;
-    document.getElementById('plugin_version').value = version;
-    document.getElementById('editPluginModal').classList.add('show');
-}
-function closeEditPluginModal() {
-    document.getElementById('editPluginModal').classList.remove('show');
-}
+function openPluginModal(){ document.getElementById('pluginModal').classList.add('show'); }
+function closePluginModal(){ document.getElementById('pluginModal').classList.remove('show'); }
 </script>

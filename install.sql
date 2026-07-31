@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS `qf_users`;
 CREATE TABLE `qf_users` (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `username` varchar(50) NOT NULL COMMENT '用户名',
-  `email` varchar(100) NOT NULL COMMENT '邮箱',
+  `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
   `password` varchar(255) NOT NULL COMMENT '密码',
   `avatar` varchar(255) DEFAULT NULL COMMENT '头像',
   `qq` varchar(20) DEFAULT NULL COMMENT 'QQ号',
@@ -27,7 +27,7 @@ CREATE TABLE `qf_users` (
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`)
+  UNIQUE KEY `phone` (`phone`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 -- ----------------------------
@@ -381,13 +381,16 @@ INSERT INTO `qf_settings` VALUES
 (1, 'site_name', '熵云', '网站名称'),
 (2, 'site_url', 'https://auth.qeefg.com', '网站地址'),
 (3, 'site_keywords', '授权站,软件授权,授权管理', 'SEO关键词'),
-(4, 'site_description', '便捷快速的授权管理系统', '网站描述'),
-(5, 'qq_group', '123456789', 'QQ群'),
-(6, 'contact_qq', '123456789', '联系QQ'),
-(7, 'require_email_register', '1', '注册是否需要邮箱验证:0否1是'),
-(8, 'require_phone_verify', '0', '是否需要手机验证:0否1是'),
-(9, 'site_logo', '', '网站LOGO路径'),
-(10, 'site_favicon', '', '网站Favicon路径');
+(4, 'site_description', '专业的软件授权与许可证服务平台', '网站描述'),
+(5, 'qq_group', '441027731', 'QQ群'),
+(6, 'contact_qq', '2264455923', '联系QQ'),
+(7, 'require_email_register', '1', '注册是否需要邮箱:0否1是'),
+(8, 'phone_verify', '0', '注册时手机验证码开关:0否1是'),
+(9, 'email_select_mode', 'random', '邮箱选择模式:random随机,sequence顺序'),
+(10, 'site_announcement', '欢迎使用熵云寄售系统！\n\n现处于测试阶段，产品免费下载，免费使用，如您通过付费等渠道知晓本系统，您可能正在遭遇源码转卖。\n\n官方测试交流群：441027731\n如遇到BUG请联系QQ 2264455923', '网站公告内容'),
+(11, 'site_logo', '', '网站LOGO路径'),
+(12, 'site_favicon', '', '网站Favicon路径'),
+(13, 'icp', '', 'ICP备案号');
 
 -- 插入默认邮件模板
 INSERT INTO `qf_email_templates` VALUES

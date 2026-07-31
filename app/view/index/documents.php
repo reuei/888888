@@ -20,37 +20,41 @@
     </svg>
 
     <header class="site-header">
-        <div class="header-inner container">
-            <a href="/" class="logo"><span class="logo-mark">&#9729;</span><span>熵云</span></a>
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <span class="logo-mark"><?= htmlspecialchars(mb_substr($siteSettings['site_name'] ?? '熵云', 0, 1)) ?></span>
+                <span><?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?></span>
+            </a>
             <nav class="main-nav">
                 <a href="/" class="nav-link">首页</a>
                 <a href="/platform" class="nav-link">平台能力</a>
                 <a href="/license-query" class="nav-link">授权查询</a>
                 <a href="/documents" class="nav-link active">文档中心</a>
-                <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncementPopup()">网站公告</a>
+                <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncement()">网站公告</a>
             </nav>
             <div class="auth-links">
-                <a href="/login" class="btn btn-ghost btn-sm">登录</a>
-                <a href="/register" class="btn btn-primary btn-sm">注册</a>
+                <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
+                <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
             </div>
-            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单"><span></span><span></span><span></span></button>
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单">
+                <span></span><span></span><span></span>
+            </button>
         </div>
     </header>
 
-    <div class="mobile-nav" id="mobileNav">
+    <nav class="mobile-nav" id="mobileNav">
         <a href="/" class="nav-link">首页</a>
         <a href="/platform" class="nav-link">平台能力</a>
         <a href="/license-query" class="nav-link">授权查询</a>
-        <a href="/documents" class="nav-link">文档中心</a>
-        <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncementPopup()">网站公告</a>
-    </div>
-
-    <div style="padding-top: 80px;">
-        <div class="container">
-            <h1 style="font-size: 28px; color: #1a1a2e; margin-bottom: 8px;">文档中心</h1>
-            <p style="color: #687690; font-size: 14px; margin-bottom: 32px;">查阅产品文档与使用指南</p>
+        <a href="/documents" class="nav-link active">文档中心</a>
+        <a href="javascript:void(0)" class="nav-link" onclick="showAnnouncement()">网站公告</a>
+        <div class="auth-links" style="margin-top: 16px; display: flex; gap: 10px; justify-content: center;">
+            <a href="/user/login" class="btn btn-ghost btn-sm">登录</a>
+            <a href="/user/register" class="btn btn-primary btn-sm">注册</a>
         </div>
-    </div>
+    </nav>
+
+    <div style="padding-top: 80px;"></div>
 
     <div class="docs-layout">
         <aside class="docs-sidebar">
@@ -67,7 +71,7 @@
                     </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div style="padding: 20px; color: #687690; text-align: center;">暂无文档</div>
+                    <div style="padding: 20px; color: var(--text-secondary); text-align: center;">暂无文档</div>
                 <?php endif; ?>
             </div>
         </aside>
@@ -80,75 +84,45 @@
                 </div>
             </div>
             <?php else: ?>
-            <div class="empty-state" style="text-align: center; padding: 80px 20px;">
-                <svg width="64" height="64" style="color: #c0c8d8; margin-bottom: 16px;"><use href="#i-doc"/></svg>
-                <h3 style="font-size: 18px; color: #1a1a2e; margin-bottom: 8px;">选择文档</h3>
-                <p style="color: #687690; font-size: 14px;">请从左侧目录选择一篇文档查看</p>
+            <div class="empty-state" style="padding: 80px 20px;">
+                <svg width="64" height="64" style="color: var(--text-muted); margin-bottom: 16px;"><use href="#i-doc"/></svg>
+                <h3 style="font-size: 18px; color: var(--text); margin-bottom: 8px;">选择文档</h3>
+                <p style="color: var(--text-secondary); font-size: 14px;">请从左侧目录选择一篇文档查看</p>
             </div>
             <?php endif; ?>
         </main>
     </div>
 
-    <footer class="site-footer">
-        <div class="container" style="text-align: center;">
-            <p style="margin-bottom: 8px;">&copy; <?= date('Y') ?> <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> All Rights Reserved.</p>
-            <?php if (!empty($siteSettings['icp'])): ?>
-            <p style="color: #687690; font-size: 12px;"><?= htmlspecialchars($siteSettings['icp']) ?></p>
-            <?php endif; ?>
-        </div>
-    </footer>
-
-    <!-- Announcement Popup Modal -->
     <?php if (!empty($siteSettings['announcement'])): ?>
     <div class="announcement-modal" id="announcementModal">
         <div class="am-overlay"></div>
         <div class="am-dialog">
             <div class="am-header">
                 <h3><svg width="18" height="18" style="vertical-align: middle; margin-right: 6px;"><use href="#i-bell"/></svg>网站公告</h3>
-                <button class="am-close" onclick="hideAnnouncement()"><svg width="18" height="18"><use href="#i-close"/></svg></button>
+                <button class="am-close" id="amCloseBtn"><svg width="18" height="18"><use href="#i-close"/></svg></button>
             </div>
             <div class="am-body">
-                <p style="color: #444; line-height: 1.8; white-space: pre-wrap;"><?= htmlspecialchars($siteSettings['announcement']) ?></p>
+                <p style="color: var(--text-secondary); line-height: 1.8; white-space: pre-wrap;"><?= htmlspecialchars($siteSettings['announcement']) ?></p>
             </div>
             <div class="am-footer">
-                <button class="btn btn-primary btn-sm" onclick="hideAnnouncement()">我知道了</button>
+                <button class="btn btn-primary btn-sm" id="amConfirmBtn">我知道了</button>
             </div>
         </div>
     </div>
     <?php endif; ?>
 
-    <script>
-        // Hamburger menu
-        document.getElementById('hamburgerBtn').addEventListener('click', function() {
-            document.getElementById('mobileNav').classList.toggle('show');
-        });
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="/">首页</a>
+                <a href="/platform">平台能力</a>
+                <a href="/license-query">授权查询</a>
+                <a href="/documents">文档中心</a>
+            </div>
+            <p class="footer-copyright">© <?= date('Y') ?> <?= htmlspecialchars($siteSettings['site_name'] ?? '熵云') ?> All Rights Reserved. <?= !empty($siteSettings['icp']) ? htmlspecialchars($siteSettings['icp']) : '' ?></p>
+        </div>
+    </footer>
 
-        // Announcement popup
-        function showAnnouncementPopup() {
-            var modal = document.getElementById('announcementModal');
-            if (modal) {
-                modal.classList.add('show');
-            }
-        }
-        function hideAnnouncement() {
-            var modal = document.getElementById('announcementModal');
-            if (modal) {
-                modal.classList.remove('show');
-            }
-        }
-        // Close modal on overlay click
-        document.addEventListener('click', function(e) {
-            var modal = document.getElementById('announcementModal');
-            if (modal && e.target.classList.contains('am-overlay')) {
-                hideAnnouncement();
-            }
-        });
-        // Close modal on Escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                hideAnnouncement();
-            }
-        });
-    </script>
+    <script src="/static/js/main.js"></script>
 </body>
 </html>

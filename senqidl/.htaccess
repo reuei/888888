@@ -1,0 +1,62 @@
+# 森企动力 - Apache配置文件
+
+# 开启URL重写
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # 如果请求的是真实文件或目录，直接访问
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # 友好URL重写
+    RewriteRule ^case/([0-9]+)$ case_detail.php?id=$1 [L]
+    RewriteRule ^news/([0-9]+)$ news_detail.php?id=$1 [L]
+    RewriteRule ^case$ case.php [L]
+    RewriteRule ^news$ news.php [L]
+    RewriteRule ^service$ service.php [L]
+    RewriteRule ^about$ about.php [L]
+    RewriteRule ^contact$ contact.php [L]
+</IfModule>
+
+# 默认文档
+DirectoryIndex index.php index.html
+
+# 禁止访问敏感目录
+Options -Indexes
+
+# 禁止访问数据目录
+<FilesMatch "\.(json|sql|log)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# PHP设置
+php_flag display_errors off
+php_value upload_max_filesize 20M
+php_value post_max_size 20M
+php_value max_execution_time 300
+
+# 压缩静态资源
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/xml+rss application/rss+xml image/svg+xml
+</IfModule>
+
+# 缓存静态资源
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# 安全头
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>

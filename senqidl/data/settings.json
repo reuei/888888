@@ -1,0 +1,33 @@
+{
+    "site_name": "森企动力",
+    "site_title": "森企动力 - 品牌数字化解决方案专家",
+    "logo": "\/assets\/images\/logo.png",
+    "favicon": "\/assets\/images\/favicon.ico",
+    "icp": "",
+    "copyright": "© 2024 森企动力. All Rights Reserved.",
+    "contact_phone": "400-888-8888",
+    "contact_email": "info@senqidl.com",
+    "contact_address": "中国·深圳",
+    "about_title": "关于森企动力",
+    "about_content": "森企动力是一家专注于品牌数字化的服务公司，致力于为企业提供数字技术驱动的品牌成长解决方案。我们以\"让数字化更有价值\"为使命，帮助企业在数字时代实现品牌价值最大化。",
+    "home_title": "品牌数字化解决方案专家",
+    "home_subtitle": "提升企业的数字形象",
+    "home_stats": [
+        {
+            "num": "5000+",
+            "label": "用户共同的选择"
+        },
+        {
+            "num": "10+",
+            "label": "年行业经验"
+        },
+        {
+            "num": "200+",
+            "label": "专业团队"
+        },
+        {
+            "num": "100%",
+            "label": "客户满意度"
+        }
+    ]
+}

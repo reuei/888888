@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="400" viewBox="0 0 750 400">
+  <defs>
+    <linearGradient id="swGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#1a5fff"/>
+    </linearGradient>
+  </defs>
+  <rect fill="url(#swGrad)" width="750" height="400"/>
+  <g opacity="0.1">
+    <rect x="50" y="50" width="120" height="120" rx="16" fill="white"/>
+    <rect x="200" y="50" width="120" height="120" rx="16" fill="white"/>
+    <rect x="350" y="50" width="120" height="120" rx="16" fill="white"/>
+    <rect x="500" y="50" width="120" height="120" rx="16" fill="white"/>
+    <rect x="125" y="200" width="120" height="120" rx="16" fill="white"/>
+    <rect x="275" y="200" width="120" height="120" rx="16" fill="white"/>
+    <rect x="425" y="200" width="120" height="120" rx="16" fill="white"/>
+  </g>
+  <text x="50" y="360" font-family="'Microsoft YaHei', sans-serif" font-size="32" font-weight="bold" fill="white">全链路服务</text>
+  <text x="50" y="390" font-family="'Microsoft YaHei', sans-serif" font-size="16" fill="white" opacity="0.8">网站建设 / SEO优化 / 外贸营销 / 品牌设计</text>
+</svg>

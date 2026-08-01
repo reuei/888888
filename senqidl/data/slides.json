@@ -1,0 +1,29 @@
+[
+    {
+        "id": 1,
+        "title": "品牌数字化解决方案专家",
+        "subtitle": "提升企业的数字形象",
+        "image": "\/assets\/images\/slide1.jpg",
+        "link": "",
+        "sort": 1,
+        "status": 1
+    },
+    {
+        "id": 2,
+        "title": "数字技术驱动的品牌成长",
+        "subtitle": "品牌数字化成长的服务公司",
+        "image": "\/assets\/images\/slide2.jpg",
+        "link": "",
+        "sort": 2,
+        "status": 1
+    },
+    {
+        "id": 3,
+        "title": "智能外贸数字营销服务",
+        "subtitle": "助力中国品牌全球化",
+        "image": "\/assets\/images\/slide3.jpg",
+        "link": "",
+        "sort": 3,
+        "status": 1
+    }
+]
